@@ -401,6 +401,9 @@ button.li:hover{background:var(--sunk)}
 .col:hover,.col:focus-visible{background:var(--sunk)}
 .xl{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:3px;margin-top:4px;font:500 11px var(--f-mono);color:var(--ink3);text-align:center}
 .tipline{margin-top:8px;min-height:20px}
+.kodkutu{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--r);background:var(--sunk);border:1px solid var(--line)}
+.kodkutu b{font-size:clamp(18px,4.6vw,24px);letter-spacing:.04em;overflow-wrap:anywhere}
+.kodmesaj{margin:0;white-space:pre-wrap;font:13px/1.5 var(--f-body);color:var(--ink2);background:var(--card);border:1px dashed var(--line);border-radius:8px;padding:10px}
 .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--form-ink);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .duyuru{display:flex;gap:12px;align-items:flex-start;max-width:880px;margin-bottom:18px;padding:14px 14px 14px 16px;border-radius:var(--r);background:var(--form-soft);border:1px solid var(--form)}
 .duyuru-i{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--form);color:#fff}
@@ -4618,7 +4621,7 @@ function daysLeft() {
 /* ---------- yapay zekâ (Claude) ---------- */
 const AI = { fn: null, ready: !(window.claude && typeof window.claude.use === "function"), off: false, images: false };
 /* akeakademi.com: AI, erişim koduyla bu sitenin sunucusundaki /api/ai üzerinden çalışır (anahtar sunucuda gizli kalır) */
-const WEBAI = { code: LS.get("ake.kod") || "", plan: LS.get("ake.plan") || "" };
+const WEBAI = { code: LS.get("ake.kod") || "", plan: LS.get("ake.plan") || "", bitis: LS.get("ake.bitis") || "" };
 const ayKey = () => dayKey().slice(0, 7);
 function aiUsage() { try { const o = JSON.parse(LS.get("ake.aiay") || "{}"); return o.m === ayKey() ? (o.n || 0) : 0; } catch (e) { return 0; } }
 function aiLimit() { const v = typeof AYAR !== "undefined" ? (WEBAI.plan === "premium" ? AYAR.aiPremium : AYAR.aiOrta) : 0; return Number(String(v || "").replace(/[^\d]/g, "")) || 0; }
@@ -4650,7 +4653,7 @@ function webAI() {
     catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network" }; }
     if (!r.ok) {
       let j = {}; try { j = await r.json(); } catch (e) { }
-      if (r.status === 401) { webAIKapat(); throw { code: "kod" }; }
+      if (r.status === 401) { webAIKapat(); throw { code: j.error === "suresi" ? "suresi" : "kod" }; }
       throw { code: j.error || "server" };
     }
     aiCount();
@@ -4672,7 +4675,7 @@ function webAI() {
   return fn;
 }
 function webAIAc() { AI.fn = webAI(); AI.off = false; AI.images = true; AI.imgTypes = ["image/jpeg", "image/png", "image/webp"]; }
-function webAIKapat() { WEBAI.code = ""; WEBAI.plan = ""; LS.del("ake.kod"); LS.del("ake.plan"); AI.fn = null; AI.images = false; }
+function webAIKapat() { WEBAI.code = ""; WEBAI.plan = ""; WEBAI.bitis = ""; LS.del("ake.kod"); LS.del("ake.plan"); LS.del("ake.bitis"); AI.fn = null; AI.images = false; }
 const premOnly = () => !(window.claude && typeof window.claude.use === "function") && WEBAI.plan !== "premium";
 async function initAI() {
   if (!(window.claude && typeof window.claude.use === "function")) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; }
@@ -4690,7 +4693,7 @@ function aiErr(e) {
     invalid_json: "Yanıt beklenen biçimde gelmedi. Tekrar dene.", image_rejected: "Görsel kabul edilmedi. JPEG, PNG ya da WebP biçiminde, daha küçük bir dosya dene.",
     images_unavailable: "Bu görünümde görsel gönderilemiyor.", prompt_too_large: "Metin çok uzun. Daha kısa bir parça gönder.",
     empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "",
-    kod: "Erişim kodun geçersiz ya da süresi dolmuş. Yeni kod için bizimle iletişime geç.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
+    kod: "Erişim kodun geçerli değil. Yeni kod için bizimle iletişime geç.", suresi: "Paketinin süresi doldu. Devam etmek için Paketler sayfasından yenileyebilirsin.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
     network: "İnternet bağlantısını kontrol edip tekrar dene.", overloaded: "AI şu an çok yoğun. Birkaç dakika sonra tekrar dene.",
     yapilandirma: "AI sunucusu henüz ayarlanmamış. Biraz sonra tekrar dene.", server: "AI şu an yanıt veremedi. Tekrar dene." })[code] ?? "Bağlantıda bir sorun oldu. Tekrar dene.";
 }
@@ -5090,7 +5093,7 @@ function vSettings() {
     <p class="small muted">${cloud.state === "cloud" ? "İlerlemen Claude hesabına bağlı ve sana ayrı tutuluyor; aynı hesapla başka cihazdan açtığında kaldığın yerden devam edersin." : "İlerlemen bu tarayıcıda saklanıyor. Cihaz değiştirirken ya da tarayıcı verisini silmeden önce yedek al."}</p>
     ${!IN_CLAUDE ? "" : `<p class="small muted">${cloud.state === "cloud" ? "Çalışma özetin (sitedeki adın, alanın ve hedefin, çözdüğün soru sayısı ve başarın, deneme sonuçların, giriş zamanların, cihaz türün) site yöneticisinin panelinde görünür. Yanlış defterin, kartların, planın ve AI öğretmenle yazışmaların yalnızca sende kalır." : "Siteyi Claude'da açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün site yöneticisine anlık görünebilir."} Ayrıntılar <a href="#kvkk">KVKK Aydınlatma Metni</a>'nde.</p>`}
     <div class="row"><button class="btn" data-a="exportData">Yedeği indir</button><button class="btn" data-a="importAsk">Yedekten geri yükle</button><button class="btn ghost" data-a="resetAsk">Tüm ilerlemeyi sıfırla</button></div></div>
-  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı</p>
+  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı</p>
     <p class="small muted">Kodun bu cihazda kayıtlı. Başka bir cihazda kullanmak için AI öğretmen sayfasına aynı kodu girmen yeterli.</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>`
     : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`}
   <div class="card stack" id="uygulama"><h2>Telefona uygulama gibi ekle</h2>
@@ -5490,13 +5493,13 @@ const inDay = (ts, k) => nn(ts) && dayKey(new Date(nn(ts))) === k;
 /* Site sahibi siteyi açınca doğrudan panel gelir; "Uygulamaya dön" dediyse bir sonraki açılışta uygulama gelir */
 UI.admin = LS.get("ake.admin") === "1" || (LS.get("ake.admin") === null && LS.get("ake.owner") === "1");
 const adminMode = () => !!UI.admin && IN_CLAUDE && (cloud.owner || !cloud.ownerKnown);
-const ADM_TABS = [["ozet", "Genel bakış", "chart"], ["kisiler", "Kişiler", "users"], ["bildirimler", "Bildirimler", "inbox"], ["ayarlar", "Duyuru ve ayarlar", "bell"]];
+const ADM_TABS = [["ozet", "Genel bakış", "chart"], ["kodlar", "Kodlar", "key"], ["kisiler", "Kişiler", "users"], ["bildirimler", "Bildirimler", "inbox"], ["ayarlar", "Duyuru ve ayarlar", "bell"]];
 function vAdminShell() {
   const t = ADM.tab || "ozet";
   let body;
   try {
     body = !cloud.ownerKnown ? `<div class="view"><div class="empty">Yönetim paneli açılıyor…</div></div>`
-      : ADM.sel ? vAdminOne(ADM.sel) : t === "kisiler" ? vAdmPeople() : t === "bildirimler" ? vReports() : t === "ayarlar" ? vAdmSettings() : vAdmOverview();
+      : ADM.sel ? vAdminOne(ADM.sel) : t === "kisiler" ? vAdmPeople() : t === "bildirimler" ? vReports() : t === "ayarlar" ? vAdmSettings() : t === "kodlar" ? vAdmKodlar() : vAdmOverview();
   } catch (e) { console.error(e); body = `<div class="view"><div class="card"><h2>Bu bölüm açılamadı</h2><p class="muted" style="margin-top:8px">Sayfayı yenilemeyi dene.</p></div></div>`; }
   const live = admLive().filter(p => !p.isMe).length;
   return `<header class="top"><div class="top-in adm-in">
@@ -5741,6 +5744,92 @@ const ADM_SUB = {
     render();
   }
 };
+
+
+/* ---------- erişim kodları: satılan her paket için süreli, imzalı kod (akeakademi.com sunucusu doğrular) ---------- */
+Object.assign(IC, { key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>' });
+const KB32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", KEPOCH = Date.UTC(2026, 0, 1);
+const KPAKET = [["orta-ay", "Orta · 1 ay", "orta", 30], ["orta-yil", "Orta · 1 yıl", "orta", 365], ["premium-ay", "Premium · 1 ay", "premium", 30], ["premium-yil", "Premium · 1 yıl", "premium", 365]];
+const KODG = { sec: null, loaded: false, list: null, son: null, busy: false, err: "", sel: "premium-ay", goster: false };
+const kIso = n => new Date(KEPOCH + n * 86400000).toISOString().slice(0, 10);
+const kTarih = iso => new Date(iso + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+function kBugun() {
+  const [y, m, d] = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()).split("-").map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - KEPOCH) / 86400000);
+}
+function kB32(bytes) { let bits = 0, val = 0, out = ""; for (const x of bytes) { val = ((val << 8) | x) & 0xffff; bits += 8; while (bits >= 5) { bits -= 5; out += KB32[(val >> bits) & 31]; } } return out; }
+const kHex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)));
+async function kodUret(plan, gun) {
+  const key = await crypto.subtle.importKey("raw", kHex(KODG.sec), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const exp = kBugun() + gun, b = new Uint8Array(10);
+  b[0] = 0x10 | (plan === "premium" ? 2 : 1); b[1] = exp >> 8; b[2] = exp & 255; crypto.getRandomValues(b.subarray(3, 5));
+  const mac = new Uint8Array(await crypto.subtle.sign("HMAC", key, b.slice(0, 5))); b.set(mac.subarray(0, 5), 5);
+  const k = kB32(b);
+  return { kod: "AKE-" + k.match(/.{4}/g).join("-"), key: k, exp, bitis: kIso(exp) };
+}
+function kodYukle() {
+  if (KODG.loaded || !ADM.db) return; KODG.loaded = true;
+  ADM.db.doc("gizli/anahtar").get().then(s => { const k = s.exists ? String((s.data() || {}).k || "") : ""; KODG.sec = /^[0-9a-f]{64}$/.test(k) ? k : ""; admPaint(); })
+    .catch(() => { KODG.sec = ""; KODG.err = "Kod ayarları okunamadı. Sayfayı yenileyip tekrar dene."; admPaint(); });
+  try { ADM.db.collection("kodlar").limit(1000).onSnapshot(q => { KODG.list = q.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).sort((a, b) => nn(b.ts) - nn(a.ts)); admPaint(); }, () => { KODG.list = KODG.list || []; admPaint(); }); } catch (e) { KODG.list = []; }
+}
+const kMesaj = r => `Merhaba! AKE Akademi ${r.paketAd} paketin hazır 🎉\nErişim kodun: ${r.kod}\nKullanmak için akeakademi.com adresinde AI öğretmen sayfasını aç ve kodu gir.\nPaketin ${kTarih(r.bitis)} tarihine kadar geçerli. İyi çalışmalar!`;
+function vAdmKodlar() {
+  const head = `<div class="vhead"><span class="eyebrow">Yalnızca sen görüyorsun</span><h1>Erişim kodları</h1><p>Shopier'den bir satış geldiğinde buradan o pakete uygun kodu üret ve alıcıya gönder. Aylık kod 30 gün, yıllık kod 365 gün sonra kendiliğinden kapanır.</p></div>`;
+  if (!ADM.db) return `<div class="view">${head}<div class="empty">Kodları yönetmek için sayfayı Claude hesabınla açman gerekir.</div></div>`;
+  kodYukle();
+  if (KODG.sec === null) return `<div class="view">${head}<div class="empty">Yükleniyor…</div></div>`;
+  const err = KODG.err ? `<p class="note">${esc(KODG.err)}</p>` : "";
+  if (!KODG.sec) return `<div class="view">${head}${err}
+    <div class="card stack"><h2>Bir kerelik kurulum</h2>
+      <p class="muted">Kodların sahte üretilememesi için önce gizli bir anahtar oluşturacağız. Bu anahtar yalnızca bu panelde ve Vercel'in gizli ayarlarında durur.</p>
+      <button class="btn pri" style="align-self:flex-start" data-a="kodKur"${KODG.busy ? " disabled" : ""}>Gizli anahtarı oluştur</button></div></div>`;
+  const R = KODG.son, list = KODG.list || [], bugun = kBugun();
+  return `<div class="view">${head}${err}
+  <div class="card stack"><h2>Yeni kod üret</h2>
+    <div class="segs" role="group" aria-label="Paket">${KPAKET.map(([k, l]) => `<button type="button" class="${KODG.sel === k ? "on" : ""}" data-a="kodSec" data-k="${k}" aria-pressed="${KODG.sel === k}">${l}</button>`).join("")}</div>
+    <label class="f">Not (isteğe bağlı)<input class="in" id="kodNot" maxlength="80" placeholder="Örn. alıcının adı ya da Shopier sipariş numarası"></label>
+    <button class="btn acc" style="align-self:flex-start" data-a="kodUret"${KODG.busy ? " disabled" : ""}>${KODG.busy ? "Üretiliyor…" : "Kod üret"}</button>
+    ${R ? `<div class="kodkutu"><span class="small muted">${esc(R.paketAd)} · ${esc(kTarih(R.bitis))} tarihine kadar geçerli</span><b class="mono" id="kodSon">${esc(R.kod)}</b>
+      <div class="row"><button class="btn sm" data-a="kodKopya" data-t="kod">Kodu kopyala</button><button class="btn sm pri" data-a="kodKopya" data-t="mesaj">Alıcıya gönderilecek mesajı kopyala</button></div>
+      <pre class="kodmesaj">${esc(kMesaj(R))}</pre></div>` : ""}
+  </div>
+  <div class="card"><div class="card-h"><h2>Üretilen kodlar</h2><span class="pill">${list.length}</span></div>
+    ${list.length ? `<div class="list">${list.map(x => { const aktif = nn(x.exp) >= bugun; return `<div class="li"><div class="grow"><div class="t mono">${esc(x.kod || "")}</div><div class="s">${esc(x.paketAd || "")} · ${esc(fmtDT(x.ts))}${x.not ? " · " + esc(x.not) : ""}</div></div><span class="pill ${aktif ? "ok" : ""}">${aktif ? "bitiş " + esc(kTarih(x.bitis || kIso(nn(x.exp)))) : "süresi doldu"}</span></div>`; }).join("")}</div>` : `<div class="empty">Henüz kod üretmedin.</div>`}
+  </div>
+  <div class="card stack"><h2>Kurulum bilgisi</h2>
+    <p class="small muted">Vercel'de <b>AKE_GIZLI</b> adlı ayarın değeri aşağıdaki anahtar olmalı. Bu anahtarı kimseyle paylaşma; elinde olan biri istediği kadar kod üretebilir. Bir kodu iptal etmek istersen Vercel'de <b>AKE_IPTAL</b> ayarına o kodu ekleyip yeniden dağıtım (Redeploy) yap.</p>
+    ${KODG.goster ? `<input class="in mono" id="kodSec" readonly value="${esc(KODG.sec)}" style="font-size:13px">` : ""}
+    <div class="row"><button class="btn sm" data-a="kodGoster">${KODG.goster ? "Gizle" : "Anahtarı göster"}</button>${KODG.goster ? `<button class="btn sm" data-a="kodKopya" data-t="sec">Anahtarı kopyala</button>` : ""}</div>
+  </div></div>`;
+}
+async function kKopya(text) {
+  try { await navigator.clipboard.writeText(text); toast("Kopyalandı."); }
+  catch (e) { openModal("Kopyala", `<p class="small muted">Metni seçip kopyala.</p><textarea class="in mono" readonly style="min-height:140px;font-size:13px">${esc(text)}</textarea>`); }
+}
+Object.assign(ADM_ACT, {
+  async kodKur() {
+    if (KODG.busy || KODG.sec) return; KODG.busy = true; render();
+    const b = crypto.getRandomValues(new Uint8Array(32)), k = [...b].map(x => x.toString(16).padStart(2, "0")).join("");
+    try { await ADM.db.doc("gizli/anahtar").set({ k, ts: Date.now() }); KODG.sec = k; KODG.goster = true; toast("Gizli anahtar oluşturuldu. Şimdi Vercel'e ekle."); }
+    catch (e) { KODG.err = "Anahtar kaydedilemedi. Tekrar dene."; }
+    KODG.busy = false; render();
+  },
+  kodSec(d) { KODG.sel = d.k; render(); },
+  kodGoster() { KODG.goster = !KODG.goster; render(); },
+  async kodUret() {
+    if (KODG.busy || !KODG.sec) return;
+    const P = KPAKET.find(x => x[0] === KODG.sel) || KPAKET[2], not = ((document.getElementById("kodNot") || {}).value || "").trim().slice(0, 80);
+    KODG.busy = true; render();
+    try {
+      const r = await kodUret(P[2], P[3]), rec = { kod: r.kod, plan: P[2], gun: P[3], exp: r.exp, bitis: r.bitis, paketAd: P[1], not, ts: Date.now() };
+      await ADM.db.doc("kodlar/" + r.key).set(rec);
+      KODG.son = rec; toast("Kod hazır.");
+    } catch (e) { KODG.err = "Kod üretilemedi. Tekrar dene."; }
+    KODG.busy = false; render();
+  },
+  kodKopya(d) { const R = KODG.son; kKopya(d.t === "sec" ? KODG.sec : d.t === "mesaj" && R ? kMesaj(R) : R ? R.kod : ""); }
+});
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -5803,7 +5892,7 @@ function vPremium() {
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="a"${UI.prem.a ? " checked" : ""}><span><a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nu ve <a href="#mesafeli">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.</span></label>
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
       <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
-      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
+      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine ya da telefonuna en geç 24 saat içinde gönderilir; kodu AI öğretmen sayfasına girmen yeterli. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
     </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">AI öğretmen ve diğer AI özellikleri hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
     <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, denemeler ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
@@ -5869,7 +5958,7 @@ const LEGAL = {
 
   "on-bilgi": { t: "Ön Bilgilendirme Formu", d: "Premium aboneliği satın almadan önce bilmen gerekenler", h: () => `
     <h2>Satıcı</h2>
-    <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}<br>Telefon: ${ay("telefon", "TELEFON")}</p>
+    <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}${AYAR.telefon ? `<br>Telefon: ${ay("telefon", "TELEFON")}` : ""}</p>
     <h2>Hizmet</h2>
     <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiOrta", "LİMİT")} mesaj), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ay("aiPremium", "LİMİT")} mesaj), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
     <h2>Fiyat</h2>
@@ -5877,9 +5966,9 @@ const LEGAL = {
     <h2>Ödeme</h2>
     <p>${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden banka veya kredi kartıyla, satın alınan dönem için peşin olarak.</p>
     <h2>Süre ve yenileme</h2>
-    <p>Paket, seçtiğin süre (1 ay ya da 1 yıl) boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. Süre bitince devam etmek istersen yeniden satın alırsın.</p>
+    <p>Paket, seçtiğin süre (1 ay için 30 gün, 1 yıl için 365 gün) boyunca geçerlidir; süre erişim kodunun gönderildiği gün başlar. Paket kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. Süre bitince devam etmek istersen yeniden satın alırsın.</p>
     <h2>Teslim</h2>
-    <p>Hizmet, ödemenin onaylanmasının ardından elektronik ortamda kullanıma açılır. Fiziksel teslimat yoktur.</p>
+    <p>Ödemen onaylandıktan sonra en geç 24 saat içinde, ödeme sırasında bildirdiğin e-posta adresine ya da telefonuna bir erişim kodu gönderilir. Hizmet, bu kodu Site'deki AI öğretmen sayfasına girmenle kullanıma açılır. Fiziksel teslimat yoktur.</p>
     <h2>Cayma hakkı</h2>
     <p>Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca, elektronik ortamda anında ifa edilen hizmetlerde ve cayma süresi bitmeden tüketicinin onayıyla ifasına başlanan hizmetlerde cayma hakkı kullanılamaz. Ödeme sırasında hizmetin hemen başlamasını onaylaman hâlinde cayma hakkın bulunmaz.</p>
     <h2>Şikâyet ve itiraz</h2>
@@ -5887,13 +5976,13 @@ const LEGAL = {
 
   "mesafeli": { t: "Mesafeli Satış Sözleşmesi", d: "Premium abonelik sözleşmesi", h: () => `
     <h2>Madde 1 – Taraflar</h2>
-    <p><b>Satıcı:</b> ${ay("adSoyad", "AD SOYAD")}, ${ay("adres", "ADRES")}, ${ay("eposta", "E-POSTA")}, ${ay("telefon", "TELEFON")}<br><b>Alıcı:</b> Site'de üyelik oluşturan ve ödeme yapan kişi. Bilgileri sipariş sırasında alınır.</p>
+    <p><b>Satıcı:</b> ${ay("adSoyad", "AD SOYAD")}, ${ay("adres", "ADRES")}, ${ay("eposta", "E-POSTA")}${AYAR.telefon ? ", " + ay("telefon", "TELEFON") : ""}<br><b>Alıcı:</b> Site'de üyelik oluşturan ve ödeme yapan kişi. Bilgileri sipariş sırasında alınır.</p>
     <h2>Madde 2 – Konu</h2>
     <p>Bu sözleşme, Alıcı'nın Site üzerinden satın aldığı Premium abonelik hizmetinin satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.</p>
     <h2>Madde 3 – Hizmet ve bedel</h2>
     <p>Hizmetin kapsamı, paketlerin bedeli ve ödeme koşulları <a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nda belirtildiği gibidir. Ön Bilgilendirme Formu bu sözleşmenin ayrılmaz parçasıdır.</p>
     <h2>Madde 4 – İfa</h2>
-    <p>Hizmet, ödemenin onaylanmasıyla Alıcı'nın hesabında anında kullanıma açılır. Satıcı hizmeti kesintisiz sunmak için makul özeni gösterir. Planlı bakım ve teknik arızalar nedeniyle kısa süreli kesintiler olabilir. Uzun süren kesintilerde Alıcı'ya kullanamadığı süre kadar ek süre tanınır.</p>
+    <p>Hizmet, ödemenin onaylanmasından sonra en geç 24 saat içinde Alıcı'ya gönderilen erişim koduyla kullanıma açılır. Satıcı hizmeti kesintisiz sunmak için makul özeni gösterir. Planlı bakım ve teknik arızalar nedeniyle kısa süreli kesintiler olabilir. Uzun süren kesintilerde Alıcı'ya kullanamadığı süre kadar ek süre tanınır.</p>
     <h2>Madde 5 – Ödeme ve yenileme</h2>
     <p>Paket bedeli, seçilen dönem (1 ay ya da 1 yıl) için ${ay("odemeAracisi", "ÖDEME ARACISI")} aracılığıyla peşin tahsil edilir. Paket kendiliğinden yenilenmez ve Alıcı'nın kartından otomatik çekim yapılmaz. Fiyat değişiklikleri yalnızca sonraki satın almalarda uygulanır.</p>
     <h2>Madde 6 – Sona erme</h2>
@@ -6311,8 +6400,8 @@ Object.assign(SUB, {
     try {
       const r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code, check: true }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok && j.ok) { WEBAI.code = code; WEBAI.plan = j.plan === "premium" ? "premium" : "orta"; LS.set("ake.kod", code); LS.set("ake.plan", WEBAI.plan); webAIAc(); toast(`AI öğretmen açıldı · ${WEBAI.plan === "premium" ? "Premium" : "Orta"} paket`); }
-      else UI.kodErr = r.status === 401 ? "Bu kod geçerli değil. Harfleri ve tireleri kontrol edip tekrar dene." : "Kod şu an kontrol edilemedi. Biraz sonra tekrar dene.";
+      if (r.ok && j.ok) { WEBAI.code = code; WEBAI.plan = j.plan === "premium" ? "premium" : "orta"; WEBAI.bitis = /^\d{4}-\d{2}-\d{2}$/.test(j.bitis || "") ? j.bitis : ""; LS.set("ake.kod", code); LS.set("ake.plan", WEBAI.plan); if (WEBAI.bitis) LS.set("ake.bitis", WEBAI.bitis); else LS.del("ake.bitis"); webAIAc(); toast(`AI öğretmen açıldı · ${WEBAI.plan === "premium" ? "Premium" : "Orta"} paket`); }
+      else UI.kodErr = r.status === 401 ? (j.error === "suresi" ? "Bu kodun süresi dolmuş. Paketini yenilemek için Paketler sayfasına bak." : "Bu kod geçerli değil. Harfleri ve tireleri kontrol edip tekrar dene.") : "Kod şu an kontrol edilemedi. Biraz sonra tekrar dene.";
     } catch (e) { UI.kodErr = "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene."; }
     UI.kodBusy = false; render();
   }

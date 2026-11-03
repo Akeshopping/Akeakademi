@@ -5,11 +5,11 @@
    Bir paketin "Bu paketi seç" düğmesi; ad soyad, e-posta ve o paketin ödeme linki dolunca açılır.
    ÖNEMLİ: AI öğretmen siteye bağlanmadan ödeme linki ekleme; yoksa satıp veremeyeceğin bir hizmet satmış olursun. */
 window.AKE_AYAR = {
-  adSoyad: "",        // Ad soyad ya da şirket unvanı (satıcı / veri sorumlusu)
-  adres: "",          // Açık adres
-  eposta: "",         // İletişim e-postası
+  adSoyad: "Ali Kaan Eren",   // Ad soyad ya da şirket unvanı (satıcı / veri sorumlusu)
+  adres: "Güneşler Yeni Mahalle 5203. Sokak No:4 Kat:1 Adapazarı/Sakarya",   // Açık adres
+  eposta: "alikaaneren13@gmail.com",   // İletişim e-postası
   telefon: "",        // Telefon (isteğe bağlı)
-  odemeAracisi: "",   // Ödeme kuruluşu. Örn: "iyzico"
+  odemeAracisi: "Shopier",   // Ödeme kuruluşu
   fiyatOrta: "149",       // Orta paket aylık fiyat (TL, sadece sayı)
   yillikOrta: "1490",     // Orta paket yıllık fiyat
   fiyatPremium: "299",    // Premium paket aylık fiyat

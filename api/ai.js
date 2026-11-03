@@ -2,10 +2,13 @@
 //
 // Vercel > Settings > Environment Variables bölümünde iki ayar gerekir:
 //   ANTHROPIC_API_KEY  Anthropic Console'dan alınan gizli anahtar. Bu dosyaya ya da siteye ASLA yazılmaz.
-//   AKE_KODLAR         AI kullanabilecek erişim kodları, virgülle ayrılmış "KOD:paket" listesi.
-//                      Örnek: AKE-PRM-7K3Q9X:premium, AKE-ORT-4M2T8V:orta
+//   AKE_GIZLI          Panelin ürettiği süreli erişim kodlarını doğrulayan gizli anahtar (panelde "Kodlar" bölümünde oluşturulur).
+//   AKE_KODLAR         (isteğe bağlı) süresiz deneme kodları, virgülle ayrılmış "KOD:paket" listesi. Örnek: AKE-G2D9-UZKM:premium
+//   AKE_IPTAL          (isteğe bağlı) iptal edilen kodlar, virgülle ayrılmış liste.
 // İsteğe bağlı: AKE_MODEL_HIZLI (varsayılan claude-haiku-5-5), AKE_MODEL_GUCLU (varsayılan claude-sonnet-5-5)
 // Ayar değiştirdikten sonra Vercel'de Deployments > son dağıtım > Redeploy yapılmalıdır.
+
+import crypto from "node:crypto";
 
 export const config = { maxDuration: 120 };
 
@@ -21,6 +24,30 @@ function kodlar() {
   });
   return m;
 }
+/* Süreli kod: AKE-XXXX-XXXX-XXXX-XXXX = 10 bayt (sürüm+paket, bitiş günü, rastgele, 5 bayt HMAC) · Crockford base32 */
+const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", EPOCH = Date.UTC(2026, 0, 1);
+const isoOf = n => new Date(EPOCH + n * 86400000).toISOString().slice(0, 10);
+function bugun() {
+  const [y, m, d] = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()).split("-").map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - EPOCH) / 86400000);
+}
+const kodAnahtar = c => { let s = String(c || "").toUpperCase().replace(/[^0-9A-Z]/g, ""); if (s.startsWith("AKE")) s = s.slice(3); return s.replace(/O/g, "0").replace(/[IL]/g, "1"); };
+function b32dec(s) {
+  let bits = 0, val = 0; const out = [];
+  for (const ch of s) { const v = B32.indexOf(ch); if (v < 0) return null; val = ((val << 5) | v) & 0xffff; bits += 5; if (bits >= 8) { bits -= 8; out.push((val >> bits) & 255); } }
+  return Buffer.from(out);
+}
+function sureliKod(code) {
+  const sec = String(process.env.AKE_GIZLI || "").trim();
+  if (!/^[0-9a-fA-F]{64}$/.test(sec)) return null;
+  const k = kodAnahtar(code); if (k.length !== 16) return null;
+  const b = b32dec(k); if (!b || b.length !== 10 || (b[0] >> 4) !== 1) return null;
+  const mac = crypto.createHmac("sha256", Buffer.from(sec, "hex")).update(b.subarray(0, 5)).digest().subarray(0, 5);
+  if (!crypto.timingSafeEqual(mac, b.subarray(5, 10))) return null;
+  return { plan: (b[0] & 15) === 2 ? "premium" : "orta", exp: b.readUInt16BE(1), key: k };
+}
+const iptal = () => new Set(String(process.env.AKE_IPTAL || "").split(/[,;\n]+/).map(kodAnahtar).filter(Boolean));
+
 function body(req) {
   if (req.body && typeof req.body === "object") return req.body;
   try { return JSON.parse(req.body || "{}"); } catch (e) { return {}; }
@@ -33,9 +60,14 @@ export default async function handler(req, res) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return fail(res, 500, "yapilandirma", "Sunucuda ANTHROPIC_API_KEY tanımlı değil.");
 
-  const b = body(req), code = String(b.code || "").trim().toUpperCase(), plan = kodlar().get(code);
+  const b = body(req), code = String(b.code || "").trim().toUpperCase();
+  let plan = kodlar().get(code), bitis = "";
+  if (!plan) {
+    const k = sureliKod(code);
+    if (k && !iptal().has(k.key)) { if (bugun() > k.exp) return fail(res, 401, "suresi"); plan = k.plan; bitis = isoOf(k.exp); }
+  }
   if (!plan) return fail(res, 401, "kod");
-  if (b.check) return res.status(200).json({ ok: true, plan });
+  if (b.check) return res.status(200).json({ ok: true, plan, bitis });
 
   const now = Date.now(), list = (hits.get(code) || []).filter(t => now - t < 5 * 60000);
   if (list.length >= 40) return fail(res, 429, "rate_limited");

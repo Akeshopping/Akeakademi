@@ -352,6 +352,11 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .price b small{font-size:18px;font-weight:600}
 .price span{font-size:13px;color:var(--ink2)}
 .plans .prem{border-color:var(--form);box-shadow:0 0 0 1px var(--form),var(--shadow)}
+.view.wide{max-width:1080px}
+.plans .card{justify-content:flex-start}
+.plans .card > .btn{margin-top:auto}
+.plans .card.sel{outline:2px solid var(--ink);outline-offset:2px}
+.xs{font-size:12px}
 .pfl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
 .pf{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
 .pf-i{flex:none;width:18px;height:18px;border-radius:50%;border:1.6px solid var(--form);margin-top:2px}
@@ -3143,7 +3148,7 @@ const PADISAH = [["Bursa'nın fethi", "Orhan Bey"], ["Edirne'nin fethi", "I. Mur
   ["Kıbrıs'ın fethi", "II. Selim"], ["İnebahtı Deniz Savaşı", "II. Selim"], ["II. Viyana Kuşatması", "IV. Mehmet"], ["Karlofça Antlaşması", "II. Mustafa"], ["Lale Devri", "III. Ahmet"],
   ["Küçük Kaynarca Antlaşması", "I. Abdülhamit"], ["Nizam-ı Cedid ordusunun kurulması", "III. Selim"], ["Sened-i İttifak", "II. Mahmut"], ["Yeniçeri Ocağı'nın kaldırılması (Vaka-i Hayriye)", "II. Mahmut"],
   ["Tanzimat Fermanı", "Abdülmecid"], ["Islahat Fermanı", "Abdülmecid"], ["I. Meşrutiyet'in ilanı", "II. Abdülhamit"]];
-kvGen("padisah", ["tarih"], "Osmanlı tarihi", 2, PADISAH, a => `${a} hangi padişah döneminde gerçekleşmiştir?`, (a, b) => `${a}, ${b} döneminde gerçekleşmiştir.`);
+kvGen("padisah", ["tarih", "tarih2"], "Osmanlı tarihi", 2, PADISAH, a => `${a} hangi padişah döneminde gerçekleşmiştir?`, (a, b) => `${a}, ${b} döneminde gerçekleşmiştir.`);
 groupGen("inkilap", ["tarih", "tarih2"], "Atatürk ilke ve inkılapları", 2, {
   "siyasi alanda": ["Saltanatın kaldırılması", "Cumhuriyetin ilanı", "Halifeliğin kaldırılması", "1924 Anayasası'nın kabulü"],
   "hukuk alanında": ["Türk Medeni Kanunu'nun kabulü", "Şeriye ve Evkaf Vekâleti'nin kaldırılması", "Türk Ceza Kanunu'nun kabulü", "Borçlar Kanunu'nun kabulü"],
@@ -3155,7 +3160,7 @@ const DEVLET = [["Türk adını resmî devlet adı olarak kullanan ilk Türk dev
   ["İslamiyet'i resmî din olarak kabul eden ilk Türk devleti", "Karahanlılar"], ["Hindistan'a seferler düzenleyen ve \"sultan\" unvanını kullanan Mahmut'un devleti", "Gazneliler"], ["Tuğrul Bey döneminde Bağdat'a girerek Abbasi halifesini koruması altına alan devlet", "Büyük Selçuklular"],
   ["Mısır'da kurulan ilk Türk-İslam devleti", "Tolunoğulları"], ["Orhun Yazıtları'nın dikildiği devlet", "II. Göktürk (Kutluk) Devleti"], ["Avrupa'da Kavimler Göçü'nü başlatan Türk topluluğu", "Avrupa Hunları"], ["Kutadgu Bilig'in yazıldığı devlet", "Karahanlılar"], ["Mani dinini benimseyen Türk devleti", "Uygurlar"]];
 kvGen("turk-devletleri", ["tarih"], "İlk Türk devletleri", 2, DEVLET, a => `${a} aşağıdakilerden hangisidir?`, (a, b) => `${a}: ${b}.`);
-groupGen("cemiyet", ["tarih"], "Kurtuluş Savaşı", 2, {
+groupGen("cemiyet", ["tarih", "tarih2"], "Kurtuluş Savaşı", 2, {
   "millî (yararlı) cemiyetler": ["Trakya-Paşaeli Müdafaa-i Hukuk Cemiyeti", "İzmir Müdafaa-i Hukuk-u Osmaniye Cemiyeti", "Vilayat-ı Şarkiye Müdafaa-i Hukuk-u Milliye Cemiyeti", "Trabzon Muhafaza-i Hukuk-u Milliye Cemiyeti", "Kilikyalılar Cemiyeti", "Redd-i İlhak Cemiyeti", "Millî Kongre Cemiyeti"],
   "azınlıkların kurduğu zararlı cemiyetler": ["Mavri Mira Cemiyeti", "Etnik-i Eterya Cemiyeti", "Pontus Rum Cemiyeti", "Taşnak Cemiyeti", "Hınçak Cemiyeti", "Alyans İsrailit Cemiyeti"],
   "Türklerin kurduğu zararlı cemiyetler": ["İngiliz Muhipleri Cemiyeti", "Wilson Prensipleri Cemiyeti", "Kürt Teali Cemiyeti", "Teali-i İslam Cemiyeti", "Sulh ve Selamet-i Osmaniye Cemiyeti"]
@@ -3653,6 +3658,397 @@ G("ydt-akis", ["ingilizce"], "Irrelevant sentence", 2, () => {
   return { p: paraNum(ss), q: "Cümleler sırasıyla okunduğunda parçanın anlam bütünlüğünü bozan cümle hangisidir?", o: ROM.slice(0, 5), a: pos,
     x: `${ROM[pos]} numaralı cümle ("${E.off}") parçanın ana konusuyla ilgili değildir.` };
 });
+/* ===== Soru kalıpları · 5. bölüm: AYT Tarih ve Coğrafya, Din, Felsefe grubu, Edebiyat, YDT ===== */
+
+/* ---------- yardımcı: üç olayı eskiden yeniye sıralama ---------- */
+const ROMA3 = ["I", "II", "III"];
+function siralaGen(id, subs, t, d, list, label) {
+  G(id, subs, t, d, () => {
+    let ev = null;
+    for (let k = 0; k < 30 && !ev; k++) { const c = shuffle(list).slice(0, 3); if (new Set(c.map(e => e[1])).size === 3) ev = c; }
+    if (!ev) return null;
+    const ord = [0, 1, 2].sort((a, b) => ev[a][1] - ev[b][1]), fmt = p => p.map(i => ROMA3[i]).join(" – ");
+    const c = fmt(ord), others = shuffle([[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]].map(fmt).filter(s => s !== c));
+    const when = e => e[2] || String(e[1]);
+    return { q: `${ev.map((e, i) => `${ROMA3[i]}. ${e[0]}`).join("\n")}\n\nYukarıdaki ${label} eskiden yeniye doğru sıralanışı aşağıdakilerden hangisidir?`, ...strChoices(c, others),
+      x: ord.map(i => `${ev[i][0]} (${when(ev[i])})`).join(" → ") + "." };
+  });
+}
+siralaGen("tarih-sirala", ["tarih", "tarih2"], "Kronoloji · sıralama", 2, OLAYLAR_TYT, "gelişmelerin");
+siralaGen("cumhuriyet-sirala", ["tarih2", "tarih"], "Kronoloji · sıralama", 2, OLAYLAR_AYT, "gelişmelerin");
+
+/* ---------- TARİH · antlaşmalar ---------- */
+const ANTLASMA = [
+  ["Karlofça Antlaşması (1699)", "Osmanlı Devleti ilk kez büyük çapta toprak kaybetti; Macaristan ve Erdel Avusturya'ya bırakıldı."],
+  ["Pasarofça Antlaşması (1718)", "İmzalanmasının ardından Osmanlı'da Lale Devri başladı."],
+  ["Belgrad Antlaşması (1739)", "Fransa'nın arabuluculuğuyla imzalandı; ardından Fransa'ya verilen kapitülasyonlar sürekli hâle getirildi."],
+  ["Küçük Kaynarca Antlaşması (1774)", "Kırım'a bağımsızlık verildi; Rusya, Osmanlı'daki Ortodoksların koruyuculuğunu üstlendi."],
+  ["Yaş Antlaşması (1792)", "Kırım'ın Rusya'ya ait olduğu Osmanlı Devleti tarafından kabul edildi."],
+  ["Bükreş Antlaşması (1812)", "Sırplara bazı ayrıcalıklar tanındı ve Prut Nehri Osmanlı–Rus sınırı oldu."],
+  ["Edirne Antlaşması (1829)", "Yunanistan'ın bağımsızlığı kabul edildi; Osmanlı'dan ayrılarak bağımsız olan ilk devlet Yunanistan oldu."],
+  ["Hünkâr İskelesi Antlaşması (1833)", "Mısır sorununda Rusya'dan yardım alındı; Boğazların savaş zamanında Rusya'nın düşmanlarına kapatılması kararlaştırıldı."],
+  ["Balta Limanı Ticaret Antlaşması (1838)", "İngiliz tüccarlara geniş ticari ayrıcalıklar tanındı; Osmanlı ekonomisi açık pazar hâline geldi."],
+  ["Londra Boğazlar Sözleşmesi (1841)", "Boğazların barış zamanında bütün yabancı savaş gemilerine kapalı olması kararlaştırıldı; Boğazlar ilk kez uluslararası bir statü kazandı."],
+  ["Paris Antlaşması (1856)", "Osmanlı Devleti Avrupa devleti sayıldı ve toprak bütünlüğü Avrupa devletlerinin güvencesine alındı; Karadeniz tarafsız hâle getirildi."],
+  ["Ayastefanos Antlaşması (1878)", "Rusya'nın himayesinde Büyük Bulgaristan Prensliği kurulması kararlaştırıldı."],
+  ["Berlin Antlaşması (1878)", "Sırbistan, Karadağ ve Romanya bağımsız oldu; Büyük Bulgaristan küçültülerek üçe ayrıldı."],
+  ["Uşi Antlaşması (1912)", "Trablusgarp İtalya'ya bırakıldı; Osmanlı'nın Kuzey Afrika'daki son toprağı elden çıktı."],
+  ["Londra Antlaşması (1913)", "I. Balkan Savaşı'nın ardından Midye–Enez hattının batısındaki topraklar Balkan devletlerine bırakıldı."],
+  ["İstanbul Antlaşması (1913)", "II. Balkan Savaşı'ndan sonra Bulgaristan ile imzalandı; Edirne ve Kırklareli Osmanlı'da kaldı."],
+  ["Mondros Ateşkes Antlaşması (1918)", "Osmanlı I. Dünya Savaşı'ndan çekildi; 7. maddeyle İtilaf devletlerine güvenliklerini tehdit eden her yeri işgal hakkı tanındı."],
+  ["Sevr Antlaşması (1920)", "Osmanlı hükûmetinin temsilcilerince imzalandı ancak bir mecliste onaylanmadığı için yürürlüğe girmedi."],
+  ["Gümrü Antlaşması (1920)", "TBMM'nin uluslararası alanda imzaladığı ilk antlaşmadır; Ermenistan ile imzalandı."],
+  ["Moskova Antlaşması (1921)", "Sovyet Rusya ile imzalandı; Misak-ı Millî'yi tanıyan ilk büyük devlet Sovyet Rusya oldu."],
+  ["Kars Antlaşması (1921)", "Kafkas cumhuriyetleriyle imzalandı; bugünkü doğu sınırımız büyük ölçüde kesinleşti."],
+  ["Ankara Antlaşması (1921)", "Fransa ile imzalandı; Hatay dışında güney sınırı belirlendi ve TBMM'yi tanıyan ilk İtilaf devleti Fransa oldu."],
+  ["Mudanya Ateşkes Antlaşması (1922)", "İstanbul ve Boğazlar savaş yapılmadan kurtarıldı; Doğu Trakya TBMM'ye bırakıldı."],
+  ["Lozan Barış Antlaşması (1923)", "Kapitülasyonlar tamamen kaldırıldı; yeni Türk devletinin bağımsızlığı uluslararası alanda tanındı."]
+];
+kvGen("antlasma-sonuc", ["tarih2", "tarih"], "Antlaşmalar", 2, ANTLASMA, a => `${a} ile ilgili aşağıdakilerden hangisi doğrudur?`, (a, b) => `${a}: ${b}`);
+vkGen("sonuc-antlasma", ["tarih2", "tarih"], "Antlaşmalar", 2, ANTLASMA, b => `"${b}"\n\nBu bilgi aşağıdaki antlaşmalardan hangisiyle ilgilidir?`, (a, b) => `${a}: ${b}`);
+
+/* ---------- TARİH · Osmanlı kurumları ---------- */
+const OS_KURUM = [
+  ["Divan-ı Hümayun", "Devlet işlerinin görüşülüp karara bağlandığı en yüksek yönetim kuruludur."],
+  ["Tımar sistemi", "Toprağın vergi geliri karşılığında dirlik sahiplerine verildiği ve onlardan atlı asker yetiştirmelerinin istendiği sistemdir."],
+  ["Devşirme sistemi", "Hristiyan ailelerin çocuklarının alınıp eğitilerek Kapıkulu ocaklarına ve saray hizmetine yetiştirildiği sistemdir."],
+  ["Enderun", "Sarayda devlet adamı ve yönetici yetiştiren okuldur."],
+  ["İltizam", "Belirli bir bölgenin vergi toplama hakkının açık artırmayla belli bir süre için verilmesidir."],
+  ["Malikâne sistemi", "Vergi toplama hakkının peşin ödeme karşılığında ömür boyu verilmesidir."],
+  ["Esham", "Devletin halka faiz karşılığında tahvil satarak yaptığı iç borçlanmadır."],
+  ["Lonca", "Şehirlerde esnaf ve zanaatkârların üretimini, fiyatlarını ve kalitesini denetleyen meslek teşkilatıdır."],
+  ["Kadı", "Yargı işlerinin yanında bulunduğu kazanın belediye ve yönetim işlerine de bakan görevlidir."],
+  ["Muhtesip", "Çarşı ve pazarları denetleyip ölçü, tartı ve fiyat kurallarına uyulmasını sağlayan görevlidir."],
+  ["Nişancı", "Padişah adına çıkarılan belgelere tuğra çeken ve toprak kayıtlarını tutan divan üyesidir."],
+  ["Defterdar", "Devletin gelir ve giderlerinden, yani maliye işlerinden sorumlu divan üyesidir."],
+  ["Kazasker", "Askerî sınıfın davalarına bakan, kadı ve müderrislerin atanmasında söz sahibi olan divan üyesidir."],
+  ["Şeyhülislam", "Yapılacak işlerin dinî kurallara uygunluğu konusunda fetva veren din ve hukuk otoritesidir."],
+  ["Vakıf", "Bir malın gelirinin hayır amacıyla cami, imaret, çeşme ve medrese gibi kamu hizmetlerine ayrılmasıdır."],
+  ["Subaşı", "Şehir ve kasabalarda güvenliği ve asayişi sağlayan görevlidir."]
+];
+kvGen("os-kurum", ["tarih2", "tarih"], "Osmanlı kültür ve medeniyeti", 2, OS_KURUM, a => `Osmanlı Devleti'nde "${a}" ile ilgili aşağıdakilerden hangisi doğrudur?`, (a, b) => `${a}: ${b}`);
+vkGen("kurum-os", ["tarih2", "tarih"], "Osmanlı kültür ve medeniyeti", 2, OS_KURUM, b => `Osmanlı Devleti'nde "${b}"\n\nBu açıklama aşağıdakilerden hangisine aittir?`, (a, b) => `${a}: ${b}`);
+
+/* ---------- TARİH · Kurtuluş Savaşı ---------- */
+const KUR_OLAY = [
+  ["Amasya Genelgesi", "Milletin bağımsızlığını yine milletin azim ve kararının kurtaracağı ilk kez bu belgede ilan edildi."],
+  ["Erzurum Kongresi", "Toplanış biçimi bakımından bölgesel, aldığı kararlar bakımından ulusal nitelikte bir kongredir."],
+  ["Sivas Kongresi", "Bütün ulusal cemiyetler Anadolu ve Rumeli Müdafaa-i Hukuk Cemiyeti adı altında birleştirildi; manda ve himaye kesin olarak reddedildi."],
+  ["Amasya Görüşmeleri", "İstanbul hükûmeti, Temsil Heyeti'ni ilk kez resmî olarak muhatap aldı."],
+  ["Misak-ı Millî", "Son Osmanlı Mebusan Meclisi tarafından kabul edilen ve ulusal sınırları belirleyen karardır."],
+  ["Teşkilat-ı Esasiye Kanunu", "TBMM'nin hazırladığı ilk anayasadır; egemenliğin kayıtsız şartsız millete ait olduğunu belirtir."],
+  ["I. İnönü Savaşı", "Düzenli ordunun kazandığı ilk zaferdir; ardından Londra Konferansı toplandı."],
+  ["II. İnönü Savaşı", "Kazanılmasının ardından Mustafa Kemal, İsmet Paşa'ya \"Siz orada yalnız düşmanı değil, milletin makûs talihini de yendiniz.\" diye yazdı."],
+  ["Kütahya-Eskişehir Savaşları", "Kaybedilmesinin ardından Mustafa Kemal'e TBMM'nin yetkilerini kullanmak üzere Başkomutanlık verildi."],
+  ["Tekâlif-i Millî Emirleri", "Ordunun ihtiyaçlarını karşılamak için halktan yiyecek, giyecek ve taşıt gibi malzemelerin toplanmasını sağladı."],
+  ["Sakarya Meydan Muharebesi", "Kazanılmasının ardından TBMM, Mustafa Kemal'e mareşal rütbesi ve gazi unvanı verdi."],
+  ["Büyük Taarruz", "Başkomutanlık Meydan Muharebesi ile sonuçlanan ve Batı Anadolu'nun düşmandan temizlenmesini sağlayan harekâttır."],
+  ["Londra Konferansı", "İtilaf devletlerinin TBMM'yi ilk kez resmen muhatap aldığı uluslararası toplantıdır."],
+  ["Saltanatın kaldırılması", "Lozan Konferansı'na iki ayrı hükûmetin davet edilmesi üzerine gerçekleşti."]
+];
+kvGen("kurtulus-olay", ["tarih", "tarih2"], "Kurtuluş Savaşı", 2, KUR_OLAY, a => `${a} ile ilgili aşağıdakilerden hangisi doğrudur?`, (a, b) => `${a}: ${b}`);
+vkGen("olay-kurtulus", ["tarih", "tarih2"], "Kurtuluş Savaşı", 2, KUR_OLAY, b => `"${b}"\n\nBu bilgi aşağıdakilerden hangisiyle ilgilidir?`, (a, b) => `${a}: ${b}`);
+const KUR_SIRA = [
+  ["Mustafa Kemal'in Samsun'a çıkışı", 1919.0519, "19 Mayıs 1919"], ["Amasya Genelgesi", 1919.0622, "22 Haziran 1919"], ["Erzurum Kongresi", 1919.0723, "23 Temmuz 1919"],
+  ["Sivas Kongresi", 1919.0904, "4 Eylül 1919"], ["Misak-ı Millî'nin kabulü", 1920.0128, "28 Ocak 1920"], ["TBMM'nin açılışı", 1920.0423, "23 Nisan 1920"],
+  ["Sevr Antlaşması", 1920.0810, "10 Ağustos 1920"], ["Gümrü Antlaşması", 1920.1203, "3 Aralık 1920"], ["I. İnönü Savaşı", 1921.0106, "Ocak 1921"],
+  ["İstiklal Marşı'nın kabulü", 1921.0312, "12 Mart 1921"], ["Sakarya Meydan Muharebesi", 1921.0823, "Ağustos–Eylül 1921"], ["Ankara Antlaşması", 1921.1020, "20 Ekim 1921"],
+  ["Büyük Taarruz", 1922.0826, "26 Ağustos 1922"], ["Mudanya Ateşkes Antlaşması", 1922.1011, "11 Ekim 1922"], ["Saltanatın kaldırılması", 1922.1101, "1 Kasım 1922"],
+  ["Lozan Barış Antlaşması", 1923.0724, "24 Temmuz 1923"], ["Cumhuriyet'in ilanı", 1923.1029, "29 Ekim 1923"]
+];
+siralaGen("kurtulus-sirala", ["tarih", "tarih2"], "Kurtuluş Savaşı · sıralama", 2, KUR_SIRA, "gelişmelerin");
+
+/* ---------- COĞRAFYA ---------- */
+groupGen("gol-olusum", ["cografya2", "cografya"], "Göller", 2, {
+  "tektonik göl": ["Tuz Gölü", "Burdur Gölü", "Hazar Gölü", "Sapanca Gölü", "İznik Gölü", "Manyas (Kuş) Gölü", "Uluabat Gölü"],
+  "volkanik set gölü": ["Van Gölü", "Erçek Gölü", "Nazik Gölü"],
+  "krater gölü": ["Nemrut Gölü", "Meke Gölü"],
+  "karstik göl": ["Salda Gölü", "Avlan Gölü"],
+  "heyelan set gölü": ["Tortum Gölü", "Sera Gölü", "Yedigöller", "Zinav Gölü"],
+  "alüvyal set gölü": ["Bafa Gölü", "Mogan Gölü", "Eymir Gölü", "Marmara Gölü"],
+  "kıyı set gölü (lagün)": ["Küçükçekmece Gölü", "Büyükçekmece Gölü", "Terkos Gölü"]
+}, g => `Aşağıdakilerden hangisi ${g} örneğidir?`, g => `Aşağıdakilerden hangisi ${g} örneği değildir?`, (m, g) => `${m}: ${g}`);
+groupGen("dag-olusum", ["cografya2", "cografya"], "Yer şekilleri", 2, {
+  "kıvrım dağı": ["Toroslar", "Kuzey Anadolu Dağları", "Doğu Karadeniz Dağları", "Güneydoğu Toroslar"],
+  "kırık (horst) dağı": ["Kaz Dağı", "Bozdağlar", "Aydın Dağları", "Uludağ"],
+  "volkanik dağ": ["Ağrı Dağı", "Erciyes Dağı", "Hasan Dağı", "Süphan Dağı", "Tendürek Dağı", "Karacadağ"]
+}, g => `Aşağıdakilerden hangisi oluşumu bakımından ${g} örneğidir?`, g => `Aşağıdakilerden hangisi oluşumu bakımından ${g} değildir?`, (m, g) => `${m}: ${g}`);
+groupGen("akarsu-deniz", ["cografya2", "cografya"], "Akarsular", 1, {
+  "Karadeniz'e dökülen": ["Kızılırmak", "Yeşilırmak", "Sakarya", "Filyos", "Çoruh"],
+  "Akdeniz'e dökülen": ["Seyhan", "Ceyhan", "Göksu", "Asi"],
+  "Ege Denizi'ne dökülen": ["Büyük Menderes", "Küçük Menderes", "Gediz", "Bakırçay", "Meriç"],
+  "Marmara Denizi'ne dökülen": ["Susurluk", "Biga Çayı", "Gönen Çayı"],
+  "Basra Körfezi'ne dökülen": ["Fırat", "Dicle"],
+  "Hazar Denizi'ne dökülen": ["Aras", "Kura"]
+}, g => `Aşağıdaki akarsulardan hangisi ${g} bir akarsudur?`, g => `Aşağıdaki akarsulardan hangisi ${g} bir akarsu değildir?`, (m, g) => `${m}: ${g.replace(" dökülen", " dökülür")}`);
+const BARAJ = [["Atatürk Barajı", "Fırat"], ["Keban Barajı", "Fırat"], ["Karakaya Barajı", "Fırat"], ["Birecik Barajı", "Fırat"], ["Ilısu Barajı", "Dicle"],
+  ["Hirfanlı Barajı", "Kızılırmak"], ["Sarıyar Barajı", "Sakarya"], ["Gökçekaya Barajı", "Sakarya"], ["Deriner Barajı", "Çoruh"], ["Seyhan Barajı", "Seyhan"],
+  ["Aslantaş Barajı", "Ceyhan"], ["Hasan Uğurlu Barajı", "Yeşilırmak"], ["Demirköprü Barajı", "Gediz"]];
+kvGen("baraj-akarsu", ["cografya2", "cografya"], "Enerji kaynakları", 1, BARAJ, a => `${a} hangi akarsu üzerinde kurulmuştur?`, (a, b) => `${a}, ${b} üzerindedir.`);
+
+/* ---------- DİN ---------- */
+groupGen("mezhep-tur", ["din"], "İslam düşüncesinde yorumlar", 2, {
+  "itikadi (inanç) mezhep": ["Maturidilik", "Eş'arilik", "Selefiyye", "Mutezile"],
+  "fıkhi (amelî) mezhep": ["Hanefilik", "Malikilik", "Şafiilik", "Hanbelilik", "Caferilik"]
+}, g => `Aşağıdakilerden hangisi ${g}tir?`, g => `Aşağıdakilerden hangisi ${g} değildir?`, (m, g) => `${m}: ${g}`);
+const MEZHEP = [["Hanefilik", "Ebu Hanife"], ["Malikilik", "İmam Malik"], ["Şafiilik", "İmam Şafii"], ["Hanbelilik", "Ahmed bin Hanbel"], ["Caferilik", "Cafer es-Sadık"],
+  ["Maturidilik", "Ebu Mansur el-Maturidi"], ["Eş'arilik", "Ebu'l-Hasan el-Eş'ari"]];
+kvGen("mezhep-kurucu", ["din"], "İslam düşüncesinde yorumlar", 1, MEZHEP, a => `${a} mezhebi hangi âlimin görüşleri etrafında oluşmuştur?`, (a, b) => `${a}: ${b}.`);
+const DINKAV2 = [["İhsan", "Allah'ı görüyormuş gibi O'na kulluk etmek ve her işi en güzel şekilde yapmak"], ["Takva", "Allah'a karşı sorumluluk bilinciyle O'nun yasaklarından sakınmak"],
+  ["İstiğfar", "Allah'tan bağışlanma dilemek"], ["Şükür", "Verilen nimetlerin değerini bilip bunu söz ve davranışla göstermek"], ["Sabır", "Zorluklar karşısında metanetini koruyup ümitsizliğe düşmeden direnmek"],
+  ["İnfak", "Allah rızası için malından ihtiyaç sahiplerine harcamak"], ["Kanaat", "Sahip olduklarıyla yetinip hırslı davranmamak"], ["Zikir", "Allah'ı anmak ve hatırlamak"],
+  ["Tefekkür", "Allah'ın yarattıkları üzerinde derin derin düşünmek"], ["Ecel", "Her canlı için belirlenmiş hayat süresinin sonu"], ["Rızık", "Allah'ın canlılara yararlanmaları için verdiği her türlü nimet"],
+  ["Berzah", "Ölümle yeniden diriliş arasındaki kabir hayatı"], ["Mahşer", "Yeniden dirilişten sonra insanların toplanacağı yer"], ["Mizan", "Ahirette amellerin tartılması"],
+  ["Hicret", "Hz. Peygamber ve Müslümanların Mekke'den Medine'ye göç etmesi"]];
+kvGen("din-kavram2", ["din"], "Temel kavramlar", 1, DINKAV2, a => `"${a}" kavramının anlamı aşağıdakilerden hangisidir?`, (a, b) => `${a}: ${b}.`);
+vkGen("din-kavram2-ters", ["din"], "Temel kavramlar", 1, DINKAV2, b => `"${b}" anlamına gelen kavram aşağıdakilerden hangisidir?`, (a, b) => `${a}: ${b}.`);
+const SIYER = [["İlk vahyin gelmesi", 610], ["Habeşistan'a ilk hicret", 615], ["Medine'ye hicret", 622], ["Bedir Savaşı", 624], ["Uhud Savaşı", 625], ["Hendek Savaşı", 627],
+  ["Hudeybiye Antlaşması", 628], ["Mekke'nin fethi", 630], ["Veda Haccı", 632]];
+siralaGen("siyer-sirala", ["din"], "Hz. Muhammed'in hayatı", 2, SIYER, "olayların");
+
+/* ---------- FELSEFE ---------- */
+const ARKHE = [["Thales", "su"], ["Anaksimenes", "hava"], ["Herakleitos", "ateş"], ["Anaksimandros", "apeiron (sınırsız ve belirsiz olan)"],
+  ["Empedokles", "dört öğe (su, hava, toprak ve ateş)"], ["Demokritos", "atomlar"], ["Pisagor", "sayı"], ["Anaksagoras", "tohumlar ve onları düzenleyen akıl (nous)"]];
+const yon = w => { const v = (w.match(/[aeıioöuüâîû]/gi) || ["a"]).pop().toLowerCase(); return w + "'" + ("eiöüî".includes(v) ? "e" : "a"); };
+kvGen("arkhe", ["felsefe"], "İlk Çağ felsefesi", 1, ARKHE, a => `${yon(a)} göre evrenin ana maddesi (arkhe) aşağıdakilerden hangisidir?`, (a, b) => `${a}: arkhe ${b}.`);
+vkGen("arkhe-ters", ["felsefe"], "İlk Çağ felsefesi", 1, ARKHE, b => `Evrenin ana maddesinin (arkhe) ${b} olduğunu savunan düşünür aşağıdakilerden hangisidir?`, (a, b) => `${a}: arkhe ${b}.`);
+groupGen("felsefe-alan", ["felsefe"], "Felsefenin alanları", 2, {
+  "bilgi felsefesi": ["Doğru bilgi mümkün müdür?", "Bilginin kaynağı akıl mıdır, deney midir?", "Bilginin sınırları nelerdir?"],
+  "varlık felsefesi": ["Varlık var mıdır, varsa nedir?", "Evrenin ilk maddesi nedir?", "Varlık değişen midir, değişmeyen midir?"],
+  "ahlak felsefesi": ["Evrensel bir ahlak yasası var mıdır?", "İyi ve kötünün ölçütü nedir?", "Ahlaki eylemlerimizde özgür müyüz?"],
+  "sanat felsefesi": ["Güzel nedir?", "Sanat eserini diğer nesnelerden ayıran nedir?", "Sanatçıyı yaratmaya yönelten nedir?"],
+  "siyaset felsefesi": ["İdeal devlet düzeni nasıl olmalıdır?", "Yönetimin meşruiyeti neye dayanır?", "Bireyin özgürlüğü ile devletin otoritesi nasıl dengelenmelidir?"],
+  "din felsefesi": ["Tanrı'nın varlığı akılla kanıtlanabilir mi?", "Kötülüğün varlığı Tanrı inancıyla nasıl bağdaşır?", "Vahiy ile akıl arasında nasıl bir ilişki vardır?"],
+  "bilim felsefesi": ["Bilimsel bilginin ölçütü nedir?", "Bilimsel yöntemin aşamaları nelerdir?", "Bilim değerlerden bağımsız mıdır?"]
+}, g => `Aşağıdaki sorulardan hangisi ${g} alanına aittir?`, null, (m, g) => `"${m}" → ${g}`);
+
+/* ---------- PSİKOLOJİ ---------- */
+groupGen("maslow", ["psikoloji"], "Güdüler · Maslow", 2, {
+  "fizyolojik ihtiyaçlar": ["Uzun bir yürüyüşten sonra susayan birinin su araması", "Uykusuz kalan bir öğrencinin dinlenmek istemesi", "Acıkan birinin yemek yemek istemesi"],
+  "güvenlik ihtiyacı": ["Kirada oturan bir ailenin barınma güvencesi için ev almak istemesi", "İşini kaybetmekten korkan birinin kadrolu bir işe geçmek istemesi", "Hırsızlık olayları artınca evine alarm taktırılması"],
+  "ait olma ve sevgi ihtiyacı": ["Yeni okuluna giden bir öğrencinin bir arkadaş grubuna katılmak istemesi", "Bir gencin ailesi ve dostlarıyla yakın ilişkiler kurmak istemesi", "Bir kişinin bir derneğe üye olup kendini o topluluğun parçası hissetmesi"],
+  "saygınlık ihtiyacı": ["Bir sporcunun başarılarının takdir edilmesini istemesi", "Bir çalışanın emeğinin tanınması için terfi beklemesi", "Bir öğrencinin öğretmenleri tarafından takdir edilmek istemesi"],
+  "kendini gerçekleştirme ihtiyacı": ["Bir ressamın yeteneğini tümüyle ortaya koyacağı özgün eserler üretmeye çalışması", "Emekli bir mühendisin merakını gidermek için yeni bir bilim alanı öğrenmesi", "Bir kişinin yeteneklerini en üst düzeyde geliştirip olabileceğinin en iyisi olmaya çalışması"]
+}, g => `Maslow'un ihtiyaçlar hiyerarşisine göre aşağıdakilerden hangisi ${g} ile açıklanabilir?`, null, (m, g) => `${m} → ${g}`);
+groupGen("bellek", ["psikoloji"], "Bellek", 2, {
+  "duyusal bellek": ["Hızla geçen bir arabanın görüntüsünün gözler kapandıktan sonra bir an zihinde kalması", "Dikkat edilmeyen bir sesin saniyenin kesirleri kadar zihinde kalıp kaybolması"],
+  "kısa süreli bellek": ["Bir telefon numarasını tuşlayana kadar tekrar ederek akılda tutmak", "Öğretmenin söylediği sayfa numarasını kitabı açana kadar hatırlamak"],
+  "uzun süreli bellek": ["Yıllar önce öğrenilen bisiklete binme becerisinin hâlâ korunması", "Çocukluktaki bir doğum gününün ayrıntılarıyla hatırlanması", "Okulda öğrenilen çarpım tablosunun yıllar sonra kullanılabilmesi"]
+}, g => `Aşağıdaki durumlardan hangisi ${g} ile ilgilidir?`, null, (m, g) => `${m} → ${g}`);
+
+/* ---------- SOSYOLOJİ ---------- */
+groupGen("statu", ["sosyoloji"], "Toplumsal yapı · statü", 1, {
+  "verilmiş (doğuştan) statü": ["kadın olmak", "erkek olmak", "bir ailenin en büyük çocuğu olmak", "torun olmak", "yaşlı olmak"],
+  "kazanılmış statü": ["doktor olmak", "öğretmen olmak", "belediye başkanı olmak", "olimpiyat şampiyonu olmak", "üniversite mezunu olmak", "evli olmak"]
+}, g => `Aşağıdakilerden hangisi ${g} örneğidir?`, g => `Aşağıdakilerden hangisi ${g} örneği değildir?`, (m, g) => `${m}: ${g}`);
+groupGen("hareketlilik", ["sosyoloji"], "Toplumsal hareketlilik", 2, {
+  "yatay hareketlilik": ["Bir öğretmenin aynı unvanla başka bir şehirdeki okula atanması", "Bir hemşirenin aynı görevle başka bir hastanede çalışmaya başlaması", "Bir muhasebecinin benzer konumdaki başka bir şirkete geçmesi"],
+  "yukarı doğru dikey hareketlilik": ["Bir öğretmenin okul müdürü olması", "Bir işçinin ustabaşılığa yükselmesi", "Bir araştırma görevlisinin profesör unvanı alması"],
+  "aşağı doğru dikey hareketlilik": ["Bir iş insanının iflas ederek yoksullaşması", "Bir yöneticinin görevinden alınıp daha alt bir göreve verilmesi", "Varlıklı bir ailenin servetini kaybetmesi"]
+}, g => `Aşağıdakilerden hangisi ${g} örneğidir?`, null, (m, g) => `${m} → ${g}`);
+
+/* ---------- MANTIK · denk önermeler (doğruluk tablosuyla hesaplanır) ---------- */
+const DENK = [
+  ["p → q", (p, q) => !p || q], ["q → p", (p, q) => !q || p], ["p′ ∨ q", (p, q) => !p || q], ["p ∨ q′", (p, q) => p || !q], ["q′ → p′", (p, q) => q || !p],
+  ["p′ → q′", (p, q) => p || !q], ["p ∧ q′", (p, q) => p && !q], ["p′ ∧ q", (p, q) => !p && q], ["p ↔ q", (p, q) => p === q], ["(p → q) ∧ (q → p)", (p, q) => (!p || q) && (!q || p)],
+  ["p ∨ q", (p, q) => p || q], ["p′ ∧ q′", (p, q) => !p && !q], ["(p ∨ q)′", (p, q) => !(p || q)], ["(p ∧ q)′", (p, q) => !(p && q)], ["p′ ∨ q′", (p, q) => !p || !q],
+  ["p ∧ q", (p, q) => p && q], ["(p′ ∨ q′)′", (p, q) => p && q], ["(p → q)′", (p, q) => p && !q], ["p′ ↔ q′", (p, q) => p === q], ["p′ → q", (p, q) => p || q], ["(p′ ∧ q)′", (p, q) => p || !q]
+];
+const TT = f => [[1, 1], [1, 0], [0, 1], [0, 0]].map(([p, q]) => f(!!p, !!q) ? 1 : 0).join("");
+G("denk-onerme", ["mantik", "mat"], "Mantık · denk önermeler", 2, () => {
+  const [ts, tf] = pick(DENK), tv = TT(tf), eq = DENK.filter(([s, f]) => s !== ts && TT(f) === tv), ne = DENK.filter(([, f]) => TT(f) !== tv);
+  if (!eq.length) return null;
+  const [cs] = pick(eq), seen = new Set(), ds = [];
+  for (const [s, f] of shuffle(ne)) { const v = TT(f); if (!seen.has(v) && ds.length < 4) { seen.add(v); ds.push(s); } }
+  if (ds.length < 4) return null;
+  return { q: `${ts} önermesinin denği aşağıdakilerden hangisidir?`, ...strChoices(cs, ds), x: `Doğruluk tablosunda (p, q) = (1,1), (1,0), (0,1), (0,0) için ${ts} ve ${cs} aynı değerleri alır: ${tv.split("").join(", ")}. Diğer seçeneklerin değerleri farklıdır.` };
+});
+
+/* ---------- EDEBİYAT · eski Türk ve Divan edebiyatı eserleri ---------- */
+const ESKI_ESER = [["Kutadgu Bilig", "Yusuf Has Hacip"], ["Divanü Lügati't-Türk", "Kaşgarlı Mahmut"], ["Atabetü'l-Hakayık", "Edip Ahmet Yükneki"], ["Divan-ı Hikmet", "Hoca Ahmet Yesevi"],
+  ["Şikâyetname", "Fuzuli"], ["Hüsn ü Aşk", "Şeyh Galip"], ["Hayriyye", "Nabi"], ["Siham-ı Kaza", "Nef'i"], ["Vesiletü'n-Necat (Mevlid)", "Süleyman Çelebi"],
+  ["Muhakemetü'l-Lugateyn", "Ali Şir Nevai"], ["Harname", "Şeyhi"], ["Garipname", "Âşık Paşa"], ["Risaletü'n-Nushiyye", "Yunus Emre"], ["Seyahatname", "Evliya Çelebi"],
+  ["Keşfü'z-Zunun", "Kâtip Çelebi"]];
+kvGen("eski-eser", ["edebiyat"], "Eser-yazar bilgisi", 2, ESKI_ESER, a => `${a} adlı eser aşağıdakilerden hangisine aittir?`, (a, b) => `${a}: ${b}.`);
+
+/* ---------- YDT · zaman ve kip ---------- */
+const YDT_GRAM = [
+  ["By the time we got to the station, the train ----.", "had already left", ["has already left", "already leaves", "will already leave", "is already leaving"]],
+  ["By the time the guests arrived, we ---- dinner.", "had prepared", ["have prepared", "prepare", "will prepare", "are preparing"]],
+  ["My uncle ---- in İzmir since 2015.", "has lived", ["lived", "lives", "had lived", "will live"]],
+  ["She ---- English for six years, and she still enjoys it.", "has been learning", ["learnt", "had learnt", "learns", "will learn"]],
+  ["If you had told me about the party earlier, I ---- it yesterday.", "would have attended", ["would attend", "will attend", "had attended", "attend"]],
+  ["If it rains tomorrow, we ---- the picnic.", "will cancel", ["would cancel", "would have cancelled", "cancelled", "had cancelled"]],
+  ["If I were you, I ---- more time on revision.", "would spend", ["will spend", "would have spent", "spent", "had spent"]],
+  ["This time tomorrow, I ---- over the Atlantic.", "will be flying", ["will have flown", "flew", "have flown", "had flown"]],
+  ["I ---- a shower when the phone rang.", "was taking", ["have taken", "will take", "am taking", "take"]],
+  ["This bridge ---- in 1973.", "was built", ["built", "has built", "is building", "was building"]],
+  ["Penicillin ---- by Alexander Fleming in 1928.", "was discovered", ["discovered", "has discovered", "is discovering", "was discovering"]],
+  ["By the end of next year, they ---- the new hospital.", "will have finished", ["have finished", "had finished", "finish", "are finishing"]],
+  ["We ---- three units so far this term.", "have covered", ["covered", "had covered", "will cover", "cover"]],
+  ["All the application forms must ---- before Friday.", "be submitted", ["submit", "submitting", "have submitted", "submitted"]],
+  ["When I was a child, I ---- play in the garden for hours.", "used to", ["am used to", "get used to", "use to", "was used to"]],
+  ["Look at those dark clouds! It ---- rain.", "is going to", ["was going to", "has", "had", "would have"]],
+  ["I wish I ---- more free time to read books.", "had", ["have", "will have", "have had", "am having"]],
+  ["The film was so boring that we ---- before the end.", "left", ["leave", "have left", "will leave", "are leaving"]],
+  ["You ---- see a doctor if the pain continues.", "should", ["mustn't", "needn't", "couldn't", "wouldn't"]],
+  ["You ---- touch that wire; it is very dangerous.", "mustn't", ["should", "have to", "need to", "could"]]
+];
+G("ydt-gramer", ["ingilizce"], "Grammar · tenses and modals", 2, () => {
+  const [s, c, ds] = pick(YDT_GRAM);
+  return { q: s, ...strChoices(c, shuffle(ds)), x: `Cümlenin zaman ve anlam ilişkisine uyan seçenek "${c}": ${s.replace("----", c)}` };
+});
+
+/* ---------- YDT · bağlaçlar ve geçiş ifadeleri ---------- */
+const YDT_BAG = [
+  ["---- the weather was terrible, the match went ahead as planned.", "Although", ["Because", "Unless", "So that", "In case"]],
+  ["---- his serious injury, he managed to finish the race.", "Despite", ["Although", "Because of", "Unless", "So as to"]],
+  ["The flight was cancelled ---- the heavy snow.", "because of", ["although", "despite", "in order to", "unless"]],
+  ["She saved money for months ---- she could travel abroad in the summer.", "so that", ["even though", "unless", "whereas", "as if"]],
+  ["You won't be able to enter the building ---- you show your ID card.", "unless", ["although", "so that", "whereas", "as though"]],
+  ["My brother loves crowded cities, ---- I prefer quiet villages.", "whereas", ["so that", "unless", "because", "in case"]],
+  ["Please call me ---- you arrive at the hotel.", "as soon as", ["even though", "whereas", "so that", "unless"]],
+  ["Take an umbrella with you ---- it rains later.", "in case", ["although", "whereas", "so that", "despite"]],
+  ["The tickets were extremely expensive; ----, we decided to watch the match on TV.", "therefore", ["moreover", "otherwise", "for instance", "in contrast"]],
+  ["He studied very hard; ----, he failed the exam.", "nevertheless", ["therefore", "as a result", "for example", "in addition"]],
+  ["Fresh fruit is good for your health; ----, it is cheap and easy to find in summer.", "moreover", ["however", "otherwise", "nevertheless", "in contrast"]],
+  ["You must leave now; ----, you will miss the last bus.", "otherwise", ["therefore", "moreover", "for instance", "similarly"]]
+];
+G("ydt-baglac", ["ingilizce"], "Linkers", 2, () => {
+  const [s, c, ds] = pick(YDT_BAG);
+  return { q: s, ...strChoices(c, shuffle(ds)), x: `Cümleler arasındaki anlam ilişkisine uyan ifade "${c}": ${s.replace("----", c)}` };
+});
+
+/* ---------- YDT · kelime bilgisi ---------- */
+const YDT_KEL = [
+  ["Heavy rain forced the organisers to ---- the concert until next week.", "postpone", ["swallow", "inherit", "whisper", "decorate"]],
+  ["You should ---- your answers carefully before handing in the exam paper.", "review", ["erupt", "inherit", "evaporate", "sneeze"]],
+  ["The museum ---- thousands of visitors every summer.", "attracts", ["hesitates", "evaporates", "resigns", "collapses"]],
+  ["Smoking can seriously ---- your health.", "damage", ["obey", "admire", "rent", "greet"]],
+  ["The company had to ---- 200 workers because of the economic crisis.", "dismiss", ["applaud", "invent", "polish", "wander"]],
+  ["Scientists are trying to ---- the effects of climate change on coral reefs.", "assess", ["betray", "inhale", "erupt", "knit"]],
+  ["Fresh water is ---- for all living things; without it, life cannot survive.", "essential", ["optional", "ancient", "fragile", "temporary"]],
+  ["The instructions were so ---- that nobody understood what to do.", "confusing", ["obvious", "generous", "punctual", "delicious"]],
+  ["She is very ----; she always arrives exactly on time.", "punctual", ["curious", "clumsy", "stubborn", "modest"]],
+  ["The bridge was closed because it was no longer ---- for heavy vehicles.", "safe", ["polite", "hungry", "famous", "jealous"]],
+  ["This medicine is ---- only with a doctor's prescription.", "available", ["visible", "eager", "brave", "honest"]],
+  ["The ---- of the internet has changed the way people communicate.", "invention", ["recipe", "punishment", "journey", "harvest"]],
+  ["Regular exercise reduces the ---- of heart disease.", "risk", ["flavour", "furniture", "applause", "harvest"]],
+  ["The teacher gave us some useful ---- on how to prepare for the exam.", "advice", ["luggage", "weather", "traffic", "furniture"]],
+  ["There is a serious ---- of clean water in some parts of the world.", "shortage", ["victory", "decoration", "celebration", "rehearsal"]],
+  ["Her ---- to the project was so important that the team gave her an award.", "contribution", ["absence", "complaint", "failure", "delay"]],
+  ["The number of electric cars has increased ---- over the past five years.", "dramatically", ["politely", "silently", "carelessly", "bravely"]],
+  ["Please drive ----; the road is very icy.", "carefully", ["loudly", "rarely", "hungrily", "proudly"]],
+  ["The results were ---- different from what the researchers had expected.", "completely", ["kindly", "nervously", "bravely", "hungrily"]],
+  ["The firefighters managed to ---- the fire before it reached the forest.", "put out", ["take after", "look up", "give in", "turn up"]],
+  ["You can ---- the meaning of the word in a dictionary.", "look up", ["put out", "take after", "give up", "run out"]],
+  ["My little sister really ---- our mother; they have the same eyes and smile.", "takes after", ["looks after", "gets over", "puts off", "runs into"]],
+  ["We have ---- milk, so I need to go to the shop.", "run out of", ["looked after", "taken after", "put out", "turned down"]],
+  ["He ---- the job offer because the salary was too low.", "turned down", ["took after", "looked up", "ran out of", "put out"]]
+];
+G("ydt-kelime", ["ingilizce"], "Vocabulary", 2, () => {
+  const [s, c, ds] = pick(YDT_KEL);
+  return { q: s, ...strChoices(c, shuffle(ds)), x: `Boşluğa anlamca uyan sözcük "${c}": ${s.replace("----", c)}` };
+});
+
+/* ---------- YDT · yeni okuma parçaları ---------- */
+EPAS.push(
+  { s: ["Sleep plays a much more active role in learning than was once believed.", "During deep sleep, the brain replays information gathered during the day and strengthens the connections that store it.", "In one study, students who slept after studying vocabulary remembered more words the next day than those who stayed awake.", "For this reason, many researchers argue that staying up all night before an exam may do more harm than good."],
+    off: "Coffee is grown in more than fifty countries around the world.",
+    main: ["Sleep helps the brain strengthen what has been learned, so it is important for studying.", "Students should drink coffee to stay awake before exams.", "Deep sleep makes people forget new vocabulary.", "Most students sleep too much during exam periods.", "The brain stops working completely during sleep."],
+    det: ["According to the passage, students who slept after studying vocabulary ----.", "remembered more words the next day", "forgot most of the words", "did worse than those who stayed awake", "could not sleep deeply", "studied for a longer time"] },
+  { s: ["Honeybees tell each other where food is through a movement known as the waggle dance.", "When a worker bee returns to the hive, it moves in a figure-eight pattern while shaking its body.", "The direction of the dance shows the direction of the food in relation to the sun, and the length of the dance indicates the distance.", "Other bees follow these movements closely and then fly directly to the food source."],
+    off: "Honey has been used as a natural sweetener for thousands of years.",
+    main: ["Honeybees use a special dance to tell other bees where food is.", "Honeybees can only find food by following the sun.", "Honey is healthier than sugar.", "Worker bees never return to the hive.", "Bees dance only to attract a partner."],
+    det: ["According to the passage, the length of the waggle dance shows ----.", "how far away the food is", "how much honey is in the hive", "the age of the worker bee", "the number of flowers", "the time of day"] },
+  { s: ["Cities are often several degrees warmer than the countryside around them, a phenomenon known as the urban heat island effect.", "Dark surfaces such as asphalt and roofs absorb sunlight during the day and release the heat slowly at night.", "Planting trees is one of the cheapest ways to reduce this effect, because trees provide shade and cool the air as water evaporates from their leaves.", "Some cities have therefore started programmes to increase the number of trees in their streets and parks."],
+    off: "The first skyscrapers were built in the late nineteenth century.",
+    main: ["Trees can help reduce the extra heat found in cities.", "Cities are always colder than the countryside.", "Asphalt is the best material for building roads.", "Skyscrapers cause most of the heat in cities.", "Planting trees is too expensive for most cities."],
+    det: ["According to the passage, dark surfaces in cities ----.", "absorb sunlight and release the heat slowly at night", "reflect all sunlight back into the sky", "cool the air through evaporation", "are found only in parks", "are being replaced by trees everywhere"] },
+  { s: ["Microplastics are tiny pieces of plastic less than five millimetres long.", "They are formed when larger plastic objects break down, and they are also added to some cosmetic products.", "Because they are so small, microplastics are easily swallowed by fish and other sea creatures.", "Scientists are now trying to find out how these particles affect human health once they enter the food chain."],
+    off: "The Pacific is the largest and deepest ocean on Earth.",
+    main: ["Microplastics are small plastic particles that can enter the food chain, and their effects are still being studied.", "Microplastics are larger than five centimetres.", "Fish are not affected by plastic in the sea.", "Cosmetic products are always harmful to the skin.", "Scientists have proved that microplastics are completely safe."],
+    det: ["According to the passage, microplastics are formed when ----.", "larger plastic objects break down", "fish swallow sea creatures", "oceans become deeper", "cosmetic products are banned", "scientists study the food chain"] },
+  { s: ["The printing press developed by Johannes Gutenberg in the fifteenth century changed the way information spread in Europe.", "Before its invention, books were copied by hand, which made them rare and expensive.", "Printing allowed books to be produced quickly and in large numbers, so more people could afford them.", "As a result, literacy rates gradually increased and new ideas reached a much wider audience."],
+    off: "Many modern libraries also lend e-books and audiobooks.",
+    main: ["The printing press made books cheaper and helped ideas spread more widely.", "Gutenberg copied all his books by hand.", "Books became more expensive after printing was invented.", "Literacy rates fell in the fifteenth century.", "Libraries no longer lend printed books."],
+    det: ["According to the passage, before the printing press books were ----.", "copied by hand and expensive", "produced quickly in large numbers", "cheap and easy to find", "printed only in Asia", "read by almost everyone"] },
+  { s: ["Regular physical activity benefits not only the body but also the mind.", "During exercise, the brain releases chemicals that can improve mood and reduce feelings of stress.", "Studies show that even a brisk thirty-minute walk several times a week can lower the risk of depression.", "Experts therefore recommend that students include short periods of exercise in their study routines."],
+    off: "Football was first played with standard rules in England in the nineteenth century.",
+    main: ["Exercise improves mental well-being, so it is useful even for busy students.", "Only professional athletes benefit from exercise.", "Walking increases stress levels.", "Students should stop studying to play football.", "Exercise has no effect on the brain."],
+    det: ["According to the passage, a brisk thirty-minute walk several times a week ----.", "can lower the risk of depression", "is dangerous for students", "has no measurable effect", "increases feelings of stress", "replaces the need for sleep"] }
+);
+
+/* ---------- YDT · İngilizceden Türkçeye çeviri ---------- */
+const YDT_CEV = [
+  ["Although the experiment failed several times, the researchers did not give up.", "Deney birkaç kez başarısız olmasına rağmen araştırmacılar pes etmedi.",
+    ["Deney birkaç kez başarısız olduğu için araştırmacılar pes etti.", "Araştırmacılar pes etseydi deney birkaç kez başarısız olmazdı.", "Deney birkaç kez başarılı olmasına rağmen araştırmacılar vazgeçti.", "Araştırmacılar deneyin başarısız olmasını beklemeden çalışmayı bıraktı."]],
+  ["The more you read, the wider your vocabulary becomes.", "Ne kadar çok okursan kelime dağarcığın o kadar genişler.",
+    ["Kelime dağarcığın genişledikçe daha az okursun.", "Çok okumak kelime dağarcığını her zaman daraltır.", "Kelime dağarcığın geniş olmadan okumaya başlamamalısın.", "Ne kadar az okursan kelime dağarcığın o kadar genişler."]],
+  ["Had it not been for your help, I could not have finished the project on time.", "Senin yardımın olmasaydı projeyi zamanında bitiremezdim.",
+    ["Senin yardımın sayesinde projeyi zamanından önce bitirdim.", "Yardım etmeseydin bile projeyi zamanında bitirirdim.", "Projeyi zamanında bitirebilmem için yardımına ihtiyacım olacak.", "Senin yardımına rağmen projeyi zamanında bitiremedim."]],
+  ["Not only does regular exercise improve physical health, but it also reduces stress.", "Düzenli egzersiz yalnızca fiziksel sağlığı iyileştirmekle kalmaz, aynı zamanda stresi de azaltır.",
+    ["Düzenli egzersiz fiziksel sağlığı iyileştirir ama stresi artırır.", "Stresi azaltan tek şey düzenli egzersizdir.", "Düzenli egzersiz fiziksel sağlığı iyileştirmez, yalnızca stresi azaltır.", "Fiziksel sağlığı iyi olanlar düzenli egzersiz yapmadan da stresle başa çıkabilir."]],
+  ["Many species may disappear unless urgent measures are taken to protect their habitats.", "Yaşam alanlarını korumak için acil önlemler alınmazsa pek çok tür yok olabilir.",
+    ["Yaşam alanları korunsa bile pek çok türün yok olması kaçınılmazdır.", "Acil önlemler alındığı için pek çok tür yok olmaktan kurtuldu.", "Pek çok tür, yaşam alanlarını korumak için acil önlemler alıyor.", "Yaşam alanları korunursa hiçbir türün yok olma tehlikesi kalmaz."]],
+  ["It was not until he moved abroad that he realised how much he missed his family.", "Ailesini ne kadar özlediğini ancak yurt dışına taşındığında fark etti.",
+    ["Ailesini özlediği için yurt dışına taşınmaktan vazgeçti.", "Yurt dışına taşınmadan önce ailesini çok özlüyordu.", "Yurt dışına taşındıktan sonra ailesini hiç özlemedi.", "Ailesi onu özlediği için yurt dışından geri döndü."]],
+  ["The new library, which was opened last month, has already attracted thousands of visitors.", "Geçen ay açılan yeni kütüphane şimdiden binlerce ziyaretçi çekti.",
+    ["Yeni kütüphane, binlerce ziyaretçi geldikten sonra geçen ay açıldı.", "Geçen ay açılması planlanan kütüphane henüz ziyaretçi kabul etmiyor.", "Binlerce ziyaretçi, geçen ay açılan kütüphaneyi beğenmedi.", "Yeni kütüphane geçen ay kapandığı için ziyaretçi sayısı azaldı."]],
+  ["Scientists have discovered that some birds can recognise themselves in a mirror.", "Bilim insanları bazı kuşların aynada kendilerini tanıyabildiğini keşfetti.",
+    ["Bilim insanları kuşların aynaya bakmaktan hoşlanmadığını keşfetti.", "Bazı kuşlar, bilim insanlarını aynada tanıyabildi.", "Bilim insanları bütün kuşların aynada kendilerini tanıdığını kanıtladı.", "Bazı kuşların aynada kendilerini tanıyıp tanımadığı hâlâ bilinmiyor."]],
+  ["You should have checked the weather forecast before setting off.", "Yola çıkmadan önce hava durumuna bakmalıydın.",
+    ["Yola çıkmadan önce hava durumuna baktığın için şanslıydın.", "Yola çıktıktan sonra hava durumuna bakman gerekecek.", "Hava durumuna bakmadan yola çıkmak her zaman daha iyidir.", "Hava durumu iyi olsaydı yola çıkardık."]],
+  ["Despite being one of the smallest countries in Europe, Luxembourg has one of the highest incomes per person.", "Avrupa'nın en küçük ülkelerinden biri olmasına rağmen Lüksemburg kişi başına en yüksek gelire sahip ülkelerden biridir.",
+    ["Lüksemburg, Avrupa'nın en küçük ülkesi olduğu için kişi başına geliri düşüktür.", "Avrupa'nın en büyük ülkelerinden biri olan Lüksemburg'un geliri de yüksektir.", "Lüksemburg'da kişi başına gelir, ülke küçüldükçe artmaktadır.", "Avrupa'daki küçük ülkelerin hepsi kişi başına en yüksek gelire sahiptir."]]
+];
+G("ydt-ceviri", ["ingilizce"], "Translation (EN → TR)", 3, () => {
+  const [en, c, ds] = pick(YDT_CEV);
+  return { q: `Aşağıdaki İngilizce cümlenin Türkçe dilindeki en yakın karşılığı hangisidir?\n\n${en}`, ...strChoices(c, shuffle(ds)), x: `Doğru çeviri: "${c}" Diğer seçenekler cümlenin anlamını (zaman, koşul, karşıtlık ya da olumluluk) değiştiriyor.` };
+});
+
+/* ---------- YDT · diyalog tamamlama ---------- */
+const YDT_DIY = [
+  [["Can I borrow your notes from yesterday's lecture?", "----", "Thanks a lot. I'll give them back tomorrow."], "Of course. Here you are.",
+    ["No, I didn't go to the cinema yesterday.", "I'm afraid the lecture starts at nine.", "Yes, I have already returned your book.", "I don't know where the library is."]],
+  [["You look exhausted. What happened?", "----", "Then you should go to bed early tonight."], "I stayed up all night studying for the exam.",
+    ["I have just woken up after a long sleep.", "I'm going on holiday next week.", "My brother bought a new car yesterday.", "I always go to bed at ten."]],
+  [["Excuse me, how can I get to the train station?", "----", "Thank you. Is it far from here?"], "Go straight ahead and turn left at the traffic lights.",
+    ["The train was delayed because of the snow.", "I usually travel by bus.", "I'm sorry, I can't play the guitar.", "The tickets are very expensive this year."]],
+  [["I'm thinking of studying medicine at university.", "----", "I know, but I've always wanted to help people."], "That's a long and demanding programme, isn't it?",
+    ["Really? I didn't know you could cook.", "I've never been to that city before.", "Medicine is the only subject you don't need to study for.", "Great, the shop closes at six."]],
+  [["Did you enjoy the concert last night?", "----", "What a pity! Maybe you can see them next time."], "I couldn't go in the end because I had a terrible headache.",
+    ["Yes, it was the best concert I have ever been to.", "I'm going to buy the tickets tomorrow.", "The band will play here next summer.", "I usually listen to classical music."]],
+  [["Our team lost the match again.", "----", "You're right. They really need a new coach."], "They haven't played well this season at all.",
+    ["They have won every match this season.", "I don't know which team you support.", "The stadium is very close to my house.", "Football matches usually last ninety minutes."]],
+  [["Should we take the bus or walk to the museum?", "----", "Good idea. The fresh air will do us good."], "Let's walk. It's a lovely day and it isn't far.",
+    ["The museum is closed on Mondays.", "Let's take a taxi; it's raining heavily.", "I've already seen that exhibition twice.", "Buses are cheaper than trains."]],
+  [["I can't decide which laptop to buy.", "----", "That's helpful. I mostly need it for writing and watching videos."], "It depends on what you'll mainly use it for.",
+    ["I bought the same laptop last year.", "Laptops are never used for writing.", "The shop doesn't sell any laptops.", "You should have bought it yesterday."]]
+];
+G("ydt-diyalog", ["ingilizce"], "Dialogue completion", 2, () => {
+  const [lines, c, ds] = pick(YDT_DIY);
+  return { q: `Diyaloğu anlamca tamamlayan ifade hangisidir?\n\nA: ${lines[0]}\nB: ${lines[1]}\nA: ${lines[2]}`, ...strChoices(c, shuffle(ds)), x: `Boşluk, A'nın son cevabıyla uyumlu olmalı: "${c}"` };
+});
+
+EPAS.push(
+  { s: ["Antarctica is the coldest, windiest and driest continent on Earth.", "Although it is covered with ice, parts of the continent receive less precipitation each year than many deserts.", "No people live there permanently, but thousands of scientists stay at research stations for months at a time.", "Their studies of the ice help us understand how the Earth's climate has changed over hundreds of thousands of years."],
+    off: "Penguins are also found in South Africa and Australia.",
+    main: ["Antarctica is an extreme continent where scientists study the history of the Earth's climate.", "Antarctica has a large permanent population.", "It rains more in Antarctica than anywhere else.", "Penguins live only in Antarctica.", "Scientists cannot work in Antarctica because of the cold."],
+    det: ["According to the passage, some parts of Antarctica ----.", "receive less precipitation than many deserts", "are warmer than tropical forests", "have large cities", "are not covered with ice at all", "are closed to scientists"] },
+  { s: ["Many people believe that multitasking helps them get more work done.", "However, research shows that the brain cannot fully focus on two demanding tasks at the same time.", "Instead, it switches quickly between them, and each switch costs time and attention.", "As a result, people who multitask often make more mistakes than those who complete one task before starting another."],
+    off: "Smartphones have become cheaper over the last decade.",
+    main: ["Multitasking usually reduces efficiency because the brain switches between tasks.", "Multitasking doubles the amount of work people can do.", "The brain can focus on many difficult tasks at once.", "Smartphones make people more productive.", "People should never work on more than one project in a year."],
+    det: ["According to the passage, people who multitask often ----.", "make more mistakes", "finish their work faster", "never switch between tasks", "have better memories", "avoid using smartphones"] },
+  { s: ["Volcanic eruptions can affect the climate of the whole planet.", "When a large volcano erupts, it can send ash and gases high into the atmosphere.", "Some of these gases form tiny particles that reflect sunlight back into space.", "In 1816, after a huge eruption in Indonesia, Europe and North America experienced such a cold summer that it became known as the year without a summer."],
+    off: "Indonesia is made up of thousands of islands.",
+    main: ["Large volcanic eruptions can cool the Earth by blocking sunlight.", "Volcanic eruptions always make summers hotter.", "Volcanic ash stays only near the volcano.", "Indonesia has the largest population in Asia.", "Volcanoes have no effect on the atmosphere."],
+    det: ["According to the passage, in 1816 Europe and North America ----.", "had an unusually cold summer", "experienced a volcanic eruption", "had the hottest summer in history", "were covered with volcanic ash", "sent scientists to Indonesia"] },
+  { s: ["Learning to play a musical instrument can benefit children in many ways.", "Practising regularly teaches them patience and discipline, as progress usually comes slowly.", "Reading music and coordinating both hands also exercises several parts of the brain at once.", "Some studies have even found that children who play an instrument perform better in language and mathematics."],
+    off: "The piano was invented in Italy around the year 1700.",
+    main: ["Playing a musical instrument helps children develop several skills.", "Children should not learn instruments before they are ten.", "Only talented children can learn to play the piano.", "Music lessons make children worse at mathematics.", "Most instruments were invented in Italy."],
+    det: ["According to the passage, practising an instrument regularly teaches children ----.", "patience and discipline", "how to invent new instruments", "to avoid mathematics", "to play without reading music", "to make quick progress without effort"] }
+);
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */
 const r1 = x => Math.round(x * 10) / 10;
@@ -4161,10 +4557,14 @@ function buildSet(parts, o) {
     const take = [];
     if (!o.genOnly) for (const q of (o.unsolvedFirst === false ? pool : fresh)) { if (take.length >= n) break; take.push(q); }
     const gens = o.src === "ai" ? [] : gensOf(s, o.topic);
+    /* Aynı kalıp bir bölümde üst üste gelmesin: her kalıptan en fazla "cap" soru, sonra eski özgün sorular */
     let order = shuffle(gens), i = 0, guard = 0, stale = 0;
+    const per = {}, cap = Math.max(2, Math.ceil(n / Math.max(1, gens.length)) + 1, Math.ceil(n * 0.12));
     while (take.length < n && gens.length && guard < n * 6 + gens.length * 2) {
-      const q = genQ(order[i % order.length], s, used);
-      if (q && (!q.stale || stale >= gens.length)) { delete q.stale; take.push(q); stale = 0; }
+      const g = order[i % order.length];
+      if ((per[g.id] || 0) >= cap) { i++; guard++; if (i % order.length === 0) order = shuffle(gens); continue; }
+      const q = genQ(g, s, used);
+      if (q && (!q.stale || stale >= gens.length)) { delete q.stale; take.push(q); stale = 0; per[g.id] = (per[g.id] || 0) + 1; }
       else if (q) stale++;
       i++; guard++; if (i % order.length === 0) order = shuffle(gens);
     }
@@ -4336,7 +4736,7 @@ function vHome() {
   return `<div class="view">${resumeBanner()}
   <div class="vhead"><span class="eyebrow">${esc(dateStr)}</span><h1>${p.name ? `Merhaba ${esc(p.name)}.` : "Merhaba."} Bugün ne çalışıyoruz?</h1></div>
   ${p.ok ? "" : `<form class="card" data-s="onboard"><div class="card-h"><h2>Seni tanıyalım</h2><span class="pill form">1 dakika</span></div>
-    <div class="fields"><label class="f">Adın<input class="in" name="name" autocomplete="given-name" placeholder="Örn. Elif"></label>
+    <div class="fields"><label class="f">Adın<input class="in" name="name" autocomplete="given-name" placeholder="Adını yaz"></label>
     <label class="f">Alanın<select class="in" name="alan">${Object.entries(ALAN).map(([k, v]) => `<option value="${k}"${p.alan === k ? " selected" : ""}>${v}</option>`).join("")}</select></label>
     <label class="f">Günlük soru hedefi<input class="in" name="gunluk" type="number" min="5" max="500" value="${goal}"></label></div>
     <div class="row" style="margin-top:12px"><button class="btn pri">Kaydet</button><span class="small muted">Alanına göre deneme ve testler hazırlanır.</span></div></form>`}
@@ -5065,7 +5465,7 @@ function vAdmOverview() {
     });
     return Object.assign(d, { v: a, q, tip: `${a} kişi · ${q.toLocaleString("tr-TR")} soru` });
   });
-  const recent = all.slice().sort((a, b) => b.last - a.last).slice(0, 6), miss = SITE.db ? AYAR_F.filter(f => f[3] && !AYAR[f[0]]) : [];
+  const recent = all.slice().sort((a, b) => b.last - a.last).slice(0, 6), miss = SITE.db ? AYAR_F.filter(f => f[3] && !AYAR[f[0]]).concat(["linkOrtaAy", "linkOrtaYil", "linkPremiumAy", "linkPremiumYil"].some(k => AYAR[k]) ? [] : [["", "en az bir ödeme linki"]]) : [];
   return `<div class="view">${head}
   ${ADM.err ? `<p class="note">${esc(ADM.err)}</p>` : ""}
   ${miss.length ? `<div class="banner"><div class="grow"><b>Site bilgilerin eksik.</b> Premium ödemesi ve yasal metinler için ${miss.length} bilgi bekleniyor: ${miss.map(f => esc(f[1])).join(", ")}.</div><button class="btn sm pri" data-a="admTab" data-k="ayarlar">Şimdi doldur</button></div>` : ""}
@@ -5189,20 +5589,27 @@ Object.assign(IC, { bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path
 const SITE = { db: null, duyuru: null, ayarDoc: null, base: null };
 const AYAR_F = [
   ["adSoyad", "Ad soyad ya da şirket unvanı", "Yasal metinlerde satıcı olarak görünür", true],
-  ["eposta", "İletişim e-postası", "Destek, iptal ve KVKK başvuruları için", true],
+  ["eposta", "İletişim e-postası", "Destek ve KVKK başvuruları için", true],
   ["adres", "Adres", "Mesafeli satış sözleşmesi için", true],
   ["telefon", "Telefon", "Örn. 0555 000 00 00", false],
-  ["fiyat", "Premium aylık fiyatı (TL)", "Örn. 149", true],
-  ["aiLimit", "Aylık AI mesaj hakkı", "Örn. 300", false],
-  ["odemeAracisi", "Ödeme kuruluşu", "Örn. iyzico, PayTR, Shopier", true],
-  ["odemeLinki", "Ödeme sayfası linki", "https:// ile başlayan link", true],
+  ["odemeAracisi", "Ödeme kuruluşu", "Örn. iyzico, Shopier", true],
+  ["fiyatOrta", "Orta paket · aylık fiyat (TL)", "149", false],
+  ["yillikOrta", "Orta paket · yıllık fiyat (TL)", "1490", false],
+  ["fiyatPremium", "Premium paket · aylık fiyat (TL)", "299", false],
+  ["yillikPremium", "Premium paket · yıllık fiyat (TL)", "2990", false],
+  ["aiOrta", "Orta paket · aylık AI mesaj hakkı", "300", false],
+  ["aiPremium", "Premium paket · aylık AI mesaj hakkı", "800", false],
+  ["linkOrtaAy", "Ödeme linki · Orta aylık", "https://…", false],
+  ["linkOrtaYil", "Ödeme linki · Orta yıllık", "https://…", false],
+  ["linkPremiumAy", "Ödeme linki · Premium aylık", "https://…", false],
+  ["linkPremiumYil", "Ödeme linki · Premium yıllık", "https://…", false],
   ["guncelleme", "Yasal metinlerin güncelleme tarihi", "Örn. 3 Kasım 2026", false]
 ];
 function applyAyar(d) {
   if (!SITE.base) SITE.base = Object.assign({}, AYAR);
   AYAR_F.forEach(([k]) => {
     let v = d && typeof d[k] === "string" ? d[k].trim().slice(0, 300) : "";
-    if (k === "odemeLinki" && v && !/^https:\/\/\S+$/i.test(v)) v = "";
+    if (/^link/.test(k) && v && !/^https:\/\/\S+$/i.test(v)) v = "";
     AYAR[k] = v || SITE.base[k] || "";
   });
 }
@@ -5226,7 +5633,7 @@ function vAdmSettings() {
   const head = `<div class="vhead"><span class="eyebrow">Yalnızca sen görüyorsun</span><h1>Duyuru ve site ayarları</h1><p>Öğrencilere duyuru gönder; Premium ve yasal metinlerde görünen bilgilerini buradan doldur. Kaydettiğin anda sitede güncellenir.</p></div>`;
   if (!SITE.db) return `<div class="view">${head}<div class="empty">Ayarları değiştirmek için sayfayı Claude hesabınla açman gerekir.</div></div>`;
   const d = SITE.duyuru && SITE.duyuru.on ? SITE.duyuru : null, A = ADM.ad || SITE.ayarDoc || {}, base = SITE.base || {}, dv = ADM.dd || d || {};
-  const miss = AYAR_F.filter(f => f[3] && !AYAR[f[0]]);
+  const miss = AYAR_F.filter(f => f[3] && !AYAR[f[0]]).concat(["linkOrtaAy", "linkOrtaYil", "linkPremiumAy", "linkPremiumYil"].some(k => AYAR[k]) ? [] : [["", "en az bir ödeme linki"]]);
   return `<div class="view">${head}
   <div class="card stack"><h2>Öğrencilere duyuru</h2>
     ${d ? `<div class="note"><b>Şu an yayında:</b> ${esc(String(d.t || "").slice(0, 80))}${d.m ? " — " + esc(String(d.m).slice(0, 140)) : ""} <span class="muted">(${esc(relT(d.ts))})</span></div>` : `<p class="small muted">Şu an yayında duyuru yok.</p>`}
@@ -5238,7 +5645,7 @@ function vAdmSettings() {
     </form>
     <p class="small muted">Duyuru, siteyi açan herkesin sayfasının en üstünde görünür ve öğrenci kapatana kadar kalır. Güncellediğinde kapatmış olanlara da yeniden görünür. Site içi bir bölüme yönlendirmek için #deneme, #banka, #paragraf, #premium gibi yazabilirsin.</p></div>
   <div class="card stack"><h2>Site bilgileri</h2>
-    ${miss.length ? `<p class="note">Premium satışı ve yasal metinler için eksik: <b>${miss.map(f => esc(f[1])).join(", ")}</b>. Bunlar dolmadan Premium sayfasında ödeme düğmesi çıkmaz, yasal metinlerde köşeli parantezli boşluklar görünür.</p>` : `<p class="note">Gerekli bilgiler tamam. Premium sayfasında "Ödemeye geç" düğmesi açık.</p>`}
+    ${miss.length ? `<p class="note">Premium satışı ve yasal metinler için eksik: <b>${miss.map(f => esc(f[1])).join(", ")}</b>. Bunlar dolmadan Premium sayfasında ödeme düğmesi çıkmaz, yasal metinlerde köşeli parantezli boşluklar görünür.</p>` : `<p class="note">Gerekli bilgiler tamam. Linkini girdiğin paketler Premium sayfasında satın alınabilir durumda.</p>`}
     <form data-s="admAyar" class="stack"><div class="fields">${AYAR_F.map(([k, l, h, req]) => `<label class="f">${esc(l)}${req ? "" : ` <span class="muted" style="font-weight:400">(isteğe bağlı)</span>`}<input class="in" name="${k}" maxlength="300" value="${esc(A[k] != null ? A[k] : (base[k] || ""))}" placeholder="${esc(h)}"${k === "odemeLinki" ? ' inputmode="url"' : k === "eposta" ? ' type="email"' : (k === "fiyat" || k === "aiLimit") ? ' inputmode="numeric"' : ""}></label>`).join("")}</div>
       <div class="row"><button class="btn pri">Kaydet</button><button type="button" class="btn ghost" data-a="admPreview" data-k="premium">Premium sayfasını gör</button><button type="button" class="btn ghost" data-a="admPreview" data-k="yasal">Yasal metinleri gör</button></div></form>
     <p class="small muted">Bu bilgiler herkese açık sayfalarda (Premium ve yasal metinler) görünür. Kart ya da şifre gibi gizli bilgi yazma.</p></div>
@@ -5264,8 +5671,8 @@ const ADM_SUB = {
   },
   async admAyar(fd) {
     const o = {}; AYAR_F.forEach(([k]) => { o[k] = String(fd.get(k) || "").trim().slice(0, 300); });
-    o.fiyat = o.fiyat.replace(/\s*(TL|₺)\s*$/i, ""); ADM.ad = o;
-    if (o.odemeLinki && !/^https:\/\/\S+$/i.test(o.odemeLinki)) { toast("Ödeme linki https:// ile başlamalı."); return; }
+    ["fiyatOrta", "yillikOrta", "fiyatPremium", "yillikPremium", "aiOrta", "aiPremium"].forEach(k => { o[k] = o[k].replace(/[^\d]/g, ""); }); ADM.ad = o;
+    if (Object.keys(o).some(k => /^link/.test(k) && o[k] && !/^https:\/\/\S+$/i.test(o[k]))) { toast("Ödeme linkleri https:// ile başlamalı."); return; }
     if (o.eposta && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.eposta)) { toast("E-posta adresini kontrol et."); return; }
     try { await SITE.db.doc("ayar/site").set(Object.assign({}, o, { _u: Date.now() })); SITE.ayarDoc = o; ADM.ad = null; applyAyar(o); toast("Site bilgileri kaydedildi."); } catch (e) { toast("Kaydedilemedi. Biraz sonra tekrar dene."); }
     render();
@@ -5273,11 +5680,14 @@ const ADM_SUB = {
 };
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
-const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", fiyat: "", aiLimit: "", odemeAracisi: "", odemeLinki: "", yapayZeka: "", guncelleme: "" }, window.AKE_AYAR || {});
+const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
+  fiyatOrta: "149", yillikOrta: "1490", fiyatPremium: "299", yillikPremium: "2990", aiOrta: "300", aiPremium: "800",
+  linkOrtaAy: "", linkOrtaYil: "", linkPremiumAy: "", linkPremiumYil: "" }, window.AKE_AYAR || {});
+Object.keys(AYAR).forEach(k => { if (AYAR[k] == null) AYAR[k] = ""; else AYAR[k] = String(AYAR[k]); });
 if (!AYAR.yapayZeka) AYAR.yapayZeka = "Anthropic (Claude)";
 if (!AYAR.barindirma) AYAR.barindirma = IN_CLAUDE ? "Anthropic'in Claude platformu" : "Vercel";
 const ay = (k, ph) => AYAR[k] ? esc(String(AYAR[k])) : `<span class="ph">[${ph}]</span>`;
-UI.prem = { a: false, b: false };
+UI.prem = { a: false, b: false, yil: false, sel: "" };
 Object.assign(IC, {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
@@ -5294,30 +5704,45 @@ function tutorOff() {
   return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Premium</span><h2>AI öğretmen çok yakında</h2><p class="muted">Takıldığın soruyu yazdığında adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen, AKE Akademi Premium ile açılıyor. Soru bankası, denemeler ve diğer tüm bölümler ücretsiz kullanılmaya devam ediyor.</p><a class="btn acc" style="align-self:flex-start" href="#premium">Premium'u incele</a></div>`;
 }
 
-/* Premium */
+/* Premium: Ücretsiz, Orta ve Premium paketleri; aylık ya da yıllık (yıllıkta 2 ay bedava) */
+const tl = v => { const n = Number(String(v || "").replace(/[^\d]/g, "")); return n ? n.toLocaleString("tr-TR") : ""; };
+const okLink = u => /^https:\/\/\S+$/i.test(String(u || ""));
+function planlar() {
+  return [
+    { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Paragraf atölyesi", "Yanlış defteri ve tekrar kartları", "Çalışma planı ve gelişim takibi"] },
+    { k: "orta", n: "Orta", tag: "dengeli", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
+      feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
+    { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },
+      feats: ["Orta paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı", "Zor sorularda daha gelişmiş AI çözümü"] }
+  ];
+}
 function vPremium() {
-  const lim = AYAR.aiLimit ? `ayda ${esc(AYAR.aiLimit)} mesaj` : "aylık mesaj hakkıyla";
-  const free = ["Soru bankası ve deneme merkezi", "Paragraf atölyesi", "Yanlış defteri ve tekrar kartları", "Çalışma planı ve gelişim takibi"];
-  const prem = [`AI öğretmen (${lim})`, "Konuna özel AI ile yeni sorular", "Deneme sonucuna AI yorumu", "AI ile haftalık çalışma planı", "AI konu özetleri"];
-  const ready = !!(AYAR.odemeLinki && AYAR.fiyat && AYAR.adSoyad && AYAR.eposta);
-  const li = (t, ok) => `<li class="pf"><span class="pf-i ${ok ? "on" : ""}" aria-hidden="true"></span>${t}</li>`;
-  const price = AYAR.fiyat
-    ? `<div class="price"><b>${esc(AYAR.fiyat)}<small> TL</small></b><span>/ ay · vergiler dahil</span></div>`
-    : `<div class="price"><b style="font:700 26px/1.1 var(--f-disp);letter-spacing:-.01em">Çok yakında</b><span>Fiyat açılışta duyurulacak</span></div>`;
-  const buy = ready ? `<div class="card stack">
-      <h2>Premium'a geç</h2>
+  const Y = UI.prem.yil, P = planlar(), satici = !!(AYAR.adSoyad && AYAR.eposta);
+  const li = t => `<li class="pf"><span class="pf-i on" aria-hidden="true"></span>${t}</li>`;
+  const fiyat = p => {
+    if (!p.ay) return `<div class="price"><b>0<small> TL</small></b><span>kayıt gerekmez</span></div>`;
+    const m = tl(p.ay), y = tl(p.yil), ym = Number(String(p.yil).replace(/[^\d]/g, "")) / 12;
+    return Y && y ? `<div class="price"><b>${y}<small> TL</small></b><span>/ yıl</span></div><p class="xs muted">Aylık ${Math.round(ym).toLocaleString("tr-TR")} TL'ye gelir · 12 ay yerine 10 ay öde</p>`
+      : `<div class="price"><b>${m}<small> TL</small></b><span>/ ay</span></div><p class="xs muted">Yıllık alırsan ${y ? y + " TL, 2 ay bedava" : "daha avantajlı"}</p>`;
+  };
+  const acik = p => p.link && okLink(Y ? p.link.yil : p.link.ay) && satici;
+  const kart = p => `<div class="card stack${p.k === "premium" ? " prem" : ""}${UI.prem.sel === p.k ? " sel" : ""}">
+      <div class="card-h" style="margin:0"><h2>${p.n}</h2><span class="pill${p.k === "ucretsiz" ? "" : " form"}">${p.tag}</span></div>${fiyat(p)}
+      <ul class="pfl">${p.feats.map(li).join("")}</ul>
+      ${p.k === "ucretsiz" ? `<a class="btn" href="#bugun">Hemen başla</a>` : acik(p) ? `<button class="btn ${p.k === "premium" ? "acc" : "pri"}" data-a="premSec" data-k="${p.k}">${UI.prem.sel === p.k ? "Seçildi" : "Bu paketi seç"}</button>` : `<button class="btn" disabled>Çok yakında</button>`}
+    </div>`;
+  const S2 = P.find(p => p.k === UI.prem.sel && acik(p));
+  const buy = S2 ? `<div class="card stack" id="odeme">
+      <h2>${S2.n} paket · ${Y ? "yıllık" : "aylık"} · ${tl(Y ? S2.yil : S2.ay)} TL</h2>
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="a"${UI.prem.a ? " checked" : ""}><span><a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nu ve <a href="#mesafeli">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.</span></label>
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
       <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
-      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Aboneliğini istediğin zaman iptal edebilirsin (<a href="#iade">İptal ve İade Koşulları</a>). 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
-    </div>`
-    : `<div class="card sunk stack"><h2>Premium çok yakında açılıyor</h2><p class="muted">Ödeme ve üyelik sistemi hazırlanıyor. Açıldığında AI öğretmen ve diğer Premium özellikler hesabına tanımlanacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi Premium haber ver")}">Bana haber ver</a>` : ""}</div>`;
-  return `<div class="view">
-    <div class="vhead"><span class="eyebrow">AKE Akademi Premium</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, denemeler ve takip araçları herkese ücretsiz. Premium, bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
-    <div class="grid2 plans">
-      <div class="card stack"><div class="card-h" style="margin:0"><h2>Ücretsiz</h2><span class="pill">her zaman</span></div><div class="price"><b>0<small> TL</small></b><span>kayıt gerekmez</span></div><ul class="pfl">${free.map(t => li(t, true)).join("")}</ul></div>
-      <div class="card stack prem"><div class="card-h" style="margin:0"><h2>Premium</h2><span class="pill form">aylık abonelik</span></div>${price}<ul class="pfl">${li("Ücretsiz plandaki her şey", true)}${prem.map(t => li(t, true)).join("")}</ul><p class="xs muted">Taahhüt yok, istediğin ay iptal edebilirsin.</p></div>
-    </div>
+      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
+    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">AI öğretmen ve diğer AI özellikleri hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
+  return `<div class="view wide">
+    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, denemeler ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
+    <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık · 2 ay bedava</button></div>
+    <div class="grid3 plans">${P.map(kart).join("")}</div>
     ${buy}
   </div>`;
 }
@@ -5380,15 +5805,15 @@ const LEGAL = {
     <h2>Satıcı</h2>
     <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}<br>Telefon: ${ay("telefon", "TELEFON")}</p>
     <h2>Hizmet</h2>
-    <p>AKE Akademi Premium aylık abonelik. Kapsam: Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiLimit", "LİMİT")} mesaj), AI ile soru üretme, deneme sonucu AI yorumu, AI haftalık plan ve AI konu özetleri.</p>
+    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiOrta", "LİMİT")} mesaj), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ay("aiPremium", "LİMİT")} mesaj), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
     <h2>Fiyat</h2>
-    <p>Aylık ${ay("fiyat", "FİYAT")} TL, tüm vergiler dahil. Ek ücret yoktur.</p>
+    <p>Orta paket aylık ${ay("fiyatOrta", "FİYAT")} TL veya yıllık ${ay("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ay("fiyatPremium", "FİYAT")} TL veya yıllık ${ay("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
     <h2>Ödeme</h2>
-    <p>${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden banka veya kredi kartıyla. İlk ödeme abonelik başlangıcında, sonraki ödemeler her ay aynı gün otomatik olarak alınır.</p>
+    <p>${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden banka veya kredi kartıyla, satın alınan dönem için peşin olarak.</p>
     <h2>Süre ve yenileme</h2>
-    <p>Abonelik belirsiz sürelidir ve iptal edilene kadar aylık olarak devam eder. İstediğin zaman, gerekçe göstermeden ve hiçbir bedel ödemeden iptal edebilirsin. İptal, ödemesi yapılmış dönemin sonunda geçerli olur ve sonraki aylar için ücret alınmaz.</p>
+    <p>Paket, seçtiğin süre (1 ay ya da 1 yıl) boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. Süre bitince devam etmek istersen yeniden satın alırsın.</p>
     <h2>Teslim</h2>
-    <p>Hizmet, ödemenin onaylanmasının hemen ardından hesabın üzerinden elektronik ortamda anında sunulur. Fiziksel teslimat yoktur.</p>
+    <p>Hizmet, ödemenin onaylanmasının ardından elektronik ortamda kullanıma açılır. Fiziksel teslimat yoktur.</p>
     <h2>Cayma hakkı</h2>
     <p>Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca, elektronik ortamda anında ifa edilen hizmetlerde ve cayma süresi bitmeden tüketicinin onayıyla ifasına başlanan hizmetlerde cayma hakkı kullanılamaz. Ödeme sırasında hizmetin hemen başlamasını onaylaman hâlinde cayma hakkın bulunmaz.</p>
     <h2>Şikâyet ve itiraz</h2>
@@ -5400,13 +5825,13 @@ const LEGAL = {
     <h2>Madde 2 – Konu</h2>
     <p>Bu sözleşme, Alıcı'nın Site üzerinden satın aldığı Premium abonelik hizmetinin satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.</p>
     <h2>Madde 3 – Hizmet ve bedel</h2>
-    <p>Hizmetin kapsamı, aylık bedeli ve ödeme koşulları <a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nda belirtildiği gibidir. Ön Bilgilendirme Formu bu sözleşmenin ayrılmaz parçasıdır.</p>
+    <p>Hizmetin kapsamı, paketlerin bedeli ve ödeme koşulları <a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nda belirtildiği gibidir. Ön Bilgilendirme Formu bu sözleşmenin ayrılmaz parçasıdır.</p>
     <h2>Madde 4 – İfa</h2>
     <p>Hizmet, ödemenin onaylanmasıyla Alıcı'nın hesabında anında kullanıma açılır. Satıcı hizmeti kesintisiz sunmak için makul özeni gösterir. Planlı bakım ve teknik arızalar nedeniyle kısa süreli kesintiler olabilir. Uzun süren kesintilerde Alıcı'ya kullanamadığı süre kadar ek süre tanınır.</p>
     <h2>Madde 5 – Ödeme ve yenileme</h2>
-    <p>Abonelik ücreti her ay abonelik başlangıç gününde ${ay("odemeAracisi", "ÖDEME ARACISI")} aracılığıyla otomatik olarak tahsil edilir. Fiyat değişiklikleri en az 30 gün önce e-posta ile bildirilir ve bildirimden sonraki ilk yenilemede uygulanır. Alıcı yeni fiyatı kabul etmezse aboneliğini iptal edebilir.</p>
-    <h2>Madde 6 – Fesih (iptal)</h2>
-    <p>Alıcı, aboneliğini istediği zaman, gerekçe göstermeden ve cezai şart ödemeden hesap ayarlarındaki "Aboneliği iptal et" butonuyla veya ${ay("eposta", "E-POSTA")} adresine e-posta göndererek iptal edebilir. Satıcı iptal talebini en geç 7 gün içinde yerine getirir ve bir sonraki dönem için ücret almaz. Alıcı, ödemesini yaptığı dönemin sonuna kadar hizmetten yararlanmaya devam eder.</p>
+    <p>Paket bedeli, seçilen dönem (1 ay ya da 1 yıl) için ${ay("odemeAracisi", "ÖDEME ARACISI")} aracılığıyla peşin tahsil edilir. Paket kendiliğinden yenilenmez ve Alıcı'nın kartından otomatik çekim yapılmaz. Fiyat değişiklikleri yalnızca sonraki satın almalarda uygulanır.</p>
+    <h2>Madde 6 – Sona erme</h2>
+    <p>Paket, satın alınan dönemin sonunda kendiliğinden sona erer; ayrıca iptal gerekmez. Alıcı, ödemesini yaptığı dönemin sonuna kadar hizmetten yararlanmaya devam eder. Sorularını ${ay("eposta", "E-POSTA")} adresine iletebilir.</p>
     <h2>Madde 7 – Cayma hakkı</h2>
     <p>Hizmet elektronik ortamda anında ifa edildiğinden ve Alıcı ödeme sırasında hizmetin hemen başlamasını onayladığından, Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca Alıcı'nın cayma hakkı bulunmaz.</p>
     <h2>Madde 8 – Satıcının sona erdirmesi</h2>
@@ -5418,8 +5843,8 @@ const LEGAL = {
 
   "iade": { t: "İptal ve İade Koşulları", d: "Aboneliği iptal etme ve ücret iadesi", h: () => `
     <ul>
-      <li><b>İptal:</b> Aboneliğini istediğin zaman hesap ayarlarından veya ${ay("eposta", "E-POSTA")} adresine yazarak iptal edebilirsin. İptal için gerekçe veya ücret gerekmez.</li>
-      <li><b>İptal sonrası:</b> Ödediğin ayın sonuna kadar Premium'u kullanmaya devam edersin, sonraki ay ücret alınmaz.</li>
+      <li><b>Yenileme yok:</b> Paketler seçtiğin süre (1 ay ya da 1 yıl) sonunda kendiliğinden sona erer; kartından otomatik çekim yapılmaz, bu yüzden ayrıca iptal etmen gerekmez.</li>
+      <li><b>Süre boyunca:</b> Ödediğin dönemin sonuna kadar paketini kullanmaya devam edersin.</li>
       <li><b>İade:</b> Hizmet ödeme anında açıldığı için cayma hakkı yoktur ve kullanılmış dönemler için kural olarak iade yapılmaz.</li>
       <li><b>İstisnalar:</b> Hatalı veya mükerrer çekim olursa ya da teknik bir sorun nedeniyle hizmete hiç erişemediysen ${ay("eposta", "E-POSTA")} adresine yazman yeterli. İnceleme sonrası ücret 14 gün içinde ödeme yaptığın karta iade edilir.</li>
     </ul>` }
@@ -5799,7 +6224,12 @@ const SUB = {
 
 /* ---------- Premium eylemleri ---------- */
 Object.assign(ACT, {
-  premBuy() { if (!(UI.prem.a && UI.prem.b) || !AYAR.odemeLinki) return; window.open(AYAR.odemeLinki, "_blank", "noopener"); }
+  premBuy() {
+    const p = planlar().find(x => x.k === UI.prem.sel), u = p && p.link ? (UI.prem.yil ? p.link.yil : p.link.ay) : "";
+    if (!(UI.prem.a && UI.prem.b) || !okLink(u)) return; window.open(u, "_blank", "noopener");
+  },
+  premSec(d) { UI.prem.sel = d.k; UI.prem.a = UI.prem.b = false; render(); const el = document.getElementById("odeme"); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); },
+  premDonem(d) { UI.prem.yil = d.k === "yil"; render(); }
 });
 Object.assign(CHG, { premOk(el) { UI.prem[el.dataset.k] = el.checked; render(); } });
 /* Android ve masaüstü Chrome: "Uygulamayı yükle" düğmesi */

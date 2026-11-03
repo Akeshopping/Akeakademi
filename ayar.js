@@ -1,5 +1,5 @@
 /* AKE Akademi site ayarları
-   Tırnak işaretlerinin arasını doldur, kaydet ve siteyi yeniden yükle (Vercel otomatik günceller).
+   Tırnak işaretlerinin arasını doldur, kaydet ve GitHub'a yükle (site birkaç dakikada otomatik güncellenir).
    Bu bilgiler Premium sayfasında ve yasal metinlerde (KVKK, mesafeli satış, iade) görünür.
    Boş bırakılan alanlar yasal metinlerde [KÖŞELİ PARANTEZ] olarak görünür.
    Bir paketin "Bu paketi seç" düğmesi; ad soyad, e-posta ve o paketin ödeme linki dolunca açılır.
@@ -23,6 +23,6 @@ window.AKE_AYAR = {
   linkPremiumAy: "https://www.shopier.com/AKESHOPPING/52547968",
   linkPremiumYil: "https://www.shopier.com/AKESHOPPING/52547986",
   yapayZeka: "",      // AI sağlayıcısı (boşsa "Anthropic (Claude)" yazar)
-  barindirma: "Vercel",
+  barindirma: "Cloudflare",
   guncelleme: "4 Kasım 2026"  // Yasal metinlerin son güncelleme tarihi
 };

@@ -4715,6 +4715,28 @@ function webAI() {
     const g = r.headers.get("x-ake-model") === "guclu"; if (g) ayArt("ake.aiguclu");
     if (json) { const j = await r.json(); j.guclu = g; return j; }
     const reader = r.body.getReader(), dec = new TextDecoder(), tail = /\n\n\[\[AKE_(HATA|KESIK)\]\]$/;
+    if ((r.headers.get("content-type") || "").includes("event-stream")) {
+      /* Cloudflare: Anthropic akışı olduğu gibi gelir; yalnızca metin parçaları alınır (düşünme blokları gösterilmez) */
+      let buf = "", out = "", stop = "", err = "";
+      const ev = blk => {
+        const line = blk.split("\n").find(l => l.startsWith("data:")); if (!line) return;
+        let d; try { d = JSON.parse(line.slice(5)); } catch (e) { return; }
+        if (d.type === "content_block_delta" && d.delta && d.delta.type === "text_delta") { out += d.delta.text; if (opts.onText) opts.onText({ text: out, delta: d.delta.text }); }
+        else if (d.type === "message_delta" && d.delta && d.delta.stop_reason) stop = d.delta.stop_reason;
+        else if (d.type === "error") err = (d.error && d.error.type) || "error";
+      };
+      try {
+        for (;;) {
+          const { value, done } = await reader.read(); if (done) break;
+          buf += dec.decode(value, { stream: true }).replace(/\r\n/g, "\n");
+          let i; while ((i = buf.indexOf("\n\n")) >= 0) { ev(buf.slice(0, i)); buf = buf.slice(i + 2); }
+        }
+        if (buf.trim()) ev(buf);
+      } catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network", text: out }; }
+      if (err) throw { code: err === "overloaded_error" ? "overloaded" : "server", text: out };
+      if (!out.trim()) throw { code: stop === "refusal" ? "refused" : "empty_completion" };
+      return { text: out, truncated: stop === "max_tokens", guclu: g };
+    }
     let text = "";
     try {
       for (;;) { const { value, done } = await reader.read(); if (done) break; text += dec.decode(value, { stream: true }); if (opts.onText) opts.onText({ text: text.replace(tail, ""), delta: "" }); }
@@ -5898,7 +5920,7 @@ const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", od
   linkOrtaAy: "", linkOrtaYil: "", linkPremiumAy: "", linkPremiumYil: "" }, window.AKE_AYAR || {});
 Object.keys(AYAR).forEach(k => { if (AYAR[k] == null) AYAR[k] = ""; else AYAR[k] = String(AYAR[k]); });
 if (!AYAR.yapayZeka) AYAR.yapayZeka = "Anthropic (Claude)";
-if (!AYAR.barindirma) AYAR.barindirma = IN_CLAUDE ? "Anthropic'in Claude platformu" : "Vercel";
+if (!AYAR.barindirma) AYAR.barindirma = IN_CLAUDE ? "Anthropic'in Claude platformu" : "Cloudflare";
 const ay = (k, ph) => AYAR[k] ? esc(String(AYAR[k])) : `<span class="ph">[${ph}]</span>`;
 const ayN = (k, ph) => AYAR[k] ? (tl(AYAR[k]) || esc(String(AYAR[k]))) : `<span class="ph">[${ph}]</span>`;
 UI.prem = { a: false, b: false, yil: false, sel: "" };

@@ -4634,8 +4634,52 @@ function aiCount() { ayArt("ake.aiay"); }
 function gucluUsage() { return ayOku("ake.aiguclu"); }
 function gucluLimit() { return ayarSayi(WEBAI.plan === "premium" ? "cozumPremium" : "cozumOrta"); }
 const gucluKalan = () => Math.max(0, gucluLimit() - gucluUsage());
-/* sohbette soru çözümü mü? fotoğraf, sayı/işlem, seçenek ya da soru kökü ifadesi */
-const soruMu = (t, img) => !!img || (String(t || "").length >= 25 && /[0-9=+*/^√%]|(^|\s)[A-Ea-e]\)|çöz|soru|cevab|hesapla|kaçtır|bulunuz|hangisi|ispat|grafik/i.test(t));
+/* sohbette soru mu? Teşekkür, selam gibi kısa mesajlar dışındaki her şey soru sayılır (gelişmiş çözüm hakkı varsa güçlü model) */
+const ACK_RE = /^(teşekkür\S*|tesekkur\S*|sağ ?ol\S*|sag ?ol\S*|eyvallah|eyv|tamam\S*|ok|okey|peki|süper|harika|güzel|anladım|anladim|merhaba|selam\S*|günaydın|iyi geceler|iyi akşamlar)(?=[\s.,!]|$)/i;
+const soruMu = (t, img) => { t = String(t || "").trim(); return !!img || (t.length >= 6 && !(t.length < 40 && ACK_RE.test(t) && !t.includes("?"))); };
+
+/* Doğrulanmış bilgi notları: soru bankasının veri tablolarından, öğrencinin mesajında geçen eser, yazar, olay, kavram için.
+   AI'ın yanlış hatırlamasına karşı (ör. eser-yazar eşleşmeleri) isteğe eklenir. */
+const nrmB = s => String(s || "").replace(/\([^)]*\)/g, " ").toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i")
+  .replace(/[^a-z0-9]/g, "").replace(/d/g, "t").replace(/b/g, "p").replace(/(.)\1+/g, "$1");
+let BILGI = null;
+function bilgiKur() {
+  const TB = {
+    ESERLER: typeof ESERLER !== "undefined" ? ESERLER : null, ESKI_ESER: typeof ESKI_ESER !== "undefined" ? ESKI_ESER : null, SAIR: typeof SAIR !== "undefined" ? SAIR : null,
+    PADISAH: typeof PADISAH !== "undefined" ? PADISAH : null, DEVLET: typeof DEVLET !== "undefined" ? DEVLET : null, ANTLASMA: typeof ANTLASMA !== "undefined" ? ANTLASMA : null,
+    OS_KURUM: typeof OS_KURUM !== "undefined" ? OS_KURUM : null, KUR_OLAY: typeof KUR_OLAY !== "undefined" ? KUR_OLAY : null, FILOZOF: typeof FILOZOF !== "undefined" ? FILOZOF : null,
+    DINKAV: typeof DINKAV !== "undefined" ? DINKAV : null, DINKAV2: typeof DINKAV2 !== "undefined" ? DINKAV2 : null, IKLIM: typeof IKLIM !== "undefined" ? IKLIM : null,
+    SOSKAV: typeof SOSKAV !== "undefined" ? SOSKAV : null, MEZHEP: typeof MEZHEP !== "undefined" ? MEZHEP : null, ARKHE: typeof ARKHE !== "undefined" ? ARKHE : null,
+    OGRENME: typeof OGRENME !== "undefined" ? OGRENME : null, SOSYOLOG: typeof SOSYOLOG !== "undefined" ? SOSYOLOG : null, BARAJ: typeof BARAJ !== "undefined" ? BARAJ : null,
+    MADEN: typeof MADEN !== "undefined" ? MADEN : null };
+  const T = n => Array.isArray(TB[n]) ? TB[n] : null;
+  const L = [], add = (keys, note) => { keys.forEach(k => { const n = nrmB(k); if (n.length >= 4) L.push([n, note]); }); };
+  const eser = [].concat(T("ESERLER") || [], T("ESKI_ESER") || []), byYazar = {};
+  eser.forEach(([e, y]) => { add([e], `"${e}" adlı eserin sahibi: ${y}`); const w = e.split(/[\s-]+/); if (w.length > 2) add([w.slice(0, 2).join(" ")], `"${e}" adlı eserin sahibi: ${y}`); (byYazar[y] = byYazar[y] || []).push(e); });
+  Object.entries(byYazar).forEach(([y, es]) => add([y], `${y} eserlerinden bazıları: ${es.join(", ")}`));
+  const kv = (n, f, both) => (T(n) || []).forEach(([a, b]) => { if (typeof a !== "string" || typeof b !== "string") return; add(both ? [a, b] : [a], f(a, b)); });
+  kv("SAIR", (a, b) => `${a}: ${b}`);
+  kv("PADISAH", (a, b) => `${a}: ${b} döneminde`, true);
+  kv("DEVLET", (a, b) => `${b}: ${a}`); (T("DEVLET") || []).forEach(([a, b]) => add([b], `${b}: ${a}`));
+  ["ANTLASMA", "OS_KURUM", "KUR_OLAY", "FILOZOF", "DINKAV", "DINKAV2", "IKLIM", "SOSKAV"].forEach(n => kv(n, (a, b) => `${a}: ${b}`));
+  kv("MEZHEP", (a, b) => `${a} mezhebinin kurucusu/imamı: ${b}`, true);
+  kv("ARKHE", (a, b) => `${a}'e göre arkhe: ${b}`);
+  kv("OGRENME", (a, b) => `${a}: ${b}`, true);
+  kv("SOSYOLOG", (a, b) => `${a}: ${b}`, true);
+  kv("BARAJ", (a, b) => `${a} ${b} üzerindedir`);
+  kv("MADEN", (a, b) => `${a}: ${b}`);
+  BILGI = L;
+}
+function bilgiNot(text) {
+  if (!BILGI) bilgiKur();
+  const t = String(text || ""), all = nrmB(t), words = new Set(t.split(/[^\p{L}\p{N}']+/u).map(w => nrmB(w.split("'")[0])).filter(Boolean)), out = [];
+  for (const [k, note] of BILGI) {
+    if (out.length >= 10) break;
+    if ((k.length >= 6 ? all.includes(k) : words.has(k)) && !out.includes(note)) out.push(note);
+  }
+  return out;
+}
+const bilgiBlok = text => { const n = bilgiNot(text); return n.length ? "\n\nAKE Akademi'nin doğrulanmış bilgi notları (soruyla ilgiliyse bunlara güven; hatırladığınla çelişirse bu notlar doğrudur; ilgisizse dikkate alma ve notlardan söz etme):\n" + n.map(x => "- " + x).join("\n") : ""; };
 function parseJSONLoose(t) {
   t = String(t || "").replace(/```(?:json)?/gi, "").trim();
   const i = t.search(/[[{]/), j = Math.max(t.lastIndexOf("]"), t.lastIndexOf("}"));
@@ -6079,7 +6123,8 @@ async function sendChat(text) {
   UI.chatDraft = ""; UI.chatImg = null; UI.chatBusy = true; UI.scrollChat = true; render(); memLog("ai", "");
   const hist = UI.chat.slice(-16).map(m => ({ role: m.role, content: m.img && m.role === "user" ? "[Öğrenci bir soru fotoğrafı ekledi.] " + m.content : m.content }));
   while (hist.length && hist[0].role !== "user") hist.shift();
-  const input = [{ role: "user", content: AI_RULES + "\n\n" + studentCtx() + "\n\nÖğrencinin mesajları aşağıda. Fotoğraf eklenmişse önce sorudaki metni ve seçenekleri oku, sonra çöz." }].concat(hist);
+  const prevU = UI.chat.filter(m => m.role === "user").slice(-2).map(m => m.content).join("\n");
+  const input = [{ role: "user", content: AI_RULES + "\n\n" + studentCtx() + bilgiBlok(prevU) + "\n\nÖğrencinin mesajları aşağıda. Fotoğraf eklenmişse önce sorudaki metni ve seçenekleri oku, sonra çöz." }].concat(hist);
   chatCtl = new AbortController();
   const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => { const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
   if (img) opts.images = [img];

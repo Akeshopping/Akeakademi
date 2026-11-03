@@ -5718,14 +5718,14 @@ const AYAR_F = [
   ["adres", "Adres", "Mesafeli satış sözleşmesi için", true],
   ["telefon", "Telefon", "Örn. 0555 000 00 00", false],
   ["odemeAracisi", "Ödeme kuruluşu", "Örn. iyzico, Shopier", true],
-  ["fiyatOrta", "Orta paket · aylık fiyat (TL)", "149", false],
-  ["yillikOrta", "Orta paket · yıllık fiyat (TL)", "1490", false],
-  ["fiyatPremium", "Premium paket · aylık fiyat (TL)", "299", false],
-  ["yillikPremium", "Premium paket · yıllık fiyat (TL)", "2990", false],
-  ["aiOrta", "Orta paket · aylık AI mesaj hakkı", "300", false],
-  ["aiPremium", "Premium paket · aylık AI mesaj hakkı", "800", false],
-  ["cozumOrta", "Orta paket · aylık gelişmiş soru çözümü", "30", false],
-  ["cozumPremium", "Premium paket · aylık gelişmiş soru çözümü", "100", false],
+  ["fiyatOrta", "Orta paket · aylık fiyat (TL)", "199", false],
+  ["yillikOrta", "Orta paket · yıllık fiyat (TL)", "2189", false],
+  ["fiyatPremium", "Premium paket · aylık fiyat (TL)", "399", false],
+  ["yillikPremium", "Premium paket · yıllık fiyat (TL)", "4389", false],
+  ["aiOrta", "Orta paket · aylık AI mesaj hakkı", "200", false],
+  ["aiPremium", "Premium paket · aylık AI mesaj hakkı", "500", false],
+  ["cozumOrta", "Orta paket · aylık gelişmiş soru çözümü", "20", false],
+  ["cozumPremium", "Premium paket · aylık gelişmiş soru çözümü", "60", false],
   ["linkOrtaAy", "Ödeme linki · Orta aylık", "https://…", false],
   ["linkOrtaYil", "Ödeme linki · Orta yıllık", "https://…", false],
   ["linkPremiumAy", "Ödeme linki · Premium aylık", "https://…", false],
@@ -5894,12 +5894,13 @@ Object.assign(ADM_ACT, {
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
-  fiyatOrta: "149", yillikOrta: "1490", fiyatPremium: "299", yillikPremium: "2990", aiOrta: "300", aiPremium: "800", cozumOrta: "30", cozumPremium: "100",
+  fiyatOrta: "199", yillikOrta: "2189", fiyatPremium: "399", yillikPremium: "4389", aiOrta: "200", aiPremium: "500", cozumOrta: "20", cozumPremium: "60",
   linkOrtaAy: "", linkOrtaYil: "", linkPremiumAy: "", linkPremiumYil: "" }, window.AKE_AYAR || {});
 Object.keys(AYAR).forEach(k => { if (AYAR[k] == null) AYAR[k] = ""; else AYAR[k] = String(AYAR[k]); });
 if (!AYAR.yapayZeka) AYAR.yapayZeka = "Anthropic (Claude)";
 if (!AYAR.barindirma) AYAR.barindirma = IN_CLAUDE ? "Anthropic'in Claude platformu" : "Vercel";
 const ay = (k, ph) => AYAR[k] ? esc(String(AYAR[k])) : `<span class="ph">[${ph}]</span>`;
+const ayN = (k, ph) => AYAR[k] ? (tl(AYAR[k]) || esc(String(AYAR[k]))) : `<span class="ph">[${ph}]</span>`;
 UI.prem = { a: false, b: false, yil: false, sel: "" };
 Object.assign(IC, {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
@@ -5920,7 +5921,7 @@ function tutorOff() {
     <a class="btn acc" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
 }
 
-/* Premium: Ücretsiz, Orta ve Premium paketleri; aylık ya da yıllık (yıllıkta 2 ay bedava) */
+/* Premium: Ücretsiz, Orta ve Premium paketleri; aylık ya da yıllık (yıllıkta 1 ay bedava) */
 const tl = v => { const n = Number(String(v || "").replace(/[^\d]/g, "")); return n ? n.toLocaleString("tr-TR") : ""; };
 const okLink = u => /^https:\/\/\S+$/i.test(String(u || ""));
 function planlar() {
@@ -5937,9 +5938,11 @@ function vPremium() {
   const li = t => `<li class="pf"><span class="pf-i on" aria-hidden="true"></span>${t}</li>`;
   const fiyat = p => {
     if (!p.ay) return `<div class="price"><b>0<small> TL</small></b><span>kayıt gerekmez</span></div>`;
-    const m = tl(p.ay), y = tl(p.yil), ym = Number(String(p.yil).replace(/[^\d]/g, "")) / 12;
-    return Y && y ? `<div class="price"><b>${y}<small> TL</small></b><span>/ yıl</span></div><p class="xs muted">Aylık ${Math.round(ym).toLocaleString("tr-TR")} TL'ye gelir · 12 ay yerine 10 ay öde</p>`
-      : `<div class="price"><b>${m}<small> TL</small></b><span>/ ay</span></div><p class="xs muted">Yıllık alırsan ${y ? y + " TL, 2 ay bedava" : "daha avantajlı"}</p>`;
+    const num = v => Number(String(v || "").replace(/[^\d]/g, "")) || 0, m = tl(p.ay), y = tl(p.yil), am = num(p.ay), yn = num(p.yil), ym = yn / 12;
+    const free = am ? 12 - yn / am : 0, fr = Math.round(free), kaz = am * 12 - yn;
+    const avantaj = kaz <= 0 ? "" : Math.abs(free - fr) < 0.05 && fr >= 1 ? `${fr} ay bedava` : `${tl(kaz)} TL kazançlı`;
+    return Y && y ? `<div class="price"><b>${y}<small> TL</small></b><span>/ yıl</span></div><p class="xs muted">Aylık ${Math.round(ym).toLocaleString("tr-TR")} TL'ye gelir${avantaj ? " · " + (Math.abs(free - fr) < 0.05 && fr >= 1 ? `12 ay yerine ${12 - fr} ay öde` : avantaj) : ""}</p>`
+      : `<div class="price"><b>${m}<small> TL</small></b><span>/ ay</span></div><p class="xs muted">Yıllık alırsan ${y ? y + " TL" + (avantaj ? ", " + avantaj : "") : "daha avantajlı"}</p>`;
   };
   const acik = p => p.link && okLink(Y ? p.link.yil : p.link.ay) && satici;
   const kart = p => `<div class="card stack${p.k === "premium" ? " prem" : ""}${UI.prem.sel === p.k ? " sel" : ""}">
@@ -5954,10 +5957,10 @@ function vPremium() {
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
       <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
       <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine ya da telefonuna en geç 24 saat içinde gönderilir; kodu AI öğretmen sayfasına girmen yeterli. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
-    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">AI öğretmen ve diğer AI özellikleri hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
+    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
     <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, denemeler ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
-    <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık · 2 ay bedava</button></div>
+    <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık${(() => { const a = Number(String(AYAR.fiyatOrta).replace(/[^\d]/g, "")), y = Number(String(AYAR.yillikOrta).replace(/[^\d]/g, "")), f = a && y ? 12 - y / a : 0; return f >= 0.95 && Math.abs(f - Math.round(f)) < 0.05 ? " · " + Math.round(f) + " ay bedava" : ""; })()}</button></div>
     <div class="grid3 plans">${P.map(kart).join("")}</div>
     ${buy}
   </div>`;
@@ -6008,7 +6011,7 @@ const LEGAL = {
       <li><b>Verilerin:</b> Üyelik sistemi açılana kadar çalışma verilerin yalnızca kendi cihazında tutulur. Tarayıcı verilerini silersen ilerlemen kaybolabilir; düzenli yedek almanı öneririz.</li>
       <li><b>Hesap:</b> Üyelik oluştururken doğru bilgi vermek ve şifreni korumak senin sorumluluğundadır. Hesap kişiseldir; başkalarıyla paylaşılamaz ve devredilemez. Hesap paylaşımı tespit edilirse hesap askıya alınabilir.</li>
       <li><b>18 yaş altı:</b> 18 yaşından küçükler veli veya vasilerinin onayıyla üye olabilir. Ücretli abonelik ödemeleri veli veya vasi tarafından ya da onların onayıyla yapılmalıdır.</li>
-      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. AI kullanımı Orta pakette ayda ${ay("aiOrta", "LİMİT")}, Premium pakette ayda ${ay("aiPremium", "LİMİT")} mesajla sınırlıdır. Gelişmiş modelle soru çözümü bu mesaj hakkının içindedir (Orta ayda ${ay("cozumOrta", "LİMİT")}, Premium ayda ${ay("cozumPremium", "LİMİT")} soru); bu hak bitince sorular standart modelle çözülmeye devam eder. Haklar her takvim ayının başında yenilenir.</li>
+      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. AI kullanımı Orta pakette ayda ${ayN("aiOrta", "LİMİT")}, Premium pakette ayda ${ayN("aiPremium", "LİMİT")} mesajla sınırlıdır. Gelişmiş modelle soru çözümü bu mesaj hakkının içindedir (Orta ayda ${ayN("cozumOrta", "LİMİT")}, Premium ayda ${ayN("cozumPremium", "LİMİT")} soru); bu hak bitince sorular standart modelle çözülmeye devam eder. Haklar her takvim ayının başında yenilenir.</li>
       <li><b>İçerik hakları:</b> Site'deki sorular, açıklamalar, metinler, görseller ve tasarım AKE Akademi'ye aittir. İzinsiz kopyalanamaz, çoğaltılamaz, satılamaz veya başka platformlarda paylaşılamaz.</li>
       <li><b>Yasak kullanım:</b> Site'nin güvenliğini bozmaya çalışmak, otomatik araçlarla içerik toplamak, AI özelliklerini kötüye kullanmak veya hukuka aykırı içerik paylaşmak yasaktır. Bu durumlarda üyelik sona erdirilebilir.</li>
       <li><b>Başarı garantisi yoktur:</b> AKE Akademi çalışmana destek olur, ancak sınav sonucu ve puan konusunda garanti vermez.</li>
@@ -6021,9 +6024,9 @@ const LEGAL = {
     <h2>Satıcı</h2>
     <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}${AYAR.telefon ? `<br>Telefon: ${ay("telefon", "TELEFON")}` : ""}</p>
     <h2>Hizmet</h2>
-    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiOrta", "LİMİT")} mesaj; bunun ${ay("cozumOrta", "LİMİT")} tanesi gelişmiş modelle soru çözümü), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ay("aiPremium", "LİMİT")} mesaj; bunun ${ay("cozumPremium", "LİMİT")} tanesi gelişmiş modelle soru çözümü), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
+    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ayN("aiOrta", "LİMİT")} mesaj; bunun ${ayN("cozumOrta", "LİMİT")} tanesi gelişmiş modelle soru çözümü), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ayN("aiPremium", "LİMİT")} mesaj; bunun ${ayN("cozumPremium", "LİMİT")} tanesi gelişmiş modelle soru çözümü), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
     <h2>Fiyat</h2>
-    <p>Orta paket aylık ${ay("fiyatOrta", "FİYAT")} TL veya yıllık ${ay("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ay("fiyatPremium", "FİYAT")} TL veya yıllık ${ay("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
+    <p>Orta paket aylık ${ayN("fiyatOrta", "FİYAT")} TL veya yıllık ${ayN("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ayN("fiyatPremium", "FİYAT")} TL veya yıllık ${ayN("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
     <h2>Ödeme</h2>
     <p>${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden banka veya kredi kartıyla, satın alınan dönem için peşin olarak.</p>
     <h2>Süre ve yenileme</h2>

@@ -10,17 +10,19 @@ window.AKE_AYAR = {
   eposta: "alikaaneren13@gmail.com",   // İletişim e-postası
   telefon: "",        // Telefon (isteğe bağlı)
   odemeAracisi: "Shopier",   // Ödeme kuruluşu
-  fiyatOrta: "149",       // Orta paket aylık fiyat (TL, sadece sayı)
-  yillikOrta: "1490",     // Orta paket yıllık fiyat
-  fiyatPremium: "299",    // Premium paket aylık fiyat
-  yillikPremium: "2990",  // Premium paket yıllık fiyat
-  aiOrta: "300",          // Orta paket aylık AI mesaj hakkı
-  aiPremium: "800",       // Premium paket aylık AI mesaj hakkı
+  fiyatOrta: "199",       // Orta paket aylık fiyat (TL, sadece sayı)
+  yillikOrta: "2189",     // Orta paket yıllık fiyat
+  fiyatPremium: "399",    // Premium paket aylık fiyat
+  yillikPremium: "4389",  // Premium paket yıllık fiyat
+  aiOrta: "200",          // Orta paket aylık AI mesaj hakkı
+  aiPremium: "500",       // Premium paket aylık AI mesaj hakkı
+  cozumOrta: "20",        // Orta paket: bu mesajların kaçı gelişmiş modelle soru çözümü olsun
+  cozumPremium: "60",     // Premium paket: bu mesajların kaçı gelişmiş modelle soru çözümü olsun
   linkOrtaAy: "",         // Ödeme linkleri (https:// ile başlar). Boş olan paket "Çok yakında" görünür.
   linkOrtaYil: "",
   linkPremiumAy: "",
   linkPremiumYil: "",
   yapayZeka: "",      // AI sağlayıcısı (boşsa "Anthropic (Claude)" yazar)
   barindirma: "Vercel",
-  guncelleme: "3 Kasım 2026"  // Yasal metinlerin son güncelleme tarihi
+  guncelleme: "4 Kasım 2026"  // Yasal metinlerin son güncelleme tarihi
 };

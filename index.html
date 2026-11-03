@@ -288,6 +288,7 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .msg.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
 .msg.a p+p,.msg.a ul,.msg.a ol{margin-top:8px}
 .msg.a ul,.msg.a ol{padding-left:20px;margin-bottom:0}
+.mtag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 .msg .att{font-size:12px;opacity:.75;margin-bottom:4px}
 .composer{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--paper);padding-top:8px}
 @media (min-width:900px){.composer{bottom:0;padding-bottom:16px}}
@@ -4623,9 +4624,18 @@ const AI = { fn: null, ready: !(window.claude && typeof window.claude.use === "f
 /* akeakademi.com: AI, erişim koduyla bu sitenin sunucusundaki /api/ai üzerinden çalışır (anahtar sunucuda gizli kalır) */
 const WEBAI = { code: LS.get("ake.kod") || "", plan: LS.get("ake.plan") || "", bitis: LS.get("ake.bitis") || "" };
 const ayKey = () => dayKey().slice(0, 7);
-function aiUsage() { try { const o = JSON.parse(LS.get("ake.aiay") || "{}"); return o.m === ayKey() ? (o.n || 0) : 0; } catch (e) { return 0; } }
-function aiLimit() { const v = typeof AYAR !== "undefined" ? (WEBAI.plan === "premium" ? AYAR.aiPremium : AYAR.aiOrta) : 0; return Number(String(v || "").replace(/[^\d]/g, "")) || 0; }
-function aiCount() { LS.set("ake.aiay", JSON.stringify({ m: ayKey(), n: aiUsage() + 1 })); }
+function ayOku(k) { try { const o = JSON.parse(LS.get(k) || "{}"); return o.m === ayKey() ? (o.n || 0) : 0; } catch (e) { return 0; } }
+function ayArt(k) { LS.set(k, JSON.stringify({ m: ayKey(), n: ayOku(k) + 1 })); }
+const ayarSayi = k => typeof AYAR !== "undefined" ? (Number(String(AYAR[k] || "").replace(/[^\d]/g, "")) || 0) : 0;
+function aiUsage() { return ayOku("ake.aiay"); }
+function aiLimit() { return ayarSayi(WEBAI.plan === "premium" ? "aiPremium" : "aiOrta"); }
+function aiCount() { ayArt("ake.aiay"); }
+/* gelişmiş çözüm: soru çözümünde güçlü model, aylık hak (mesaj hakkının içinde) */
+function gucluUsage() { return ayOku("ake.aiguclu"); }
+function gucluLimit() { return ayarSayi(WEBAI.plan === "premium" ? "cozumPremium" : "cozumOrta"); }
+const gucluKalan = () => Math.max(0, gucluLimit() - gucluUsage());
+/* sohbette soru çözümü mü? fotoğraf, sayı/işlem, seçenek ya da soru kökü ifadesi */
+const soruMu = (t, img) => !!img || (String(t || "").length >= 25 && /[0-9=+*/^√%]|(^|\s)[A-Ea-e]\)|çöz|soru|cevab|hesapla|kaçtır|bulunuz|hangisi|ispat|grafik/i.test(t));
 function parseJSONLoose(t) {
   t = String(t || "").replace(/```(?:json)?/gi, "").trim();
   const i = t.search(/[[{]/), j = Math.max(t.lastIndexOf("]"), t.lastIndexOf("}"));
@@ -4646,7 +4656,8 @@ function webAI() {
   async function call(input, opts, json) {
     opts = opts || {};
     const lim = aiLimit(); if (lim && aiUsage() >= lim) throw { code: "kota" };
-    const body = { code: WEBAI.code, messages: typeof input === "string" ? [{ role: "user", content: input }] : input, tier: opts.modelTier || "default", json: !!json };
+    const guclu = opts.modelTier === "solve" && gucluKalan() > 0;
+    const body = { code: WEBAI.code, messages: typeof input === "string" ? [{ role: "user", content: input }] : input, tier: opts.modelTier || "default", guclu, json: !!json };
     if (opts.images && opts.images[0]) body.image = await imgToB64(opts.images[0]);
     let r;
     try { r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: opts.signal }); }
@@ -4657,7 +4668,8 @@ function webAI() {
       throw { code: j.error || "server" };
     }
     aiCount();
-    if (json) { const j = await r.json(); return j; }
+    const g = r.headers.get("x-ake-model") === "guclu"; if (g) ayArt("ake.aiguclu");
+    if (json) { const j = await r.json(); j.guclu = g; return j; }
     const reader = r.body.getReader(), dec = new TextDecoder(), tail = /\n\n\[\[AKE_(HATA|KESIK)\]\]$/;
     let text = "";
     try {
@@ -4667,7 +4679,7 @@ function webAI() {
     text = text.replace(tail, "");
     if (bad) throw { code: "server", text };
     if (!text.trim()) throw { code: "empty_completion" };
-    return { text, truncated: cut };
+    return { text, truncated: cut, guclu: g };
   }
   const fn = (input, opts) => call(input, opts, false);
   fn.json = async (input, opts) => { const j = await call(input, opts, true), v = parseJSONLoose(j.text); if (v === undefined) throw { code: "invalid_json" }; return v; };
@@ -4703,11 +4715,14 @@ function studentCtx() {
 }
 const AI_RULES = `Sen AKE Akademi'nin YKS (TYT, AYT, YDT) öğretmenisin. Öğrenciyle Türkçe, samimi ama net konuş.
 Kurallar:
-- Kısa ve anlaşılır ol; uzun konu anlatımı istenmedikçe en fazla 12-15 satır yaz.
-- Soru çözerken adımları numaralı ve sade yaz; sonucu sonda açıkça belirt.
+- Kısa ve anlaşılır ol; uzun konu anlatımı istenmedikçe sohbet cevaplarında en fazla 12-15 satır yaz. Soru çözümünde doğruluk kısalıktan önemlidir; gereken adımı atlama.
+- Soru çözerken önce soruyu ve seçenekleri dikkatle oku, verilenleri ve isteneni belirle; sonra adımları numaralı ve sade yaz.
+- Cevabı yazmadan önce sonucu kontrol et: bulduğun değeri soruda yerine koy ya da seçeneklerle karşılaştır. Tutmuyorsa hatayı bul ve yeniden çöz. Çoktan seçmeli soruda en sona "Cevap: C) ..." biçiminde yaz.
+- Fotoğraflı soruda önce soruyu bir iki cümleyle kendi sözünle yaz ki doğru okuduğun anlaşılsın. Görsel okunmuyorsa ya da soru veya şekil eksikse tahmin yürütme; daha net bir fotoğraf iste.
+- Emin olmadığında bunu açıkça söyle; tahmini kesin cevap gibi sunma.
 - Matematik ifadelerini düz metinle yaz: x^2, √x, a/b, π. LaTeX kullanma.
 - Başlık işareti (#) kullanma; gerekirse kısa madde listesi kullan.
-- Emin olmadığın bilgiyi uydurma; tarih, kural ya da puan hesabı gibi değişebilen bilgilerde ÖSYM'nin güncel duyurusunu kontrol etmesini söyle.
+- Tarih, kural ya da puan hesabı gibi değişebilen bilgilerde ÖSYM'nin güncel duyurusunu kontrol etmesini söyle.
 - Öğrenci yalnızca cevabı isterse cevabı ver, ama nedenini bir iki cümleyle açıkla.
 - Ders dışı isteklerde kibarca YKS çalışmasına dön.`;
 /* ===== Görünümler ===== */
@@ -5093,7 +5108,7 @@ function vSettings() {
     <p class="small muted">${cloud.state === "cloud" ? "İlerlemen Claude hesabına bağlı ve sana ayrı tutuluyor; aynı hesapla başka cihazdan açtığında kaldığın yerden devam edersin." : "İlerlemen bu tarayıcıda saklanıyor. Cihaz değiştirirken ya da tarayıcı verisini silmeden önce yedek al."}</p>
     ${!IN_CLAUDE ? "" : `<p class="small muted">${cloud.state === "cloud" ? "Çalışma özetin (sitedeki adın, alanın ve hedefin, çözdüğün soru sayısı ve başarın, deneme sonuçların, giriş zamanların, cihaz türün) site yöneticisinin panelinde görünür. Yanlış defterin, kartların, planın ve AI öğretmenle yazışmaların yalnızca sende kalır." : "Siteyi Claude'da açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün site yöneticisine anlık görünebilir."} Ayrıntılar <a href="#kvkk">KVKK Aydınlatma Metni</a>'nde.</p>`}
     <div class="row"><button class="btn" data-a="exportData">Yedeği indir</button><button class="btn" data-a="importAsk">Yedekten geri yükle</button><button class="btn ghost" data-a="resetAsk">Tüm ilerlemeyi sıfırla</button></div></div>
-  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı</p>
+  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p>
     <p class="small muted">Kodun bu cihazda kayıtlı. Başka bir cihazda kullanmak için AI öğretmen sayfasına aynı kodu girmen yeterli.</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>`
     : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`}
   <div class="card stack" id="uygulama"><h2>Telefona uygulama gibi ekle</h2>
@@ -5129,13 +5144,13 @@ function vTutor() {
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">7/24 yanında</span><h1>AI öğretmenim</h1><p>Takıldığın soruyu yaz${AI.images ? " ya da fotoğrafını ekle" : ""}; konu anlatımı, çözüm adımları ve çalışma önerisi iste. Öğretmenin alanını ve zayıf konularını bilir.</p></div>
   ${!AI.ready ? `<div class="empty">Claude'a bağlanılıyor…</div>` : !aiOn() ? tutorOff() : `
-  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map(m => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
+  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map(m => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.g ? `<div class="mtag">Gelişmiş çözüm</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
     ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>` : ""}</div>
   <div class="composer">${UI.chatImg ? `<div class="row small" style="margin-bottom:6px"><span class="pill form">📎 ${esc(UI.chatImg.name || "görsel")}</span><button class="btn sm ghost" data-a="chatImgClear">Kaldır</button></div>` : ""}
     <form data-s="chat">${AI.images ? `<label class="btn ghost sm" title="Soru fotoğrafı ekle" style="min-height:40px">${icon("img")}<input type="file" accept="${esc((AI.imgTypes || ["image/jpeg", "image/png", "image/webp"]).join(","))}" data-c="chatImg" hidden></label>` : ""}
       <textarea id="chatIn" data-i="chatDraft" rows="1" placeholder="Sorunu yaz…" aria-label="Mesaj">${esc(UI.chatDraft)}</textarea>
       ${UI.chatBusy ? `<button type="button" class="btn sm" data-a="chatStop">Durdur</button>` : `<button class="btn pri sm" style="min-height:40px" aria-label="Gönder">${icon("send")}</button>`}</form>
-    ${UI.chat.length && !UI.chatBusy ? `<div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn sm ghost" data-a="chatClear">Sohbeti temizle</button></div>` : ""}</div>`}
+    ${(!IN_CLAUDE && WEBAI.code && gucluLimit()) || (UI.chat.length && !UI.chatBusy) ? `<div class="row" style="justify-content:space-between;margin-top:6px">${!IN_CLAUDE && WEBAI.code && gucluLimit() ? `<span class="small muted">${gucluKalan() ? `Bu ay ${gucluKalan()} gelişmiş çözüm hakkın kaldı. Soru sorduğunda kullanılır.` : "Bu ayki gelişmiş çözüm hakkın bitti; sorular standart modelle çözülüyor."}</span>` : "<span></span>"}${UI.chat.length && !UI.chatBusy ? `<button class="btn sm ghost" style="margin-left:auto" data-a="chatClear">Sohbeti temizle</button>` : ""}</div>` : ""}</div>`}
   </div>`;
 }
 /* ===== Soru çözme oturumu (deneme, test, paragraf, yanlış tekrarı) ===== */
@@ -5665,6 +5680,8 @@ const AYAR_F = [
   ["yillikPremium", "Premium paket · yıllık fiyat (TL)", "2990", false],
   ["aiOrta", "Orta paket · aylık AI mesaj hakkı", "300", false],
   ["aiPremium", "Premium paket · aylık AI mesaj hakkı", "800", false],
+  ["cozumOrta", "Orta paket · aylık gelişmiş soru çözümü", "30", false],
+  ["cozumPremium", "Premium paket · aylık gelişmiş soru çözümü", "100", false],
   ["linkOrtaAy", "Ödeme linki · Orta aylık", "https://…", false],
   ["linkOrtaYil", "Ödeme linki · Orta yıllık", "https://…", false],
   ["linkPremiumAy", "Ödeme linki · Premium aylık", "https://…", false],
@@ -5712,7 +5729,7 @@ function vAdmSettings() {
     <p class="small muted">Duyuru, siteyi açan herkesin sayfasının en üstünde görünür ve öğrenci kapatana kadar kalır. Güncellediğinde kapatmış olanlara da yeniden görünür. Site içi bir bölüme yönlendirmek için #deneme, #banka, #paragraf, #premium gibi yazabilirsin.</p></div>
   <div class="card stack"><h2>Site bilgileri</h2>
     ${miss.length ? `<p class="note">Premium satışı ve yasal metinler için eksik: <b>${miss.map(f => esc(f[1])).join(", ")}</b>. Bunlar dolmadan Premium sayfasında ödeme düğmesi çıkmaz, yasal metinlerde köşeli parantezli boşluklar görünür.</p>` : `<p class="note">Gerekli bilgiler tamam. Linkini girdiğin paketler Premium sayfasında satın alınabilir durumda.</p>`}
-    <form data-s="admAyar" class="stack"><div class="fields">${AYAR_F.map(([k, l, h, req]) => `<label class="f">${esc(l)}${req ? "" : ` <span class="muted" style="font-weight:400">(isteğe bağlı)</span>`}<input class="in" name="${k}" maxlength="300" value="${esc(A[k] != null ? A[k] : (base[k] || ""))}" placeholder="${esc(h)}"${k === "odemeLinki" ? ' inputmode="url"' : k === "eposta" ? ' type="email"' : (k === "fiyat" || k === "aiLimit") ? ' inputmode="numeric"' : ""}></label>`).join("")}</div>
+    <form data-s="admAyar" class="stack"><div class="fields">${AYAR_F.map(([k, l, h, req]) => `<label class="f">${esc(l)}${req ? "" : ` <span class="muted" style="font-weight:400">(isteğe bağlı)</span>`}<input class="in" name="${k}" maxlength="300" value="${esc(A[k] != null ? A[k] : (base[k] || ""))}" placeholder="${esc(h)}"${/^link/.test(k) ? ' inputmode="url"' : k === "eposta" ? ' type="email"' : /^(fiyat|yillik|ai|cozum)/.test(k) ? ' inputmode="numeric"' : ""}></label>`).join("")}</div>
       <div class="row"><button class="btn pri">Kaydet</button><button type="button" class="btn ghost" data-a="admPreview" data-k="premium">Premium sayfasını gör</button><button type="button" class="btn ghost" data-a="admPreview" data-k="yasal">Yasal metinleri gör</button></div></form>
     <p class="small muted">Bu bilgiler herkese açık sayfalarda (Premium ve yasal metinler) görünür. Kart ya da şifre gibi gizli bilgi yazma.</p></div>
   </div>`;
@@ -5737,7 +5754,7 @@ const ADM_SUB = {
   },
   async admAyar(fd) {
     const o = {}; AYAR_F.forEach(([k]) => { o[k] = String(fd.get(k) || "").trim().slice(0, 300); });
-    ["fiyatOrta", "yillikOrta", "fiyatPremium", "yillikPremium", "aiOrta", "aiPremium"].forEach(k => { o[k] = o[k].replace(/[^\d]/g, ""); }); ADM.ad = o;
+    ["fiyatOrta", "yillikOrta", "fiyatPremium", "yillikPremium", "aiOrta", "aiPremium", "cozumOrta", "cozumPremium"].forEach(k => { o[k] = o[k].replace(/[^\d]/g, ""); }); ADM.ad = o;
     if (Object.keys(o).some(k => /^link/.test(k) && o[k] && !/^https:\/\/\S+$/i.test(o[k]))) { toast("Ödeme linkleri https:// ile başlamalı."); return; }
     if (o.eposta && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.eposta)) { toast("E-posta adresini kontrol et."); return; }
     try { await SITE.db.doc("ayar/site").set(Object.assign({}, o, { _u: Date.now() })); SITE.ayarDoc = o; ADM.ad = null; applyAyar(o); toast("Site bilgileri kaydedildi."); } catch (e) { toast("Kaydedilemedi. Biraz sonra tekrar dene."); }
@@ -5833,7 +5850,7 @@ Object.assign(ADM_ACT, {
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
-  fiyatOrta: "149", yillikOrta: "1490", fiyatPremium: "299", yillikPremium: "2990", aiOrta: "300", aiPremium: "800",
+  fiyatOrta: "149", yillikOrta: "1490", fiyatPremium: "299", yillikPremium: "2990", aiOrta: "300", aiPremium: "800", cozumOrta: "30", cozumPremium: "100",
   linkOrtaAy: "", linkOrtaYil: "", linkPremiumAy: "", linkPremiumYil: "" }, window.AKE_AYAR || {});
 Object.keys(AYAR).forEach(k => { if (AYAR[k] == null) AYAR[k] = ""; else AYAR[k] = String(AYAR[k]); });
 if (!AYAR.yapayZeka) AYAR.yapayZeka = "Anthropic (Claude)";
@@ -5866,9 +5883,9 @@ function planlar() {
   return [
     { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Paragraf atölyesi", "Yanlış defteri ve tekrar kartları", "Çalışma planı ve gelişim takibi"] },
     { k: "orta", n: "Orta", tag: "dengeli", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
-      feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
+      feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
     { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },
-      feats: ["Orta paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı", "Zor sorularda daha gelişmiş AI çözümü"] }
+      feats: ["Orta paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
   ];
 }
 function vPremium() {
@@ -5947,7 +5964,7 @@ const LEGAL = {
       <li><b>Verilerin:</b> Üyelik sistemi açılana kadar çalışma verilerin yalnızca kendi cihazında tutulur. Tarayıcı verilerini silersen ilerlemen kaybolabilir; düzenli yedek almanı öneririz.</li>
       <li><b>Hesap:</b> Üyelik oluştururken doğru bilgi vermek ve şifreni korumak senin sorumluluğundadır. Hesap kişiseldir; başkalarıyla paylaşılamaz ve devredilemez. Hesap paylaşımı tespit edilirse hesap askıya alınabilir.</li>
       <li><b>18 yaş altı:</b> 18 yaşından küçükler veli veya vasilerinin onayıyla üye olabilir. Ücretli abonelik ödemeleri veli veya vasi tarafından ya da onların onayıyla yapılmalıdır.</li>
-      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. Premium üyelerin AI kullanımı ayda ${ay("aiLimit", "LİMİT")} mesajla sınırlıdır ve limit her abonelik döneminde yenilenir.</li>
+      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. AI kullanımı Orta pakette ayda ${ay("aiOrta", "LİMİT")}, Premium pakette ayda ${ay("aiPremium", "LİMİT")} mesajla sınırlıdır. Gelişmiş modelle soru çözümü bu mesaj hakkının içindedir (Orta ayda ${ay("cozumOrta", "LİMİT")}, Premium ayda ${ay("cozumPremium", "LİMİT")} soru); bu hak bitince sorular standart modelle çözülmeye devam eder. Haklar her takvim ayının başında yenilenir.</li>
       <li><b>İçerik hakları:</b> Site'deki sorular, açıklamalar, metinler, görseller ve tasarım AKE Akademi'ye aittir. İzinsiz kopyalanamaz, çoğaltılamaz, satılamaz veya başka platformlarda paylaşılamaz.</li>
       <li><b>Yasak kullanım:</b> Site'nin güvenliğini bozmaya çalışmak, otomatik araçlarla içerik toplamak, AI özelliklerini kötüye kullanmak veya hukuka aykırı içerik paylaşmak yasaktır. Bu durumlarda üyelik sona erdirilebilir.</li>
       <li><b>Başarı garantisi yoktur:</b> AKE Akademi çalışmana destek olur, ancak sınav sonucu ve puan konusunda garanti vermez.</li>
@@ -5960,7 +5977,7 @@ const LEGAL = {
     <h2>Satıcı</h2>
     <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}${AYAR.telefon ? `<br>Telefon: ${ay("telefon", "TELEFON")}` : ""}</p>
     <h2>Hizmet</h2>
-    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiOrta", "LİMİT")} mesaj), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ay("aiPremium", "LİMİT")} mesaj), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
+    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ay("aiOrta", "LİMİT")} mesaj; bunun ${ay("cozumOrta", "LİMİT")} tanesi gelişmiş modelle soru çözümü), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ay("aiPremium", "LİMİT")} mesaj; bunun ${ay("cozumPremium", "LİMİT")} tanesi gelişmiş modelle soru çözümü), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
     <h2>Fiyat</h2>
     <p>Orta paket aylık ${ay("fiyatOrta", "FİYAT")} TL veya yıllık ${ay("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ay("fiyatPremium", "FİYAT")} TL veya yıllık ${ay("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
     <h2>Ödeme</h2>
@@ -6064,11 +6081,11 @@ async function sendChat(text) {
   while (hist.length && hist[0].role !== "user") hist.shift();
   const input = [{ role: "user", content: AI_RULES + "\n\n" + studentCtx() + "\n\nÖğrencinin mesajları aşağıda. Fotoğraf eklenmişse önce sorudaki metni ve seçenekleri oku, sonra çöz." }].concat(hist);
   chatCtl = new AbortController();
-  const opts = { cache: false, signal: chatCtl.signal, onText: ({ text: t }) => { const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
+  const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => { const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
   if (img) opts.images = [img];
   try {
     const r = await AI.fn(input, opts);
-    UI.chat.push({ role: "assistant", content: r.text + (r.truncated ? "\n\n(Yanıt uzunluk sınırında kesildi.)" : "") });
+    UI.chat.push(Object.assign({ role: "assistant", content: r.text + (r.truncated ? "\n\n(Yanıt uzunluk sınırında kesildi.)" : "") }, r.guclu ? { g: 1 } : {}));
   } catch (e) {
     const msg = aiErr(e);
     if (e && e.text) UI.chat.push({ role: "assistant", content: e.text + (msg ? "\n\n(" + msg + ")" : "") });

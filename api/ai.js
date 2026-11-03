@@ -5,7 +5,9 @@
 //   AKE_GIZLI          Panelin ürettiği süreli erişim kodlarını doğrulayan gizli anahtar (panelde "Kodlar" bölümünde oluşturulur).
 //   AKE_KODLAR         (isteğe bağlı) süresiz deneme kodları, virgülle ayrılmış "KOD:paket" listesi. Örnek: AKE-G2D9-UZKM:premium
 //   AKE_IPTAL          (isteğe bağlı) iptal edilen kodlar, virgülle ayrılmış liste.
-// İsteğe bağlı: AKE_MODEL_HIZLI (varsayılan claude-haiku-5-5), AKE_MODEL_GUCLU (varsayılan claude-sonnet-5-5)
+// İsteğe bağlı: AKE_MODEL_HIZLI (varsayılan claude-haiku-5-5), AKE_MODEL_GUCLU (varsayılan claude-sonnet-5-5),
+//   AKE_EFOR_GUCLU (gelişmiş çözümün düşünme düzeyi: low, medium, high · varsayılan medium)
+// Soru çözümü (tier "solve"): öğrencinin aylık gelişmiş çözüm hakkı varsa güçlü model, yoksa hızlı model en yüksek düzeyde.
 // Ayar değiştirdikten sonra Vercel'de Deployments > son dağıtım > Redeploy yapılmalıdır.
 
 import crypto from "node:crypto";
@@ -15,6 +17,8 @@ export const config = { maxDuration: 120 };
 const MODEL = { hizli: process.env.AKE_MODEL_HIZLI || "claude-haiku-5-5", guclu: process.env.AKE_MODEL_GUCLU || "claude-sonnet-5-5" };
 const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const hits = new Map(); // aynı sunucu örneğinde kod başına kısa süreli istek sınırı
+const strongHits = new Map(); // aynı sunucu örneğinde kod başına günlük gelişmiş çözüm sınırı (kötüye kullanıma karşı)
+const EFOR = ["low", "medium", "high"].includes(process.env.AKE_EFOR_GUCLU) ? process.env.AKE_EFOR_GUCLU : "medium";
 
 function kodlar() {
   const m = new Map();
@@ -87,10 +91,19 @@ export default async function handler(req, res) {
     last.content = [{ type: "image", source: { type: "base64", media_type: b.image.media_type, data: b.image.data } }, { type: "text", text: last.content }];
   }
 
-  // Orta paket her zaman hızlı modeli kullanır; Premium'da zor işler (deneme yorumu, plan) güçlü modele gider.
-  const complex = b.tier === "complex", strong = complex && plan === "premium";
-  const effort = b.tier === "quick" ? "low" : complex ? (strong ? "medium" : "high") : "medium";
-  const payload = { model: strong ? MODEL.guclu : MODEL.hizli, max_tokens: b.json ? 10000 : 8000, messages: merged, output_config: { effort }, stream: !b.json };
+  // Model seçimi:
+  //  solve   : soru çözümü. Gelişmiş hak varsa güçlü model, yoksa hızlı model en yüksek düşünme düzeyinde.
+  //  complex : deneme yorumu, çalışma planı. Premium'da güçlü model.
+  //  quick   : kısa işler. default: diğer her şey (hızlı model, yüksek düzey).
+  let strong = false, effort = "high";
+  if (b.tier === "solve" && b.guclu) {
+    const day = new Date().toISOString().slice(0, 10), sk = code + "|" + day, n = strongHits.get(sk) || 0;
+    if (n < 40) { strong = true; effort = EFOR; strongHits.set(sk, n + 1); }
+    if (strongHits.size > 5000) strongHits.clear();
+  } else if (b.tier === "complex") { strong = plan === "premium"; effort = strong ? "medium" : "high"; }
+  else if (b.tier === "quick") effort = "low";
+  const payload = { model: strong ? MODEL.guclu : MODEL.hizli, max_tokens: strong ? 12000 : b.json ? 10000 : 8000, messages: merged, output_config: { effort }, stream: !b.json };
+  res.setHeader("X-AKE-Model", strong ? "guclu" : "hizli");
 
   let r;
   try {

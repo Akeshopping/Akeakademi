@@ -4617,8 +4617,65 @@ function daysLeft() {
 
 /* ---------- yapay zekâ (Claude) ---------- */
 const AI = { fn: null, ready: !(window.claude && typeof window.claude.use === "function"), off: false, images: false };
+/* akeakademi.com: AI, erişim koduyla bu sitenin sunucusundaki /api/ai üzerinden çalışır (anahtar sunucuda gizli kalır) */
+const WEBAI = { code: LS.get("ake.kod") || "", plan: LS.get("ake.plan") || "" };
+const ayKey = () => dayKey().slice(0, 7);
+function aiUsage() { try { const o = JSON.parse(LS.get("ake.aiay") || "{}"); return o.m === ayKey() ? (o.n || 0) : 0; } catch (e) { return 0; } }
+function aiLimit() { const v = typeof AYAR !== "undefined" ? (WEBAI.plan === "premium" ? AYAR.aiPremium : AYAR.aiOrta) : 0; return Number(String(v || "").replace(/[^\d]/g, "")) || 0; }
+function aiCount() { LS.set("ake.aiay", JSON.stringify({ m: ayKey(), n: aiUsage() + 1 })); }
+function parseJSONLoose(t) {
+  t = String(t || "").replace(/```(?:json)?/gi, "").trim();
+  const i = t.search(/[[{]/), j = Math.max(t.lastIndexOf("]"), t.lastIndexOf("}"));
+  if (i < 0 || j < i) return undefined;
+  try { return JSON.parse(t.slice(i, j + 1)); } catch (e) { return undefined; }
+}
+async function imgToB64(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+    const k = Math.min(1, 1600 / Math.max(img.naturalWidth || 1, img.naturalHeight || 1)), c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return { media_type: "image/jpeg", data: c.toDataURL("image/jpeg", 0.85).split(",")[1] };
+  } catch (e) { throw { code: "image_rejected" }; } finally { URL.revokeObjectURL(url); }
+}
+function webAI() {
+  async function call(input, opts, json) {
+    opts = opts || {};
+    const lim = aiLimit(); if (lim && aiUsage() >= lim) throw { code: "kota" };
+    const body = { code: WEBAI.code, messages: typeof input === "string" ? [{ role: "user", content: input }] : input, tier: opts.modelTier || "default", json: !!json };
+    if (opts.images && opts.images[0]) body.image = await imgToB64(opts.images[0]);
+    let r;
+    try { r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: opts.signal }); }
+    catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network" }; }
+    if (!r.ok) {
+      let j = {}; try { j = await r.json(); } catch (e) { }
+      if (r.status === 401) { webAIKapat(); throw { code: "kod" }; }
+      throw { code: j.error || "server" };
+    }
+    aiCount();
+    if (json) { const j = await r.json(); return j; }
+    const reader = r.body.getReader(), dec = new TextDecoder(), tail = /\n\n\[\[AKE_(HATA|KESIK)\]\]$/;
+    let text = "";
+    try {
+      for (;;) { const { value, done } = await reader.read(); if (done) break; text += dec.decode(value, { stream: true }); if (opts.onText) opts.onText({ text: text.replace(tail, ""), delta: "" }); }
+    } catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network", text: text.replace(tail, "") }; }
+    const cut = /\[\[AKE_KESIK\]\]$/.test(text), bad = /\[\[AKE_HATA\]\]$/.test(text);
+    text = text.replace(tail, "");
+    if (bad) throw { code: "server", text };
+    if (!text.trim()) throw { code: "empty_completion" };
+    return { text, truncated: cut };
+  }
+  const fn = (input, opts) => call(input, opts, false);
+  fn.json = async (input, opts) => { const j = await call(input, opts, true), v = parseJSONLoose(j.text); if (v === undefined) throw { code: "invalid_json" }; return v; };
+  fn.limits = async () => ({ images: { maxCount: 1, mediaTypes: ["image/jpeg", "image/png", "image/webp"] } });
+  return fn;
+}
+function webAIAc() { AI.fn = webAI(); AI.off = false; AI.images = true; AI.imgTypes = ["image/jpeg", "image/png", "image/webp"]; }
+function webAIKapat() { WEBAI.code = ""; WEBAI.plan = ""; LS.del("ake.kod"); LS.del("ake.plan"); AI.fn = null; AI.images = false; }
+const premOnly = () => !(window.claude && typeof window.claude.use === "function") && WEBAI.plan !== "premium";
 async function initAI() {
-  if (!(window.claude && typeof window.claude.use === "function")) { AI.ready = true; render(); return; }
+  if (!(window.claude && typeof window.claude.use === "function")) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; }
   try { AI.fn = await window.claude.use("sample"); } catch (e) { AI.fn = null; }
   AI.ready = true;
   if (AI.fn) { try { const l = await AI.fn.limits(); AI.images = !!(l && l.images); AI.imgTypes = l && l.images ? l.images.mediaTypes : []; } catch (e) { } }
@@ -4632,7 +4689,10 @@ function aiErr(e) {
     session_expired: "Claude oturumun sona ermiş. Yeniden giriş yapıp tekrar dene.", refused: "Bu isteğe yanıt verilemedi. Soruyu farklı ifade etmeyi dene.",
     invalid_json: "Yanıt beklenen biçimde gelmedi. Tekrar dene.", image_rejected: "Görsel kabul edilmedi. JPEG, PNG ya da WebP biçiminde, daha küçük bir dosya dene.",
     images_unavailable: "Bu görünümde görsel gönderilemiyor.", prompt_too_large: "Metin çok uzun. Daha kısa bir parça gönder.",
-    empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "" })[code] ?? "Bağlantıda bir sorun oldu. Tekrar dene.";
+    empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "",
+    kod: "Erişim kodun geçersiz ya da süresi dolmuş. Yeni kod için bizimle iletişime geç.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
+    network: "İnternet bağlantısını kontrol edip tekrar dene.", overloaded: "AI şu an çok yoğun. Birkaç dakika sonra tekrar dene.",
+    yapilandirma: "AI sunucusu henüz ayarlanmamış. Biraz sonra tekrar dene.", server: "AI şu an yanıt veremedi. Tekrar dene." })[code] ?? "Bağlantıda bir sorun oldu. Tekrar dene.";
 }
 function studentCtx() {
   const p = S.profile, w = weakTopics(4).map(x => `${SUBJ[x.s].n} – ${x.t} (%${x.acc})`).join("; ");
@@ -5030,6 +5090,9 @@ function vSettings() {
     <p class="small muted">${cloud.state === "cloud" ? "İlerlemen Claude hesabına bağlı ve sana ayrı tutuluyor; aynı hesapla başka cihazdan açtığında kaldığın yerden devam edersin." : "İlerlemen bu tarayıcıda saklanıyor. Cihaz değiştirirken ya da tarayıcı verisini silmeden önce yedek al."}</p>
     ${!IN_CLAUDE ? "" : `<p class="small muted">${cloud.state === "cloud" ? "Çalışma özetin (sitedeki adın, alanın ve hedefin, çözdüğün soru sayısı ve başarın, deneme sonuçların, giriş zamanların, cihaz türün) site yöneticisinin panelinde görünür. Yanlış defterin, kartların, planın ve AI öğretmenle yazışmaların yalnızca sende kalır." : "Siteyi Claude'da açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün site yöneticisine anlık görünebilir."} Ayrıntılar <a href="#kvkk">KVKK Aydınlatma Metni</a>'nde.</p>`}
     <div class="row"><button class="btn" data-a="exportData">Yedeği indir</button><button class="btn" data-a="importAsk">Yedekten geri yükle</button><button class="btn ghost" data-a="resetAsk">Tüm ilerlemeyi sıfırla</button></div></div>
+  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı</p>
+    <p class="small muted">Kodun bu cihazda kayıtlı. Başka bir cihazda kullanmak için AI öğretmen sayfasına aynı kodu girmen yeterli.</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>`
+    : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`}
   <div class="card stack" id="uygulama"><h2>Telefona uygulama gibi ekle</h2>
     <p class="small muted">AKE Akademi'yi ana ekranına eklersen tek dokunuşla, uygulama gibi açılır. Güncellemeler otomatik gelir; yeniden kurman gerekmez.</p>
     <div class="grid2">
@@ -5696,12 +5759,15 @@ NAVG.push(["AKE Akademi", [["premium", "Premium", "star"], ["yasal", "Yasal meti
 
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";
-  if (IN_CLAUDE) return `<p class="${c}">${orig}</p>`;
+  if (IN_CLAUDE || aiOn()) return `<p class="${c}">${orig}</p>`;
   return `<p class="${c}">${feat} AKE Akademi Premium ile açılıyor. <a href="#premium">Premium'u incele →</a></p>`;
 }
 function tutorOff() {
   if (IN_CLAUDE) return `<div class="card"><h2>AI öğretmen şu an kapalı</h2><p class="muted" style="margin-top:8px">Bu bölüm Claude ile çalışır. Sayfayı Claude hesabınla açtığında ilk soruda izin istenir. İzin vermezsen ya da hesabında Claude kullanılamıyorsa diğer tüm bölümler çalışmaya devam eder.</p></div>`;
-  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Premium</span><h2>AI öğretmen çok yakında</h2><p class="muted">Takıldığın soruyu yazdığında adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen, AKE Akademi Premium ile açılıyor. Soru bankası, denemeler ve diğer tüm bölümler ücretsiz kullanılmaya devam ediyor.</p><a class="btn acc" style="align-self:flex-start" href="#premium">Premium'u incele</a></div>`;
+  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Orta ve Premium</span><h2>AI öğretmen paketlerle açılıyor</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen Orta ve Premium paketlerde var. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor.</p>
+    <form data-s="aiKod" class="row"><input class="in" name="kod" placeholder="Erişim kodun" autocomplete="off" autocapitalize="characters" spellcheck="false" style="max-width:240px" aria-label="Erişim kodu"><button class="btn pri"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Kodu etkinleştir"}</button></form>
+    ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}
+    <a class="btn acc" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
 }
 
 /* Premium: Ücretsiz, Orta ve Premium paketleri; aylık ya da yıllık (yıllıkta 2 ay bedava) */
@@ -5964,13 +6030,14 @@ Yalnızca ${arr.length} sayıdan oluşan bir JSON dizisi döndür. Örnek: [2,0,
   G2.busy = false; G2.stage = ""; render();
 }
 async function planAI() {
+  if (premOnly()) { toast("AI ile kişisel çalışma planı Premium pakette var."); return; }
   UI.planBusy = true; UI.planErr = ""; UI.modal = null; render();
   try {
     const prompt = `${studentCtx()}
 Bu YKS öğrencisi için Pazartesi'den Pazar'a 7 günlük bir çalışma planı hazırla. Her gün 3-5 görev olsun; görevler somut ve ölçülebilir olsun (örnek: "Türev: 30 soru", "TYT denemesi + yanlış analizi"). Hafta sonunda bir deneme ve tekrar olsun. Günlük çalışma 4-6 saat civarında olsun. Zayıf konulara öncelik ver, alanının derslerini dengeli dağıt.
 Ders anahtarları: ${Object.entries(SUBJ).map(([k, v]) => k + "=" + v.n).join(", ")}
 Yalnızca JSON dizisi döndür: [{"day":0,"text":"Görev","s":"mat","min":45}]  (day: 0=Pazartesi … 6=Pazar; s yukarıdaki anahtarlardan biri ya da boş metin; min dakika)`;
-    const arr = await AI.fn.json(prompt, { cache: false });
+    const arr = await AI.fn.json(prompt, { cache: false, modelTier: "complex" });
     const tasks = (Array.isArray(arr) ? arr : []).map(o => ({ id: uid(), day: Number(o && o.day), text: String((o && o.text) || "").slice(0, 140), s: SUBJ[o && o.s] ? o.s : "", min: Math.max(0, Math.min(600, Math.round(Number(o && o.min) || 0))), done: false }))
       .filter(t => Number.isInteger(t.day) && t.day >= 0 && t.day <= 6 && t.text.trim());
     if (!tasks.length) throw { code: "invalid_json" };
@@ -6073,6 +6140,7 @@ ${q.p}
 Öğrencinin cümlesini değerlendir: 10 üzerinden bir puan ver, neyi doğru yakaladığını ve neyi kaçırdığını 2-4 cümleyle söyle, sonra ana fikri tek cümleyle sen yaz.`, { cache: false });
   },
   aiResult(d) {
+    if (premOnly()) { toast("Deneme sonucuna AI yorumu Premium pakette var."); return; }
     const R = d.id && S.exams.find(e => e.id === d.id) || UI.lastResult; if (!R) return;
     const miss = {}; (R.qs || []).forEach(q => { if (q.your !== q.a) { const k = (SUBJ[q.s] ? SUBJ[q.s].n : q.s) + " – " + q.t; miss[k] = (miss[k] || 0) + 1; } });
     const missTxt = Object.entries(miss).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, n]) => `${k}: ${n}`).join("; ");
@@ -6082,7 +6150,7 @@ ${studentCtx()}
 Öğrenci "${R.title}" çözdü. Toplam ${R.d} doğru, ${R.y} yanlış, ${R.b} boş; net ${nfx(R.net)}; süre ${fmtDur(R.secs)}${R.dur ? " / " + fmtDur(R.dur) : ""}.
 Bölümler: ${R.sections.map(s => `${s.n} ${s.d}D ${s.y}Y ${s.b}B (net ${nfx(s.net)})`).join("; ")}
 Yanlış ya da boş bıraktığı konular: ${missTxt || "bilgi yok"}
-Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta için somut, ölçülebilir öneriler (hangi konudan kaç soru gibi). Net hesabı doğru − yanlış ÷ 4'tür.`, { cache: false });
+Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta için somut, ölçülebilir öneriler (hangi konudan kaç soru gibi). Net hesabı doğru − yanlış ÷ 4'tür.`, { cache: false, modelTier: "complex" });
   },
   reportAsk() {
     UI.reportQ = RUN.qs[RUN.cur];
@@ -6236,6 +6304,21 @@ Object.assign(CHG, { premOk(el) { UI.prem[el.dataset.k] = el.checked; render(); 
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); UI.installEvt = e; if (route() === "ayarlar") render(); });
 window.addEventListener("appinstalled", () => { UI.installEvt = null; render(); });
 ACT.installApp = async () => { const e = UI.installEvt; if (!e) return; UI.installEvt = null; try { e.prompt(); await e.userChoice; } catch (x) { } render(); };
+Object.assign(SUB, {
+  async aiKod(fd) {
+    const code = String(fd.get("kod") || "").trim().toUpperCase(); if (!code || UI.kodBusy) return;
+    UI.kodBusy = true; UI.kodErr = ""; render();
+    try {
+      const r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code, check: true }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.ok) { WEBAI.code = code; WEBAI.plan = j.plan === "premium" ? "premium" : "orta"; LS.set("ake.kod", code); LS.set("ake.plan", WEBAI.plan); webAIAc(); toast(`AI öğretmen açıldı · ${WEBAI.plan === "premium" ? "Premium" : "Orta"} paket`); }
+      else UI.kodErr = r.status === 401 ? "Bu kod geçerli değil. Harfleri ve tireleri kontrol edip tekrar dene." : "Kod şu an kontrol edilemedi. Biraz sonra tekrar dene.";
+    } catch (e) { UI.kodErr = "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene."; }
+    UI.kodBusy = false; render();
+  }
+});
+ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
+ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
 Object.assign(ACT, ADM_ACT); Object.assign(CHG, ADM_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */

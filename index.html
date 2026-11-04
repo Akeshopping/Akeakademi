@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı.">
+<script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151a27" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -288,6 +289,23 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .msg.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
 .msg.a p+p,.msg.a ul,.msg.a ol{margin-top:8px}
 .msg.a ul,.msg.a ol{padding-left:20px;margin-bottom:0}
+:root[data-fs="l"] #main{zoom:1.12}
+:root[data-fs="xl"] #main{zoom:1.25}
+:root[data-font="okuma"]{--f-body:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif;--f-disp:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif}
+:root[data-font="okuma"] body{letter-spacing:.012em;line-height:1.7}
+.erisim-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.erisim-row>b{font-weight:600}
+.tema-btn{padding:6px;min-width:36px;justify-content:center}
+.tema-btn svg,.ses-btn svg{width:18px;height:18px}
+.ses-btn{gap:6px}
+.ses-btn.on{color:var(--form-ink);border-color:var(--form)}
+.qmeta .ses-btn{padding:3px 8px;min-height:30px}
+.ai-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ai-tools .mtag{margin-top:0}
+.li.mli{flex-wrap:wrap}
+.li.mli .grow{flex:1 1 240px}
+.li-act{display:flex;gap:6px;flex-wrap:wrap}
+.qa button.due{border-color:var(--form);background:var(--form-soft)}
 .mtag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 .msg .att{font-size:12px;opacity:.75;margin-bottom:4px}
 .composer{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--paper);padding-top:8px}
@@ -4594,13 +4612,13 @@ function record(q, res, chosen) { // res: 1 doğru, 0 yanlış, -1 boş
   t[res === 1 ? 0 : res === 0 ? 1 : 2]++;
   if (!q.gen) { const a = S.ans[q.id] || (S.ans[q.id] = [0, 0, 0, 0, 0]); a[res === 1 ? 0 : res === 0 ? 1 : 2]++; a[3] = Date.now(); a[4] = res; }
   if (res !== 1) addMistake(q, chosen);
-  else if (S.mistakes[q.id] && !S.mistakes[q.id].learned) { const m = S.mistakes[q.id]; m.ok = (m.ok || 0) + 1; if (m.ok >= 2) m.learned = true; touch("mistakes"); }
+  else if (S.mistakes[q.id] && !S.mistakes[q.id].learned) { if (tekrarDogru(S.mistakes[q.id])) touch("mistakes"); }
   touch("stats");
 }
 function snap(q) { const o = { id: q.id, s: q.s, t: q.t, d: q.d, q: q.q, o: q.o, a: q.a, x: q.x }; if (q.p) o.p = q.p; if (q.fig) o.fig = q.fig; if (q.gen) o.gen = q.gen; if (q.fix) o.fix = 1; if (q.src) o.src = q.src; return o; }
 function addMistake(q, chosen) {
   const m = S.mistakes[q.id];
-  S.mistakes[q.id] = { q: snap(q), n: (m ? m.n : 0) + 1, ts: Date.now(), ok: 0, learned: false, last: chosen == null ? -1 : chosen };
+  S.mistakes[q.id] = { q: snap(q), n: (m ? m.n : 0) + 1, ts: Date.now(), ok: 0, learned: false, last: chosen == null ? -1 : chosen, dk: gunSonra(TEKRAR_GUN[0]) };
   touch("mistakes");
 }
 function weakTopics(limit) {
@@ -4820,6 +4838,9 @@ const IC = {
   img: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
   send: '<path d="M4 12l16-8-6 16-2-7z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
+  ses: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18.2 6.5a7.5 7.5 0 0 1 0 11"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
@@ -4830,7 +4851,7 @@ const NAVG = [
 ];
 function navHTML(r) {
   if (LEGAL[r]) r = "yasal";
-  const cnt = { yanlislar: openMistakes().length, kartlar: dueCount() };
+  const cnt = { yanlislar: tekrarBekleyen().length, kartlar: dueCount() };
   const groups = NAVG.map(g => g.slice());
   return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("");
 }
@@ -4841,6 +4862,7 @@ function header() {
     <div class="top-sp"></div>
     <div id="savest" class="save ${c}" title="${t}"><i></i><span class="lbl">${t}</span></div>
     ${cloud.owner && IN_CLAUDE ? `<button class="btn sm adm-go" data-a="admEnter" title="Yönetim paneli (yalnızca sen görüyorsun)">${icon("users")}<span>Panel</span></button>` : ""}
+    <button type="button" class="btn sm ghost tema-btn" data-a="temaHizli" aria-label="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}" title="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}">${icon(koyuMu() ? "sun" : "moon")}</button>
     <div class="chip-cd" title="YKS 2027 TYT oturumuna kalan gün"><b>${daysLeft()}</b><span>gün · YKS 2027</span></div>
   </div></header>`;
 }
@@ -4869,7 +4891,7 @@ function aiBox(key, idle) {
   const st = UI.ai[key];
   if (!st) return idle || "";
   if (st.busy && !st.text) return `<div class="ai-out" id="ai-${key}"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>`;
-  return `<div class="ai-out" id="ai-${key}">${md(st.text || "")}${st.err ? `<p class="small" style="color:var(--bad)">${esc(st.err)}</p>` : ""}</div>`;
+  return `<div class="ai-out" id="ai-${key}">${md(st.text || "")}${st.err ? `<p class="small" style="color:var(--bad)">${esc(st.err)}</p>` : ""}${!st.busy && st.text ? `<div class="ai-tools">${sesBtn("sesAI", ` data-k="${esc(key)}"`, "ai:" + key, "Dinle")}</div>` : ""}</div>`;
 }
 
 /* ---------- Çalışma alanım ---------- */
@@ -4898,7 +4920,7 @@ function vHome() {
   <div class="card"><div class="card-h"><h2>Hızlı başla</h2></div><div class="qa">
     <button data-a="quick" data-k="mini"><b>Mini ${EXAMS[defaultExam()].n} denemesi</b><span>Gerçek dağılımın dörtte biri, süreli</span></button>
     <button data-a="quick" data-k="weak"><b>Zayıf konumu çalış</b><span>${weak.length ? esc(SUBJ[weak[0].s].n + " · " + weak[0].t) : "Önce birkaç soru çöz, zayıf konunu bulalım"}</span></button>
-    <button data-a="go" data-h="yanlislar"><b>Yanlış defterim</b><span>${open ? open + " soru tekrar bekliyor" : "Şimdilik boş"}</span></button>
+    ${tekrarBekleyen().length ? `<button data-a="mistDue" class="due"><b>Bugünün yanlış tekrarı</b><span>${tekrarBekleyen().length} sorunun tekrar zamanı geldi</span></button>` : `<button data-a="go" data-h="yanlislar"><b>Yanlış defterim</b><span>${open ? open + " soru tekrar bekliyor" : "Şimdilik boş"}</span></button>`}
     <button data-a="go" data-h="kartlar"><b>Tekrar kartları</b><span>${due ? due + " kartın tekrar zamanı geldi" : "Formül, eser ve kelime kartları"}</span></button>
   </div></div>
   <div class="grid2">
@@ -5063,17 +5085,25 @@ function vPara() {
 /* ---------- Yanlış defterim ---------- */
 function vMistakes() {
   const M = UI.mist, all = Object.entries(S.mistakes), open = all.filter(([, m]) => !m.learned), done = all.filter(([, m]) => m.learned);
-  const list = (M.tab === "open" ? open : done).filter(([, m]) => !M.s || m.q.s === M.s).sort((a, b) => b[1].ts - a[1].ts);
+  const list = (M.tab === "open" ? open : done).filter(([, m]) => !M.s || m.q.s === M.s)
+    .sort((a, b) => M.tab === "open" ? (tekrarGunu(a[1]) < tekrarGunu(b[1]) ? -1 : tekrarGunu(a[1]) > tekrarGunu(b[1]) ? 1 : b[1].ts - a[1].ts) : b[1].ts - a[1].ts);
+  const dueN = M.tab === "open" ? list.filter(([, m]) => tekrarVakti(m)).length : 0, sonraki = sonrakiTekrar();
+  const item = ([id, m]) => {
+    const [tc, tl] = tekrarEtiket(m);
+    return `<div class="li mli"><div class="grow"><div class="t">${esc(m.q.q.length > 120 ? m.q.q.slice(0, 120) + "…" : m.q.q)}</div>
+      <div class="s">${esc(SUBJ[m.q.s] ? SUBJ[m.q.s].n : "")} · ${esc(m.q.t)} · ${m.n} kez · ${m.last >= 0 ? "senin cevabın " + LET[m.last] : "boş"} · doğru ${LET[m.q.a]}</div>
+      ${M.tab === "open" ? `<div class="row" style="gap:6px;margin-top:6px"><span class="pill ${tc}">${tl}</span>${m.ok ? `<span class="pill ok">${Math.min(m.ok, TEKRAR_HEDEF)}/${TEKRAR_HEDEF} tekrar</span>` : ""}</div>` : ""}</div>
+      <div class="li-act"><button class="btn sm" data-a="mistOne" data-id="${esc(id)}">Çöz</button><button class="btn sm ghost" data-a="benzerMist" data-id="${esc(id)}">Benzerini çöz</button>${M.tab === "done" ? "" : `<button class="btn sm ghost" data-a="mistLearn" data-id="${esc(id)}" title="Öğrendim olarak işaretle">Öğrendim</button>`}</div></div>`;
+  };
   return `<div class="view">${resumeBanner()}
-  <div class="vhead"><span class="eyebrow">Hata en iyi öğretmen</span><h1>Yanlış defterim</h1><p>Yanlış ya da boş bıraktığın her soru buraya düşer. Bir soruyu iki kez üst üste doğru çözünce "öğrenildi" olur.</p></div>
+  <div class="vhead"><span class="eyebrow">Hata en iyi öğretmen</span><h1>Yanlış defterim</h1><p>Yanlış ya da boş bıraktığın her soru buraya düşer ve 1, 3 ve 7 gün sonra yeniden karşına çıkar. Üç tekrarda da doğru çözersen "öğrenildi" olur. Aynı mantıkta yeni sorularla pekiştirmek için "Benzerini çöz"e bas.</p></div>
   <div class="row" style="justify-content:space-between"><div class="seg">${[["open", `Tekrar edilecek (${open.length})`], ["done", `Öğrenilenler (${done.length})`]].map(([k, l]) => `<button data-a="mistTab" data-k="${k}" class="${M.tab === k ? "on" : ""}">${l}</button>`).join("")}</div>
     <select class="in" style="max-width:220px" data-c="mistS">${subjOpts(M.s, true)}</select></div>
-  ${M.tab === "open" && list.length ? `<button class="btn pri" data-a="mistStart">${Math.min(list.length, 30)} soruyu tekrar çöz</button>` : ""}
-  <div class="card">${list.length ? `<div class="list">${list.slice(0, 80).map(([id, m]) => `<div class="li"><div class="grow"><div class="t">${esc(m.q.q.length > 120 ? m.q.q.slice(0, 120) + "…" : m.q.q)}</div><div class="s">${esc(SUBJ[m.q.s] ? SUBJ[m.q.s].n : "")} · ${esc(m.q.t)} · ${m.n} kez · ${m.last >= 0 ? "senin cevabın " + LET[m.last] : "boş"} · doğru ${LET[m.q.a]}</div></div>${m.ok ? `<span class="pill ok">${m.ok}/2</span>` : ""}<button class="btn sm" data-a="mistOne" data-id="${esc(id)}">Çöz</button>${M.tab === "done" ? "" : `<button class="btn sm ghost" data-a="mistLearn" data-id="${esc(id)}" title="Öğrendim olarak işaretle">Öğrendim</button>`}</div>`).join("")}</div>`
+  ${M.tab === "open" && list.length ? `<div class="row">${dueN ? `<button class="btn pri" data-a="mistDue">Bugün tekrar zamanı gelen ${dueN} soruyu çöz</button>` : `<span class="small muted">Bugün tekrar edilecek yanlış yok.${sonraki ? " Sıradaki tekrar: " + esc(sonraki) + "." : ""}</span>`}<button class="btn ${dueN ? "ghost" : ""}" data-a="mistStart">${dueN ? "Hepsini şimdi çöz" : Math.min(list.length, 30) + " soruyu yine de çöz"}</button></div>` : ""}
+  <div class="card">${list.length ? `<div class="list">${list.slice(0, 80).map(item).join("")}</div>`
     : `<div class="empty">${M.tab === "open" ? "Tekrar bekleyen soru yok. Deneme ya da test çözdükçe yanlışların burada toplanır." : "Henüz öğrenildi olarak işaretlenen soru yok."}</div>`}</div>
   </div>`;
 }
-
 /* ---------- Tekrar kartları ---------- */
 const BOXDAYS = [0, 1, 2, 4, 8, 16];
 function deckCards(d) {
@@ -5169,6 +5199,7 @@ function vSettings() {
     <label class="f">Günlük soru hedefi<input class="in" type="number" min="5" max="500" data-c="prof" data-k="gunluk" value="${esc(p.gunluk)}"></label>
     <label class="f">TYT tarihi<input class="in" type="date" data-c="prof" data-k="examDate" value="${esc(p.examDate || EXAM_DEFAULT)}"></label></div>
     <p class="small muted">ÖSYM'nin açıkladığı 2027 takvimine göre TYT 19 Haziran 2027'de yapılacak. Takvim değişirse tarihi buradan güncelleyebilirsin.</p></div>
+  ${erisimKart()}
   <div class="card stack"><h2>Kayıt ve yedek</h2>
     <p><b>Durum:</b> ${esc(st)}.</p>
     <p class="small muted">${cloud.state === "cloud" ? "İlerlemen Claude hesabına bağlı ve sana ayrı tutuluyor; aynı hesapla başka cihazdan açtığında kaldığın yerden devam edersin." : "İlerlemen bu tarayıcıda saklanıyor. Cihaz değiştirirken ya da tarayıcı verisini silmeden önce yedek al."}</p>
@@ -5210,7 +5241,7 @@ function vTutor() {
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">7/24 yanında</span><h1>AI öğretmenim</h1><p>Takıldığın soruyu yaz${AI.images ? " ya da fotoğrafını ekle" : ""}; konu anlatımı, çözüm adımları ve çalışma önerisi iste. Öğretmenin alanını ve zayıf konularını bilir.</p></div>
   ${!AI.ready ? `<div class="empty">Claude'a bağlanılıyor…</div>` : !aiOn() ? tutorOff() : `
-  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map(m => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.g ? `<div class="mtag">Gelişmiş çözüm</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
+  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map((m, ci) => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.role !== "user" ? `<div class="ai-tools">${m.g ? `<span class="mtag">Gelişmiş çözüm</span>` : ""}${sesBtn("sesChat", ` data-i="${ci}"`, "chat:" + ci, "Dinle")}</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
     ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>` : ""}</div>
   <div class="composer">${UI.chatImg ? `<div class="row small" style="margin-bottom:6px"><span class="pill form">📎 ${esc(UI.chatImg.name || "görsel")}</span><button class="btn sm ghost" data-a="chatImgClear">Kaldır</button></div>` : ""}
     <form data-s="chat">${AI.images ? `<label class="btn ghost sm" title="Soru fotoğrafı ekle" style="min-height:40px">${icon("img")}<input type="file" accept="${esc((AI.imgTypes || ["image/jpeg", "image/png", "image/webp"]).join(","))}" data-c="chatImg" hidden></label>` : ""}
@@ -5254,7 +5285,7 @@ function vRun() {
   const corr = perm.indexOf(q.a), qk = "q:" + q.id;
   const expl = rev ? `<div class="expl"><div class="res ${sel === q.a ? "ok" : "bad"}">${sel === q.a ? "Doğru!" : `Yanlış. Doğru cevap ${LET[corr]}.`}</div><p>${fq(q.x)}</p>
     ${R.kind === "para" && R.times[i] ? `<p class="small muted">Bu soruda ${R.times[i]} saniye harcadın${R.times[i] > 90 ? "; hedef 90 saniye" : ""}.</p>` : ""}
-    <div class="row">${aiOn() ? `<button class="btn sm" data-a="aiExplain"${UI.ai[qk] && UI.ai[qk].busy ? " disabled" : ""}>${icon("spark")} AI açıklasın</button>` : ""}<button class="btn sm ghost" data-a="reportAsk">${icon("flag")} Bildir</button></div>
+    <div class="row"><button class="btn sm" data-a="benzerEkle" title="Bu sorunun mantığında yeni sorular sıraya eklenir"${UI.benzerBusy ? " disabled" : ""}>${UI.benzerBusy ? "Hazırlanıyor…" : "Benzerini çöz"}</button>${aiOn() ? `<button class="btn sm" data-a="aiExplain"${UI.ai[qk] && UI.ai[qk].busy ? " disabled" : ""}>${icon("spark")} AI açıklasın</button>` : ""}${sesBtn("sesCozum", "", "cozum:" + q.id, "Çözümü dinle")}<button class="btn sm ghost" data-a="reportAsk">${icon("flag")} Bildir</button></div>
     ${aiBox(qk)}${R.kind === "para" && q.p && aiOn() ? paraIdea(q) : ""}</div>` : "";
   const last = i === R.qs.length - 1;
   const wide = window.matchMedia && window.matchMedia("(min-width:900px)").matches, open = UI.sheetOpen == null ? wide : UI.sheetOpen;
@@ -5263,7 +5294,7 @@ function vRun() {
   <div class="runbar"><button class="btn sm ghost" data-a="runExit">${icon("back")} Çık</button><span class="ttl">${esc(R.title)}</span>
     <span class="timer" id="timer" title="${R.dur ? "Kalan süre" : "Geçen süre"}">${timerTxt}</span><button class="btn sm pri" data-a="finishAsk">Bitir</button></div>
   <div class="qcard">
-    <div class="qmeta"><span class="qno">Soru ${i + 1}/${R.qs.length}</span>${R.secs.length > 1 && sec.n !== subj ? `<span class="pill">${esc(sec.n)}</span>` : ""}<span class="pill form">${esc(subj)}</span><span class="small muted">${esc(q.t)}${q.d ? " · " + DIFF[q.d] : ""}${q.src === "ai" ? " · AI" : ""}</span>
+    <div class="qmeta"><span class="qno">Soru ${i + 1}/${R.qs.length}</span>${R.secs.length > 1 && sec.n !== subj ? `<span class="pill">${esc(sec.n)}</span>` : ""}<span class="pill form">${esc(subj)}</span>${sesBtn("sesSoru", "", "soru:" + q.id)}<span class="small muted">${esc(q.t)}${q.d ? " · " + DIFF[q.d] : ""}${q.src === "ai" ? " · AI" : ""}</span>
       ${R.kind === "para" ? `<span class="mono small" style="margin-left:auto" id="qtimer">${rev ? (R.times[i] || 0) + " sn" : Math.floor((Date.now() - R.qStart) / 1000) + " sn"}</span>` : ""}</div>
     <div class="qbody">${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}${q.fig ? figSVG(q.fig) : ""}<div class="qtext">${fq(q.q)}</div><div class="opts" role="group" aria-label="Seçenekler">${opts}</div>${expl}</div>
   </div>
@@ -5291,16 +5322,17 @@ function pickAnswer(o) {
   if (R.rev[i]) return;
   R.ans[i] = o; R.rev[i] = true;
   const secs = Math.max(1, Math.round((Date.now() - R.qStart) / 1000)); R.times[i] = secs;
-  const res = o === q.a ? 1 : 0;
+  const res = o === q.a ? 1 : 0, m0 = S.mistakes[q.id], ok0 = m0 && !m0.learned ? (m0.ok || 0) : null;
   record(q, res, o);
   if (R.kind === "para") { S.para.times.push(secs); if (res) S.para.c++; else S.para.w++; touch("stats"); }
   const m = S.mistakes[q.id];
-  if (res === 1 && m && m.learned) toast("Bu soruyu öğrendin, yanlış defterinden çıktı.");
+  if (res === 1 && m && m.learned && ok0 != null) toast("Bu soruyu öğrendin, yanlış defterinden çıktı.");
+  else if (res === 1 && m && ok0 != null && (m.ok || 0) > ok0) toast(`Tekrar ${m.ok}/${TEKRAR_HEDEF} tamam. Bu soru ${TEKRAR_GUN[m.ok]} gün sonra yine karşına gelecek.`);
   saveRun(); render();
 }
 function moveTo(i) {
   const R = RUN; if (i < 0 || i >= R.qs.length) return;
-  R.cur = i; if (!R.rev[i]) R.qStart = Date.now();
+  sesDurdur(); R.cur = i; if (!R.rev[i]) R.qStart = Date.now();
   saveRun(); render();
   const qc = document.querySelector(".qcard"); if (qc) { const top = qc.getBoundingClientRect().top + window.scrollY - 130; if (window.scrollY > top) window.scrollTo(0, Math.max(0, top)); }
 }
@@ -5913,6 +5945,203 @@ Object.assign(ADM_ACT, {
   },
   kodKopya(d) { const R = KODG.son; kKopya(d.t === "sec" ? KODG.sec : d.t === "mesaj" && R ? kMesaj(R) : R ? R.kod : ""); }
 });
+/* ===== Yeni özellikler: erişilebilirlik (15), sesli okuma, benzer soru üretici (11), yanlış defterinde aralıklı tekrar (2) ===== */
+
+/* ---------- 15 · Erişilebilirlik: tema, yazı boyutu, okuma dostu yazı tipi ---------- */
+const ERISIM = { tema: LS.get("ake.tema") || "auto", yazi: LS.get("ake.yazi") || "n", font: LS.get("ake.font") || "std" };
+const OKUMA_FONT = "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap";
+const koyuMu = () => ERISIM.tema === "dark" || (ERISIM.tema === "auto" && !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches));
+function erisimUygula() {
+  const d = document.documentElement;
+  if (ERISIM.tema === "light" || ERISIM.tema === "dark") d.setAttribute("data-theme", ERISIM.tema); else d.removeAttribute("data-theme");
+  if (ERISIM.yazi === "l" || ERISIM.yazi === "xl") d.setAttribute("data-fs", ERISIM.yazi); else d.removeAttribute("data-fs");
+  if (ERISIM.font === "okuma") {
+    d.setAttribute("data-font", "okuma");
+    if (!document.getElementById("okumaFont")) { const l = document.createElement("link"); l.id = "okumaFont"; l.rel = "stylesheet"; l.href = OKUMA_FONT; document.head.appendChild(l); }
+  } else d.removeAttribute("data-font");
+  /* telefon durum çubuğu rengi (web sürümünde) */
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+    const med = m.getAttribute("media") || "", dflt = /dark/.test(med) ? "#151a27" : "#ffffff";
+    m.setAttribute("content", ERISIM.tema === "auto" ? dflt : (ERISIM.tema === "dark" ? "#151a27" : "#ffffff"));
+  });
+}
+function erisimSet(k, v) {
+  const ok = { tema: ["auto", "light", "dark"], yazi: ["n", "l", "xl"], font: ["std", "okuma"] };
+  if (!ok[k] || !ok[k].includes(v)) return;
+  ERISIM[k] = v; LS.set("ake." + k, v); erisimUygula(); render();
+}
+if (window.matchMedia) try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (ERISIM.tema === "auto") render(); }); } catch (e) { }
+erisimUygula();
+
+function segSec(k, cur, opts) {
+  return `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-a="erisim" data-k="${k}" data-v="${v}" class="${cur === v ? "on" : ""}" aria-pressed="${cur === v}">${l}</button>`).join("")}</div>`;
+}
+function erisimKart() {
+  const ses = !!window.speechSynthesis;
+  return `<div class="card stack" id="erisim"><h2>Görünüm ve erişilebilirlik</h2>
+    <div class="erisim-row"><b>Tema</b>${segSec("tema", ERISIM.tema, [["auto", "Otomatik"], ["light", "Açık"], ["dark", "Koyu"]])}</div>
+    <div class="erisim-row"><b>Yazı boyutu</b>${segSec("yazi", ERISIM.yazi, [["n", "Normal"], ["l", "Büyük"], ["xl", "Çok büyük"]])}</div>
+    <div class="erisim-row"><b>Yazı tipi</b>${segSec("font", ERISIM.font, [["std", "Standart"], ["okuma", "Okuma dostu"]])}</div>
+    <p class="small muted">Otomatik tema, telefonunun ya da bilgisayarının açık/koyu ayarını izler. Okuma dostu yazı tipi, harflerin birbirine karışmaması için tasarlanmıştır.</p>
+    <div class="erisim-row"><b>Sesli okuma</b>${ses ? `<button type="button" class="btn sm" data-a="sesDene">${icon("ses")} Dene</button>` : `<span class="small muted">Bu tarayıcı sesli okumayı desteklemiyor.</span>`}</div>
+    ${ses ? `<p class="small muted">Soru çözerken soru kartındaki hoparlör düğmesi soruyu ve seçenekleri, AI öğretmenin cevaplarındaki "Dinle" düğmesi cevabı sesli okur. Ses, cihazının kendi Türkçe sesiyle çalışır; internet ve ek ücret gerekmez.</p>` : ""}</div>`;
+}
+
+/* ---------- sesli okuma (cihazın kendi sesi, internet ve ücret gerekmez) ---------- */
+const SES = { key: "" };
+function sesMetin(t) {
+  return String(t || "").replace(/```[\s\S]*?```/g, " ").replace(/[#*_`>|]/g, " ").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\^\{([^}]*)\}/g, " üssü $1 ").replace(/\^(\d+)/g, " üssü $1 ").replace(/√\{([^}]*)\}/g, " karekök $1 ").replace(/√/g, " karekök ")
+    .replace(/π/g, " pi ").replace(/≤/g, " küçük eşit ").replace(/≥/g, " büyük eşit ").replace(/≠/g, " eşit değil ").replace(/−/g, "-")
+    .replace(/\s+/g, " ").trim();
+}
+function sesOku(text, key, lang) {
+  const ss = window.speechSynthesis;
+  if (!ss) { toast("Bu tarayıcı sesli okumayı desteklemiyor."); return; }
+  if (SES.key === key && (ss.speaking || ss.pending)) { ss.cancel(); SES.key = ""; render(); return; }
+  ss.cancel();
+  const u = new SpeechSynthesisUtterance(sesMetin(text).slice(0, 6000));
+  u.lang = lang || "tr-TR";
+  try { const v = ss.getVoices().find(x => x.lang && x.lang.toLowerCase().startsWith(u.lang.slice(0, 2).toLowerCase())); if (v) u.voice = v; } catch (e) { }
+  u.rate = 1;
+  const bitti = () => { if (SES.key === key) { SES.key = ""; render(); } };
+  u.onend = bitti; u.onerror = bitti;
+  SES.key = key; ss.speak(u); render();
+}
+function sesDurdur() { if (window.speechSynthesis && SES.key) { window.speechSynthesis.cancel(); SES.key = ""; } }
+const sesBtn = (act, attrs, key, etiket) => window.speechSynthesis ? `<button type="button" class="btn sm ghost ses-btn${SES.key === key ? " on" : ""}" data-a="${act}"${attrs || ""} aria-label="${SES.key === key ? "Okumayı durdur" : "Sesli oku"}" title="${SES.key === key ? "Okumayı durdur" : "Sesli oku"}">${icon("ses")}${etiket ? `<span>${SES.key === key ? "Durdur" : etiket}</span>` : ""}</button>` : "";
+function soruMetni(q, perm) {
+  const ops = (perm || [0, 1, 2, 3, 4]).map((oi, pos) => `${LET[pos]}: ${plainQ(q.o[oi])}.`).join(" ");
+  return (q.p ? plainQ(q.p) + ". " : "") + plainQ(q.q) + ". Seçenekler. " + ops;
+}
+
+/* ---------- 11 · Benzer soru üretici: aynı kalıptan yeni sayılarla, yoksa aynı konudan ---------- */
+function benzerSorular(q, n) {
+  n = n || 3;
+  const used = new Set([hashQ(q)]), out = [];
+  const g = q.gen && GENS.find(x => x.id === q.gen);
+  if (g) for (let i = 0; i < n * 4 && out.length < n; i++) { const nq = genQ(g, q.s, used); if (nq) { delete nq.stale; if (!out.some(y => hashQ(y) === hashQ(nq))) out.push(nq); } }
+  if (out.length < n && SUBJ[q.s]) {
+    const r = buildSet([[q.s, n - out.length + 1]], { topic: q.t });
+    r.qs.forEach(x => { if (out.length < n && x.id !== q.id && hashQ(x) !== hashQ(q) && !out.some(y => y.id === x.id)) out.push(x); });
+  }
+  return out.slice(0, n);
+}
+/* Çözüm sırasında: benzer soruları bu oturumda hemen sonraya ekle */
+function benzerYerlestir(add) {
+  const R = RUN; if (!R || !add.length) return;
+  const k = add.length, at = R.cur + 1;
+  const ins = (arr, vals) => { if (arr.length < at) arr.length = at; arr.splice(at, 0, ...vals); };
+  ins(R.qs, add);
+  ins(R.perm, add.map(x => (x.fix || isNumOpts(x)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])));
+  ins(R.ans, add.map(() => null)); ins(R.rev, add.map(() => false)); ins(R.flag, add.map(() => false)); ins(R.times, add.map(() => 0));
+  R.secs.forEach(s => { if (s.from >= at) s.from += k; if (s.to >= at) s.to += k; });
+  markSeen(add);
+  toast(`${k} benzer soru sıraya eklendi.`);
+  moveTo(at);
+}
+function benzerYok(q, yer) {
+  if (!aiOn()) { toast("Bu konuda başka hazır soru yok."); return; }
+  UI.benzerQ = { q: snap(q), yer };
+  openModal("AI ile benzer soru üretilsin mi?", `<p>"${esc(q.t)}" konusunda hazır benzer soru yok. AI bu sorunun mantığında 3 yeni soru yazsın, cevaplarını ikinci kez kontrol etsin.</p>${IN_CLAUDE ? "" : `<p class="small muted">Bu işlem 2 AI mesaj hakkı kullanır.</p>`}`,
+    [{ l: "Vazgeç", a: "modalClose" }, { l: "Üret", a: "benzerAIGo", k: "pri" }]);
+}
+function benzerEkle() {
+  const R = RUN; if (!R) return;
+  const q = R.qs[R.cur], add = benzerSorular(q, 3).map(snap);
+  if (!add.length) { benzerYok(q, "run"); return; }
+  benzerYerlestir(add);
+}
+/* Yanlış defterinden: o sorunun benzerleriyle yeni kısa test */
+function benzerBaslat(q) {
+  const qs = benzerSorular(q, 5);
+  if (!qs.length) { benzerYok(q, "mist"); return; }
+  startRun({ kind: "benzer", title: "Benzer sorular · " + q.t, mode: "study", qs });
+}
+async function benzerAI() {
+  const B = UI.benzerQ; UI.modal = null; if (!B || UI.benzerBusy) { render(); return; }
+  const q = B.q, s = q.s, en = s === "ingilizce", sj = SUBJ[s] || { n: s, e: "" };
+  UI.benzerBusy = true; render(); toast("AI benzer soruları hazırlıyor…");
+  try {
+    const prompt = `YKS ${sj.e} ${sj.n} dersi, "${q.t}" konusu. Aşağıdaki örnek soruyla aynı bilgiyi ya da beceriyi ölçen, aynı zorlukta 3 yeni ve özgün çoktan seçmeli soru yaz. Örneği kopyalama; sayıları, durumu ya da bağlamı değiştir.
+
+Örnek soru:
+${q.p ? plainQ(q.p) + "\n" : ""}${plainQ(q.q)}
+${q.o.map((x, j) => LET[j] + ") " + plainQ(x)).join("\n")}
+Doğru cevap: ${LET[q.a]}
+Çözüm: ${plainQ(q.x)}
+
+Kurallar:
+- Her soruda tam 5 seçenek ve yalnızca bir doğru cevap olsun; seçenekler birbirinden farklı olsun.
+- Sayısal sorularda sonucu iki kez hesapla.
+- ${en ? "Soru ve seçenekler İngilizce, açıklama Türkçe olsun." : "Soru, seçenekler ve açıklama Türkçe olsun."}
+- Paragraf sorusu yazıyorsan parçayı "p" alanına, soru kökünü "q" alanına koy; değilse "p" boş kalsın.
+- Matematik ifadelerini düz metinle yaz: x^2, √x, a/b.
+- Açıklama 2-4 cümle olsun ve çözümü göstersin.
+Yalnızca JSON dizisi döndür. Biçim örneği:
+[{"p":"","q":"Soru metni","o":["seçenek","seçenek","seçenek","seçenek","seçenek"],"a":2,"x":"Açıklama"}]
+"a", doğru seçeneğin 0-4 arası sırasıdır.`;
+    let arr = await AI.fn.json(prompt, { cache: false });
+    if (!Array.isArray(arr)) arr = [];
+    arr = arr.map(o => o && Object.assign({}, o, { a: Number(o.a) })).filter(o => o && typeof o.q === "string" && o.q.trim() && Array.isArray(o.o) && o.o.length === 5 && o.o.every(x => typeof x === "string" && x.trim()) && new Set(o.o.map(x => x.trim())).size === 5 && Number.isInteger(o.a) && o.a >= 0 && o.a <= 4).slice(0, 3);
+    if (!arr.length) throw { code: "invalid_json" };
+    const vp = `Aşağıdaki çoktan seçmeli soruları bağımsız olarak, dikkatle çöz. Her soru için doğru seçeneğin 0-4 arası sırasını ver (A=0 … E=4). Bir soruda birden fazla doğru seçenek varsa, hiç doğru seçenek yoksa ya da soru hatalıysa -1 yaz.
+
+${arr.map((o, i) => `Soru ${i + 1}:\n${o.p && o.p.trim() ? o.p.trim() + "\n" : ""}${o.q}\n${o.o.map((x, j) => LET[j] + ") " + x).join("\n")}`).join("\n\n")}
+
+Yalnızca ${arr.length} sayıdan oluşan bir JSON dizisi döndür. Örnek: [2,0,-1]`;
+    const ver = await AI.fn.json(vp, { cache: false });
+    const kept = arr.filter((o, i) => Array.isArray(ver) && Number(ver[i]) === o.a).map(o => {
+      const nq = { id: "ai-" + uid(), s, t: q.t, d: q.d || 2, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi.", src: "ai" };
+      if (typeof o.p === "string" && o.p.trim()) nq.p = o.p.trim();
+      return nq;
+    });
+    if (!kept.length) throw { code: "empty_completion" };
+    kept.forEach(x => S.aiQs.push(x)); touch("ai");
+    UI.benzerBusy = false; UI.benzerQ = null;
+    if (B.yer === "run" && RUN) benzerYerlestir(kept.map(snap));
+    else startRun({ kind: "benzer", title: "Benzer sorular · " + q.t, mode: "study", qs: kept });
+  } catch (e) { UI.benzerBusy = false; render(); toast(aiErr(e) || "Benzer soru üretilemedi. Tekrar dene."); }
+}
+
+/* ---------- 2 · Yanlış defteri: aralıklı tekrar (1, 3, 7 gün) ---------- */
+const TEKRAR_GUN = [1, 3, 7], TEKRAR_HEDEF = 3;
+const gunSonra = n => { const d = new Date(); d.setDate(d.getDate() + n); return dayKey(d); };
+const tekrarGunu = m => m.dk || dayKey(new Date(m.ts || Date.now()));
+const tekrarVakti = m => !m.learned && tekrarGunu(m) <= dayKey();
+function tekrarBekleyen() { return openMistakes().filter(([, m]) => tekrarVakti(m)); }
+function tekrarEtiket(m) {
+  const dk = tekrarGunu(m), bugun = dayKey();
+  if (dk <= bugun) return ["warn", "Bugün tekrar"];
+  const fark = Math.round((new Date(dk + "T12:00:00") - new Date(bugun + "T12:00:00")) / 86400000);
+  return ["", fark === 1 ? "Yarın" : fark + " gün sonra"];
+}
+/* record() içinden: doğru cevap yalnızca tekrar zamanı geldiyse ilerletir */
+function tekrarDogru(m) {
+  if (!tekrarVakti(m)) return false;
+  m.ok = Math.min(TEKRAR_HEDEF, (m.ok || 0) + 1);
+  if (m.ok >= TEKRAR_HEDEF) m.learned = true;
+  else m.dk = gunSonra(TEKRAR_GUN[m.ok] || 7);
+  return true;
+}
+function sonrakiTekrar() {
+  const l = openMistakes().map(([, m]) => tekrarGunu(m)).filter(dk => dk > dayKey()).sort();
+  return l[0] ? new Date(l[0] + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" }) : "";
+}
+
+const OZ_ACT = {
+  erisim(d) { erisimSet(d.k, d.v); },
+  temaHizli() { erisimSet("tema", koyuMu() ? "light" : "dark"); },
+  sesDene() { sesOku("Merhaba, ben AKE Akademi. Soruları ve AI öğretmenin cevaplarını sana sesli okuyabilirim.", "dene"); },
+  sesSoru() { const R = RUN; if (!R) return; const q = R.qs[R.cur]; sesOku(soruMetni(q, R.perm[R.cur]), "soru:" + q.id, q.s === "ingilizce" ? "en-US" : "tr-TR"); },
+  sesCozum() { const R = RUN; if (!R) return; const q = R.qs[R.cur]; sesOku(`Doğru cevap ${LET[R.perm[R.cur].indexOf(q.a)]}. ${plainQ(q.x)}`, "cozum:" + q.id); },
+  sesChat(d) { const m = UI.chat[+d.i]; if (m) sesOku(m.content, "chat:" + d.i); },
+  sesAI(d) { const st = UI.ai[d.k]; if (st && st.text) sesOku(st.text, "ai:" + d.k); },
+  benzerEkle() { if (!UI.benzerBusy) benzerEkle(); },
+  benzerAIGo() { benzerAI(); },
+  benzerMist(d) { const m = S.mistakes[d.id]; if (m) benzerBaslat(m.q); },
+  mistDue() { const l = tekrarBekleyen().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); if (!l.length) { toast("Bugün tekrar zamanı gelen yanlış yok."); return; } startRun({ kind: "mistakes", title: "Bugünün yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); }
+};
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -6495,7 +6724,7 @@ Object.assign(SUB, {
 });
 ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
 ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
-Object.assign(ACT, ADM_ACT); Object.assign(CHG, ADM_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
+Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */
 APP.addEventListener("click", e => {
@@ -6520,7 +6749,7 @@ document.addEventListener("keydown", e => {
   else if (e.key === "ArrowRight") moveTo(RUN.cur + 1);
   else if (e.key === "ArrowLeft") moveTo(RUN.cur - 1);
 });
-window.addEventListener("hashchange", () => { UI.menu = false; UI.inRun = false; memPage(route()); render(); window.scrollTo(0, 0); });
+window.addEventListener("hashchange", () => { sesDurdur(); UI.menu = false; UI.inRun = false; memPage(route()); render(); window.scrollTo(0, 0); });
 ["mouseover", "focusin"].forEach(ev => APP.addEventListener(ev, e => tipShow(e.target)));
 ["mouseout", "focusout"].forEach(ev => APP.addEventListener(ev, e => tipHide(e.target)));
 

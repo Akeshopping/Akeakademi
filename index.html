@@ -22,34 +22,34 @@
 <script src="/ayar.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 /* Düzen: masaüstünde sol menü + tek içerik sütunu; telefonda üst şerit + alt sekme çubuğu.
    Görsel motif: ÖSYM optik cevap kâğıdı — turuncu baskı çizgileri, kurşun kalemle doldurulan A–E kutucukları. */
 :root{
-  --paper:#f2f3f7; --card:#ffffff; --sunk:#f7f8fb; --ink:#141b30; --ink2:#4a5370; --ink3:#7b839a;
-  --line:#dbdfe8; --line2:#e9ecf2;
-  --form:#e0652a; --form-ink:#b2461a; --form-soft:#fcece3;
-  --ok:#14805a; --ok-soft:#e0f2e9; --bad:#c0304e; --bad-soft:#fae4e9; --warn:#9a6300; --warn-soft:#fbf0d9;
-  --pencil:#252c40; --on-ink:#ffffff;
-  --f-disp:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --r:10px; --r-s:7px;
-  --shadow:0 1px 2px rgba(20,27,48,.05),0 6px 20px -12px rgba(20,27,48,.18);
+  --paper:#f4f6fa; --card:#ffffff; --sunk:#f8f9fc; --ink:#0f172a; --ink2:#475569; --ink3:#8590a6;
+  --line:#e2e7ef; --line2:#edf1f6;
+  --form:#2447d6; --form-ink:#1c38b0; --form-soft:#e9eeff; --brand:#e0652a;
+  --ok:#0f7b55; --ok-soft:#e2f4eb; --bad:#c42f4b; --bad-soft:#fce8ec; --warn:#9a5b00; --warn-soft:#fdf1da;
+  --pencil:#1e293b; --on-ink:#ffffff;
+  --f-disp:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-body:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:12px; --r-s:8px;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 4px 14px -8px rgba(15,23,42,.12);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0d111b; --card:#151a27; --sunk:#111521; --ink:#e7eaf3; --ink2:#a8afc3; --ink3:#788097;
-  --line:#283043; --line2:#1d2333;
-  --form:#ff8a4c; --form-ink:#ffad80; --form-soft:#33201a;
-  --ok:#46c38b; --ok-soft:#12291f; --bad:#f06c86; --bad-soft:#341822; --warn:#e3ab3e; --warn-soft:#2e2412;
-  --pencil:#dfe3ee; --on-ink:#0d111b; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}}
+  --paper:#0b1120; --card:#111a2d; --sunk:#0d1526; --ink:#e6eaf3; --ink2:#a4aec3; --ink3:#6f7a91;
+  --line:#22304a; --line2:#18233a;
+  --form:#7d9bff; --form-ink:#a8bbff; --form-soft:#18244a;
+  --ok:#3fca8f; --ok-soft:#10291f; --bad:#f06c86; --bad-soft:#341822; --warn:#e3ab3e; --warn-soft:#2e2412;
+  --pencil:#dfe5f1; --on-ink:#0b1120; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#0d111b; --card:#151a27; --sunk:#111521; --ink:#e7eaf3; --ink2:#a8afc3; --ink3:#788097;
-  --line:#283043; --line2:#1d2333;
-  --form:#ff8a4c; --form-ink:#ffad80; --form-soft:#33201a;
-  --ok:#46c38b; --ok-soft:#12291f; --bad:#f06c86; --bad-soft:#341822; --warn:#e3ab3e; --warn-soft:#2e2412;
-  --pencil:#dfe3ee; --on-ink:#0d111b; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}
+  --paper:#0b1120; --card:#111a2d; --sunk:#0d1526; --ink:#e6eaf3; --ink2:#a4aec3; --ink3:#6f7a91;
+  --line:#22304a; --line2:#18233a;
+  --form:#7d9bff; --form-ink:#a8bbff; --form-soft:#18244a;
+  --ok:#3fca8f; --ok-soft:#10291f; --bad:#f06c86; --bad-soft:#341822; --warn:#e3ab3e; --warn-soft:#2e2412;
+  --pencil:#dfe5f1; --on-ink:#0b1120; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font:400 15px/1.55 var(--f-body);margin:0;min-height:100vh}
@@ -78,10 +78,10 @@ sup,sub{font-size:.72em}
 .top-in{display:flex;align-items:center;gap:12px;height:58px;max-width:1240px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
 .brand-mark{display:grid;grid-template-columns:repeat(5,7px);gap:2.5px}
-.brand-mark i{width:7px;height:7px;border-radius:50%;border:1.4px solid var(--form)}
-.brand-mark i.f{background:var(--pencil);border-color:var(--pencil)}
+.brand-mark i{width:7px;height:7px;border-radius:50%;border:1.4px solid var(--brand)}
+.brand-mark i.f{background:var(--brand);border-color:var(--brand)}
 .brand b{font:800 17px/1 var(--f-disp);letter-spacing:.02em;white-space:nowrap}
-.brand b span{color:var(--form-ink)}
+.brand b span{color:var(--brand)}
 .top-sp{flex:1}
 .chip-cd{display:flex;align-items:baseline;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sunk);white-space:nowrap}
 .chip-cd b{font:700 15px/1 var(--f-mono);color:var(--form-ink)}
@@ -92,7 +92,7 @@ sup,sub{font-size:.72em}
 .shell{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1240px;margin:0 auto;gap:28px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .side{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));align-self:start;padding-block:22px;max-height:calc(100vh - 58px);overflow:auto}
-.side h4,.menu-sheet h4{font:600 11px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:18px 10px 8px}
+.side h4,.menu-sheet h4{font:600 12px/1 var(--f-body);color:var(--ink3);margin:18px 10px 8px}
 .menu-sheet h4:first-child{margin-top:4px}
 .side h4:first-child{margin-top:0}
 .nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--ink2);font-weight:500;font-size:14.5px}
@@ -175,7 +175,7 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:700px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
-.tile b{display:block;font:700 24px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.tile b{display:block;font:700 24px/1.1 var(--f-disp);font-variant-numeric:tabular-nums}
 .tile span{font-size:12.5px;color:var(--ink2)}
 .qa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (max-width:520px){.qa{grid-template-columns:minmax(0,1fr)}}
@@ -241,7 +241,7 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);cursor:pointer;font-size:15px;line-height:1.45}
 .opt:hover{border-color:var(--ink3)}
-.bub{flex:none;width:27px;height:27px;border-radius:50%;border:1.6px solid var(--form);display:grid;place-items:center;font:600 12.5px/1 var(--f-mono);color:var(--form-ink);margin-top:-2px}
+.bub{flex:none;width:27px;height:27px;border-radius:50%;border:1.6px solid var(--form);display:grid;place-items:center;font:700 12.5px/1 var(--f-body);color:var(--form-ink);margin-top:-2px}
 .opt .ot{min-width:0;overflow-wrap:anywhere;padding-top:1px}
 .opt.sel{border-color:var(--pencil)}
 .opt.sel .bub{background:var(--pencil);border-color:var(--pencil);color:var(--paper)}
@@ -306,6 +306,61 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .li.mli .grow{flex:1 1 240px}
 .li-act{display:flex;gap:6px;flex-wrap:wrap}
 .qa button.due{border-color:var(--form);background:var(--form-soft)}
+/* ---------- yeni düzen: sade başlıklar, bölüm sekmeleri, ana sayfa ---------- */
+.vhead .eyebrow{display:none}
+.subtabs{display:flex;gap:4px;padding:4px;background:var(--sunk);border:1px solid var(--line);border-radius:12px;overflow-x:auto;scrollbar-width:none;width:100%;max-width:640px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs a{flex:1 0 auto;text-align:center;padding:8px 8px;border-radius:9px;text-decoration:none;font-weight:600;font-size:14px;color:var(--ink2);white-space:nowrap}
+@media (max-width:420px){.subtabs a{font-size:13px;padding:8px 5px}}
+.subtabs a.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.home-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.home-head p{margin-top:4px}
+.today .tasks{display:flex;flex-direction:column;margin-top:4px}
+.gtask{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2)}
+.gtask:last-child{border-bottom:0}
+.gtask .ck{flex:none;width:22px;height:22px;border-radius:50%;border:1.8px solid var(--line);display:grid;place-items:center}
+.gtask.done .ck{background:var(--ok);border-color:var(--ok)}
+.gtask.done .ck::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.gtask .grow{flex:1;min-width:0}
+.gtask .t{font-weight:600}
+.gtask.done .t{color:var(--ink3);text-decoration:line-through}
+.gtask .s{font-size:12.5px;color:var(--ink2)}
+.ders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.ders{display:flex;flex-direction:column;gap:8px;text-align:left;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;color:var(--ink)}
+.ders:hover{border-color:var(--form)}
+.ders b{font-weight:600;font-size:14.5px}
+.ders small{font-size:12px;color:var(--ink2)}
+.dbar{height:5px;border-radius:3px;background:var(--line2);overflow:hidden}
+.dbar i{display:block;height:100%;border-radius:3px}
+.h0{background:var(--line)}.h1{background:#e0485f}.h2{background:#ef8a3a}.h3{background:#d6b02a}.h4{background:#57b36b}.h5{background:#1f9a62}
+.subj-chips{display:flex;flex-direction:column;gap:10px}
+.subj-chips .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.subj-chips .grp>span{font-size:12px;font-weight:700;color:var(--ink3);width:40px}
+.topic-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2)}
+.topic-row:last-child{border-bottom:0}
+.topic-row .heat{flex:none;width:6px;align-self:stretch;border-radius:3px}
+.topic-row .grow{flex:1;min-width:0}
+.topic-row .t{font-weight:600}
+.topic-row .s{font-size:12.5px;color:var(--ink2)}
+.heatmap{display:flex;flex-direction:column;gap:12px}
+.hm-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center}
+@media (max-width:520px){.hm-row{grid-template-columns:1fr}}
+.hm-row b{font-size:13.5px;font-weight:600}
+.hm-cells{display:flex;flex-wrap:wrap;gap:4px}
+.hm-cells button{width:22px;height:22px;border-radius:5px;border:0;cursor:pointer;padding:0}
+.hm-leg{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink2);align-items:center}
+.hm-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+.pomo{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.pomo .clock{font:700 clamp(44px,10vw,64px)/1 var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kisa-feed{height:min(calc(100dvh - 210px),660px);min-height:420px;max-width:560px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.kisa-feed::-webkit-scrollbar{display:none}
+.kisa{flex:none;height:100%;scroll-snap-align:start;border-radius:16px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line)}
+.kisa .k-ders{font-size:13px;font-weight:700;color:var(--form-ink)}
+.kisa h2{font-size:24px}
+.kisa ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.5}
+.kisa .k-alt{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.rapor{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:14px}
+.mic.on{color:#fff;background:var(--bad);border-color:var(--bad)}
 .mtag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 .msg .att{font-size:12px;opacity:.75;margin-bottom:4px}
 .composer{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--paper);padding-top:8px}
@@ -4607,8 +4662,8 @@ function topicsOf(s) {
 /* ---------- istatistik ---------- */
 function record(q, res, chosen) { // res: 1 doğru, 0 yanlış, -1 boş
   const day = S.daily[dayKey()] || (S.daily[dayKey()] = { q: 0, c: 0 });
-  if (res !== -1) { day.q++; if (res === 1) day.c++; }
   const key = q.s + "|" + q.t, t = S.topic[key] || (S.topic[key] = [0, 0, 0]);
+  if (res !== -1) { day.q++; if (res === 1) day.c++; day.tp = day.tp || {}; day.tp[key] = (day.tp[key] || 0) + 1; }
   t[res === 1 ? 0 : res === 0 ? 1 : 2]++;
   if (!q.gen) { const a = S.ans[q.id] || (S.ans[q.id] = [0, 0, 0, 0, 0]); a[res === 1 ? 0 : res === 0 ? 1 : 2]++; a[3] = Date.now(); a[4] = res; }
   if (res !== 1) addMistake(q, chosen);
@@ -4840,17 +4895,24 @@ const IC = {
   back: '<path d="M15 5l-7 7 7 7"/>',
   ses: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18.2 6.5a7.5 7.5 0 0 1 0 11"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const NAVG = [
-  ["Öğrenme alanın", [["bugun", "Çalışma alanım", "home"], ["ogretmen", "AI öğretmenim", "spark"], ["deneme", "Deneme merkezi", "clock"], ["banka", "Soru bankası", "stack"], ["studyo", "Çalışma stüdyosu", "pen"], ["paragraf", "Paragraf atölyesi", "para"]]],
-  ["Takip", [["yanlislar", "Yanlış defterim", "x"], ["kartlar", "Tekrar kartları", "cards"], ["plan", "Çalışma planım", "cal"], ["gelisim", "Gelişimim", "chart"]]],
-  ["Hesap", [["ayarlar", "Hedefler ve ayarlar", "gear"]]]
+  ["Çalış", [["bugun", "Ana sayfa", "home"], ["studyo", "Soru çöz", "stack"], ["deneme", "Denemeler", "clock"], ["ogretmen", "AI öğretmen", "spark"]]],
+  ["Takip", [["yanlislar", "Tekrar", "cards"], ["plan", "Planım", "cal"], ["gelisim", "Gelişimim", "chart"]]],
+  ["Hesap", [["ayarlar", "Ayarlar", "gear"]]]
 ];
+/* alt sayfalar hangi ana menüye ait */
+const NAVACT = { banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme" };
+const SORU_TABS = [["studyo", "Konular"], ["banka", "Soru ara"], ["paragraf", "Paragraf"], ["uret", "AI ile üret"]];
+const TEKRAR_TABS = [["yanlislar", "Yanlışlarım"], ["kartlar", "Kartlar"], ["kisa", "Kısa dersler"]];
+const subTabs = (tabs, cur) => `<nav class="subtabs" aria-label="Bölüm">${tabs.map(([k, l]) => `<a href="#${k}" class="${k === cur ? "on" : ""}"${k === cur ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav>`;
 function navHTML(r) {
   if (LEGAL[r]) r = "yasal";
+  r = NAVACT[r] || r;
   const cnt = { yanlislar: tekrarBekleyen().length, kartlar: dueCount() };
   const groups = NAVG.map(g => g.slice());
   return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("");
@@ -4867,7 +4929,8 @@ function header() {
   </div></header>`;
 }
 function tabbar(r) {
-  const t = [["bugun", "Bugün", "home"], ["deneme", "Deneme", "clock"], ["banka", "Sorular", "stack"], ["ogretmen", "AI", "spark"]];
+  const t = [["bugun", "Ana sayfa", "home"], ["studyo", "Soru çöz", "stack"], ["deneme", "Deneme", "clock"], ["ogretmen", "AI", "spark"]];
+  r = NAVACT[r] || r;
   return `<nav class="tabbar" aria-label="Ana menü">${t.map(([k, l, ic]) => `<a href="#${k}" class="${r === k && !UI.menu ? "on" : ""}">${icon(ic)}<span>${l}</span></a>`).join("")}<button type="button" class="${UI.menu ? "on" : ""}" data-a="menu">${icon("menu")}<span>Menü</span></button></nav>`;
 }
 function menuSheet(r) { return `<div class="modal-bg" data-a="menuClose"><div class="modal menu-sheet" data-stop="1" role="dialog" aria-label="Tüm bölümler">${navHTML(r)}</div></div>`; }
@@ -4896,42 +4959,30 @@ function aiBox(key, idle) {
 
 /* ---------- Çalışma alanım ---------- */
 function vHome() {
-  const p = S.profile, today = S.daily[dayKey()] || { q: 0, c: 0 }, goal = +p.gunluk || 40, tot = totals(), due = dueCount(), open = openMistakes().length;
-  const weak = weakTopics(3), last = S.exams[S.exams.length - 1], tasks = S.plan.tasks.filter(t => t.day === todayIdx());
+  const p = S.profile, goal = +p.gunluk || 40, today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
+  const prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
   const dateStr = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
   return `<div class="view">${resumeBanner()}
-  <div class="vhead"><span class="eyebrow">${esc(dateStr)}</span><h1>${p.name ? `Merhaba ${esc(p.name)}.` : "Merhaba."} Bugün ne çalışıyoruz?</h1></div>
+  <div class="home-head"><div><h1>${p.name ? `Merhaba ${esc(p.name)}` : "Merhaba"}</h1><p class="muted">${esc(dateStr)} · YKS 2027'ye <b>${daysLeft()}</b> gün</p></div><a class="btn pri" href="#studyo">Soru çöz</a></div>
   ${p.ok ? "" : `<form class="card" data-s="onboard"><div class="card-h"><h2>Seni tanıyalım</h2><span class="pill form">1 dakika</span></div>
     <div class="fields"><label class="f">Adın<input class="in" name="name" autocomplete="given-name" placeholder="Adını yaz"></label>
     <label class="f">Alanın<select class="in" name="alan">${Object.entries(ALAN).map(([k, v]) => `<option value="${k}"${p.alan === k ? " selected" : ""}>${v}</option>`).join("")}</select></label>
     <label class="f">Günlük soru hedefi<input class="in" name="gunluk" type="number" min="5" max="500" value="${goal}"></label></div>
     <div class="row" style="margin-top:12px"><button class="btn pri">Kaydet</button><span class="small muted">Alanına göre deneme ve testler hazırlanır.</span></div></form>`}
-  <div class="hero">
-    <div class="card"><span class="eyebrow">YKS 2027 geri sayım</span>
-      <div class="cd-big" style="margin-top:10px"><b class="num">${daysLeft()}</b><span>gün kaldı</span></div>
-      <div class="cd-sub"><span>TYT <b>19 Haziran</b> Cumartesi</span><span>AYT ve YDT <b>20 Haziran</b> Pazar</span></div>
-      <p class="small muted" style="margin-top:10px">Başvurular 4 Şubat – 2 Mart 2027, sonuçlar 21 Temmuz 2027. Tarihler ÖSYM'nin 2027 sınav takviminden alınmıştır.</p></div>
-    <div class="card goal"><div class="row" style="justify-content:space-between"><h3>Bugünkü hedef</h3><span class="mono small">${today.q}/${goal}</span></div>
-      <div class="bar ${today.q >= goal ? "ok" : ""}"><i style="width:${Math.min(100, pct(today.q, goal))}%"></i></div>
-      <p class="small muted">${today.q >= goal ? "Günlük hedefini tamamladın." : `${goal - today.q} soru daha çözersen hedef tamam.`}${today.q ? ` Bugünkü doğruluk %${pct(today.c, today.q)}.` : ""}</p>
-      <button class="btn pri" data-a="quick" data-k="mix">20 soruluk karma test</button></div>
+  <section class="card today"><div class="card-h"><h2>Bugünün programı</h2><span class="small muted">${done}/${prog.length} tamam</span></div>
+    <div class="bar ${today.q >= goal ? "ok" : ""}"><i style="width:${Math.min(100, pct(today.q, goal))}%"></i></div>
+    <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
+    ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
+    <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
+  <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
+    <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${o.n ? `${o.n} soru · %${o.acc} doğru` : "Henüz başlamadın"}</small></button>`; }).join("")}</div></section>
+  <div class="grid2">
+    <section class="card"><div class="card-h"><h2>Son deneme</h2>${last ? `<button class="btn sm ghost" data-a="openResult" data-id="${last.id}">Sonucu aç</button>` : ""}</div>
+      ${last ? `<div class="row" style="gap:22px"><div class="net-big"><b class="num">${nfx(last.net)}</b><span class="muted">net</span></div><div class="stack" style="gap:4px"><b>${esc(last.title)}</b><span class="small muted">${fmtDate(last.date)} · ${last.d} doğru, ${last.y} yanlış, ${last.b} boş</span></div></div>` : `<div class="empty">Henüz deneme çözmedin.<div style="margin-top:10px"><button class="btn sm pri" data-a="quick" data-k="mini">Mini deneme başlat</button></div></div>`}</section>
+    <section class="card"><div class="card-h"><h2>Zayıf konuların</h2><a class="btn sm ghost" href="#gelisim">Gelişimim</a></div>
+      ${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : "warn"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çöz</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözdükçe en çok zorlandığın konular burada listelenir.</div>`}</section>
   </div>
   <div class="tiles">${tile(tot.q, "çözülen soru")}${tile("%" + pct(tot.c, tot.q), "genel doğruluk")}${tile(streak(), "günlük seri")}${tile(S.exams.length, "deneme")}</div>
-  <div class="card"><div class="card-h"><h2>Hızlı başla</h2></div><div class="qa">
-    <button data-a="quick" data-k="mini"><b>Mini ${EXAMS[defaultExam()].n} denemesi</b><span>Gerçek dağılımın dörtte biri, süreli</span></button>
-    <button data-a="quick" data-k="weak"><b>Zayıf konumu çalış</b><span>${weak.length ? esc(SUBJ[weak[0].s].n + " · " + weak[0].t) : "Önce birkaç soru çöz, zayıf konunu bulalım"}</span></button>
-    ${tekrarBekleyen().length ? `<button data-a="mistDue" class="due"><b>Bugünün yanlış tekrarı</b><span>${tekrarBekleyen().length} sorunun tekrar zamanı geldi</span></button>` : `<button data-a="go" data-h="yanlislar"><b>Yanlış defterim</b><span>${open ? open + " soru tekrar bekliyor" : "Şimdilik boş"}</span></button>`}
-    <button data-a="go" data-h="kartlar"><b>Tekrar kartları</b><span>${due ? due + " kartın tekrar zamanı geldi" : "Formül, eser ve kelime kartları"}</span></button>
-  </div></div>
-  <div class="grid2">
-    <div class="card"><div class="card-h"><h2>Bugünün planı</h2><a class="btn sm ghost" href="#plan">Planı aç</a></div>
-      ${tasks.length ? `<div class="list">${tasks.map(taskRow).join("")}</div>` : `<div class="empty">Bugün için görev yok. <a href="#plan">Haftalık plan</a> oluşturabilirsin.</div>`}</div>
-    <div class="card"><div class="card-h"><h2>Zayıf konuların</h2><a class="btn sm ghost" href="#gelisim">Gelişimim</a></div>
-      ${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : "warn"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>`
-        : `<div class="empty">Her konuda en az 3 soru çözdükçe burada en çok zorlandığın konular listelenir.</div>`}</div>
-  </div>
-  ${last ? `<div class="card"><div class="card-h"><h2>Son deneme</h2><button class="btn sm ghost" data-a="openResult" data-id="${last.id}">Sonucu aç</button></div>
-    <div class="row" style="gap:22px"><div class="net-big"><b class="num">${nfx(last.net)}</b><span class="muted">net</span></div><div class="stack" style="gap:4px"><b>${esc(last.title)}</b><span class="small muted">${fmtDate(last.date)} · ${last.d} doğru, ${last.y} yanlış, ${last.b} boş</span></div></div></div>` : ""}
   </div>`;
 }
 function taskRow(t) {
@@ -5024,6 +5075,7 @@ function vBank() {
   const ai = S.aiQs.length;
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1><p>${BANK.length} özgün, çözümü yazılmış soru${ai ? ` ve senin ürettiğin ${ai} AI sorusu` : ""}. Bunlara ek olarak ${GENS.length} soru kalıbı en az ${nfx(QSTATS.distinct)} farklı soru üretir; kalıp soruları denemelerde ve Çalışma stüdyosunda karşına çıkar, gördüğün bir soru bir daha gelmez.</p></div>
+  ${subTabs(SORU_TABS, "banka")}
   <div class="card stack">
     <div class="fields">
       <label class="f">Ders<select class="in" data-c="bank" data-k="s">${subjOpts(B.s, true)}</select></label>
@@ -5041,16 +5093,20 @@ function vBank() {
 
 /* ---------- Çalışma stüdyosu ---------- */
 function vStudio() {
-  const s = UI.studio.s || (S.profile.alan === "SOZ" ? "edebiyat" : S.profile.alan === "DIL" ? "ingilizce" : "mat"), tops = topicsOf(s), G2 = UI.gen;
-  const gs = G2.s || s;
+  const s = UI.studio.s && SUBJ[UI.studio.s] ? UI.studio.s : (alanDersleri()[0] || "mat"), tops = topicsOf(s), dz = dersOzet(s);
+  const grp = ["TYT", "AYT", "YDT"].map(e => [e, Object.keys(SUBJ).filter(k => SUBJ[k].e === e)]);
   return `<div class="view">${resumeBanner()}
-  <div class="vhead"><span class="eyebrow">Kendi temponda</span><h1>Çalışma stüdyosu</h1><p>Bir ders ve konu seç, 10 soruluk çözümlü set başlasın. Sayısal konularda sorular her seferinde yeni sayılarla, cevabı kodla hesaplanarak üretilir.</p></div>
-  <div class="card stack">
-    <label class="f" style="max-width:320px">Ders<select class="in" data-c="studioS">${subjOpts(s)}</select></label>
-    <div class="list">${tops.map(t => { const st = S.topic[s + "|" + t.t], n = st ? st[0] + st[1] + st[2] : 0;
-      return `<div class="li"><div class="grow"><div class="t">${esc(t.t)}</div><div class="s">${t.n ? t.n + " özgün soru" : ""}${t.n && t.g ? " · " : ""}${t.g ? t.g + " kalıp, sınırsız soru" : ""}</div></div>${n ? `<span class="pill ${pct(st[0], n) >= 70 ? "ok" : pct(st[0], n) >= 50 ? "warn" : "bad"}">%${pct(st[0], n)} · ${n}</span>` : `<span class="pill">yeni</span>`}<button class="btn sm" data-a="topicStart" data-s="${s}" data-t="${esc(t.t)}">Çalış</button></div>`; }).join("")}</div>
-  </div>
-  <div class="card stack"><div class="card-h" style="margin:0"><h2>AI ile soru üret</h2><span class="pill form">çift kontrol</span></div>
+  <div class="vhead"><h1>Soru çöz</h1><p>Önce dersi, sonra konuyu seç; 10 soruluk çözümlü set başlar. Konunun yanındaki renk o konudaki başarını gösterir.</p></div>
+  ${subTabs(SORU_TABS, "studyo")}
+  <div class="card"><div class="subj-chips">${grp.map(([e, ks]) => `<div class="grp"><span>${e}</span><div class="seg">${ks.map(k => `<button type="button" data-a="dersSec" data-s="${k}" class="${k === s ? "on" : ""}" aria-pressed="${k === s}">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</button>`).join("")}</div></div>`).join("")}</div></div>
+  <div class="card"><div class="card-h"><h2>${esc(SUBJ[s].n)}</h2><button class="btn sm pri" data-a="dersKarisik" data-s="${s}">Karışık 10 soru</button></div>
+    <p class="small muted" style="margin-bottom:4px">${dz.n ? `Bu derste ${dz.n} soru çözdün, doğruluğun %${dz.acc}.` : "Bu derste henüz soru çözmedin."} ${tops.length} konu.</p>
+    <div>${tops.map(t => { const k = konuOzet(s, t.t); return `<div class="topic-row"><span class="heat ${isiSinif(k.acc)}" aria-hidden="true"></span><div class="grow"><div class="t">${esc(t.t)}</div><div class="s">${t.g ? "Sınırsız soru" : t.n + " soru"}${k.n ? ` · ${k.n} çözdün, %${k.acc} doğru` : " · henüz çözmedin"}</div></div><button class="btn sm" data-a="topicStart" data-s="${s}" data-t="${esc(t.t)}">Çöz</button></div>`; }).join("")}</div>
+    <div class="hm-leg" style="margin-top:14px">${heatLegend()}</div></div>
+  </div>`;
+}
+function uretKartlari(s, gs, G2) {
+  return `  <div class="card stack"><div class="card-h" style="margin:0"><h2>AI ile soru üret</h2><span class="pill form">çift kontrol</span></div>
     <p class="small muted">${IN_CLAUDE ? "Claude" : "AI"} istediğin konuda özgün sorular yazar, ardından her soruyu cevabını görmeden yeniden çözer. İki çözüm uyuşmazsa soru atılır; geçen sorular soru bankana eklenir.</p>
     ${aiOn() ? `<div class="fields">
       <label class="f">Ders<select class="in" data-c="genF" data-k="s">${subjOpts(gs)}</select></label>
@@ -5066,7 +5122,7 @@ function vStudio() {
     ${aiOn() ? `<form class="row" data-s="summary"><select class="in" name="s" style="max-width:200px">${subjOpts(s)}</select><input class="in" name="t" placeholder="Konu, örn. Logaritma" required style="flex:1;min-width:160px"><button class="btn">Özetle</button></form>${aiBox("sum")}`
       : premNote("Konu özetleri Claude ile hazırlanır.", "AI konu özetleri", "note")}
   </div>
-  </div>`;
+`;
 }
 
 /* ---------- Paragraf atölyesi ---------- */
@@ -5075,6 +5131,7 @@ function vPara() {
   const t = S.para.times, avg = t.length ? Math.round(t.reduce((a, b) => a + b, 0) / t.length) : 0, n = S.para.c + S.para.w;
   return `<div class="view">${resumeBanner()}
   <div class="vhead"><span class="eyebrow">Hız ve anlama</span><h1>Paragraf atölyesi</h1><p>TYT Türkçe'nin yarısından fazlası paragraf sorusudur. Her soruda hedef süre 90 saniye; kronometre seni takip eder, çözümden sonra ana fikri kendi cümlenle yazıp ${IN_CLAUDE ? "Claude'a" : "Premium'daki AI öğretmene"} değerlendirtebilirsin.</p></div>
+  ${subTabs(SORU_TABS, "paragraf")}
   <div class="tiles">${tile(n, "paragraf sorusu")}${tile("%" + pct(S.para.c, n), "doğruluk")}${tile(avg ? avg + " sn" : "–", "ortalama süre")}${tile(P.length + PARA_N, "paragraf")}</div>
   <div class="card stack"><div class="card-h" style="margin:0"><h2>Antrenman</h2><button class="btn pri" data-a="paraStart">Paragraf antrenmanını başlat</button></div>
     <div class="list">${P.map(q => { const a = S.ans[q.id]; return `<div class="li"><div class="grow"><div class="t">${esc(q.p.slice(0, 110))}…</div><div class="s">${esc(q.t)}</div></div>${a ? `<span class="pill ${a[4] === 1 ? "ok" : "bad"}">${a[4] === 1 ? "Doğru" : "Yanlış"}</span>` : ""}<button class="btn sm" data-a="paraOne" data-id="${q.id}">Çöz</button></div>`; }).join("")}</div>
@@ -5096,7 +5153,8 @@ function vMistakes() {
       <div class="li-act"><button class="btn sm" data-a="mistOne" data-id="${esc(id)}">Çöz</button><button class="btn sm ghost" data-a="benzerMist" data-id="${esc(id)}">Benzerini çöz</button>${M.tab === "done" ? "" : `<button class="btn sm ghost" data-a="mistLearn" data-id="${esc(id)}" title="Öğrendim olarak işaretle">Öğrendim</button>`}</div></div>`;
   };
   return `<div class="view">${resumeBanner()}
-  <div class="vhead"><span class="eyebrow">Hata en iyi öğretmen</span><h1>Yanlış defterim</h1><p>Yanlış ya da boş bıraktığın her soru buraya düşer ve 1, 3 ve 7 gün sonra yeniden karşına çıkar. Üç tekrarda da doğru çözersen "öğrenildi" olur. Aynı mantıkta yeni sorularla pekiştirmek için "Benzerini çöz"e bas.</p></div>
+  <div class="vhead"><span class="eyebrow">Hata en iyi öğretmen</span><h1>Tekrar</h1><p>Yanlış ya da boş bıraktığın her soru buraya düşer ve 1, 3 ve 7 gün sonra yeniden karşına çıkar. Üç tekrarda da doğru çözersen "öğrenildi" olur. Aynı mantıkta yeni sorularla pekiştirmek için "Benzerini çöz"e bas.</p></div>
+  ${subTabs(TEKRAR_TABS, "yanlislar")}
   <div class="row" style="justify-content:space-between"><div class="seg">${[["open", `Tekrar edilecek (${open.length})`], ["done", `Öğrenilenler (${done.length})`]].map(([k, l]) => `<button data-a="mistTab" data-k="${k}" class="${M.tab === k ? "on" : ""}">${l}</button>`).join("")}</div>
     <select class="in" style="max-width:220px" data-c="mistS">${subjOpts(M.s, true)}</select></div>
   ${M.tab === "open" && list.length ? `<div class="row">${dueN ? `<button class="btn pri" data-a="mistDue">Bugün tekrar zamanı gelen ${dueN} soruyu çöz</button>` : `<span class="small muted">Bugün tekrar edilecek yanlış yok.${sonraki ? " Sıradaki tekrar: " + esc(sonraki) + "." : ""}</span>`}<button class="btn ${dueN ? "ghost" : ""}" data-a="mistStart">${dueN ? "Hepsini şimdi çöz" : Math.min(list.length, 30) + " soruyu yine de çöz"}</button></div>` : ""}
@@ -5125,6 +5183,7 @@ function vCards() {
   const decks = DECKS.map(d => d.id).concat(["mine"]);
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">Aralıklı tekrar</span><h1>Tekrar kartları</h1><p>Formüller, eser–yazar eşleşmeleri, tarih kronolojisi ve İngilizce kelimeler. Unuttuğun kart sık, bildiğin kart seyrek gelir.</p></div>
+  ${subTabs(TEKRAR_TABS, "kartlar")}
   <div class="grid2">${decks.map(d => { const s = deckStat(d); return `<div class="card"><div class="card-h"><h3>${esc(deckName(d))}</h3><span class="pill">${s.n} kart</span></div><p class="small muted" style="margin-bottom:12px">${s.due ? `<b>${s.due}</b> kartın tekrar zamanı geldi · ` : ""}${s.nw} yeni kart</p><button class="btn ${s.due ? "pri" : ""}" data-a="deckStart" data-d="${d}" ${s.n ? "" : "disabled"}>${s.due ? "Tekrar et" : "Çalış"}</button></div>`; }).join("")}</div>
   <form class="card stack" data-s="addCard"><h2>Kendi kartını ekle</h2><div class="fields"><label class="f">Ön yüz<input class="in" name="f" required maxlength="140" placeholder="Örn. Sinüs teoremi"></label><label class="f">Arka yüz<input class="in" name="b" required maxlength="200" placeholder="a / sin A = 2R"></label></div><button class="btn" style="align-self:flex-start">Kartı ekle</button></form>
   </div>`;
@@ -5136,6 +5195,7 @@ function vPlan() {
   const T = S.plan.tasks, done = T.filter(t => t.done).length, ti = todayIdx();
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">Haftalık düzen</span><h1>Çalışma planım</h1><p>Her gün için görev yaz ya da ${IN_CLAUDE ? "Claude" : "Premium'daki AI"} zayıf konularına ve alanına göre bir hafta hazırlasın.</p></div>
+  ${pomoKart()}
   <div class="card"><div class="row" style="justify-content:space-between"><div class="stack" style="gap:6px;flex:1;min-width:200px"><b>${done}/${T.length} görev tamam</b><div class="bar ok"><i style="width:${pct(done, T.length)}%"></i></div></div>
     <div class="row">${aiOn() ? `<button class="btn pri" data-a="planAI" ${UI.planBusy ? "disabled" : ""}>${UI.planBusy ? "Plan hazırlanıyor…" : "AI ile haftalık plan"}</button>` : ""}${T.length ? `<button class="btn" data-a="planReset">Tikleri temizle</button><button class="btn ghost" data-a="planClearAsk">Planı sil</button>` : ""}</div></div>
     ${UI.planErr ? `<p class="small" style="color:var(--bad);margin-top:8px">${esc(UI.planErr)}</p>` : ""}</div>
@@ -5184,7 +5244,10 @@ function vProgress() {
   <div class="grid2">
     <div class="card"><h2 style="margin-bottom:10px">Ders bazında doğruluk</h2>${subs.length ? subs.map(x => `<div class="hbar"><span>${esc(SUBJ[x.s].n)}</span><span class="tr"><i style="width:${x.acc}%;background:${x.acc >= 70 ? "var(--ok)" : x.acc >= 50 ? "var(--warn)" : "var(--bad)"}"></i></span><span class="v">%${x.acc}</span></div>`).join("") : `<div class="empty">Henüz veri yok.</div>`}</div>
     <div class="card"><h2 style="margin-bottom:10px">Öncelikli konular</h2>${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : w.acc < 70 ? "warn" : "ok"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözünce sıralama oluşur.</div>`}</div>
-  </div></div>`;
+  </div>${netTahminKart()}
+  ${isiHaritasi()}
+  ${veliRaporKart()}
+  </div>`;
 }
 
 /* ---------- Hedefler ve ayarlar ---------- */
@@ -5245,8 +5308,9 @@ function vTutor() {
     ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>` : ""}</div>
   <div class="composer">${UI.chatImg ? `<div class="row small" style="margin-bottom:6px"><span class="pill form">📎 ${esc(UI.chatImg.name || "görsel")}</span><button class="btn sm ghost" data-a="chatImgClear">Kaldır</button></div>` : ""}
     <form data-s="chat">${AI.images ? `<label class="btn ghost sm" title="Soru fotoğrafı ekle" style="min-height:40px">${icon("img")}<input type="file" accept="${esc((AI.imgTypes || ["image/jpeg", "image/png", "image/webp"]).join(","))}" data-c="chatImg" hidden></label>` : ""}
-      <textarea id="chatIn" data-i="chatDraft" rows="1" placeholder="Sorunu yaz…" aria-label="Mesaj">${esc(UI.chatDraft)}</textarea>
+      ${tutorSesAraclari()}<textarea id="chatIn" data-i="chatDraft" rows="1" placeholder="${srObj ? "Dinliyorum…" : "Sorunu yaz…"}" aria-label="Mesaj">${esc(UI.chatDraft)}</textarea>
       ${UI.chatBusy ? `<button type="button" class="btn sm" data-a="chatStop">Durdur</button>` : `<button class="btn pri sm" style="min-height:40px" aria-label="Gönder">${icon("send")}</button>`}</form>
+    ${sesliModSatiri()}
     ${(!IN_CLAUDE && WEBAI.code && gucluLimit()) || (UI.chat.length && !UI.chatBusy) ? `<div class="row" style="justify-content:space-between;margin-top:6px">${!IN_CLAUDE && WEBAI.code && gucluLimit() ? `<span class="small muted">${gucluKalan() ? `Bu ay ${gucluKalan()} gelişmiş çözüm hakkın kaldı. Soru sorduğunda kullanılır.` : "Bu ayki gelişmiş çözüm hakkın bitti; sorular standart modelle çözülüyor."}</span>` : "<span></span>"}${UI.chat.length && !UI.chatBusy ? `<button class="btn sm ghost" style="margin-left:auto" data-a="chatClear">Sohbeti temizle</button>` : ""}</div>` : ""}</div>`}
   </div>`;
 }
@@ -6142,6 +6206,205 @@ const OZ_ACT = {
   benzerMist(d) { const m = S.mistakes[d.id]; if (m) benzerBaslat(m.q); },
   mistDue() { const l = tekrarBekleyen().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); if (!l.length) { toast("Bugün tekrar zamanı gelen yanlış yok."); return; } startRun({ kind: "mistakes", title: "Bugünün yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); }
 };
+
+/* ===== Ders/konu yardımcıları ve ısı renkleri (5) ===== */
+function alanDersleri() {
+  const out = [], add = s => { if (SUBJ[s] && !out.includes(s)) out.push(s); };
+  EXAMS.TYT.sec.forEach(sec => sec.p.forEach(([s]) => add(s)));
+  const ex = EXAMS[defaultExam()]; if (ex && ex !== EXAMS.TYT) ex.sec.forEach(sec => sec.p.forEach(([s]) => add(s)));
+  return out;
+}
+function dersOzet(s) { let c = 0, n = 0; Object.entries(S.topic).forEach(([k, v]) => { if (k.split("|")[0] === s) { c += v[0]; n += v[0] + v[1] + v[2]; } }); return { n, acc: n ? pct(c, n) : null }; }
+function konuOzet(s, t) { const v = S.topic[s + "|" + t], n = v ? v[0] + v[1] + v[2] : 0; return { n, acc: n ? pct(v[0], n) : null }; }
+const isiSinif = acc => acc == null ? "h0" : acc < 40 ? "h1" : acc < 55 ? "h2" : acc < 70 ? "h3" : acc < 85 ? "h4" : "h5";
+const heatLegend = () => [["h0", "Çözülmedi"], ["h1", "%40 altı"], ["h2", "%40–55"], ["h3", "%55–70"], ["h4", "%70–85"], ["h5", "%85 ve üstü"]].map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join("");
+function isiHaritasi() {
+  const al = alanDersleri(), ds = al.concat(Object.keys(SUBJ).filter(s => !al.includes(s) && dersOzet(s).n));
+  return `<div class="card"><div class="card-h"><h2>Konu ısı haritası</h2></div>
+    <p class="small muted" style="margin-bottom:12px">Her kare bir konu; renk o konudaki başarını gösterir. Bir kareye dokunursan o konudan 10 soru başlar.</p>
+    <div class="heatmap">${ds.map(s => `<div class="hm-row"><b>${esc(SUBJ[s].n)}</b><div class="hm-cells">${topicsOf(s).map(t => { const k = konuOzet(s, t.t), lbl = `${t.t}: ${k.n ? "%" + k.acc + ", " + k.n + " soru" : "henüz çözülmedi"}`; return `<button type="button" class="${isiSinif(k.acc)}" data-a="topicStart" data-s="${s}" data-t="${esc(t.t)}" aria-label="${esc(lbl)}" title="${esc(lbl)}"></button>`; }).join("")}</div></div>`).join("")}</div>
+    <div class="hm-leg" style="margin-top:14px">${heatLegend()}</div></div>`;
+}
+
+/* ===== 3 · Her sabah yenilenen günlük program ===== */
+function gunlukProgram() {
+  const bugun = dayKey(), goal = +S.profile.gunluk || 40, day = S.daily[bugun] || { q: 0, c: 0 };
+  let G = null; try { G = JSON.parse(LS.get("ake.gp") || "null"); } catch (e) { G = null; }
+  if (!G || G.d !== bugun) {
+    const w = weakTopics(2).map(x => ({ s: x.s, t: x.t })), ds = alanDersleri(), di = new Date().getDate();
+    for (let i = 0; w.length < 2 && i < ds.length * 2; i++) {
+      const s = ds[(di + i * 5) % ds.length], all = topicsOf(s), yeni = all.filter(t => !S.topic[s + "|" + t.t]), t = (yeni.length ? yeni : all)[(di + i) % Math.max(1, (yeni.length ? yeni : all).length)];
+      if (t && !w.some(x => x.s === s && x.t === t.t)) w.push({ s, t: t.t });
+    }
+    const son = S.exams.length ? S.exams[S.exams.length - 1].date : 0;
+    G = { d: bugun, w, m0: tekrarBekleyen().length, k0: dueCount(), den: Date.now() - son > 6 * 86400000 };
+    LS.set("ake.gp", JSON.stringify(G));
+  }
+  const tp = day.tp || {}, out = [];
+  out.push({ id: "hedef", t: `${goal} soru çöz`, s: `Bugün ${day.q}/${goal}`, done: day.q >= goal, a: "quick", k: "mix", l: "Karışık test" });
+  if (G.m0 || tekrarBekleyen().length) { const n = tekrarBekleyen().length; out.push({ t: "Yanlış tekrarı", s: n ? `${n} sorunun tekrar zamanı geldi` : "Bugünkü tekrarlar bitti", done: !n, a: "mistDue", l: "Başla" }); }
+  if (G.k0 || dueCount()) { const n = dueCount(); out.push({ t: "Kart tekrarı", s: n ? `${n} kart bekliyor` : "Bugünkü kartlar bitti", done: !n, a: "go", h: "kartlar", l: "Aç" }); }
+  G.w.forEach(x => { if (!SUBJ[x.s]) return; const n = tp[x.s + "|" + x.t] || 0; out.push({ t: `${SUBJ[x.s].n}: ${x.t}`, s: `10 soru, bugün ${Math.min(n, 10)}/10`, done: n >= 10, a: "topicStart", ds: x.s, dt: x.t, l: "Çöz" }); });
+  if (G.den) { const ok = S.exams.some(e => dayKey(new Date(e.date)) === bugun); out.push({ t: `Mini ${EXAMS[defaultExam()].n} denemesi`, s: "Haftalık durum kontrolü, süreli", done: ok, a: "quick", k: "mini", l: "Başla" }); }
+  return out;
+}
+function gtaskHTML(x) {
+  const at = x.a === "topicStart" ? ` data-s="${x.ds}" data-t="${esc(x.dt)}"` : x.a === "go" ? ` data-h="${x.h}"` : x.k ? ` data-k="${x.k}"` : "";
+  return `<div class="gtask${x.done ? " done" : ""}"><span class="ck" aria-hidden="true"></span><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(x.s)}</div></div>${x.done ? `<span class="small muted">Tamam</span>` : `<button class="btn sm" data-a="${x.a}"${at}>${x.l}</button>`}</div>`;
+}
+
+/* ===== 4 · Net tahmini (deneme eğiliminden) ===== */
+function netTahmin() {
+  const by = {};
+  S.exams.forEach(e => { const tot = (e.d || 0) + (e.y || 0) + (e.b || 0); if (EXAMS[e.type] && tot >= 8) (by[e.type] = by[e.type] || []).push({ x: e.date, r: e.net / tot }); });
+  const examT = new Date((S.profile.examDate || EXAM_DEFAULT) + "T10:15:00+03:00").getTime(), W = 7 * 86400000;
+  return Object.entries(by).filter(([, l]) => l.length >= 2).map(([t, l]) => {
+    const full = EXAMS[t].sec.reduce((a, s) => a + s.p.reduce((b, p) => b + p[1], 0), 0), pts = l.slice(-8), n = pts.length;
+    const mx = pts.reduce((a, p) => a + p.x, 0) / n, my = pts.reduce((a, p) => a + p.r, 0) / n;
+    let sxx = 0, sxy = 0; pts.forEach(p => { sxx += (p.x - mx) ** 2; sxy += (p.x - mx) * (p.r - my); });
+    let slope = sxx > W * W / 50 ? sxy / sxx : 0; /* denemeler çok sık aralıkla çözüldüyse eğilim hesaplanmaz */
+    slope = Math.max(-0.03 / W, Math.min(0.03 / W, slope)); /* haftada en fazla ±%3 */
+    const cl = v => Math.max(0, Math.min(1, v)), simdi = cl(my + slope * (pts[n - 1].x - mx));
+    const tahmin = cl(simdi + slope * Math.max(0, examT - Date.now()) * 0.6);
+    return { t, n: l.length, full, simdi: simdi * full, tahmin: tahmin * full, hafta: slope * W * full };
+  });
+}
+function netTahminKart() {
+  const L = netTahmin();
+  return `<div class="card"><div class="card-h"><h2>Net tahmini</h2></div>
+    ${L.length ? `<div class="list">${L.map(x => `<div class="li"><div class="grow"><div class="t">${esc(EXAMS[x.t].n)}</div><div class="s">${x.n} deneme · şu anki seviyen tam sınava göre ~${nfx(x.simdi)} net · eğilim haftada ${x.hafta >= 0 ? "+" : ""}${nfx(x.hafta)} net</div></div><div class="net-big" style="text-align:right"><b class="num">~${Math.round(x.tahmin)}</b><span class="muted small">sınav günü tahmini</span></div></div>`).join("")}</div>
+      <p class="small muted" style="margin-top:10px">Tahmin, son denemelerindeki net oranının gidişatına dayanır; mini denemeler tam sınava oranlanır. Kesin sonuç değildir, düzenli deneme çözdükçe isabeti artar.</p>`
+      : `<div class="empty">Aynı türden en az 2 deneme çözdüğünde, gidişatına göre sınav günü netin burada tahmin edilir.</div>`}</div>`;
+}
+
+/* ===== 8 · Veli raporu ===== */
+function veliRaporMetni() {
+  const p = S.profile; let q = 0, c = 0, gun = 0, fm = 0;
+  for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); const x = S.daily[dayKey(d)]; if (x) { q += x.q || 0; c += x.c || 0; if (x.q) gun++; fm += x.fm || 0; } }
+  const bas = Date.now() - 7 * 86400000, den = S.exams.filter(e => e.date >= bas), weak = weakTopics(3), acik = openMistakes().length;
+  return [`AKE Akademi haftalık rapor${p.name ? " · " + p.name : ""}`, `${new Date(bas + 86400000).toLocaleDateString("tr-TR")} – ${new Date().toLocaleDateString("tr-TR")}`, "",
+    `Çözülen soru: ${q}${q ? ` (doğruluk %${pct(c, q)})` : ""}`, `Çalışılan gün: ${gun}/7`, fm ? `Odaklı çalışma: ${fm} dakika` : null,
+    `Deneme: ${den.length ? den.map(e => `${e.title}: ${nfx(e.net)} net`).join("; ") : "bu hafta çözülmedi"}`,
+    weak.length ? `Üzerinde durulacak konular: ${weak.map(w => `${SUBJ[w.s].n} – ${w.t} (%${w.acc})`).join(", ")}` : null,
+    `Tekrar bekleyen yanlış: ${acik}`, `YKS 2027'ye kalan gün: ${daysLeft()}`].filter(x => x != null).join("\n");
+}
+function veliRaporKart() {
+  const t = veliRaporMetni();
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Veli raporu</h2></div>
+    <p class="small muted">Son 7 günün özeti. Haftada bir velinle ya da öğretmeninle paylaşabilirsin.</p>
+    <div class="rapor">${esc(t)}</div>
+    <div class="row"><a class="btn pri" href="https://wa.me/?text=${encodeURIComponent(t)}" target="_blank" rel="noopener">WhatsApp ile gönder</a><button class="btn" data-a="raporKopya">Kopyala</button></div></div>`;
+}
+
+/* ===== 13 · Odak sayacı (25 dk odak, 5 dk mola) ===== */
+const POMO_SURE = { odak: 25 * 60, mola: 5 * 60 };
+const POMO = (() => { try { const o = JSON.parse(LS.get("ake.pomo") || "null"); if (o && POMO_SURE[o.mode]) return o; } catch (e) { } return { mode: "odak", end: 0, kalan: POMO_SURE.odak, run: false }; })();
+let pomoTimer = null;
+const fmtMS = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+const pomoKalan = () => POMO.run ? Math.max(0, Math.round((POMO.end - Date.now()) / 1000)) : POMO.kalan;
+const pomoKaydet = () => LS.set("ake.pomo", JSON.stringify(POMO));
+function pomoTick() {
+  const k = pomoKalan(), el = document.getElementById("pomoClock"); if (el) el.textContent = fmtMS(k);
+  if (POMO.run && k <= 0) {
+    POMO.run = false;
+    if (POMO.mode === "odak") { const d = S.daily[dayKey()] || (S.daily[dayKey()] = { q: 0, c: 0 }); d.fm = (d.fm || 0) + 25; touch("stats"); toast("25 dakikalık odak turu bitti. Şimdi 5 dakika mola."); POMO.mode = "mola"; }
+    else { toast("Mola bitti. Hazırsan yeni odak turunu başlat."); POMO.mode = "odak"; }
+    POMO.kalan = POMO_SURE[POMO.mode]; pomoKaydet();
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) { }
+    render();
+  }
+  if (!POMO.run && pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
+}
+if (POMO.run) pomoTimer = setInterval(pomoTick, 1000);
+function pomoKart() {
+  const fm = (S.daily[dayKey()] || {}).fm || 0;
+  return `<div class="card pomo"><h2>Odak sayacı</h2>
+    <div class="seg">${[["odak", "Odak 25 dk"], ["mola", "Mola 5 dk"]].map(([k, l]) => `<button type="button" data-a="pomoMod" data-k="${k}" class="${POMO.mode === k ? "on" : ""}"${POMO.run ? " disabled" : ""}>${l}</button>`).join("")}</div>
+    <div class="clock" id="pomoClock" role="timer">${fmtMS(pomoKalan())}</div>
+    <div class="row" style="justify-content:center">${POMO.run ? `<button class="btn" data-a="pomoDur">Duraklat</button>` : `<button class="btn pri" data-a="pomoBasla">${POMO.kalan < POMO_SURE[POMO.mode] ? "Devam et" : "Başlat"}</button>`}<button class="btn ghost" data-a="pomoSifirla">Sıfırla</button></div>
+    <p class="small muted">Bugün odaklı çalışma: <b>${fm} dk</b>. Telefonu bırak, 25 dakika tek bir işe odaklan; sayaç bitince mola zamanı.</p></div>`;
+}
+
+/* ===== 9 · Sesli koç: konuşarak sor, cevabı dinle ===== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const SESLI = { on: LS.get("ake.sesli") === "1" };
+let srObj = null;
+function dinleBasla() {
+  if (!SR) { toast("Bu tarayıcı sesle yazmayı desteklemiyor. iPhone'da Safari, Android'de Chrome kullan."); return; }
+  if (srObj) { try { srObj.stop(); } catch (e) { } return; }
+  sesDurdur();
+  const r = new SR(), base = UI.chatDraft ? UI.chatDraft.trim() + " " : "";
+  r.lang = "tr-TR"; r.interimResults = true; r.continuous = false;
+  r.onresult = e => { let t = ""; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; UI.chatDraft = base + t; const el = document.getElementById("chatIn"); if (el) el.value = UI.chatDraft; };
+  r.onend = () => { srObj = null; render(); if (SESLI.on && UI.chatDraft.trim()) sendChat(UI.chatDraft); };
+  r.onerror = e => { srObj = null; if (e && (e.error === "not-allowed" || e.error === "service-not-allowed")) toast("Mikrofon izni verilmedi. Tarayıcı ayarlarından izin verebilirsin."); render(); };
+  srObj = r; try { r.start(); } catch (e) { srObj = null; } render();
+}
+function sesliCevap() { if (!SESLI.on || !window.speechSynthesis) return; const i = UI.chat.length - 1, m = UI.chat[i]; if (m && m.role === "assistant") sesOku(m.content, "chat:" + i); }
+function tutorSesAraclari() {
+  return `${SR ? `<button type="button" class="btn ghost sm mic${srObj ? " on" : ""}" data-a="dinle" aria-label="${srObj ? "Dinlemeyi bitir" : "Sesle sor"}" title="${srObj ? "Dinlemeyi bitir" : "Sesle sor"}" style="min-height:40px">${icon("mic")}</button>` : ""}`;
+}
+function sesliModSatiri() {
+  return window.speechSynthesis ? `<label class="check small" style="margin-top:6px"><input type="checkbox" data-c="sesliMod"${SESLI.on ? " checked" : ""}> <span>Sesli mod: ${SR ? "mikrofonla sor, " : ""}cevapları otomatik dinle</span></label>` : "";
+}
+
+/* ===== 10 · Kısa ders kartları (dikey kaydırmalı) ===== */
+function kisaKartlar() {
+  const T = (v, n, s, f) => Array.isArray(v) ? { n, s, items: v.map(f) } : null;
+  const kaynak = DECKS.map(d => ({ n: d.n, s: d.s, items: d.cards.map(c => `${c[0]}: ${c[1]}`) })).concat([
+    T(typeof ESERLER !== "undefined" ? ESERLER : null, "Eserler ve yazarları", "edebiyat", x => `${x[0]}: ${x[1]}`),
+    T(typeof ESKI_ESER !== "undefined" ? ESKI_ESER : null, "Eski Türk edebiyatı eserleri", "edebiyat", x => `${x[0]}: ${x[1]}`),
+    T(typeof PADISAH !== "undefined" ? PADISAH : null, "Olay ve dönemin padişahı", "tarih", x => `${x[0]}: ${x[1]}`),
+    T(typeof ANTLASMA !== "undefined" ? ANTLASMA : null, "Antlaşmalar", "tarih2", x => `${x[0]}: ${x[1]}`),
+    T(typeof KUR_OLAY !== "undefined" ? KUR_OLAY : null, "Kurtuluş Savaşı dönemi", "tarih", x => `${x[0]}: ${x[1]}`),
+    T(typeof FILOZOF !== "undefined" ? FILOZOF : null, "Filozoflar ve görüşleri", "felsefe", x => `${x[0]}: ${x[1]}`),
+    T(typeof SOSYOLOG !== "undefined" ? SOSYOLOG : null, "Sosyologlar", "sosyoloji", x => `${x[0]}: ${x[1]}`),
+    T(typeof OGRENME !== "undefined" ? OGRENME : null, "Öğrenme kuramları", "psikoloji", x => `${x[0]}: ${x[1]}`),
+    T(typeof MADEN !== "undefined" ? MADEN : null, "Türkiye'de madenler", "cografya2", x => `${x[0]}: ${x[1]}`),
+    T(typeof IKLIM !== "undefined" ? IKLIM : null, "İklim ve bitki örtüsü", "cografya", x => `${x[0]}: ${x[1]}`),
+    T(typeof DINKAV !== "undefined" ? DINKAV : null, "Dini kavramlar", "din", x => `${x[0]}: ${x[1]}`)
+  ]).filter(Boolean);
+  const kartlar = [];
+  kaynak.forEach(k => { for (let i = 0; i < k.items.length; i += 4) kartlar.push({ n: k.n, s: k.s, items: k.items.slice(i, i + 4) }); });
+  /* her gün farklı sırayla; aynı gün aynı sıra */
+  let h = 0; const g = dayKey(); for (let i = 0; i < g.length; i++) h = (h * 31 + g.charCodeAt(i)) | 0;
+  const rnd = () => { h = (h * 1103515245 + 12345) | 0; return ((h >>> 0) % 100000) / 100000; };
+  for (let i = kartlar.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [kartlar[i], kartlar[j]] = [kartlar[j], kartlar[i]]; }
+  return kartlar.slice(0, 60);
+}
+function vKisa() {
+  const K = kisaKartlar(); UI.kisa = K;
+  return `<div class="view">
+  <div class="vhead"><h1>Kısa ders kartları</h1><p>Yukarı kaydırarak ilerle. Her kart bir dakikalık özet; hazır hissettiğinde o dersten soru çöz.</p></div>
+  ${subTabs(TEKRAR_TABS, "kisa")}
+  <div class="kisa-feed">${K.map((k, i) => `<article class="kisa"><span class="k-ders">${esc(SUBJ[k.s] ? SUBJ[k.s].n : "Genel")} · ${i + 1}/${K.length}</span><h2>${esc(k.n)}</h2><ul>${k.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <div class="k-alt">${sesBtn("sesKisa", ` data-i="${i}"`, "kisa:" + i, "Dinle")}${SUBJ[k.s] ? `<button class="btn sm pri" data-a="dersKarisik" data-s="${k.s}">Bu dersten 10 soru</button>` : ""}</div></article>`).join("")}</div>
+  </div>`;
+}
+
+/* ===== AI ile soru üret (Soru çöz bölümünün sekmesi) ===== */
+function vUret() {
+  const s = UI.studio.s || alanDersleri()[0] || "mat", G2 = UI.gen, gs = G2.s || s;
+  return `<div class="view">
+  <div class="vhead"><h1>AI ile soru üret</h1><p>İstediğin konuda yeni sorular ya da konu özeti iste. Üretilen sorular cevabı görülmeden ikinci kez çözülür; tutmayan soru atılır.</p></div>
+  ${subTabs(SORU_TABS, "uret")}
+  ${uretKartlari(s, gs, G2)}
+  </div>`;
+}
+
+Object.assign(OZ_ACT, {
+  dersSec(d) { UI.studio.s = d.s; UI.gen.s = d.s; render(); },
+  dersAc(d) { UI.studio.s = d.s; UI.gen.s = d.s; go("studyo"); },
+  dersKarisik(d) { if (!SUBJ[d.s]) return; const b = buildSet([[d.s, 10]], { unsolvedFirst: true }); startRun({ kind: "practice", title: `${SUBJ[d.s].n} · karışık`, mode: "study", qs: b.qs }); },
+  raporKopya() { const t = veliRaporMetni(); try { navigator.clipboard.writeText(t).then(() => toast("Rapor kopyalandı."), () => toast("Kopyalanamadı; metni seçip kopyalayabilirsin.")); } catch (e) { toast("Kopyalanamadı; metni seçip kopyalayabilirsin."); } },
+  pomoMod(d) { if (POMO.run || !POMO_SURE[d.k]) return; POMO.mode = d.k; POMO.kalan = POMO_SURE[d.k]; pomoKaydet(); render(); },
+  pomoBasla() { POMO.end = Date.now() + pomoKalan() * 1000; POMO.run = true; pomoKaydet(); if (!pomoTimer) pomoTimer = setInterval(pomoTick, 1000); render(); },
+  pomoDur() { POMO.kalan = pomoKalan(); POMO.run = false; pomoKaydet(); render(); },
+  pomoSifirla() { POMO.run = false; POMO.kalan = POMO_SURE[POMO.mode]; pomoKaydet(); render(); },
+  dinle() { dinleBasla(); },
+  sesKisa(d) { const k = (UI.kisa || [])[+d.i]; if (k) sesOku(k.n + ". " + k.items.join(". "), "kisa:" + d.i); }
+});
+const OZ_CHG = { sesliMod(el) { SESLI.on = !!el.checked; LS.set("ake.sesli", SESLI.on ? "1" : "0"); render(); } };
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -6157,7 +6420,7 @@ Object.assign(IC, {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
-NAVG.push(["AKE Akademi", [["premium", "Premium", "star"], ["yasal", "Yasal metinler", "doc"]]]);
+NAVG[2][1].push(["premium", "Paketler", "star"], ["yasal", "Yasal metinler", "doc"]);
 
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";
@@ -6339,7 +6602,7 @@ function siteFoot() {
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex });
+Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)); return ROUTES[h] ? h : "bugun"; }
 function render() {
@@ -6391,7 +6654,7 @@ async function sendChat(text) {
     else if (msg) toast(msg);
   }
   UI.chatBusy = false; chatCtl = null; UI.scrollChat = true;
-  UI.chat = UI.chat.slice(-30); LS.set("ake.chat", JSON.stringify(UI.chat)); render();
+  UI.chat = UI.chat.slice(-30); LS.set("ake.chat", JSON.stringify(UI.chat)); render(); sesliCevap();
 }
 async function genRun() {
   const G2 = UI.gen, s = G2.s || UI.studio.s || "mat", t = (G2.t || "").trim();
@@ -6724,7 +6987,7 @@ Object.assign(SUB, {
 });
 ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
 ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
-Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
+Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */
 APP.addEventListener("click", e => {

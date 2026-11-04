@@ -20,6 +20,7 @@
 //   POST sil                          hesabı ve verilerini siler
 
 import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
+import { sosyalSil } from "../../../lib/sosyal.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
@@ -139,6 +140,7 @@ export async function onRequest({ request, env, params }) {
     return json(200, { paket: r.paket, kullanim: k, limit: r.paket ? limitler(env, r.paket.plan) : null });
   }
   if (ad === "sil" && m === "POST") {
+    try { await sosyalSil(env, u.id); } catch (e) { console.error("sosyal sil", e); }
     await env.DB.batch([
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),

@@ -363,6 +363,38 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .hm-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
 .pomo{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .pomo .clock{font:700 clamp(44px,10vw,64px)/1 var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* ---------- sosyal: arkadaş ligi, canlı deneme, sınıf, odak odası ---------- */
+.canli-nokta{display:inline-block;flex:none;width:9px;height:9px;border-radius:50%;background:var(--c3);margin-right:9px;vertical-align:middle;animation:canliAtis 1.8s ease-out infinite}
+@keyframes canliAtis{0%{box-shadow:0 0 0 0 rgba(0,217,163,.55)}70%{box-shadow:0 0 0 9px rgba(0,217,163,0)}100%{box-shadow:0 0 0 0 rgba(0,217,163,0)}}
+@media (prefers-reduced-motion:reduce){.canli-nokta{animation:none}}
+.oda{display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink2);margin:0}
+.oda:not(.dolu) .canli-nokta{background:var(--ink3);animation:none}
+.oda b{color:var(--ink)}
+.xp-kart{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--grad);color:#fff;border-color:transparent}
+.xp-kart .muted,.xp-kart .faint{color:rgba(255,255,255,.88)}
+.xp-big{display:flex;flex-direction:column;gap:2px}
+.xp-big b{font:900 46px/1 var(--f-disp);letter-spacing:-.02em;text-shadow:0 1px 2px rgba(6,16,43,.2)}
+.xp-big span{font-weight:700}
+.lb-n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--f-body);background:var(--sunk);color:var(--ink2)}
+.lb-n.m1{background:linear-gradient(135deg,#ffe08a,#f2a300);color:#432b00}
+.lb-n.m2{background:linear-gradient(135deg,#eef2f8,#a9b5c7);color:#26304a}
+.lb-n.m3{background:linear-gradient(135deg,#f8cba6,#c4733a);color:#3a1b05}
+.lb-row .bar{height:6px;margin-top:6px}
+.lb-row.ben{background:var(--form-soft);border-radius:10px;padding-left:10px;padding-right:10px;border-bottom-color:transparent}
+.davet{margin-top:12px;padding-top:12px;border-top:1px solid var(--line2);gap:8px}
+code.kod{font:700 14px/1 var(--f-mono);letter-spacing:.14em;background:var(--form-soft);color:var(--form-ink);padding:6px 9px;border-radius:8px;white-space:nowrap}
+.ikili{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.ikili{grid-template-columns:1fr}}
+.davet-in{text-transform:uppercase;letter-spacing:.14em;width:100%}
+.davet-in::placeholder{text-transform:none;letter-spacing:normal}
+.sira-kart b.num{font:900 42px/1 var(--f-disp);background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sinif{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.sinif.acik{border-color:var(--form)}
+.sinif-h{gap:8px;flex-wrap:wrap}
+.lig-mini{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit}
+.lig-mini:hover{border-color:var(--form)}
+.lig-ok{font-size:28px;line-height:1;color:var(--ink3)}
+.canli-kart h2{display:flex;align-items:center}
 .kisa-feed{height:min(calc(100dvh - 210px),660px);min-height:420px;max-width:560px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
 .kisa-feed::-webkit-scrollbar{display:none}
 .kisa{flex:none;height:100%;scroll-snap-align:start;border-radius:16px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line)}
@@ -4716,6 +4748,7 @@ function record(q, res, chosen) { // res: 1 doğru, 0 yanlış, -1 boş
   if (res !== -1) { day.q++; if (res === 1) day.c++; day.tp = day.tp || {}; day.tp[key] = (day.tp[key] || 0) + 1; }
   t[res === 1 ? 0 : res === 0 ? 1 : 2]++;
   if (!q.gen) { const a = S.ans[q.id] || (S.ans[q.id] = [0, 0, 0, 0, 0]); a[res === 1 ? 0 : res === 0 ? 1 : 2]++; a[3] = Date.now(); a[4] = res; }
+  if (res !== -1) xpEkle(res === 1 ? "d" : "y");
   if (res !== 1) addMistake(q, chosen);
   else if (S.mistakes[q.id] && !S.mistakes[q.id].learned) { if (tekrarDogru(S.mistakes[q.id])) touch("mistakes"); }
   touch("stats");
@@ -4954,6 +4987,8 @@ const IC = {
   g: '<path d="M20.5 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.6z" fill="#4285F4" stroke="none"/><path d="M12 21c2.4 0 4.4-.8 5.9-2.2L15 16.6c-.8.5-1.8.9-3 .9-2.3 0-4.3-1.6-5-3.7H4v2.3A9 9 0 0 0 12 21z" fill="#34A853" stroke="none"/><path d="M7 13.8a5.4 5.4 0 0 1 0-3.6V7.9H4a9 9 0 0 0 0 8.2z" fill="#FBBC05" stroke="none"/><path d="M12 6.5c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 4 7.9l3 2.3c.7-2.1 2.7-3.7 5-3.7z" fill="#EA4335" stroke="none"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  kupa: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5.5a2.5 2.5 0 0 0 2.6 3.6M16 6h2.5a2.5 2.5 0 0 1-2.6 3.6M12 13v3.5M8.5 20.5h7M9.5 16.5h5v4h-5z"/>',
+  okul: '<path d="M2.5 9.5 12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.4M21.5 9.5V15"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
@@ -4963,7 +4998,7 @@ const NAVG = [
   ["Hesap", [["ayarlar", "Ayarlar", "gear"]]]
 ];
 /* alt sayfalar hangi ana menüye ait */
-const NAVACT = { banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme" };
+const NAVACT = { banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
 const SORU_TABS = [["studyo", "Konular"], ["banka", "Soru ara"], ["paragraf", "Paragraf"], ["uret", "AI ile üret"]];
 const TEKRAR_TABS = [["yanlislar", "Yanlışlarım"], ["kartlar", "Kartlar"], ["kisa", "Kısa dersler"]];
 const subTabs = (tabs, cur) => `<nav class="subtabs" aria-label="Bölüm">${tabs.map(([k, l]) => `<a href="#${k}" class="${k === cur ? "on" : ""}"${k === cur ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav>`;
@@ -5033,6 +5068,7 @@ function vHome() {
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
     <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
+  ${canliKart(true)}${ligMini()}
   <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
     <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${o.n ? `${o.n} soru · %${o.acc} doğru` : "Henüz başlamadın"}</small></button>`; }).join("")}</div></section>
   <div class="grid2">
@@ -5065,6 +5101,7 @@ function vExam() {
   let lastSec = null;
   return `<div class="view">${resumeBanner()}
   <div class="vhead"><span class="eyebrow">Hedef sınav · odak muhakeme</span><h1>Deneme merkezi</h1><p>Süreyi yönet, dersleri karıştır, sonucunu ders ders incele. Bölüm dağılımları ÖSYM'nin 2026 oturum yapısını esas alır.</p></div>
+  ${canliKart()}
   <div class="card stack">
     <div><h3 style="margin-bottom:8px">Oturum</h3><div class="seg" role="group" aria-label="Sınav türü">${Object.entries(EXAMS).map(([k, v]) => `<button data-a="exType" data-k="${k}" class="${k === type ? "on" : ""}">${v.n}</button>`).join("")}</div>
       <p class="small muted" style="margin-top:8px">${esc(ex.long)} · resmî oturum ${full} soru, ${ex.min} dakika</p></div>
@@ -5390,7 +5427,7 @@ function startRun(cfg) {
   RUN = { id: uid(), kind: cfg.kind, type: cfg.type || null, title: cfg.title, mode: cfg.mode || "study", qs,
     perm: qs.map(q => (q.fix || sabitSira(q)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])),
     ans: qs.map(() => null), rev: [], flag: [], times: [], start: Date.now(), dur: Math.round((cfg.dur || 0) * 60), cur: 0, qStart: Date.now(),
-    secs: cfg.secs || [{ n: cfg.title, from: 0, to: qs.length }] };
+    secs: cfg.secs || [{ n: cfg.title, from: 0, to: qs.length }], canli: cfg.canli || null };
   markSeen(qs);
   UI.inRun = true; UI.modal = null; UI.sheetOpen = null; saveRun(); render(); window.scrollTo(0, 0); startTick();
 }
@@ -5460,6 +5497,7 @@ function moveTo(i) {
 }
 function finishRun(auto) {
   const R = RUN; if (!R) return;
+  if (R.canli) { canliBitir(R, auto); return; }
   const per = R.secs.map(s => ({ n: s.n, d: 0, y: 0, b: 0 }));
   R.qs.forEach((q, i) => {
     const a = R.ans[i], res = a == null ? -1 : (a === q.a ? 1 : 0), si = Math.max(0, R.secs.findIndex(s => i >= s.from && i < s.to));
@@ -5473,6 +5511,7 @@ function finishRun(auto) {
   const result = { id: uid(), kind: R.kind, type: R.type, title: R.title, date: Date.now(), secs: used, dur: R.dur, mode: R.mode, sections: per, d: D, y: Y, b: B, net: net(D, Y),
     qs: R.qs.map((q, i) => Object.assign(snap(q), { your: R.ans[i] })) };
   memLog(R.kind, R.mode === "exam" ? `${R.title} · ${D} doğru, ${Y} yanlış, ${B} boş · ${nfx(result.net)} net` : `${R.title} · ${D} doğru / ${R.qs.length} soru`);
+  if (R.kind === "exam" && R.mode === "exam" && D + Y >= 20) xpEkle("deneme");
   if (R.kind === "exam") { S.exams.push(result); touch("exams"); UI.resultId = result.id; UI.lastResult = null; }
   else { UI.lastResult = result; UI.resultId = null; }
   RUN = null; saveRun(); UI.inRun = false; UI.modal = null;
@@ -5497,7 +5536,7 @@ function tick() {
    Her kişinin ilerlemesi kendi alanında (data/users/<id>) tutulur ve yalnızca ona görünür.
    Yöneticiye giden tek şey kısa bir çalışma özetidir: members/<id> (kişinin kendisi yazar, yalnızca site sahibi okur).
    Kayıt izni olmayan ziyaretçiler, site sahibinin paneli açıkken canlı bağlantıdan görülür: seen/<id> (yalnızca site sahibi). */
-const PGN = { bugun: "Çalışma alanı", ogretmen: "AI öğretmen", deneme: "Deneme merkezi", banka: "Soru bankası", studyo: "Çalışma stüdyosu", paragraf: "Paragraf atölyesi", yanlislar: "Yanlış defteri", kartlar: "Tekrar kartları", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Ayarlar", premium: "Premium", yasal: "Yasal metinler", sonuc: "Sonuç ekranı", yonetim: "Yönetim paneli", bildirimler: "Soru bildirimleri", run: "Soru çözüyor" };
+const PGN = { bugun: "Çalışma alanı", ogretmen: "AI öğretmen", deneme: "Deneme merkezi", banka: "Soru bankası", studyo: "Çalışma stüdyosu", paragraf: "Paragraf atölyesi", yanlislar: "Yanlış defteri", kartlar: "Tekrar kartları", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Ayarlar", premium: "Premium", yasal: "Yasal metinler", sonuc: "Sonuç ekranı", yonetim: "Yönetim paneli", bildirimler: "Soru bildirimleri", run: "Soru çözüyor", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı deneme" };
 const KINDN = { exam: "Deneme", practice: "Pratik", para: "Paragraf antrenmanı", mistakes: "Yanlış tekrarı" };
 const LOGN = { giris: "Giriş yaptı", exam: "Deneme bitirdi", practice: "Pratik bitirdi", para: "Paragraf antrenmanı bitirdi", mistakes: "Yanlış tekrarı yaptı", kart: "Kart tekrarı yaptı", ai: "AI öğretmene soru sordu", uretim: "AI ile soru üretti", plan: "AI ile plan hazırlattı", bildirim: "Soru bildirdi", calisma: "Çalışmaya başladı" };
 const nn = v => (typeof v === "number" && isFinite(v)) ? v : (isFinite(+v) ? +v : 0);
@@ -5600,7 +5639,7 @@ const fmtMin = m => { m = Math.round(nn(m)); if (!m) return "0 dk"; const h = Ma
 const LIVE = { room: null, sent: "", t: null, peers: [], pend: [], seenW: {}, seenBusy: {}, seenNext: {} };
 function presState() {
   const inRun = !!(RUN && UI.inRun);
-  return { pg: adminMode() ? "" : inRun ? "run" : route(), act: RUN ? RUN.kind : "", ti: RUN ? String(RUN.title || "").slice(0, 60) : "", n: RUN ? RUN.ans.filter(a => a != null).length : 0, of: RUN ? RUN.qs.length : 0, dev: devStr(DEV) };
+  return { pg: adminMode() ? "" : inRun ? "run" : route(), act: RUN ? RUN.kind : "", ti: RUN ? String(RUN.title || "").slice(0, 60) : "", n: RUN ? RUN.ans.filter(a => a != null).length : 0, of: RUN ? RUN.qs.length : 0, dev: devStr(DEV), fo: typeof POMO !== "undefined" && POMO.run && POMO.mode === "odak" ? 1 : 0 };
 }
 function presSoon() {
   if (!LIVE.room) return;
@@ -6365,21 +6404,23 @@ function pomoTick() {
   const k = pomoKalan(), el = document.getElementById("pomoClock"); if (el) el.textContent = fmtMS(k);
   if (POMO.run && k <= 0) {
     POMO.run = false;
-    if (POMO.mode === "odak") { const d = S.daily[dayKey()] || (S.daily[dayKey()] = { q: 0, c: 0 }); d.fm = (d.fm || 0) + 25; touch("stats"); toast("25 dakikalık odak turu bitti. Şimdi 5 dakika mola."); POMO.mode = "mola"; }
+    if (POMO.mode === "odak") { const d = S.daily[dayKey()] || (S.daily[dayKey()] = { q: 0, c: 0 }); d.fm = (d.fm || 0) + 25; touch("stats"); xpEkle("odak"); toast("25 dakikalık odak turu bitti. Şimdi 5 dakika mola."); POMO.mode = "mola"; }
     else { toast("Mola bitti. Hazırsan yeni odak turunu başlat."); POMO.mode = "odak"; }
     POMO.kalan = POMO_SURE[POMO.mode]; pomoKaydet();
     try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) { }
-    render();
+    odaGuncelle(); render();
   }
   if (!POMO.run && pomoTimer) { clearInterval(pomoTimer); pomoTimer = null; }
 }
 if (POMO.run) pomoTimer = setInterval(pomoTick, 1000);
 function pomoKart() {
   const fm = (S.daily[dayKey()] || {}).fm || 0;
-  return `<div class="card pomo"><h2>Odak sayacı</h2>
+  odaOku();
+  return `<div class="card pomo"><h2>Odak odası</h2>
     <div class="seg">${[["odak", "Odak 25 dk"], ["mola", "Mola 5 dk"]].map(([k, l]) => `<button type="button" data-a="pomoMod" data-k="${k}" class="${POMO.mode === k ? "on" : ""}"${POMO.run ? " disabled" : ""}>${l}</button>`).join("")}</div>
     <div class="clock" id="pomoClock" role="timer">${fmtMS(pomoKalan())}</div>
     <div class="row" style="justify-content:center">${POMO.run ? `<button class="btn" data-a="pomoDur">Duraklat</button>` : `<button class="btn pri" data-a="pomoBasla">${POMO.kalan < POMO_SURE[POMO.mode] ? "Devam et" : "Başlat"}</button>`}<button class="btn ghost" data-a="pomoSifirla">Sıfırla</button></div>
+    ${odaSatir()}
     <p class="small muted">Bugün odaklı çalışma: <b>${fm} dk</b>. Telefonu bırak, 25 dakika tek bir işe odaklan; sayaç bitince mola zamanı.</p></div>`;
 }
 
@@ -6520,7 +6561,7 @@ async function initHesap() {
   try {
     const { r, j } = await hesapIstek("ben");
     if (j.ayar) HESAP.ayar = j.ayar;
-    if (r.ok) { hesapUygula(j); HESAP.hazir = true; render(); await hesapEsitle(); }
+    if (r.ok) { hesapUygula(j); HESAP.hazir = true; render(); await hesapEsitle(); sosyalBasla(); }
     else if (r.status === 401) { AI.fn = null; AI.images = false; }
     else HESAP.yok = true; /* hesap sunucusu henüz kurulmadı: eski kod sistemi çalışır */
   } catch (e) { HESAP.yok = true; }
@@ -6537,6 +6578,7 @@ async function girisSonrasi(j) {
   const eski = LS.get("ake.kod");
   if (!HESAP.paket && eski) { try { const b = await hesapIstek("kod-bagla", { method: "POST", body: JSON.stringify({ kod: eski }) }); if (b.r.ok) hesapUygula(b.j); } catch (e) { } }
   await hesapEsitle();
+  sosyalBasla();
   toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor.");
 }
 const HESAP_HATA = {
@@ -6602,7 +6644,7 @@ function tutorGirisKapisi() {
 Object.assign(OZ_ACT, {
   girisGeri() { HESAP.adim = "eposta"; HESAP.err = ""; render(); },
   async girisTekrar() { if (HESAP.busy || !HESAP.eposta) return; HESAP.busy = true; HESAP.err = ""; render(); const { r, j } = await hesapIstek("kod-gonder", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta }) }).catch(() => ({ r: { status: 0 }, j: {} })); HESAP.busy = false; if (r.ok) toast("Yeni kod gönderildi."); else HESAP.err = hesapHata(j, r); render(); },
-  async cikis() { try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } HESAP.user = null; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
+  async cikis() { try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } HESAP.user = null; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
   hesapSilAsk() { openModal("Hesabın silinsin mi?", "<p>Hesabın ve hesabında saklanan tüm çalışma verilerin kalıcı olarak silinir. Bu cihazdaki kopya silinmez. Hesabına bağlı paket kodu başka hesapta kullanılamaz hâle gelir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Hesabımı sil", a: "hesapSilGo", k: "pri" }]); },
   async hesapSilGo() { UI.modal = null; const { r } = await hesapIstek("sil", { method: "POST" }).catch(() => ({ r: { ok: false } })); if (!r.ok) { toast("Hesap silinemedi. Tekrar dene."); render(); return; } HESAP.user = null; HESAP.paket = null; cloud.col = null; cloud.state = "local"; AI.fn = null; render(); toast("Hesabın silindi."); }
 });
@@ -6660,6 +6702,7 @@ function vYonetim() {
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
         : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
     ${soruBolumu()}`}
+    ${canliYonetim()}
   </div>`;
 }
 async function yonIstek(path, body) {
@@ -6738,6 +6781,451 @@ Object.assign(OZ_ACT, {
   soruHepsi() { const ids = ((SORU.veri && SORU.veri.bekleyen) || []).slice(0, 30).map(q => q.id); if (ids.length) soruKarar(ids, "onay"); }
 });
 Object.assign(OZ_CHG, { soruDers(el) { SORU.s = el.value; render(); } });
+/* ===== Sosyal: arkadaş ligi, canlı deneme, sınıf (öğretmen paneli), odak odası (akeakademi.com, hesapla) ===== */
+const SOS = { ben: null, lig: null, sinif: null, canli: null, sinifAc: {}, sinifDetay: {}, sonuc: {}, t: {}, busy: "", err: {}, oda: null, odaT: 0, odaBusy: 0 };
+const sosAktif = () => !IN_CLAUDE && typeof HESAP !== "undefined" && !!HESAP.user && !HESAP.yok;
+const fmtN = n => Number(n || 0).toLocaleString("tr-TR");
+const hashParam = k => { try { return new URLSearchParams((location.hash.split("?")[1]) || "").get(k) || ""; } catch (e) { return ""; } };
+async function sosIstek(path, body, keep) {
+  const o = { credentials: "same-origin", headers: { "content-type": "application/json" } };
+  if (body !== undefined) { o.method = "POST"; o.body = JSON.stringify(body); if (keep) o.keepalive = true; }
+  const r = await fetch("/api/sosyal/" + path, o);
+  let j = {}; try { j = await r.json(); } catch (e) { }
+  return { r, j };
+}
+async function sosYukle(k, zorla) {
+  if (IN_CLAUDE || (k !== "canli" && !sosAktif()) || SOS.t[k + "_b"]) return;
+  if (!zorla && SOS.t[k] && Date.now() - SOS.t[k] < 30000) return;
+  SOS.t[k + "_b"] = 1;
+  try {
+    if (k === "lig" || k === "ben") await xpGonder();
+    const { r, j } = await sosIstek(k);
+    if (r.ok) { SOS[k] = j; SOS.err[k] = ""; }
+    else { SOS.err[k] = r.status === 401 ? "" : (j.message || "Şu an yüklenemedi. Biraz sonra tekrar dene."); if (r.status === 401 && k !== "canli") HESAP.user = null; }
+  } catch (e) { SOS.err[k] = "Bağlantı kurulamadı."; }
+  SOS.t[k] = Date.now(); SOS.t[k + "_b"] = 0;
+  if (k === "ben" && SOS.ben && SOS.ben.sinif) ozetSoon();
+  render();
+}
+const sosTaze = (k, ms) => { if (!SOS.t[k + "_b"] && (!SOS.t[k] || Date.now() - SOS.t[k] > (ms || 30000))) setTimeout(() => sosYukle(k, true), 0); };
+function sosyalBasla() {
+  if (!sosAktif()) return;
+  sosYukle("ben", true); xpGonder(); canliGonderBekleyen();
+  const dv = LS.get("ake.davet");
+  if (dv) { LS.del("ake.davet"); const [t, kod] = dv.split(":"); if (kod && (t === "lig" || t === "sinif")) location.hash = "#" + t + "?kod=" + kod; }
+}
+function sosyalSifirla() { SOS.ben = SOS.lig = SOS.sinif = null; SOS.sonuc = {}; SOS.sinifDetay = {}; SOS.t = {}; }
+
+/* ---------- puan kuyruğu: doğru 10, yanlış 2, deneme 50, odak turu 25 ---------- */
+const XPQ = (() => { const z = { d: 0, y: 0, deneme: 0, odak: 0 }; try { return Object.assign(z, JSON.parse(LS.get("ake.xpq") || "{}")); } catch (e) { return z; } })();
+let xpT = null, xpBusy = false;
+function xpEkle(k, n) {
+  if (!k || !sosAktif()) return;
+  XPQ[k] = (XPQ[k] || 0) + (n || 1); LS.set("ake.xpq", JSON.stringify(XPQ));
+  clearTimeout(xpT); xpT = setTimeout(xpGonder, 15000);
+  ozetSoon();
+}
+async function xpGonder(keep) {
+  clearTimeout(xpT);
+  if (xpBusy || !sosAktif() || !(XPQ.d || XPQ.y || XPQ.deneme || XPQ.odak)) return;
+  const b = { d: Math.min(XPQ.d, 400), y: Math.min(XPQ.y, 400), deneme: Math.min(XPQ.deneme, 2), odak: Math.min(XPQ.odak, 6) };
+  xpBusy = true;
+  try {
+    const { r, j } = await sosIstek("xp", b, keep);
+    if (r.ok || r.status === 401) {
+      Object.keys(b).forEach(k => XPQ[k] = Math.max(0, XPQ[k] - b[k]));
+      if (r.status === 401) Object.keys(XPQ).forEach(k => XPQ[k] = 0);
+      LS.set("ake.xpq", JSON.stringify(XPQ));
+      if (SOS.ben && j.xp != null) SOS.ben.xp = j.xp;
+      if (XPQ.d || XPQ.y || XPQ.deneme || XPQ.odak) xpT = setTimeout(xpGonder, 2000);
+    } else xpT = setTimeout(xpGonder, 60000);
+  } catch (e) { xpT = setTimeout(xpGonder, 60000); }
+  xpBusy = false;
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") { xpGonder(true); if (ozetT) ozetGonder(true); } });
+
+/* ---------- sınıf üyesi öğrencinin çalışma özeti (öğretmen görür) ---------- */
+let ozetT = null;
+function ozetSoon() { if (!sosAktif() || !SOS.ben || !SOS.ben.sinif) return; clearTimeout(ozetT); ozetT = setTimeout(ozetGonder, 20000); }
+function ozetHesapla() {
+  let q = 0, c = 0, fm = 0; const d = new Date();
+  for (let i = 0; i < 7; i++) { const x = S.daily[dayKey(d)]; if (x) { q += x.q || 0; c += x.c || 0; fm += x.fm || 0; } d.setDate(d.getDate() - 1); }
+  const t = totals(), son = Object.keys(S.daily).filter(k => S.daily[k].q || S.daily[k].fm).sort().pop() || "";
+  return { v: 1, h: q, hc: c, fm, top: t.q, tc: t.c, seri: streak(), son, alan: S.profile.alan || "", hedef: String(S.profile.hedef || "").slice(0, 60),
+    zayif: weakTopics(5).map(w => ({ s: SUBJ[w.s] ? SUBJ[w.s].n : w.s, t: String(w.t).slice(0, 50), p: w.acc, n: w.n })),
+    den: S.exams.slice(-5).map(e => ({ ti: String(e.title || "").slice(0, 50), net: e.net, n: (e.d || 0) + (e.y || 0) + (e.b || 0), tarih: e.date })),
+    tekrar: typeof tekrarBekleyen === "function" ? tekrarBekleyen().length : 0 };
+}
+async function ozetGonder(keep) {
+  clearTimeout(ozetT); ozetT = null;
+  if (!sosAktif() || !SOS.ben || !SOS.ben.sinif) return;
+  try { const { j } = await sosIstek("ozet", { ozet: ozetHesapla() }, keep); if (j && j.kayit === false && SOS.ben) SOS.ben.sinif = 0; } catch (e) { }
+}
+
+/* ---------- odak odası: şu an kaç kişi odak turunda ---------- */
+const ODA_ID = (() => { let v = LS.get("ake.oda"); if (!v || !/^[a-z0-9]{8,40}$/.test(v)) { v = Array.from(crypto.getRandomValues(new Uint8Array(10)), x => x.toString(16).padStart(2, "0")).join(""); LS.set("ake.oda", v); } return v; })();
+let odaT = null;
+const odaktaMi = () => !!(POMO.run && POMO.mode === "odak");
+async function odaNabiz(cik) {
+  try { const { r, j } = await sosIstek("oda", cik ? { id: ODA_ID, cik: 1 } : { id: ODA_ID }, cik); if (r.ok) { SOS.oda = j.n; SOS.odaT = Date.now(); odaBoya(); } } catch (e) { }
+}
+function odaGuncelle() {
+  clearInterval(odaT); odaT = null;
+  if (IN_CLAUDE) { presSoon(); setTimeout(odaBoya, 1700); return; }
+  if (odaktaMi()) { odaNabiz(); odaT = setInterval(() => { if (odaktaMi()) odaNabiz(); else odaGuncelle(); }, 45000); }
+  else if (SOS.odaIc) odaNabiz(true);
+  SOS.odaIc = odaktaMi();
+}
+function odaSayisi() {
+  if (IN_CLAUDE) {
+    const kim = new Set(); (LIVE.peers || []).forEach(p => { if (!p.isMe && p.presence && p.presence.fo) kim.add(p.by || p.peer); });
+    return kim.size + (odaktaMi() ? 1 : 0);
+  }
+  return SOS.oda;
+}
+function odaOku() {
+  if (IN_CLAUDE || SOS.odaBusy || Date.now() - SOS.odaT < 60000) return;
+  SOS.odaBusy = 1;
+  setTimeout(async () => { try { const { r, j } = await sosIstek("oda"); if (r.ok) SOS.oda = j.n; } catch (e) { } SOS.odaT = Date.now(); SOS.odaBusy = 0; odaBoya(); }, 0);
+}
+function odaSatir() {
+  const n = odaSayisi(), ben = odaktaMi();
+  let t;
+  if (n == null) t = "Odak odası: başlattığında aynı anda çalışan herkesle birlikte sayılırsın.";
+  else if (ben) t = n > 1 ? `Sen ve <b>${n - 1}</b> kişi şu an odak turunda` : "Odak odasındasın. Şu an ilk başlayan sensin.";
+  else t = n > 0 ? `Şu an <b>${n}</b> kişi odak odasında çalışıyor. Başlat, sen de katıl.` : "Odak odası şu an boş. Başlattığında odaya girersin.";
+  return `<p class="oda${n > 0 || ben ? " dolu" : ""}" id="odaN"><span class="canli-nokta" aria-hidden="true"></span><span>${t}</span></p>`;
+}
+function odaBoya() { const el = document.getElementById("odaN"); if (el) el.outerHTML = odaSatir(); }
+
+/* ---------- ortak parçalar ---------- */
+function sosGirisKart(ne) {
+  if (IN_CLAUDE) return `<div class="card"><p>${ne} akeakademi.com'da hesabınla çalışır.</p></div>`;
+  if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
+  if (HESAP.yok) return `<div class="card"><p class="muted">${ne} şu an hazırlanıyor. Biraz sonra tekrar dene.</p></div>`;
+  return `<div class="card stack"><h2>Önce giriş yap</h2><p class="muted">${ne} hesabınla çalışır; puanın, sıralaman ve sınıfın her cihazda aynı kalır. Giriş ücretsiz.</p><a class="btn pri" style="align-self:flex-start" href="#hesap">Giriş yap</a></div>`;
+}
+function takmaKart() {
+  const B = SOS.ben; if (!B) return "";
+  const v = B.takmaVar ? B.takma : (S.profile.name || (B.takma !== "Öğrenci" ? B.takma : ""));
+  return `<form class="card stack" data-s="sosTakma"><div class="card-h"><h2>Görünen adın</h2>${B.takmaVar ? `<span class="small muted">${esc(B.takma)}</span>` : `<span class="pill warn">Henüz seçilmedi</span>`}</div>
+    <p class="small muted">Liglerde ve canlı deneme sıralamasında bu ad görünür. E-posta adresin kimseye gösterilmez.</p>
+    <div class="row"><input class="in" name="takma" maxlength="24" minlength="2" required value="${esc(sf("takma", "takma", v))}" placeholder="Örn. Elif K." style="flex:1;min-width:160px" aria-label="Görünen ad"><button class="btn${B.takmaVar ? "" : " pri"}" type="submit"${SOS.busy === "takma" ? " disabled" : ""}>Kaydet</button></div></form>`;
+}
+function kalanYazi(ms) {
+  ms = Math.max(0, ms); const g = Math.floor(ms / 86400000), s = Math.floor(ms % 86400000 / 3600000), d = Math.max(1, Math.ceil(ms % 3600000 / 60000));
+  return g ? `${g} gün${s ? " " + s + " sa" : ""}` : s ? `${s} sa ${d % 60 ? d + " dk" : ""}`.trim() : `${d} dk`;
+}
+const saatYazi = ms => { const d = new Date(ms); return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" }) + " " + d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }); };
+function gunOnce(k) {
+  if (!k) return "henüz çalışmadı";
+  const a = new Date(k + "T12:00:00"), b = new Date(dayKey() + "T12:00:00"), n = Math.round((b - a) / 86400000);
+  return n <= 0 ? "bugün" : n === 1 ? "dün" : n + " gün önce";
+}
+
+/* ---------- arkadaş ligi ---------- */
+function vLig() {
+  const head = `<div class="vhead"><span class="eyebrow">Takip · haftalık yarış</span><h1>Arkadaş ligi</h1><p>Arkadaşlarınla haftalık puan yarışı. Her doğru cevap 10, her yanlış 2 puan; 20 ve daha fazla soruluk deneme 50, tamamlanan odak turu 25 puan getirir. Puanlar her pazartesi 00.00'da sıfırlanır.</p></div>`;
+  const kod = kodTemizle(hashParam("kod"));
+  if (!sosAktif()) { if (kod) LS.set("ake.davet", "lig:" + kod); return `<div class="view">${head}${sosGirisKart("Arkadaş ligi")}</div>`; }
+  sosTaze("ben"); sosTaze("lig");
+  const B = SOS.ben, L = SOS.lig, kalan = B ? B.haftaBitis - Date.now() : 0;
+  return `<div class="view">${head}
+    ${B ? `<div class="card xp-kart"><div class="xp-big"><b class="num">${fmtN(B.xp)}</b><span>bu haftaki puanın</span></div><div class="stack" style="gap:4px"><span class="small muted">Haftanın bitmesine ${kalanYazi(kalan)}</span><span class="xs faint">Günde en fazla 2.500 puan kazanılır.</span></div></div>` : ""}
+    ${B && !B.takmaVar ? takmaKart() : ""}
+    ${SOS.err.lig ? `<p class="note">${esc(SOS.err.lig)}</p>` : ""}
+    ${!L ? (SOS.err.lig ? "" : `<div class="empty">Ligler yükleniyor…</div>`) : L.ligler.length ? L.ligler.map(ligKart).join("") : `<div class="card empty">Henüz bir ligde değilsin. Aşağıdan bir lig kur ve davet kodunu arkadaşlarına gönder; ya da arkadaşının kodunu yazıp katıl.</div>`}
+    <div class="ikili">
+      <form class="card stack" data-s="ligKatil"><h2>Lige katıl</h2><input class="in mono davet-in" name="kod" maxlength="8" placeholder="Davet kodu" autocapitalize="characters" autocomplete="off" required value="${esc(sf("ligKatil", "kod", kod))}"><button class="btn${kod ? " pri" : ""}" type="submit"${SOS.busy === "ligKatil" ? " disabled" : ""}>Katıl</button></form>
+      <form class="card stack" data-s="ligKur"><h2>Lig kur</h2><input class="in" name="ad" maxlength="40" placeholder="Örn. 12-A Sayısalcılar" required value="${esc(sf("ligKur", "ad"))}"><button class="btn${kod ? "" : " pri"}" type="submit"${SOS.busy === "ligKur" ? " disabled" : ""}>Ligi kur</button></form>
+    </div>
+    ${B && B.takmaVar ? takmaKart() : ""}
+  </div>`;
+}
+const kodTemizle = s => String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, "").slice(0, 8);
+function ligKart(l) {
+  const max = Math.max(1, ...l.uyeler.map(u => u.xp));
+  return `<section class="card"><div class="card-h"><h2>${esc(l.ad)}</h2><span class="small muted">${l.uyeler.length} kişi</span></div>
+    <div class="list lb">${l.uyeler.map((u, i) => `<div class="li lb-row${u.ben ? " ben" : ""}"><span class="lb-n${i < 3 && u.xp > 0 ? " m" + (i + 1) : ""}">${i + 1}</span><div class="grow"><div class="t">${esc(u.takma)}${u.ben ? ` <span class="pill form">sen</span>` : ""}</div><div class="bar"><i style="width:${Math.round(100 * u.xp / max)}%"></i></div></div><b class="mono">${fmtN(u.xp)}</b></div>`).join("")}</div>
+    ${l.gecenBirinci ? `<p class="small muted" style="margin-top:10px">Geçen haftanın birincisi: <b>${esc(l.gecenBirinci.takma)}</b> · ${fmtN(l.gecenBirinci.xp)} puan${l.gecenBirinci.ben ? " · tebrikler!" : ""}</p>` : ""}
+    <div class="row davet"><span class="small muted">Davet kodu</span><code class="kod">${esc(l.kod)}</code><button class="btn sm" data-a="davetPaylas" data-k="${esc(l.kod)}" data-n="${esc(l.ad)}" data-t="lig">Paylaş</button><span class="grow"></span><button class="btn sm ghost" data-a="ligAyrilAsk" data-id="${esc(l.id)}" data-n="${esc(l.ad)}">Ligden ayrıl</button></div></section>`;
+}
+
+function ligMini() {
+  if (!sosAktif()) return "";
+  sosTaze("lig", 300000);
+  const L = SOS.lig; if (!L || !L.ligler || !L.ligler.length) return "";
+  const l = L.ligler[0], i = Math.max(0, l.uyeler.findIndex(u => u.ben)), me = l.uyeler[i] || { xp: 0 }, ust = l.uyeler[i - 1];
+  return `<a class="card lig-mini" href="#lig"><span class="lb-n${i < 3 && me.xp > 0 ? " m" + (i + 1) : ""}">${i + 1}</span><div class="grow"><b>${esc(l.ad)}</b><div class="small muted">Bu hafta ${fmtN(me.xp)} puan · ${l.uyeler.length} kişi · ${ust ? `${esc(ust.takma)} ile aranda ${fmtN(ust.xp - me.xp)} puan var` : me.xp > 0 ? "liderdesin" : "ilk puanı sen al"}</div></div><span class="lig-ok" aria-hidden="true">›</span></a>`;
+}
+
+/* ---------- canlı deneme ---------- */
+function canliKart(ev) {
+  if (IN_CLAUDE) return "";
+  sosTaze("canli", ev ? 120000 : 45000);
+  const C = SOS.canli; if (!C || !C.denemeler) return "";
+  const now = Date.now();
+  let l = C.denemeler.filter(d => d.bitis > now - 7 * 86400000);
+  if (ev) l = l.filter(d => d.bitis > now && d.baslangic - now < 3 * 86400000);
+  l = l.sort((a, b) => (a.bitis < now) - (b.bitis < now) || (a.bitis < now ? b.baslangic - a.baslangic : a.baslangic - b.baslangic)).slice(0, ev ? 2 : 6);
+  if (!l.length) return "";
+  return `<section class="card canli-kart"><div class="card-h"><h2><span class="canli-nokta" aria-hidden="true"></span>Canlı denemeler</h2>${ev ? `<a class="btn sm ghost" href="#deneme">Tümü</a>` : ""}</div>
+    ${ev ? "" : `<p class="small muted" style="margin-bottom:10px">Herkes aynı soruları aynı saatte çözer. Deneme bitince sıralama, cevap anahtarı ve çözümler açılır.</p>`}
+    <div class="list">${l.map(canliSatir).join("")}</div></section>`;
+}
+function canliSatir(d) {
+  const now = Date.now(), dur = now < d.baslangic ? "yakinda" : now < d.bitis ? "acik" : "bitti", busy = SOS.busy === "katil:" + d.id;
+  let pill, btn = "";
+  if (dur === "yakinda") pill = `<span class="pill">${kalanYazi(d.baslangic - now)} sonra</span>`;
+  else if (dur === "acik") {
+    pill = `<span class="pill ok">Şu an açık</span>`;
+    btn = d.benim ? `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">Gönderildi</button>` : !sosAktif() ? `<a class="btn sm pri" href="#hesap">Katılmak için giriş yap</a>` : `<button class="btn sm pri" data-a="canliKatil" data-id="${esc(d.id)}"${busy ? " disabled" : ""}>${busy ? "Açılıyor…" : "Katıl"}</button>`;
+  } else { pill = `<span class="pill">Bitti · ${fmtN(d.katilan)} kişi</span>`; btn = `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">${d.benim ? "Sıralamam" : "Sıralama"}</button>`; }
+  return `<div class="li mli"><div class="grow"><div class="t">${esc(d.baslik)}</div><div class="s">${esc(EXAMS[d.tur] ? EXAMS[d.tur].n : d.tur || "Deneme")} · ${d.adet} soru · ${d.sure} dk · ${saatYazi(d.baslangic)}${dur === "acik" ? ` · bitişe ${kalanYazi(d.bitis - now)}` : ""}${d.benim ? ` · netin ${nfx(d.benim.net)}` : ""}</div></div><div class="li-act">${pill}${btn}</div></div>`;
+}
+async function canliKatil(id) {
+  if (SOS.busy) return;
+  if (!S.profile.ok) { toast("Önce ana sayfada kendini tanıt, sonra denemeye katıl."); return; }
+  SOS.busy = "katil:" + id; render();
+  try {
+    const { r, j } = await sosIstek("canli/" + id + "/sorular");
+    SOS.busy = "";
+    if (!r.ok) { toast(j.message || "Denemeye girilemedi."); sosYukle("canli", true); return; }
+    const qs = j.sorular.map(q => Object.assign({}, q, { a: -1, x: "" }));
+    startRun({ kind: "exam", type: j.tur, title: j.baslik, mode: "exam", qs, secs: j.secs && j.secs.length ? j.secs : null, dur: Math.max(1, (j.bitis - Date.now()) / 60000), canli: j.id });
+  } catch (e) { SOS.busy = ""; toast("Bağlantı kurulamadı."); render(); }
+}
+/* Canlı denemede bitir: cevaplar sunucuda puanlanır, sıralama ve çözümler deneme bitince açılır */
+function canliBitir(R, auto) {
+  const used = R.dur ? Math.min(R.dur, Math.round((Date.now() - R.start) / 1000)) : Math.round((Date.now() - R.start) / 1000);
+  const p = { id: R.canli, cevap: R.ans.map(a => a == null ? null : a), sure: used, baslik: R.title };
+  LS.set("ake.canliGonder", JSON.stringify(p));
+  RUN = null; saveRun(); UI.inRun = false; UI.modal = null; UI.canliId = p.id;
+  SOS.sonuc[p.id] = Object.assign(SOS.sonuc[p.id] || { id: p.id, baslik: p.baslik }, { gonderiliyor: true });
+  location.hash = "#canli?id=" + p.id; render(); window.scrollTo(0, 0);
+  if (auto) toast("Süre doldu; cevapların gönderiliyor.");
+  canliGonderBekleyen();
+}
+async function canliGonderBekleyen(n) {
+  n = n || 0;
+  let p = null; try { p = JSON.parse(LS.get("ake.canliGonder") || "null"); } catch (e) { }
+  if (!p || !sosAktif()) return;
+  try {
+    const { r, j } = await sosIstek("canli/" + p.id + "/gonder", { cevap: p.cevap, sure: p.sure });
+    if (r.ok) {
+      LS.del("ake.canliGonder"); SOS.t.canli = 0; SOS.t["s:" + p.id] = 0;
+      SOS.sonuc[p.id] = Object.assign(SOS.sonuc[p.id] || {}, { id: p.id, baslik: p.baslik, benim: j, bitis: j.bitis, acik: false, gonderiliyor: false });
+      toast(`Cevapların gönderildi: ${j.d} doğru, ${j.y} yanlış, ${nfx(j.net)} net.`); return;
+    }
+    if (r.status === 400 || r.status === 404 || r.status === 410 || r.status === 425) { LS.del("ake.canliGonder"); if (SOS.sonuc[p.id]) SOS.sonuc[p.id].gonderiliyor = false; toast(j.message || "Cevaplar gönderilemedi."); return; }
+  } catch (e) { }
+  if (n < 4) setTimeout(() => canliGonderBekleyen(n + 1), 4000 * (n + 1));
+  else { if (SOS.sonuc[p.id]) SOS.sonuc[p.id].gonderiliyor = false; toast("Cevaplar henüz gönderilemedi; bağlantı gelince yeniden denenecek."); render(); }
+}
+async function sonucYukle(id) {
+  const k = "s:" + id; if (SOS.t[k + "_b"]) return;
+  SOS.t[k + "_b"] = 1;
+  try {
+    const { r, j } = await sosIstek("canli/" + id + "/sonuc");
+    if (r.ok) { SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], j, { gonderiliyor: false, hata: "" }); if (j.acik && j.cevabim) canliIceAktar(j); }
+    else SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], { hata: r.status === 401 ? "giris" : (j.message || "Sonuç yüklenemedi.") });
+  } catch (e) { SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], { hata: "Bağlantı kurulamadı." }); }
+  SOS.t[k] = Date.now(); SOS.t[k + "_b"] = 0; render();
+}
+function canliIceAktar(R) {
+  const eid = "canli:" + R.id;
+  if (!R.cevabim || !Array.isArray(R.sorular) || S.exams.some(e => e.id === eid)) return;
+  const secs = R.secs && R.secs.length ? R.secs : [{ n: R.baslik, from: 0, to: R.sorular.length }];
+  const per = secs.map(s => ({ n: s.n, d: 0, y: 0, b: 0 }));
+  R.sorular.forEach((q, i) => {
+    const a = R.cevabim[i], res = a == null ? -1 : (a === q.a ? 1 : 0), si = Math.max(0, secs.findIndex(s => i >= s.from && i < s.to));
+    if (res === 1) per[si].d++; else if (res === 0) per[si].y++; else per[si].b++;
+    record(q, res, a);
+  });
+  per.forEach(p => p.net = net(p.d, p.y));
+  const D = per.reduce((a, p) => a + p.d, 0), Y = per.reduce((a, p) => a + p.y, 0), B = per.reduce((a, p) => a + p.b, 0);
+  S.exams.push({ id: eid, kind: "exam", type: EXAMS[R.tur] ? R.tur : null, title: R.baslik + " · canlı", date: R.bitis, secs: R.benim ? R.benim.sure || 0 : 0, dur: (R.sure || 0) * 60, mode: "exam", sections: per, d: D, y: Y, b: B, net: net(D, Y),
+    qs: R.sorular.map((q, i) => Object.assign(snap(q), { your: R.cevabim[i] })), canli: { sira: R.sira, katilan: R.katilan } });
+  touch("exams");
+  if (R.sorular.length >= 20) xpEkle("deneme");
+}
+function vCanli() {
+  const id = hashParam("id") || UI.canliId;
+  if (!id) return vExam();
+  UI.canliId = id;
+  const R = SOS.sonuc[id], now = Date.now();
+  if (!R || (!R.gonderiliyor && (!SOS.t["s:" + id] || (R.acik === false && now >= (R.bitis || 0) && now - SOS.t["s:" + id] > 15000) || now - SOS.t["s:" + id] > 120000))) { if (sosAktif()) setTimeout(() => sonucYukle(id), 0); }
+  const head = `<div class="vhead"><span class="eyebrow">Canlı deneme</span><h1>${esc(R && R.baslik || "Canlı deneme")}</h1>${R && R.baslangic ? `<p>${saatYazi(R.baslangic)} · ${R.adet} soru · ${R.sure} dk · ${fmtN(R.katilan)} katılımcı</p>` : ""}</div>`;
+  if (!sosAktif()) return `<div class="view">${head}${sosGirisKart("Canlı deneme")}</div>`;
+  if (!R || (!R.baslangic && !R.benim && !R.hata)) return `<div class="view">${head}<div class="empty">${R && R.gonderiliyor ? "Cevapların gönderiliyor…" : "Yükleniyor…"}</div></div>`;
+  if (R.hata && !R.baslangic) return `<div class="view">${head}<div class="card"><p>${esc(R.hata === "giris" ? "Sonucu görmek için giriş yap." : R.hata)}</p></div></div>`;
+  const ben = R.benim, ex = S.exams.find(e => e.id === "canli:" + id);
+  const skor = ben ? `<div class="tiles">${tile(ben.d, "doğru")}${tile(ben.y, "yanlış")}${tile(ben.b, "boş")}${tile(nfx(ben.net), "net")}</div>` : "";
+  if (!R.acik) return `<div class="view">${head}${skor}
+    <div class="card stack"><h2>${ben ? "Cevapların alındı" : R.gonderiliyor ? "Cevapların gönderiliyor…" : "Deneme sürüyor"}</h2>
+      <p class="muted">Sıralama, cevap anahtarı ve çözümler deneme bitince açılır: <b>${saatYazi(R.bitis)}</b> (${kalanYazi(R.bitis - now)} sonra). O zaman bu sayfaya dön ya da yenile.</p>
+      <div class="row"><button class="btn" data-a="canliYenile" data-id="${esc(id)}">Yenile</button><a class="btn ghost" href="#deneme">Deneme merkezi</a></div></div></div>`;
+  const L = R.siralama || [], benSatir = ben && R.sira > L.length ? `<div class="li lb-row ben"><span class="lb-n">${R.sira}</span><div class="grow"><div class="t">${esc(SOS.ben ? SOS.ben.takma : "Sen")} <span class="pill form">sen</span></div></div><span class="small muted">${ben.d}D ${ben.y}Y</span><b class="mono">${nfx(ben.net)}</b></div>` : "";
+  return `<div class="view">${head}${skor}
+    ${ben ? `<div class="card sira-kart"><div><b class="num">${fmtN(R.sira)}.</b><span class="muted"> / ${fmtN(R.katilan)} katılımcı</span></div><p class="small muted">Sıralama nete göre, eşitlikte daha kısa sürede bitiren öne geçer.</p>
+      <div class="row">${ex ? `<button class="btn pri" data-a="openResult" data-id="${esc(ex.id)}">Ders ders sonucum ve çözümler</button>` : ""}</div></div>`
+      : `<div class="card stack"><p class="muted">Bu denemeye katılmadın. Aynı soruları şimdi süreli çözüp kendini sıralamayla karşılaştırabilirsin.</p><button class="btn pri" style="align-self:flex-start" data-a="canliSonradan" data-id="${esc(id)}">Bu denemeyi şimdi çöz</button></div>`}
+    <section class="card"><div class="card-h"><h2>Sıralama</h2><span class="small muted">İlk ${L.length}</span></div>
+      ${L.length ? `<div class="list lb">${L.map(s => `<div class="li lb-row${s.ben ? " ben" : ""}"><span class="lb-n${s.sira <= 3 ? " m" + s.sira : ""}">${s.sira}</span><div class="grow"><div class="t">${esc(s.takma)}${s.ben ? ` <span class="pill form">sen</span>` : ""}</div></div><span class="small muted">${s.d}D ${s.y}Y</span><b class="mono">${nfx(s.net)}</b></div>`).join("")}${benSatir}</div>` : `<div class="empty">Bu denemeye kimse katılmadı.</div>`}</section>
+  </div>`;
+}
+
+/* ---------- sınıf ve öğretmen paneli ---------- */
+function vSinif() {
+  const head = `<div class="vhead"><span class="eyebrow">Hesap · sınıf</span><h1>Sınıfım</h1><p>Öğretmeninin verdiği kodla sınıfına katıl. Öğretmensen sınıf aç, kodu öğrencilerinle paylaş ve çalışmalarını tek ekrandan izle.</p></div>`;
+  const kod = kodTemizle(hashParam("kod"));
+  if (!sosAktif()) { if (kod) LS.set("ake.davet", "sinif:" + kod); return `<div class="view">${head}${sosGirisKart("Sınıf")}</div>`; }
+  sosTaze("sinif"); sosTaze("ben", 120000);
+  const C = SOS.sinif;
+  if (!C) return `<div class="view">${head}${SOS.err.sinif ? `<p class="note">${esc(SOS.err.sinif)}</p>` : `<div class="empty">Yükleniyor…</div>`}</div>`;
+  return `<div class="view">${head}
+    <section class="card stack"><div class="card-h"><h2>Öğrenci olarak</h2></div>
+      ${C.ogrenci.length ? `<div class="list">${C.ogrenci.map(s => `<div class="li"><div class="grow"><div class="t">${esc(s.ad)}</div><div class="s">${s.ogretmen ? "Öğretmen: " + esc(s.ogretmen) : "Sınıf"}</div></div><button class="btn sm ghost" data-a="sinifAyrilAsk" data-id="${esc(s.id)}" data-n="${esc(s.ad)}">Ayrıl</button></div>`).join("")}</div>` : `<p class="muted">Henüz bir sınıfa katılmadın.</p>`}
+      <form class="row" data-s="sinifKatil"><input class="in mono davet-in" name="kod" maxlength="8" placeholder="Sınıf kodu" autocapitalize="characters" autocomplete="off" required value="${esc(sf("sinifKatil", "kod", kod))}" style="flex:1;min-width:150px"><button class="btn${kod || !C.ogrenci.length ? " pri" : ""}" type="submit"${SOS.busy === "sinifKatil" ? " disabled" : ""}>Sınıfa katıl</button></form>
+      <p class="xs muted">Katıldığında öğretmenin son 7 günde çözdüğün soru sayısını, doğru oranını, zayıf konularını, son deneme netlerini ve en son ne zaman çalıştığını görür. Cevapların ve yazışmaların görünmez. Sınıftan ayrılınca bu özet silinir.</p></section>
+    <section class="card stack"><div class="card-h"><h2>Öğretmen paneli</h2>${C.ogretmen.length ? `<span class="small muted">${C.ogretmen.length} sınıf</span>` : ""}</div>
+      ${C.ogretmen.length ? C.ogretmen.map(sinifKart).join("") : `<p class="muted">Öğretmen ya da koçsan bir sınıf aç; kodunu öğrencilerine gönder. Her öğrencinin haftalık çalışmasını ve sınıfın en zayıf konularını burada görürsün.</p>`}
+      <form class="row" data-s="sinifKur"><input class="in" name="ad" maxlength="40" placeholder="Sınıf adı, örn. 12-A Sayısal" required value="${esc(sf("sinifKur", "ad"))}" style="flex:1;min-width:180px"><button class="btn" type="submit"${SOS.busy === "sinifKur" ? " disabled" : ""}>Sınıf aç</button></form></section>
+  </div>`;
+}
+function sinifKart(s) {
+  const acik = !!SOS.sinifAc[s.id], D = SOS.sinifDetay[s.id];
+  if (acik && (!D || Date.now() - (D._t || 0) > 60000) && !SOS.t["c:" + s.id + "_b"]) setTimeout(() => sinifDetayYukle(s.id), 0);
+  return `<div class="sinif${acik ? " acik" : ""}"><div class="row sinif-h"><div class="grow"><b>${esc(s.ad)}</b><div class="small muted">${D ? D.ogrenciler.length : s.n} öğrenci · kod <code class="kod">${esc(s.kod)}</code></div></div>
+      <button class="btn sm" data-a="davetPaylas" data-k="${esc(s.kod)}" data-n="${esc(s.ad)}" data-t="sinif">Kodu paylaş</button><button class="btn sm ${acik ? "ghost" : "pri"}" data-a="sinifAc" data-id="${esc(s.id)}" aria-expanded="${acik}">${acik ? "Kapat" : "Öğrencileri gör"}</button></div>
+    ${acik ? (D ? sinifIcerik(s, D) : `<div class="empty">Yükleniyor…</div>`) : ""}</div>`;
+}
+function sinifIcerik(s, D) {
+  const O = D.ogrenciler || [], oz = O.filter(o => o.ozet);
+  if (!O.length) return `<div class="empty">Henüz öğrenci yok. Kodu paylaştığında öğrencilerin Sınıfım sayfasından katılır.</div><div class="row" style="justify-content:flex-end"><button class="btn sm ghost" data-a="sinifSilAsk" data-id="${esc(s.id)}" data-n="${esc(s.ad)}">Sınıfı kapat</button></div>`;
+  const toplam = oz.reduce((a, o) => a + (o.ozet.h || 0), 0), dogru = oz.reduce((a, o) => a + (o.ozet.hc || 0), 0);
+  const aktif = oz.filter(o => o.ozet.son && (Date.now() - new Date(o.ozet.son + "T12:00:00")) < 7 * 86400000).length;
+  const zm = new Map();
+  oz.forEach(o => (o.ozet.zayif || []).forEach(z => { const k = z.s + " · " + z.t, e = zm.get(k) || { k, n: 0, p: 0 }; e.n++; e.p += z.p; zm.set(k, e); }));
+  const zl = [...zm.values()].sort((a, b) => b.n - a.n || a.p / a.n - b.p / b.n).slice(0, 6);
+  const sirali = O.slice().sort((a, b) => ((b.ozet && b.ozet.h) || 0) - ((a.ozet && a.ozet.h) || 0));
+  return `<div class="tiles">${tile(O.length, "öğrenci")}${tile(fmtN(toplam), "son 7 günde soru")}${tile(toplam ? "%" + Math.round(100 * dogru / toplam) : "—", "ortalama doğru")}${tile(aktif, "bu hafta çalışan")}</div>
+    ${zl.length ? `<div class="stack" style="gap:6px"><b class="small">Sınıfın en çok zorlandığı konular</b><div class="row" style="gap:6px">${zl.map(z => `<span class="pill bad">${esc(z.k)} · ${z.n} öğrenci · ort. %${Math.round(z.p / z.n)}</span>`).join("")}</div></div>` : ""}
+    <div class="list">${sirali.map(o => { const z = o.ozet; const son = z && z.den && z.den.length ? z.den[z.den.length - 1] : null;
+      return `<div class="li mli ogr"><div class="grow"><div class="t">${esc(o.ad)}${o.tamAd && o.tamAd !== o.ad ? ` <span class="small muted">${esc(o.tamAd)}</span>` : ""}</div>
+        ${z ? `<div class="s">7 günde <b>${fmtN(z.h)}</b> soru · %${z.h ? Math.round(100 * z.hc / z.h) : 0} doğru · ${fmtN(z.fm || 0)} dk odak · seri ${z.seri || 0} gün · son çalışma ${gunOnce(z.son)}</div>
+          ${son ? `<div class="s">Son deneme: ${esc(son.ti)} · <b>${nfx(son.net)}</b> net</div>` : ""}
+          ${z.zayif && z.zayif.length ? `<div class="s">Zayıf: ${z.zayif.slice(0, 3).map(w => `${esc(w.t)} %${w.p}`).join(", ")}</div>` : ""}` : `<div class="s">Henüz özet gelmedi; öğrenci siteye girip soru çözdüğünde görünür.</div>`}</div>
+        <div class="li-act"><button class="btn sm ghost" data-a="sinifCikarAsk" data-id="${esc(s.id)}" data-k="${esc(o.kid)}" data-n="${esc(o.ad)}">Çıkar</button></div></div>`; }).join("")}</div>
+    <div class="row" style="justify-content:space-between"><span class="xs muted">Özetler öğrenci çalıştıkça güncellenir.</span><button class="btn sm ghost" data-a="sinifSilAsk" data-id="${esc(s.id)}" data-n="${esc(s.ad)}">Sınıfı kapat</button></div>`;
+}
+async function sinifDetayYukle(id) {
+  const k = "c:" + id + "_b"; if (SOS.t[k]) return; SOS.t[k] = 1;
+  try { const { r, j } = await sosIstek("sinif/" + id); if (r.ok) SOS.sinifDetay[id] = Object.assign(j, { _t: Date.now() }); else { SOS.sinifAc[id] = false; toast(j.message || "Sınıf açılamadı."); } }
+  catch (e) { SOS.sinifAc[id] = false; toast("Bağlantı kurulamadı."); }
+  SOS.t[k] = 0; render();
+}
+
+/* ---------- yönetim: canlı deneme planla ---------- */
+function canliYonetim() {
+  sosTaze("canli", 60000);
+  const Y = UI.cy || (UI.cy = { tur: defaultExam(), boy: "quarter" }), { adet, dk } = cyHesap(Y);
+  const C = SOS.canli && SOS.canli.denemeler || [];
+  return `<div class="card stack"><h2>Canlı deneme planla</h2>
+    <p class="small muted">Sorular şimdi bankadan ve soru kalıplarından seçilir, sunucuya kaydedilir. Başlangıç saatinde herkes aynı soruları çözer; cevap anahtarı deneme bitene kadar kimseye gönderilmez.</p>
+    <form class="stack" data-s="canliPlanla">
+      <div class="fields"><label class="f">Başlık<input class="in" name="baslik" maxlength="40" required placeholder="Örn. Pazar TYT kampı" value="${esc(sf("planla", "baslik"))}"></label>
+        <label class="f">Sınav<select class="in" name="tur" data-c="cyTur">${Object.entries(EXAMS).map(([k, v]) => `<option value="${k}"${k === Y.tur ? " selected" : ""}>${esc(v.n)}</option>`).join("")}</select></label>
+        <label class="f">Uzunluk<select class="in" name="boy" data-c="cyBoy">${[["full", "Tam"], ["half", "Yarım"], ["quarter", "Mini (¼)"]].map(([k, l]) => `<option value="${k}"${k === Y.boy ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+        <label class="f">Başlangıç<input class="in" type="datetime-local" name="bas" required value="${esc(sf("planla", "bas"))}"></label>
+        <label class="f">Süre (dakika)<input class="in" type="number" name="sure" id="cySure" min="5" max="300" placeholder="${dk}" value="${esc(sf("planla", "sure"))}"></label></div>
+      <button class="btn pri" type="submit" id="cyBtn" style="align-self:flex-start"${SOS.busy === "planla" ? " disabled" : ""}>${SOS.busy === "planla" ? "Hazırlanıyor…" : `${adet} soruluk denemeyi planla`}</button></form>
+    ${C.length ? `<div class="list">${C.map(d => `<div class="li mli"><div class="grow"><div class="t">${esc(d.baslik)}</div><div class="s">${saatYazi(d.baslangic)} · ${d.adet} soru · ${d.sure} dk · ${fmtN(d.katilan)} katılımcı</div></div><div class="li-act"><span class="pill ${d.durum === "acik" ? "ok" : ""}">${{ yakinda: "Yakında", acik: "Açık", bitti: "Bitti" }[d.durum] || d.durum}</span><button class="btn sm ghost" data-a="canliSilAsk" data-id="${esc(d.id)}" data-n="${esc(d.baslik)}">Sil</button></div></div>`).join("")}</div>` : ""}</div>`;
+}
+function cyHesap(Y) {
+  const ex = EXAMS[Y.tur] || EXAMS.TYT, f = { full: 1, half: 0.5, quarter: 0.25 }[Y.boy] || 0.25;
+  return { adet: ex.sec.reduce((a, s) => a + s.p.reduce((b, [, n]) => b + Math.max(1, Math.round(n * f)), 0), 0), dk: Math.max(10, Math.round(ex.min * f)) };
+}
+/* Formu yeniden çizmeden yalnızca soru sayısını ve önerilen süreyi güncelle (yazılan başlık silinmesin) */
+function cyBoya() {
+  const { adet, dk } = cyHesap(UI.cy), b = document.getElementById("cyBtn"), su = document.getElementById("cySure");
+  if (b && !SOS.busy) b.textContent = `${adet} soruluk denemeyi planla`; if (su) su.placeholder = dk;
+}
+function canliSorulariHazirla(tur, boy) {
+  const ex = EXAMS[tur], f = { full: 1, half: 0.5, quarter: 0.25 }[boy] || 0.25, qs = [], secs = [];
+  ex.sec.forEach(sec => sec.p.forEach(([s, n]) => {
+    const b = buildSet([[s, Math.max(1, Math.round(n * f))]], { unsolvedFirst: false });
+    let sc = secs[secs.length - 1];
+    if (!sc || sc.n !== sec.n) { sc = { n: sec.n, from: qs.length, to: qs.length }; secs.push(sc); }
+    b.qs.filter(q => Array.isArray(q.o) && q.o.length === 5 && Number.isInteger(q.a)).forEach(q => { const o = snap(q); delete o.src; qs.push(o); });
+    sc.to = qs.length;
+  }));
+  return { qs, secs: secs.filter(x => x.to > x.from), dk: Math.max(10, Math.round(ex.min * f)) };
+}
+
+/* ---------- eylemler ---------- */
+const SOS_ACT = {
+  async davetPaylas(d) {
+    const lig = d.t === "lig", url = `https://akeakademi.com/#${lig ? "lig" : "sinif"}?kod=${d.k}`;
+    const text = lig ? `AKE Akademi'de "${d.n}" ligine katıl, haftalık puan yarışalım! Davet kodu: ${d.k}` : `AKE Akademi'de "${d.n}" sınıfına katıl. Sınıf kodu: ${d.k}`;
+    if (navigator.share) { try { await navigator.share({ title: "AKE Akademi", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    try { await navigator.clipboard.writeText(text + " " + url); toast("Davet metni kopyalandı; arkadaşına yapıştırıp gönder."); } catch (e) { toast("Kod: " + d.k); }
+  },
+  ligAyrilAsk(d) { UI.sosSec = d; openModal("Ligden ayrıl", `<p>"${esc(d.n)}" liginden ayrılırsan bu ligin sıralamasında artık görünmezsin. Puanın silinmez; diğer liglerinde sayılmaya devam eder.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Ayrıl", a: "ligAyrilGo", k: "pri" }]); },
+  async ligAyrilGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r } = await sosIstek("lig/ayril", { id: d.id }).catch(() => ({ r: {} })); toast(r.ok ? "Ligden ayrıldın." : "Ayrılamadın; tekrar dene."); sosYukle("lig", true); sosYukle("ben", true); },
+  canliKatil(d) {
+    if (RUN) { UI.sosSec = d; openModal("Yarım kalan oturum var", `<p>"${esc(RUN.title)}" oturumun henüz bitmedi. Canlı denemeye girersen o oturumdaki cevaplar silinir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Canlı denemeye gir", a: "canliKatilGo", k: "pri" }]); return; }
+    canliKatil(d.id);
+  },
+  canliKatilGo() { const d = UI.sosSec || {}; UI.modal = null; if (RUN && RUN.canli) { toast("Zaten bir canlı denemedesin."); render(); return; } RUN = null; saveRun(); canliKatil(d.id); },
+  canliSonucAc(d) { UI.canliId = d.id; SOS.t["s:" + d.id] = 0; location.hash = "#canli?id=" + d.id; },
+  canliYenile(d) { SOS.t["s:" + d.id] = 0; sonucYukle(d.id); },
+  canliSonradan(d) {
+    const R = SOS.sonuc[d.id]; if (!R || !R.sorular) return;
+    startRun({ kind: "exam", type: EXAMS[R.tur] ? R.tur : null, title: R.baslik + " · sonradan", mode: "exam", qs: R.sorular, secs: R.secs && R.secs.length ? R.secs : null, dur: R.sure || 0 });
+  },
+  canliSilAsk(d) { UI.sosSec = d; openModal("Canlı denemeyi sil", `<p>"${esc(d.n)}" denemesi ve katılımcıların sonuçları silinir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sil", a: "canliSilGo", k: "pri" }]); },
+  async canliSilGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r, j } = await sosIstek("canli/" + d.id + "/sil", {}).catch(() => ({ r: {}, j: {} })); toast(r.ok ? "Deneme silindi." : (j.message || "Silinemedi.")); sosYukle("canli", true); },
+  sinifAc(d) { SOS.sinifAc[d.id] = !SOS.sinifAc[d.id]; if (SOS.sinifAc[d.id]) delete SOS.sinifDetay[d.id]; render(); },
+  sinifAyrilAsk(d) { UI.sosSec = d; openModal("Sınıftan ayrıl", `<p>"${esc(d.n)}" sınıfından ayrılırsan öğretmenin çalışma özetini artık göremez.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Ayrıl", a: "sinifAyrilGo", k: "pri" }]); },
+  async sinifAyrilGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r } = await sosIstek("sinif/ayril", { id: d.id }).catch(() => ({ r: {} })); toast(r.ok ? "Sınıftan ayrıldın." : "Ayrılamadın; tekrar dene."); sosYukle("sinif", true); sosYukle("ben", true); },
+  sinifCikarAsk(d) { UI.sosSec = d; openModal("Öğrenciyi çıkar", `<p>${esc(d.n)} sınıftan çıkarılır; çalışma özeti artık sende görünmez. Öğrenci kodla yeniden katılabilir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Çıkar", a: "sinifCikarGo", k: "pri" }]); },
+  async sinifCikarGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r } = await sosIstek("sinif/" + d.id + "/cikar", { kid: d.k }).catch(() => ({ r: {} })); toast(r.ok ? "Öğrenci çıkarıldı." : "Çıkarılamadı."); delete SOS.sinifDetay[d.id]; sosYukle("sinif", true); },
+  sinifSilAsk(d) { UI.sosSec = d; openModal("Sınıfı kapat", `<p>"${esc(d.n)}" sınıfı kapanır, tüm öğrenciler sınıftan çıkarılır. Öğrencilerin kendi çalışmaları silinmez.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sınıfı kapat", a: "sinifSilGo", k: "pri" }]); },
+  async sinifSilGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r } = await sosIstek("sinif/" + d.id + "/sil", {}).catch(() => ({ r: {} })); toast(r.ok ? "Sınıf kapatıldı." : "Kapatılamadı."); delete SOS.sinifAc[d.id]; sosYukle("sinif", true); }
+};
+const SOS_CHG = {
+  cyTur(el) { UI.cy = Object.assign(UI.cy || {}, { tur: el.value }); cyBoya(); },
+  cyBoy(el) { UI.cy = Object.assign(UI.cy || {}, { boy: el.value }); cyBoya(); }
+};
+/* Gönderilen form değerleri hata olursa kaybolmasın diye saklanır, başarıda silinir */
+const sf = (form, alan, yedek) => { const v = UI.sf && UI.sf[form] && UI.sf[form][alan]; return v != null ? v : (yedek || ""); };
+async function sosGonder(busy, path, body, basari, sakla) {
+  if (SOS.busy) return; SOS.busy = busy; UI.sf = UI.sf || {}; UI.sf[busy] = sakla || body; render();
+  let res = { r: { ok: false }, j: {} };
+  try { res = await sosIstek(path, body); } catch (e) { res.j.message = "Bağlantı kurulamadı."; }
+  SOS.busy = "";
+  if (res.r.ok) { delete UI.sf[busy]; basari(res.j); } else toast(res.j.message || "İşlem yapılamadı; tekrar dene.");
+  render();
+}
+const SOS_SUB = {
+  sosTakma(fd) { sosGonder("takma", "takma", { takma: fd.get("takma") }, j => { if (SOS.ben) { SOS.ben.takma = j.takma; SOS.ben.takmaVar = true; } toast("Görünen adın kaydedildi."); SOS.t.lig = 0; }); },
+  ligKur(fd) { sosGonder("ligKur", "lig/kur", { ad: fd.get("ad") }, j => { toast(`Lig kuruldu. Davet kodu: ${j.kod}`); sosYukle("lig", true); sosYukle("ben", true); }); },
+  ligKatil(fd) { sosGonder("ligKatil", "lig/katil", { kod: fd.get("kod") }, j => { toast(j.zaten ? "Zaten bu ligdesin." : `"${j.ad}" ligine katıldın.`); if (hashParam("kod")) history.replaceState(null, "", "#lig"); sosYukle("lig", true); sosYukle("ben", true); }); },
+  sinifKatil(fd) { sosGonder("sinifKatil", "sinif/katil", { kod: fd.get("kod") }, j => { toast(j.zaten ? "Zaten bu sınıftasın." : `"${j.ad}" sınıfına katıldın.`); if (hashParam("kod")) history.replaceState(null, "", "#sinif"); if (SOS.ben) SOS.ben.sinif = (SOS.ben.sinif || 0) + 1; ozetGonder(); sosYukle("sinif", true); sosYukle("ben", true); }); },
+  sinifKur(fd) { sosGonder("sinifKur", "sinif/kur", { ad: fd.get("ad") }, j => { toast(`Sınıf açıldı. Sınıf kodu: ${j.kod}`); sosYukle("sinif", true); }); },
+  canliPlanla(fd) {
+    const tur = fd.get("tur"), boy = fd.get("boy"), bas = new Date(fd.get("bas")).getTime();
+    if (!EXAMS[tur] || !bas) { toast("Sınav türünü ve başlangıç saatini seç."); return; }
+    const h = canliSorulariHazirla(tur, boy), sure = Math.max(5, +fd.get("sure") || h.dk);
+    sosGonder("planla", "canli/olustur", { baslik: fd.get("baslik"), tur, baslangic: bas, sure, sorular: h.qs, secs: h.secs }, () => { toast(`Canlı deneme planlandı: ${saatYazi(bas)}`); sosYukle("canli", true); },
+      { baslik: fd.get("baslik"), bas: fd.get("bas"), sure: fd.get("sure") });
+  }
+};
+/* Odak sayacı değişince odak odasını güncelle */
+["pomoBasla", "pomoDur", "pomoSifirla", "pomoMod"].forEach(k => { const f = OZ_ACT[k]; if (f) OZ_ACT[k] = function () { const r = f.apply(this, arguments); odaGuncelle(); return r; }; });
+Object.assign(OZ_ACT, SOS_ACT); Object.assign(OZ_CHG, SOS_CHG);
+if (POMO.run && POMO.mode === "odak") setTimeout(odaGuncelle, 1500);
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -6753,7 +7241,7 @@ Object.assign(IC, {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
-if (!IN_CLAUDE) NAVG[2][1].unshift(["hesap", "Hesabım", "users"]);
+if (!IN_CLAUDE) { NAVG[2][1].unshift(["hesap", "Hesabım", "users"], ["sinif", "Sınıfım", "okul"]); NAVG[1][1].push(["lig", "Arkadaş ligi", "kupa"]); }
 NAVG[2][1].push(["premium", "Paketler", "star"], ["yasal", "Yasal metinler", "doc"]);
 
 function premNote(orig, feat, cls) {
@@ -6820,7 +7308,7 @@ const LEGAL = {
   "kvkk": { t: "KVKK Aydınlatma Metni", d: "Kişisel verilerinin nasıl işlendiği ve hakların", h: () => `
     <p><b>Veri sorumlusu:</b> ${ay("adSoyad", "AD SOYAD")} ("AKE Akademi"), Adres: ${ay("adres", "ADRES")}, E-posta: ${ay("eposta", "E-POSTA")}</p>
     <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, AKE Akademi internet sitesi ve uygulaması ("Site") kullanıcılarının kişisel verilerinin nasıl işlendiğini aşağıda açıklıyoruz.</p>
-    ${IN_CLAUDE ? "" : `<p class="note">Site'yi hesap açmadan kullanırsan profil bilgilerin, çözdüğün sorular, denemelerin, odak süren ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. Hesap açarsan e-posta adresin (Google ile girersen Google hesabındaki adın ve hesap kimliğin), bu çalışma verilerin, aylık AI kullanım sayıların ve hesabına bağlanan paket kodun, hesabını her cihazda kullanabilmen için sunucumuzda (${ay("barindirma", "BARINDIRMA")}) saklanır. Giriş kodları e-posta gönderim hizmeti (Resend) aracılığıyla gönderilir. Hesabını Hesabım sayfasından istediğin zaman silebilirsin; silindiğinde hesabındaki çalışma verilerin kalıcı olarak silinir. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
+    ${IN_CLAUDE ? "" : `<p class="note">Site'yi hesap açmadan kullanırsan profil bilgilerin, çözdüğün sorular, denemelerin, odak süren ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. Hesap açarsan e-posta adresin (Google ile girersen Google hesabındaki adın ve hesap kimliğin), bu çalışma verilerin, aylık AI kullanım sayıların ve hesabına bağlanan paket kodun, hesabını her cihazda kullanabilmen için sunucumuzda (${ay("barindirma", "BARINDIRMA")}) saklanır. Giriş kodları e-posta gönderim hizmeti (Resend) aracılığıyla gönderilir. Hesabını Hesabım sayfasından istediğin zaman silebilirsin; silindiğinde hesabındaki çalışma verilerin kalıcı olarak silinir. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Arkadaş ligine katılırsan seçtiğin görünen ad ve haftalık puanın o ligin üyelerine; canlı denemeye katılırsan görünen adın, netin ve sıralaman diğer katılımcılara görünür. Bir sınıfa katılırsan o sınıfın öğretmeni çalışma özetini (son 7 gündeki soru sayısı, doğru oranı, zayıf konular, deneme netleri, son çalışma günü) görür; sınıftan ayrıldığında bu özet silinir. Odak odasındaki kişi sayısı için yalnızca rastgele bir cihaz numarası kullanılır. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
     ${!IN_CLAUDE ? "" : `<p class="note">Şu an Site'de ücretli üyelik yoktur. Site'yi Claude hesabınla açtığında ve hesabına kayıt iznin olduğunda ilerlemen, yalnızca sana açık ayrı bir alanda saklanır. Bu durumda çalışma özetin (Site'de yazdığın ad, alanın ve hedefin, çözdüğün soru sayısı ve başarı oranın, deneme sonuçların, giriş zamanların, gezdiğin bölümler, cihaz ve tarayıcı türün) ile Claude hesabındaki adın Site yöneticisinin panelinde görünür. Yanlış defterin, tekrar kartların, çalışma planın ve AI öğretmenle yazışmaların yöneticiye gönderilmez. Kayıt iznin yoksa ilerlemen yalnızca kendi tarayıcında saklanır; Site'yi açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün yöneticiye anlık görünebilir. Aşağıda sayılan üyelik ve ödeme verileri bu özellikler açıldığında işlenecektir.</p>`}
     <h2>İşlenen kişisel veriler</h2>
     <ul><li><b>Kimlik:</b> ad, soyad</li><li><b>İletişim:</b> e-posta adresi, varsa telefon numarası</li><li><b>Müşteri işlem:</b> abonelik planı, ödeme tarihi ve tutarı, fatura bilgileri. Kart bilgilerin bizde tutulmaz, doğrudan ödeme kuruluşu tarafından işlenir.</li><li><b>Kullanım:</b> çalışılan dersler, deneme sonuçları, ilerleme kayıtları, AI öğretmene yazdığın sorular ve aldığın cevaplar</li><li><b>İşlem güvenliği:</b> IP adresi, giriş kayıtları, cihaz ve tarayıcı bilgisi</li></ul>
@@ -6937,7 +7425,7 @@ function siteFoot() {
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim });
+Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
 function render() {
@@ -7323,7 +7811,7 @@ Object.assign(SUB, {
 });
 ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
 ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
-Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(SUB, HESAP_SUB); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
+Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(SUB, HESAP_SUB, SOS_SUB); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */
 APP.addEventListener("click", e => {

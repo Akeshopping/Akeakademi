@@ -6,48 +6,17 @@
 //   AKE_KODLAR         (isteğe bağlı) süresiz deneme kodları, virgülle ayrılmış "KOD:paket" listesi. Örnek: AKE-G2D9-UZKM:premium
 //   AKE_IPTAL          (isteğe bağlı) iptal edilen kodlar, virgülle ayrılmış liste.
 //   AKE_MODEL_HIZLI, AKE_MODEL_GUCLU, AKE_EFOR_GUCLU (isteğe bağlı model ayarları)
+//   AKE_LIMIT_ORTA / AKE_LIMIT_PREMIUM, AKE_GUCLU_ORTA / AKE_GUCLU_PREMIUM (isteğe bağlı aylık haklar; varsayılan 200/500 ve 20/60)
+//   Bindings: D1 veritabanı DB bağlıysa AI yalnızca giriş yapmış ve kodu hesabına bağlı öğrenciye çalışır; kota sunucuda tutulur.
 // Ayar değiştirdikten sonra Deployments > son dağıtım > Retry deployment yapılmalıdır.
 //
 // Yanıt akışı Anthropic'ten olduğu gibi (SSE) tarayıcıya aktarılır; ayrıştırmayı tarayıcı yapar.
 // Böylece sunucu neredeyse hiç işlemci kullanmaz (Cloudflare ücretsiz planı için önemli).
 
+import { json, fail, sema, oturum, aktifPaket, kodBagla, kullanimAl, kullanimArtir, limitler, kodCoz } from "../../lib/ortak.js";
+
 const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const hits = new Map(), strongHits = new Map();
-const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", EPOCH = Date.UTC(2026, 0, 1);
-const isoOf = n => new Date(EPOCH + n * 86400000).toISOString().slice(0, 10);
-const bugun = () => Math.floor((Date.now() + 3 * 3600000 - EPOCH) / 86400000); // Türkiye saati (UTC+3)
-const kodAnahtar = c => { let s = String(c || "").toUpperCase().replace(/[^0-9A-Z]/g, ""); if (s.startsWith("AKE")) s = s.slice(3); return s.replace(/O/g, "0").replace(/[IL]/g, "1"); };
-
-function json(status, obj, extra) {
-  return new Response(JSON.stringify(obj), { status, headers: Object.assign({ "content-type": "application/json; charset=utf-8", "cache-control": "no-store" }, extra || {}) });
-}
-const fail = (status, error, message) => json(status, { error, message: message || "" });
-
-function kodlar(env) {
-  const m = new Map();
-  String(env.AKE_KODLAR || "").split(/[,;\n]+/).forEach(x => {
-    const [k, p] = x.split(":").map(s => (s || "").trim());
-    if (k && k.length >= 6) m.set(k.toUpperCase(), (p || "").toLowerCase() === "premium" ? "premium" : "orta");
-  });
-  return m;
-}
-function b32dec(s) {
-  let bits = 0, val = 0; const out = [];
-  for (const ch of s) { const v = B32.indexOf(ch); if (v < 0) return null; val = ((val << 5) | v) & 0xffff; bits += 5; if (bits >= 8) { bits -= 8; out.push((val >> bits) & 255); } }
-  return new Uint8Array(out);
-}
-async function sureliKod(env, code) {
-  const sec = String(env.AKE_GIZLI || "").trim();
-  if (!/^[0-9a-fA-F]{64}$/.test(sec)) return null;
-  const k = kodAnahtar(code); if (k.length !== 16) return null;
-  const b = b32dec(k); if (!b || b.length !== 10 || (b[0] >> 4) !== 1) return null;
-  const key = await crypto.subtle.importKey("raw", new Uint8Array(sec.match(/../g).map(h => parseInt(h, 16))), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const mac = new Uint8Array(await crypto.subtle.sign("HMAC", key, b.slice(0, 5)));
-  let diff = 0; for (let i = 0; i < 5; i++) diff |= mac[i] ^ b[5 + i];
-  if (diff) return null;
-  return { plan: (b[0] & 15) === 2 ? "premium" : "orta", exp: (b[1] << 8) | b[2], key: k };
-}
-const iptal = env => new Set(String(env.AKE_IPTAL || "").split(/[,;\n]+/).map(kodAnahtar).filter(Boolean));
+const hits = new Map();
 
 export async function onRequest({ request, env }) {
   if (request.method !== "POST") return fail(405, "method");
@@ -58,14 +27,29 @@ export async function onRequest({ request, env }) {
 
   let b = {}; try { b = await request.json(); } catch (e) { b = {}; }
   if (!b || typeof b !== "object") b = {};
-  const code = String(b.code || "").trim().toUpperCase();
-  let plan = kodlar(env).get(code), bitis = "";
-  if (!plan) {
-    const k = await sureliKod(env, code);
-    if (k && !iptal(env).has(k.key)) { if (bugun() > k.exp) return fail(401, "suresi"); plan = k.plan; bitis = isoOf(k.exp); }
+
+  /* Hesap ve paket: AI, hesaba bağlı ve süresi geçmemiş bir erişim koduyla çalışır.
+     Veritabanı bağlı değilse (eski kurulum) yalnızca koda bakılır. */
+  let kid = null, plan = null, bitis = "", sayac = null, lim = null;
+  if (env.DB) {
+    try { await sema(env); } catch (e) { return fail(500, "yapilandirma", "Veritabanı hazırlanamadı."); }
+    const u = await oturum(request, env);
+    if (!u) return fail(401, "giris");
+    kid = u.id;
+    let pk = await aktifPaket(env, kid);
+    if (!pk && b.code) { const r = await kodBagla(env, kid, b.code); if (r.hata) return fail(r.durum || 400, r.hata); pk = r.paket; }
+    if (!pk) return fail(402, "paket");
+    plan = pk.plan; bitis = pk.bitis;
+    if (b.check) return json(200, { ok: true, plan, bitis });
+    lim = limitler(env, plan); sayac = await kullanimAl(env, kid);
+    if (sayac.mesaj >= lim.mesaj) return fail(429, "kota", "", { "x-ake-mesaj": String(sayac.mesaj), "x-ake-guclu": String(sayac.guclu) });
+  } else {
+    const k = await kodCoz(env, b.code);
+    if (k.hata) return fail(k.durum, k.hata);
+    plan = k.plan; bitis = k.bitis;
+    if (b.check) return json(200, { ok: true, plan, bitis });
   }
-  if (!plan) return fail(401, "kod");
-  if (b.check) return json(200, { ok: true, plan, bitis });
+  const code = kid || String(b.code || "").trim().toUpperCase();
 
   const now = Date.now(), list = (hits.get(code) || []).filter(t => now - t < 5 * 60000);
   if (list.length >= 40) return fail(429, "rate_limited");
@@ -91,11 +75,8 @@ export async function onRequest({ request, env }) {
   //  complex : deneme yorumu, çalışma planı. Premium'da güçlü model.
   //  quick   : kısa işler. default: diğer her şey (hızlı model, yüksek düzey).
   let strong = false, effort = "high";
-  if (b.tier === "solve" && b.guclu) {
-    const sk = code + "|" + new Date().toISOString().slice(0, 10), n = strongHits.get(sk) || 0;
-    if (n < 40) { strong = true; effort = EFOR; strongHits.set(sk, n + 1); }
-    if (strongHits.size > 5000) strongHits.clear();
-  } else if (b.tier === "complex") { strong = plan === "premium"; effort = strong ? "medium" : "high"; }
+  if (b.tier === "solve" && (sayac ? sayac.guclu < lim.guclu : b.guclu)) { strong = true; effort = EFOR; }
+  else if (b.tier === "complex") { strong = plan === "premium"; effort = strong ? "medium" : "high"; }
   else if (b.tier === "quick") effort = "low";
   const payload = { model: strong ? MODEL.guclu : MODEL.hizli, max_tokens: strong ? 12000 : b.json ? 10000 : 8000, messages: merged, output_config: { effort }, stream: !b.json };
   const modelHdr = { "x-ake-model": strong ? "guclu" : "hizli" };
@@ -118,6 +99,10 @@ export async function onRequest({ request, env }) {
     return fail(502, "server");
   }
 
+  if (kid) {
+    try { await kullanimArtir(env, kid, strong && b.tier === "solve"); } catch (e) { console.error("kullanim", e); }
+    modelHdr["x-ake-mesaj"] = String(sayac.mesaj + 1); modelHdr["x-ake-guclu"] = String(sayac.guclu + (strong && b.tier === "solve" ? 1 : 0));
+  }
   if (b.json) {
     const j = await r.json().catch(() => ({}));
     const text = (j.content || []).filter(c => c.type === "text").map(c => c.text).join("");

@@ -368,6 +368,15 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .kisa .k-alt{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
 .rapor{white-space:pre-wrap;font-size:14px;line-height:1.6;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:14px}
 .mic.on{color:#fff;background:var(--bad);border-color:var(--bad)}
+.btn.google{background:var(--card);border:1px solid var(--line);color:var(--ink);justify-content:center;gap:10px;font-weight:600;min-height:44px}
+.btn.google svg{width:18px;height:18px}
+.ya-da{display:flex;align-items:center;gap:10px;color:var(--ink3);font-size:12.5px}
+.ya-da::before,.ya-da::after{content:"";flex:1;height:1px;background:var(--line)}
+.kod-in{max-width:160px;font-size:20px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}
+.hesap-btn{padding:4px}
+.giris-btn svg{width:17px;height:17px}
+@media (max-width:440px){.giris-btn span{display:none}.giris-btn{padding:6px 8px}.top-in{gap:8px}}
+.hesap-btn .av{width:28px;height:28px;border-radius:50%;background:var(--form);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
 .mtag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 .msg .att{font-size:12px;opacity:.75;margin-bottom:4px}
 .composer{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--paper);padding-top:8px}
@@ -4718,12 +4727,14 @@ const ayKey = () => dayKey().slice(0, 7);
 function ayOku(k) { try { const o = JSON.parse(LS.get(k) || "{}"); return o.m === ayKey() ? (o.n || 0) : 0; } catch (e) { return 0; } }
 function ayArt(k) { LS.set(k, JSON.stringify({ m: ayKey(), n: ayOku(k) + 1 })); }
 const ayarSayi = k => typeof AYAR !== "undefined" ? (Number(String(AYAR[k] || "").replace(/[^\d]/g, "")) || 0) : 0;
-function aiUsage() { return ayOku("ake.aiay"); }
-function aiLimit() { return ayarSayi(WEBAI.plan === "premium" ? "aiPremium" : "aiOrta"); }
+/* Hesap varsa kullanım ve haklar sunucudan gelir (asıl sayaç sunucudadır); yoksa bu cihazdaki sayaç */
+const sunucuSayac = () => typeof HESAP !== "undefined" && HESAP.user && HESAP.kullanim;
+function aiUsage() { return sunucuSayac() ? HESAP.kullanim.mesaj : ayOku("ake.aiay"); }
+function aiLimit() { return sunucuSayac() && HESAP.limit ? HESAP.limit.mesaj : ayarSayi(WEBAI.plan === "premium" ? "aiPremium" : "aiOrta"); }
 function aiCount() { ayArt("ake.aiay"); }
 /* gelişmiş çözüm: soru çözümünde güçlü model, aylık hak (mesaj hakkının içinde) */
-function gucluUsage() { return ayOku("ake.aiguclu"); }
-function gucluLimit() { return ayarSayi(WEBAI.plan === "premium" ? "cozumPremium" : "cozumOrta"); }
+function gucluUsage() { return sunucuSayac() ? HESAP.kullanim.guclu : ayOku("ake.aiguclu"); }
+function gucluLimit() { return sunucuSayac() && HESAP.limit ? HESAP.limit.guclu : ayarSayi(WEBAI.plan === "premium" ? "cozumPremium" : "cozumOrta"); }
 const gucluKalan = () => Math.max(0, gucluLimit() - gucluUsage());
 /* sohbette soru mu? Teşekkür, selam gibi kısa mesajlar dışındaki her şey soru sayılır (gelişmiş çözüm hakkı varsa güçlü model) */
 const ACK_RE = /^(teşekkür\S*|tesekkur\S*|sağ ?ol\S*|sag ?ol\S*|eyvallah|eyv|tamam\S*|ok|okey|peki|süper|harika|güzel|anladım|anladim|merhaba|selam\S*|günaydın|iyi geceler|iyi akşamlar)(?=[\s.,!]|$)/i;
@@ -4795,15 +4806,19 @@ function webAI() {
     const body = { code: WEBAI.code, messages: typeof input === "string" ? [{ role: "user", content: input }] : input, tier: opts.modelTier || "default", guclu, json: !!json };
     if (opts.images && opts.images[0]) body.image = await imgToB64(opts.images[0]);
     let r;
-    try { r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: opts.signal }); }
+    try { r = await fetch("/api/ai", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: opts.signal }); }
     catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network" }; }
     if (!r.ok) {
       let j = {}; try { j = await r.json(); } catch (e) { }
+      if (j.error === "giris") { if (typeof HESAP !== "undefined") HESAP.user = null; AI.fn = null; throw { code: "giris" }; }
+      if (j.error === "paket") { if (typeof HESAP !== "undefined") HESAP.paket = null; AI.fn = null; throw { code: "paket" }; }
+      if (j.error === "kota" && typeof HESAP !== "undefined" && HESAP.kullanim) { const m = +r.headers.get("x-ake-mesaj"); if (m) HESAP.kullanim.mesaj = m; }
       if (r.status === 401) { webAIKapat(); throw { code: j.error === "suresi" ? "suresi" : "kod" }; }
       throw { code: j.error || "server" };
     }
     aiCount();
     const g = r.headers.get("x-ake-model") === "guclu"; if (g) ayArt("ake.aiguclu");
+    if (typeof HESAP !== "undefined" && HESAP.kullanim && r.headers.get("x-ake-mesaj")) { HESAP.kullanim.mesaj = +r.headers.get("x-ake-mesaj") || HESAP.kullanim.mesaj; HESAP.kullanim.guclu = +r.headers.get("x-ake-guclu") || HESAP.kullanim.guclu; }
     if (json) { const j = await r.json(); j.guclu = g; return j; }
     const reader = r.body.getReader(), dec = new TextDecoder(), tail = /\n\n\[\[AKE_(HATA|KESIK)\]\]$/;
     if ((r.headers.get("content-type") || "").includes("event-stream")) {
@@ -4847,7 +4862,7 @@ function webAIAc() { AI.fn = webAI(); AI.off = false; AI.images = true; AI.imgTy
 function webAIKapat() { WEBAI.code = ""; WEBAI.plan = ""; WEBAI.bitis = ""; LS.del("ake.kod"); LS.del("ake.plan"); LS.del("ake.bitis"); AI.fn = null; AI.images = false; }
 const premOnly = () => !(window.claude && typeof window.claude.use === "function") && WEBAI.plan !== "premium";
 async function initAI() {
-  if (!(window.claude && typeof window.claude.use === "function")) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; }
+  if (!(window.claude && typeof window.claude.use === "function")) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; } /* web: hesap varsa initHesap paketi yükleyince AI açılır */
   try { AI.fn = await window.claude.use("sample"); } catch (e) { AI.fn = null; }
   AI.ready = true;
   if (AI.fn) { try { const l = await AI.fn.limits(); AI.images = !!(l && l.images); AI.imgTypes = l && l.images ? l.images.mediaTypes : []; } catch (e) { } }
@@ -4862,7 +4877,7 @@ function aiErr(e) {
     invalid_json: "Yanıt beklenen biçimde gelmedi. Tekrar dene.", image_rejected: "Görsel kabul edilmedi. JPEG, PNG ya da WebP biçiminde, daha küçük bir dosya dene.",
     images_unavailable: "Bu görünümde görsel gönderilemiyor.", prompt_too_large: "Metin çok uzun. Daha kısa bir parça gönder.",
     empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "",
-    kod: "Erişim kodun geçerli değil. Yeni kod için bizimle iletişime geç.", suresi: "Paketinin süresi doldu. Devam etmek için Paketler sayfasından yenileyebilirsin.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
+    kod: "Erişim kodun geçerli değil. Yeni kod için bizimle iletişime geç.", giris: "AI öğretmeni kullanmak için giriş yap.", paket: "AI öğretmen için Orta ya da Premium paketin olmalı. Kodun varsa Hesabım sayfasından ekle.", baska_hesap: "Bu erişim kodu başka bir hesaba bağlı. Kodlar kişiseldir; bir sorun varsa bize yaz.", suresi: "Paketinin süresi doldu. Devam etmek için Paketler sayfasından yenileyebilirsin.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
     network: "İnternet bağlantısını kontrol edip tekrar dene.", overloaded: "AI şu an çok yoğun. Birkaç dakika sonra tekrar dene.",
     yapilandirma: "AI sunucusu henüz ayarlanmamış. Biraz sonra tekrar dene.", server: "AI şu an yanıt veremedi. Tekrar dene." })[code] ?? "Bağlantıda bir sorun oldu. Tekrar dene.";
 }
@@ -4913,6 +4928,7 @@ const IC = {
   back: '<path d="M15 5l-7 7 7 7"/>',
   ses: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18.2 6.5a7.5 7.5 0 0 1 0 11"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/>',
+  g: '<path d="M20.5 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.6z" fill="#4285F4" stroke="none"/><path d="M12 21c2.4 0 4.4-.8 5.9-2.2L15 16.6c-.8.5-1.8.9-3 .9-2.3 0-4.3-1.6-5-3.7H4v2.3A9 9 0 0 0 12 21z" fill="#34A853" stroke="none"/><path d="M7 13.8a5.4 5.4 0 0 1 0-3.6V7.9H4a9 9 0 0 0 0 8.2z" fill="#FBBC05" stroke="none"/><path d="M12 6.5c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 4 7.9l3 2.3c.7-2.1 2.7-3.7 5-3.7z" fill="#EA4335" stroke="none"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
@@ -4942,6 +4958,7 @@ function header() {
     <div class="top-sp"></div>
     <div id="savest" class="save ${c}" title="${t}"><i></i><span class="lbl">${t}</span></div>
     ${cloud.owner && IN_CLAUDE ? `<button class="btn sm adm-go" data-a="admEnter" title="Yönetim paneli (yalnızca sen görüyorsun)">${icon("users")}<span>Panel</span></button>` : ""}
+    ${!IN_CLAUDE && !HESAP.yok && HESAP.hazir ? (HESAP.user ? `<a class="btn sm ghost hesap-btn" href="#hesap" aria-label="Hesabım" title="${esc(HESAP.user.eposta)}"><span class="av">${esc((HESAP.user.ad || HESAP.user.eposta || "?").slice(0, 1).toLocaleUpperCase("tr"))}</span></a>` : `<a class="btn sm giris-btn" href="#hesap" aria-label="Giriş yap">${icon("users")}<span>Giriş yap</span></a>`) : ""}
     <button type="button" class="btn sm ghost tema-btn" data-a="temaHizli" aria-label="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}" title="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}">${icon(koyuMu() ? "sun" : "moon")}</button>
     <div class="chip-cd" title="YKS 2027 TYT oturumuna kalan gün"><b>${daysLeft()}</b><span>gün · YKS 2027</span></div>
   </div></header>`;
@@ -5287,9 +5304,7 @@ function vSettings() {
     <p class="small muted">${cloud.state === "cloud" ? "İlerlemen Claude hesabına bağlı ve sana ayrı tutuluyor; aynı hesapla başka cihazdan açtığında kaldığın yerden devam edersin." : "İlerlemen bu tarayıcıda saklanıyor. Cihaz değiştirirken ya da tarayıcı verisini silmeden önce yedek al."}</p>
     ${!IN_CLAUDE ? "" : `<p class="small muted">${cloud.state === "cloud" ? "Çalışma özetin (sitedeki adın, alanın ve hedefin, çözdüğün soru sayısı ve başarın, deneme sonuçların, giriş zamanların, cihaz türün) site yöneticisinin panelinde görünür. Yanlış defterin, kartların, planın ve AI öğretmenle yazışmaların yalnızca sende kalır." : "Siteyi Claude'da açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün site yöneticisine anlık görünebilir."} Ayrıntılar <a href="#kvkk">KVKK Aydınlatma Metni</a>'nde.</p>`}
     <div class="row"><button class="btn" data-a="exportData">Yedeği indir</button><button class="btn" data-a="importAsk">Yedekten geri yükle</button><button class="btn ghost" data-a="resetAsk">Tüm ilerlemeyi sıfırla</button></div></div>
-  ${IN_CLAUDE ? "" : `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p>
-    <p class="small muted">Kodun bu cihazda kayıtlı. Başka bir cihazda kullanmak için AI öğretmen sayfasına aynı kodu girmen yeterli.</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>`
-    : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`}
+  ${hesapOzetKart()}
   <div class="card stack" id="uygulama"><h2>Telefona uygulama gibi ekle</h2>
     <p class="small muted">AKE Akademi'yi ana ekranına eklersen tek dokunuşla, uygulama gibi açılır. Güncellemeler otomatik gelir; yeniden kurman gerekmez.</p>
     <div class="grid2">
@@ -6424,6 +6439,172 @@ Object.assign(OZ_ACT, {
   sesKisa(d) { const k = (UI.kisa || [])[+d.n]; if (k) sesOku(k.n + ". " + k.items.join(". "), "kisa:" + d.n); }
 });
 const OZ_CHG = { sesliMod(el) { SESLI.on = !!el.checked; LS.set("ake.sesli", SESLI.on ? "1" : "0"); render(); } };
+/* ===== Hesap (akeakademi.com): e-posta ya da Google ile giriş, ilerlemenin hesapta saklanması, kodun hesaba bağlanması ===== */
+const HESAP = { hazir: !!(window.claude && typeof window.claude.use === "function"), yok: !!(window.claude && typeof window.claude.use === "function"), user: null, paket: null, kullanim: null, limit: null, ayar: { google: false, eposta: false }, adim: "eposta", eposta: "", busy: false, err: "" };
+async function hesapIstek(path, opt) {
+  const r = await fetch("/api/hesap/" + path, Object.assign({ credentials: "same-origin", headers: { "content-type": "application/json" } }, opt || {}));
+  let j = {}; try { j = await r.json(); } catch (e) { }
+  return { r, j };
+}
+function hesapUygula(j) {
+  if (j.kullanici) HESAP.user = j.kullanici;
+  if ("paket" in j) HESAP.paket = j.paket || null;
+  if (j.kullanim) HESAP.kullanim = j.kullanim;
+  if ("limit" in j) HESAP.limit = j.limit || null;
+  if (j.ayar) HESAP.ayar = j.ayar;
+  if (HESAP.paket) { WEBAI.plan = HESAP.paket.plan; WEBAI.bitis = HESAP.paket.bitis || ""; WEBAI.code = HESAP.paket.kod || WEBAI.code || "hesap"; webAIAc(); }
+  else if (HESAP.user && !HESAP.yok) { AI.fn = null; AI.images = false; }
+}
+/* Hesaptaki veriyi Claude panelindeki gibi alan alan saklar: her alanın en yeni sürümü kazanır */
+const webCol = () => ({
+  async get() {
+    const { r, j } = await hesapIstek("veri");
+    if (r.status === 401) throw { code: "not_granted" };
+    if (!r.ok) throw { code: "network" };
+    return { docs: Object.entries(j.alanlar || {}).map(([id, v]) => ({ id, exists: true, data: () => v })) };
+  },
+  doc(a) {
+    return { async set(o) {
+      const r = await fetch("/api/hesap/veri/" + a, { method: "PUT", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(o) });
+      if (r.status === 401) { HESAP.user = null; throw { code: "not_granted" }; }
+      if (r.status === 413) throw { code: "invalid_argument" };
+      if (r.status === 409) { setTimeout(() => { if (HESAP.user) hesapEsitle(); }, 1500); return; }
+      if (!r.ok) throw { code: "network" };
+    } };
+  }
+});
+async function hesapEsitle() {
+  if (IN_CLAUDE || !HESAP.user) return;
+  cloud.col = webCol(); cloud.writable = null; cloud.state = "loading"; paintSave();
+  try {
+    const snap = await cloud.col.get(), remote = {};
+    snap.docs.forEach(d => { if (d.exists) remote[d.id] = d.data(); });
+    let changed = false;
+    for (const a of Object.keys(AREA)) {
+      const r = remote[a], ru = (r && r._u) || 0, lu = S.upd[a] || 0;
+      if (r && ru > lu) { AREA[a].forEach(k => { if (r[k] !== undefined) S[k] = clone(r[k]); }); S.upd[a] = ru; changed = true; }
+      else if (lu > ru) dirty.add(a);
+    }
+    if (changed) { normalize(); saveLocal(); }
+    cloud.state = "cloud";
+    if (dirty.size) await flush();
+  } catch (e) { cloud.state = "local"; cloud.col = null; }
+  render();
+}
+async function initHesap() {
+  if (IN_CLAUDE) return;
+  try {
+    const { r, j } = await hesapIstek("ben");
+    if (j.ayar) HESAP.ayar = j.ayar;
+    if (r.ok) { hesapUygula(j); HESAP.hazir = true; render(); await hesapEsitle(); }
+    else if (r.status === 401) { AI.fn = null; AI.images = false; }
+    else HESAP.yok = true; /* hesap sunucusu henüz kurulmadı: eski kod sistemi çalışır */
+  } catch (e) { HESAP.yok = true; }
+  HESAP.hazir = true;
+  const h = location.hash || "";
+  if (/giris=ok/.test(h)) { toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor."); history.replaceState(null, "", "#hesap"); }
+  else if (/hata=google/.test(h)) { toast("Google ile giriş tamamlanamadı. Tekrar dene ya da e-postayla giriş yap."); history.replaceState(null, "", "#hesap"); }
+  render();
+}
+async function girisSonrasi(j) {
+  hesapUygula(j);
+  /* Eski sistemde bu cihaza girilmiş kod varsa hesaba bağla */
+  const eski = LS.get("ake.kod");
+  if (!HESAP.paket && eski) { try { const b = await hesapIstek("kod-bagla", { method: "POST", body: JSON.stringify({ kod: eski }) }); if (b.r.ok) hesapUygula(b.j); } catch (e) { } }
+  await hesapEsitle();
+  toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor.");
+}
+const HESAP_HATA = {
+  eposta_gecersiz: "E-posta adresini kontrol et.", bekle: "Yeni kod için 1 dakika bekle.", cok_istek: "Çok fazla deneme yapıldı. Biraz sonra tekrar dene.",
+  kod_gecersiz: "6 haneli kodu yaz.", kod_yanlis: "Kod yanlış. E-postadaki kodu kontrol et.", kod_suresi: "Kodun süresi doldu. Yeni kod iste.", cok_deneme: "Çok fazla yanlış deneme. Yeni kod iste.",
+  eposta: "E-posta gönderilemedi. Adresi kontrol edip tekrar dene.", yapilandirma: "Giriş sistemi henüz ayarlanıyor. Biraz sonra tekrar dene.",
+  kod: "Bu erişim kodu geçerli değil. Harfleri ve tireleri kontrol et.", suresi: "Bu kodun süresi dolmuş. Paketini yenilemek için Paketler sayfasına bak.",
+  baska_hesap: "Bu erişim kodu başka bir hesaba bağlı. Kodlar kişiseldir; bir sorun varsa bize yaz."
+};
+const hesapHata = (j, r) => HESAP_HATA[j && j.error] || (r && r.status >= 500 ? "Sunucuya ulaşılamadı. Biraz sonra tekrar dene." : "Bir sorun oldu. Tekrar dene.");
+
+function girisFormu(kisa) {
+  const H = HESAP;
+  return `${H.ayar.google ? `<a class="btn google" href="/api/hesap/google">${icon("g")}<span>Google ile devam et</span></a><div class="ya-da"><span>ya da e-postayla</span></div>` : ""}
+    ${H.adim === "kod" ? `<form data-s="girisKod" class="stack" style="gap:10px"><p class="small"><b>${esc(H.eposta)}</b> adresine 6 haneli bir kod gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.</p>
+      <div class="row"><input class="in kod-in" name="kod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" aria-label="6 haneli kod" required><button class="btn pri"${H.busy ? " disabled" : ""}>${H.busy ? "Kontrol ediliyor…" : "Giriş yap"}</button></div>
+      <div class="row"><button type="button" class="linkbtn small" data-a="girisGeri">E-postayı değiştir</button><button type="button" class="linkbtn small" data-a="girisTekrar">Kodu yeniden gönder</button></div></form>`
+    : `<form data-s="girisEposta" class="row"><input class="in" name="eposta" type="email" autocomplete="email" placeholder="E-posta adresin" aria-label="E-posta adresi" value="${esc(H.eposta)}" required style="flex:1;min-width:200px"><button class="btn ${H.ayar.google ? "" : "pri"}"${H.busy ? " disabled" : ""}>${H.busy ? "Gönderiliyor…" : "Kod gönder"}</button></form>`}
+    ${H.err ? `<p class="small" style="color:var(--bad)">${esc(H.err)}</p>` : ""}
+    ${kisa ? "" : `<p class="xs muted">Giriş yaparak <a href="#kosullar">Kullanım Koşulları</a>'nı kabul etmiş olursun. Kişisel verilerin <a href="#kvkk">KVKK Aydınlatma Metni</a>'ne göre işlenir.</p>`}`;
+}
+function paketKart() {
+  const H = HESAP, p = H.paket, k = H.kullanim || { mesaj: 0, guclu: 0 }, L = H.limit;
+  return `<div class="card stack"><h2>Paketin</h2>
+    ${p ? `<p><b>${p.plan === "premium" ? "Premium" : "Orta"}</b>${p.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(p.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""}</p>
+      ${L ? `<div class="stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="small">Bu ay AI mesajı</span><span class="small mono">${k.mesaj} / ${L.mesaj}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.mesaj, L.mesaj))}%"></i></div>
+      <div class="row" style="justify-content:space-between"><span class="small">Gelişmiş soru çözümü</span><span class="small mono">${k.guclu} / ${L.guclu}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.guclu, L.guclu))}%"></i></div></div>` : ""}
+      <div class="row"><a class="btn pri" href="#ogretmen">AI öğretmene git</a></div>`
+    : `<p class="muted">Şu an ücretsiz paketi kullanıyorsun. AI öğretmen Orta ve Premium paketlerde var.</p><div class="row"><a class="btn pri" href="#premium">Paketleri incele</a></div>`}
+    <form data-s="kodBagla" class="stack" style="gap:8px;border-top:1px solid var(--line2);padding-top:12px"><b class="small">${p ? "Yeni ya da yenileme kodun mu var?" : "Erişim kodun var mı?"}</b>
+      <div class="row"><input class="in" name="kod" placeholder="AKE-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Erişim kodu" style="flex:1;min-width:200px"><button class="btn"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Hesabıma ekle"}</button></div>
+      ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}<p class="xs muted">Kod hesabına bağlanır; başka bir hesapta kullanılamaz.</p></form></div>`;
+}
+function vHesap() {
+  const H = HESAP;
+  if (IN_CLAUDE || H.yok) return `<div class="view"><div class="vhead"><h1>Hesabım</h1><p>${IN_CLAUDE ? "Bu sürümde ilerlemen Claude hesabına bağlı olarak saklanır." : "Hesap sistemi çok yakında açılıyor. O zamana kadar ilerlemen bu cihazda saklanır; Ayarlar'dan yedek alabilirsin."}</p></div></div>`;
+  if (!H.hazir) return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div><div class="empty">Yükleniyor…</div></div>`;
+  if (!H.user) return `<div class="view"><div class="vhead"><h1>Giriş yap</h1><p>Hesabınla ilerlemen, yanlış defterin ve paketin her cihazda seninle olur. Telefonunu değiştirsen de hiçbir şey kaybolmaz. Hesap açmak ücretsiz.</p></div>
+    <div class="card stack" style="max-width:520px">${girisFormu()}</div></div>`;
+  const [, st] = saveLabel();
+  return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>
+    <div class="card stack"><h2>${esc(H.user.ad || "Hesap bilgilerin")}</h2><p><b>E-posta:</b> ${esc(H.user.eposta)}</p><p class="small muted"><b>Kayıt:</b> ${esc(st)}. Çalışma verilerin hesabında saklanır ve giriş yaptığın her cihazda eşitlenir.</p>
+      <div class="row"><button class="btn" data-a="cikis">Çıkış yap</button><button class="btn ghost" data-a="hesapSilAsk">Hesabımı sil</button></div></div>
+    ${paketKart()}</div>`;
+}
+function hesapOzetKart() {
+  if (IN_CLAUDE) return "";
+  const H = HESAP;
+  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
+  return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${H.paket.plan === "premium" ? "Premium" : "Orta"} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
+    : `<p class="small muted">Giriş yaparsan ilerlemen hesabında saklanır ve telefonunu değiştirsen de kaybolmaz.</p><div class="row"><a class="btn pri" href="#hesap">Giriş yap</a></div>`}</div>`;
+}
+/* AI öğretmen kapısı (web) */
+function tutorGirisKapisi() {
+  if (HESAP.yok) return null;
+  if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
+  if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Orta ve Premium</span><h2>AI öğretmen için giriş yap</h2>
+    <p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularını bilen AI öğretmen paketlerle açılır. Önce giriş yap; paket kodun hesabına bağlanır.</p>${girisFormu(true)}<a class="btn ghost" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
+  if (!HESAP.paket) return paketKart();
+  return null;
+}
+
+Object.assign(OZ_ACT, {
+  girisGeri() { HESAP.adim = "eposta"; HESAP.err = ""; render(); },
+  async girisTekrar() { if (HESAP.busy || !HESAP.eposta) return; HESAP.busy = true; HESAP.err = ""; render(); const { r, j } = await hesapIstek("kod-gonder", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta }) }).catch(() => ({ r: { status: 0 }, j: {} })); HESAP.busy = false; if (r.ok) toast("Yeni kod gönderildi."); else HESAP.err = hesapHata(j, r); render(); },
+  async cikis() { try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } HESAP.user = null; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
+  hesapSilAsk() { openModal("Hesabın silinsin mi?", "<p>Hesabın ve hesabında saklanan tüm çalışma verilerin kalıcı olarak silinir. Bu cihazdaki kopya silinmez. Hesabına bağlı paket kodu başka hesapta kullanılamaz hâle gelir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Hesabımı sil", a: "hesapSilGo", k: "pri" }]); },
+  async hesapSilGo() { UI.modal = null; const { r } = await hesapIstek("sil", { method: "POST" }).catch(() => ({ r: { ok: false } })); if (!r.ok) { toast("Hesap silinemedi. Tekrar dene."); render(); return; } HESAP.user = null; HESAP.paket = null; cloud.col = null; cloud.state = "local"; AI.fn = null; render(); toast("Hesabın silindi."); }
+});
+const HESAP_SUB = {
+  async girisEposta(fd) {
+    const e = String(fd.get("eposta") || "").trim(); if (!e || HESAP.busy) return;
+    HESAP.busy = true; HESAP.err = ""; HESAP.eposta = e; render();
+    const { r, j } = await hesapIstek("kod-gonder", { method: "POST", body: JSON.stringify({ eposta: e }) }).catch(() => ({ r: { status: 0 }, j: {} }));
+    HESAP.busy = false; if (r.ok) HESAP.adim = "kod"; else HESAP.err = hesapHata(j, r); render();
+    if (r.ok) { const el = document.querySelector(".kod-in"); if (el) el.focus(); }
+  },
+  async girisKod(fd) {
+    const k = String(fd.get("kod") || "").replace(/\D/g, ""); if (k.length !== 6 || HESAP.busy) { HESAP.err = HESAP_HATA.kod_gecersiz; render(); return; }
+    HESAP.busy = true; HESAP.err = ""; render();
+    const { r, j } = await hesapIstek("kod-dogrula", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta, kod: k }) }).catch(() => ({ r: { status: 0 }, j: {} }));
+    HESAP.busy = false;
+    if (r.ok) { HESAP.adim = "eposta"; await girisSonrasi(j); } else { HESAP.err = hesapHata(j, r); render(); }
+  },
+  async kodBagla(fd) {
+    const k = String(fd.get("kod") || "").trim(); if (!k || UI.kodBusy) return;
+    UI.kodBusy = true; UI.kodErr = ""; render();
+    const { r, j } = await hesapIstek("kod-bagla", { method: "POST", body: JSON.stringify({ kod: k }) }).catch(() => ({ r: { status: 0 }, j: {} }));
+    UI.kodBusy = false;
+    if (r.ok) { hesapUygula(j); LS.del("ake.kod"); toast("Paketin hesabına eklendi. AI öğretmen açıldı."); } else UI.kodErr = hesapHata(j, r);
+    render();
+  }
+};
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -6439,6 +6620,7 @@ Object.assign(IC, {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/>',
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
+if (!IN_CLAUDE) NAVG[2][1].unshift(["hesap", "Hesabım", "users"]);
 NAVG[2][1].push(["premium", "Paketler", "star"], ["yasal", "Yasal metinler", "doc"]);
 
 function premNote(orig, feat, cls) {
@@ -6447,6 +6629,7 @@ function premNote(orig, feat, cls) {
   return `<p class="${c}">${feat} AKE Akademi Premium ile açılıyor. <a href="#premium">Premium'u incele →</a></p>`;
 }
 function tutorOff() {
+  const kapi = !IN_CLAUDE && tutorGirisKapisi(); if (kapi) return kapi;
   if (IN_CLAUDE) return `<div class="card"><h2>AI öğretmen şu an kapalı</h2><p class="muted" style="margin-top:8px">Bu bölüm Claude ile çalışır. Sayfayı Claude hesabınla açtığında ilk soruda izin istenir. İzin vermezsen ya da hesabında Claude kullanılamıyorsa diğer tüm bölümler çalışmaya devam eder.</p></div>`;
   return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Orta ve Premium</span><h2>AI öğretmen paketlerle açılıyor</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen Orta ve Premium paketlerde var. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor.</p>
     <form data-s="aiKod" class="row"><input class="in" name="kod" placeholder="Erişim kodun" autocomplete="off" autocapitalize="characters" spellcheck="false" style="max-width:240px" aria-label="Erişim kodu"><button class="btn pri"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Kodu etkinleştir"}</button></form>
@@ -6504,7 +6687,7 @@ const LEGAL = {
   "kvkk": { t: "KVKK Aydınlatma Metni", d: "Kişisel verilerinin nasıl işlendiği ve hakların", h: () => `
     <p><b>Veri sorumlusu:</b> ${ay("adSoyad", "AD SOYAD")} ("AKE Akademi"), Adres: ${ay("adres", "ADRES")}, E-posta: ${ay("eposta", "E-POSTA")}</p>
     <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, AKE Akademi internet sitesi ve uygulaması ("Site") kullanıcılarının kişisel verilerinin nasıl işlendiğini aşağıda açıklıyoruz.</p>
-    ${IN_CLAUDE ? "" : `<p class="note">Şu an Site'de üyelik yoktur. Profil bilgilerin, çözdüğün sorular, denemelerin, odak süren ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
+    ${IN_CLAUDE ? "" : `<p class="note">Site'yi hesap açmadan kullanırsan profil bilgilerin, çözdüğün sorular, denemelerin, odak süren ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. Hesap açarsan e-posta adresin (Google ile girersen Google hesabındaki adın ve hesap kimliğin), bu çalışma verilerin, aylık AI kullanım sayıların ve hesabına bağlanan paket kodun, hesabını her cihazda kullanabilmen için sunucumuzda (${ay("barindirma", "BARINDIRMA")}) saklanır. Giriş kodları e-posta gönderim hizmeti (Resend) aracılığıyla gönderilir. Hesabını Hesabım sayfasından istediğin zaman silebilirsin; silindiğinde hesabındaki çalışma verilerin kalıcı olarak silinir. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
     ${!IN_CLAUDE ? "" : `<p class="note">Şu an Site'de ücretli üyelik yoktur. Site'yi Claude hesabınla açtığında ve hesabına kayıt iznin olduğunda ilerlemen, yalnızca sana açık ayrı bir alanda saklanır. Bu durumda çalışma özetin (Site'de yazdığın ad, alanın ve hedefin, çözdüğün soru sayısı ve başarı oranın, deneme sonuçların, giriş zamanların, gezdiğin bölümler, cihaz ve tarayıcı türün) ile Claude hesabındaki adın Site yöneticisinin panelinde görünür. Yanlış defterin, tekrar kartların, çalışma planın ve AI öğretmenle yazışmaların yöneticiye gönderilmez. Kayıt iznin yoksa ilerlemen yalnızca kendi tarayıcında saklanır; Site'yi açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün yöneticiye anlık görünebilir. Aşağıda sayılan üyelik ve ödeme verileri bu özellikler açıldığında işlenecektir.</p>`}
     <h2>İşlenen kişisel veriler</h2>
     <ul><li><b>Kimlik:</b> ad, soyad</li><li><b>İletişim:</b> e-posta adresi, varsa telefon numarası</li><li><b>Müşteri işlem:</b> abonelik planı, ödeme tarihi ve tutarı, fatura bilgileri. Kart bilgilerin bizde tutulmaz, doğrudan ödeme kuruluşu tarafından işlenir.</li><li><b>Kullanım:</b> çalışılan dersler, deneme sonuçları, ilerleme kayıtları, AI öğretmene yazdığın sorular ve aldığın cevaplar</li><li><b>İşlem güvenliği:</b> IP adresi, giriş kayıtları, cihaz ve tarayıcı bilgisi</li></ul>
@@ -6621,9 +6804,9 @@ function siteFoot() {
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa });
+Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
-function route() { const h = decodeURIComponent((location.hash || "").slice(1)); return ROUTES[h] ? h : "bugun"; }
+function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;
   if (adminMode()) APP.innerHTML = vAdminShell();
@@ -6993,6 +7176,7 @@ window.addEventListener("appinstalled", () => { UI.installEvt = null; render(); 
 ACT.installApp = async () => { const e = UI.installEvt; if (!e) return; UI.installEvt = null; try { e.prompt(); await e.userChoice; } catch (x) { } render(); };
 Object.assign(SUB, {
   async aiKod(fd) {
+    if (!HESAP.yok) { if (HESAP.user) return HESAP_SUB.kodBagla(fd); toast("Önce giriş yap; kodun hesabına bağlanacak."); go("hesap"); return; }
     const code = String(fd.get("kod") || "").trim().toUpperCase(); if (!code || UI.kodBusy) return;
     UI.kodBusy = true; UI.kodErr = ""; render();
     try {
@@ -7006,7 +7190,7 @@ Object.assign(SUB, {
 });
 ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
 ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
-Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
+Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(SUB, HESAP_SUB); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */
 APP.addEventListener("click", e => {
@@ -7040,6 +7224,7 @@ if (RUN && RUN.dur && RUN.mode === "exam" && RUN.start + RUN.dur * 1000 <= Date.
 else { render(); if (RUN) startTick(); }
 initCloud();
 initAI();
+initHesap();
 initRoom();
 
 

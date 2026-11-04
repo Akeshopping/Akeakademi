@@ -24,5 +24,5 @@ window.AKE_AYAR = {
   linkPremiumYil: "https://www.shopier.com/AKESHOPPING/52547986",
   yapayZeka: "",      // AI sağlayıcısı (boşsa "Anthropic (Claude)" yazar)
   barindirma: "Cloudflare",
-  guncelleme: "4 Kasım 2026"  // Yasal metinlerin son güncelleme tarihi
+  guncelleme: "5 Kasım 2026"  // Yasal metinlerin son güncelleme tarihi
 };

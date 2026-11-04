@@ -3,28 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı.">
+<meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest?v=6d9394b5a2">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=6d9394b5a2">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=6d9394b5a2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
-<meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png">
+<meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=6d9394b5a2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
 <meta property="og:locale" content="tr_TR">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://akeakademi.com/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AKE Akademi","url":"https://akeakademi.com/","inLanguage":"tr","description":"YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AKE Akademi","url":"https://akeakademi.com/","inLanguage":"tr","description":"YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı."}</script>
 <title>AKE Akademi</title>
 <script src="/ayar.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,11 +94,14 @@ sup,sub{font-size:.72em}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top-in{display:flex;align-items:center;gap:12px;height:58px;max-width:1240px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
-.brand-mark{display:grid;grid-template-columns:repeat(5,7px);gap:2.5px}
-.brand-mark i{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--c1)}
-.brand-mark i.f{background:radial-gradient(circle at 34% 30%,#9fe6ff 0%,#2a6bff 58%,#1747d6 100%);border-color:transparent;box-shadow:0 0 8px rgba(31,91,255,.45)}
-.brand b{font:900 18px/1 var(--f-disp);letter-spacing:.02em;white-space:nowrap}
-.brand b span{background:var(--wm);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* logo: kömür siyahı kare içinde yükselen eğri; yazı: AKE kalın, Akademi ince */
+.logo-tile{flex:none;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:28%;overflow:hidden;
+  background:radial-gradient(120% 120% at 88% 6%,rgba(42,99,255,.85) 0%,rgba(42,99,255,0) 58%),radial-gradient(90% 90% at 0% 100%,rgba(0,217,163,.22),rgba(0,217,163,0) 60%),#0e111c;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 5px 14px -6px rgba(31,91,255,.6)}
+.logo-tile.lg2{background:radial-gradient(130% 130% at 30% -10%,#7aa3ff 0%,#2a63ff 50%,#1544c9 100%)}
+.logo-tile svg{width:100%;height:100%;display:block}
+.brand .wm,.wm{font:800 19px/1 var(--f-disp);letter-spacing:-.012em;white-space:nowrap;color:var(--ink)}
+.wm span{font-weight:500}
 .top-sp{flex:1}
 .chip-cd{display:flex;align-items:baseline;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sunk);white-space:nowrap}
 .chip-cd b{font:800 15px/1 var(--f-disp);color:var(--form)}
@@ -135,7 +138,7 @@ main{min-width:0;padding-block:24px 64px}
   .tabbar .on{color:var(--ink)}
   .tabbar .on svg{color:var(--form)}
 }
-@media (max-width:420px){.chip-cd span{display:none}.brand b{font-size:15px}}
+@media (max-width:420px){.chip-cd span{display:none}.brand .wm{font-size:17px}.logo-tile{width:30px;height:30px}}
 
 /* ---------- yüzeyler ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);min-width:0}
@@ -422,24 +425,50 @@ code.kod{font:700 14px/1 var(--f-mono);letter-spacing:.14em;background:var(--for
 @media (max-width:440px){.giris-btn span{display:none}.giris-btn{padding:6px 8px}.top-in{gap:8px}}
 .hesap-btn .av{width:28px;height:28px;border-radius:50%;background:var(--form);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
 /* ---------- giriş efekti: optik form kutucukları dolar, logo belirir, sayfa açılır ---------- */
-#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#0b0c12;overflow:hidden;cursor:pointer;animation:introOut .55s cubic-bezier(.7,0,.3,1) 1.75s forwards}
-#intro::before{content:"";position:absolute;inset:0;background:radial-gradient(48vmax 34vmax at 50% 46%,rgba(31,91,255,.34),transparent 65%),radial-gradient(40vmax 30vmax at 85% 100%,rgba(0,217,163,.10),transparent 65%);animation:introNefes 2.2s ease-in-out both}
-#intro .arc{position:absolute;inset:0;width:100%;height:100%}
-#intro .arc path{fill:none;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:introCiz 1.25s cubic-bezier(.5,0,.2,1) .1s forwards}
-#intro .ic{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
-#intro .ib{display:flex;gap:12px}
-#intro .ib i{flex:none;width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.85);opacity:0;transform:scale(.4);animation:introBub .35s cubic-bezier(.2,1.4,.4,1) forwards}
-#intro .ib i:nth-child(1){animation-delay:.05s}#intro .ib i:nth-child(2){animation-delay:.13s}#intro .ib i:nth-child(3){animation-delay:.21s}#intro .ib i:nth-child(4){animation-delay:.29s}#intro .ib i:nth-child(5){animation-delay:.37s}
-#intro .ib i.f::after{content:"";display:block;width:100%;height:100%;border-radius:50%;background:#fff;transform:scale(0);animation:introFill .3s ease-out .75s forwards}
-#intro .wm{font:900 clamp(34px,9vw,58px)/1 var(--f-disp);color:#fff;letter-spacing:.03em;display:flex;gap:.28em;opacity:0;transform:translateY(14px);animation:introUp .5s cubic-bezier(.2,.9,.3,1) .9s forwards}
-#intro .wm span{background:linear-gradient(180deg,#b9d0ff 0%,#5b8cff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-#intro .tg{font:600 15px/1 var(--f-body);color:rgba(255,255,255,.75);letter-spacing:.06em;opacity:0;animation:introUp .5s ease 1.15s forwards}
-@keyframes introBub{to{opacity:1;transform:scale(1)}}
-@keyframes introFill{to{transform:scale(1)}}
-@keyframes introUp{to{opacity:1;transform:none}}
-@keyframes introNefes{0%{opacity:0;transform:scale(.92)}60%{opacity:1}100%{opacity:1;transform:scale(1.04)}}
-@keyframes introCiz{to{stroke-dashoffset:0}}
-@keyframes introOut{to{opacity:0;transform:scale(1.06);visibility:hidden}}
+#intro{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;--t:clamp(88px,24vw,116px);--fs:clamp(36px,9vw,58px);-webkit-tap-highlight-color:transparent}
+#intro .izemin{position:absolute;inset:0;transition:opacity .6s cubic-bezier(.4,0,.2,1) .1s}
+#intro .ibg{position:absolute;inset:0;background:radial-gradient(130% 95% at 50% 50%,#0d0f19 0%,#07080d 62%,#030407 100%)}
+#intro .ibl{position:absolute;inset:0;opacity:0;background:radial-gradient(44vmax 34vmax at 50% 50%,rgba(31,91,255,.30) 0%,rgba(31,91,255,.13) 38%,rgba(31,91,255,.04) 62%,transparent 80%),radial-gradient(34vmax 24vmax at 84% 98%,rgba(0,217,163,.10),transparent 66%),radial-gradient(30vmax 22vmax at 12% 6%,rgba(0,184,255,.07),transparent 66%);animation:inBloom 1.8s cubic-bezier(.2,.7,.2,1) forwards}
+#intro svg.ia{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#intro .ia path{fill:none;stroke-linecap:round}
+#intro .ihead{opacity:0}
+#intro .iburst,#intro .iring{position:absolute;left:50%;top:50%;width:calc(var(--t)*1.5);height:calc(var(--t)*1.5);margin:calc(var(--t)*-.75) 0 0 calc(var(--t)*-.75);border-radius:50%;opacity:0;pointer-events:none}
+#intro .iburst{background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(140,180,255,.55) 35%,rgba(31,91,255,0) 100%)}
+#intro .iring{border:1.5px solid rgba(140,180,255,.7);box-shadow:0 0 24px rgba(31,91,255,.5),inset 0 0 18px rgba(31,91,255,.35)}
+#intro .ilg{position:absolute;left:50%;top:50%;width:var(--t);height:var(--t);margin:calc(var(--t)/-2) 0 0 calc(var(--t)/-2);opacity:0;will-change:transform}
+#intro .ilg .logo-tile{position:relative;width:100%;height:100%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 26px 70px -20px rgba(31,91,255,.95),0 0 0 1px rgba(31,91,255,.25)}
+#intro .ilg .lg-egri{stroke-dasharray:1;stroke-dashoffset:1}
+#intro .ilg .lg-nokta,#intro .ilg .lg-hale{transform-box:fill-box;transform-origin:center;transform:scale(0)}
+#intro .ishine{position:absolute;inset:-20%;background:linear-gradient(112deg,transparent 38%,rgba(255,255,255,.32) 50%,transparent 62%);transform:translateX(-120%);pointer-events:none}
+#intro .iyazi{transition:opacity .25s ease}
+#intro .iwm{position:absolute;left:0;right:0;top:calc(50% + var(--t)/2 + 28px);text-align:center;font:800 var(--fs)/1.08 var(--f-disp);letter-spacing:-.02em;color:#fff;white-space:nowrap}
+#intro .iwm .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding:0 .02em .1em}
+#intro .iwm .w2{font-weight:500;color:#dfe8ff}
+#intro .iwm i{display:inline-block;font-style:normal;transform:translateY(112%)}
+#intro .itg{position:absolute;left:0;right:0;top:calc(50% + var(--t)/2 + 28px + var(--fs)*1.2 + 16px);text-align:center;font:600 12.5px/1 var(--f-body);letter-spacing:.5em;text-transform:uppercase;color:rgba(206,219,255,.72);opacity:0}
+#intro.indi .ilg{animation:inTile .75s cubic-bezier(.2,.9,.25,1.1) forwards}
+#intro.indi .ilg .lg-egri{animation:inCiz .6s cubic-bezier(.55,0,.2,1) .16s forwards}
+#intro.indi .ilg .lg-nokta{animation:inPop .5s cubic-bezier(.2,1.7,.4,1) .58s forwards}
+#intro.indi .ilg .lg-hale{animation:inPop .8s cubic-bezier(.2,.8,.2,1) .62s forwards}
+#intro.indi .iburst{animation:inBurst .7s cubic-bezier(.2,.7,.3,1) forwards}
+#intro.indi .iring{animation:inRing 1.1s cubic-bezier(.15,.75,.25,1) .04s forwards}
+#intro.indi .iwm i{animation:inHarf .75s cubic-bezier(.16,1,.3,1) calc(.32s + var(--i)*38ms) forwards}
+#intro.indi .itg{animation:inTg 1s cubic-bezier(.2,.7,.2,1) .8s forwards}
+#intro.indi .ishine{animation:inShine 1s cubic-bezier(.45,0,.25,1) .95s forwards}
+#intro.indi svg.ia{animation:inSon 1.3s ease .15s forwards}
+#intro.cik{pointer-events:none}
+#intro.cik .izemin,#intro.cik .iyazi{opacity:0}
+.intro-ucus .top .brand .logo-tile{visibility:hidden}
+@keyframes inBloom{0%{opacity:0;transform:scale(.88)}100%{opacity:1;transform:scale(1)}}
+@keyframes inTile{0%{opacity:0;transform:scale(.45);filter:blur(16px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:scale(1);filter:none}}
+@keyframes inCiz{to{stroke-dashoffset:0}}
+@keyframes inPop{to{transform:scale(1)}}
+@keyframes inBurst{0%{opacity:0;transform:scale(.15)}22%{opacity:1}100%{opacity:0;transform:scale(1.9)}}
+@keyframes inRing{0%{opacity:.95;transform:scale(.3)}100%{opacity:0;transform:scale(2.9)}}
+@keyframes inHarf{to{transform:none}}
+@keyframes inTg{0%{opacity:0;letter-spacing:.55em}100%{opacity:1;letter-spacing:.28em}}
+@keyframes inShine{to{transform:translateX(120%)}}
+@keyframes inSon{to{opacity:.18}}
 @media (prefers-reduced-motion:reduce){#intro{display:none}}
 .mtag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
 .msg .att{font-size:12px;opacity:.75;margin-bottom:4px}
@@ -5018,6 +5047,15 @@ const IC = {
   okul: '<path d="M2.5 9.5 12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6V16c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.4M21.5 9.5V15"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
+/* ---------- logo: "Yükseliş" — doğru cevaba yükselen eğri ve işaretlenmiş kutucuk (LOGO_NO ile 2 ya da 3'e geçilir) ---------- */
+const LOGO_NO = 1;
+const LOGO_V = {
+  1: id => `<svg viewBox="0 0 48 48"><defs><linearGradient id="${id}l" x1="10" y1="36" x2="34" y2="15" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2f66ff"/><stop offset="1" stop-color="#4fd2ff"/></linearGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><circle class="lg-hale" cx="34.6" cy="14.8" r="10" fill="url(#${id}g)"/><path class="lg-egri" pathLength="1" d="M11 35.6C19.6 35.6 23.4 21.6 30.6 16.9" fill="none" stroke="url(#${id}l)" stroke-width="3.6" stroke-linecap="round"/><circle class="lg-nokta" cx="34.6" cy="14.8" r="4.7" fill="#fff"/></svg>`,
+  2: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path class="lg-egri" pathLength="1" d="M13.2 36.2 24 12.2l10.8 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-hale" cx="24" cy="28.6" r="8" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="28.6" r="3.7" fill="#bff3ff"/></svg>`,
+  3: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}f" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b9efff"/><stop offset=".55" stop-color="#2f6bff"/><stop offset="1" stop-color="#1747d6"/></radialGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#3f7bff" stop-opacity=".7"/><stop offset="1" stop-color="#3f7bff" stop-opacity="0"/></radialGradient></defs><circle class="lg-egri" cx="12.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-egri" cx="35.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-hale" cx="24" cy="24" r="13" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="24" r="7" fill="url(#${id}f)"/></svg>`
+};
+const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}</span>`;
+const WORDMARK = `<b class="wm">AKE <span>Akademi</span></b>`;
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const NAVG = [
   ["Çalış", [["bugun", "Ana sayfa", "home"], ["studyo", "Soru çöz", "stack"], ["deneme", "Denemeler", "clock"], ["ogretmen", "AI öğretmen", "spark"]]],
@@ -5040,7 +5078,7 @@ function navHTML(r) {
 function header() {
   const [c, t] = saveLabel();
   return `<header class="top"><div class="top-in">
-    <a class="brand" href="#bugun" aria-label="AKE Akademi ana sayfa"><span class="brand-mark" aria-hidden="true"><i></i><i class="f"></i><i></i><i></i><i></i></span><b>AKE <span>AKADEMİ</span></b></a>
+    <a class="brand" href="#bugun" aria-label="AKE Akademi ana sayfa">${logoTile("hl")}${WORDMARK}</a>
     <div class="top-sp"></div>
     <div id="savest" class="save ${c}" title="${t}"><i></i><span class="lbl">${t}</span></div>
     ${cloud.owner && IN_CLAUDE ? `<button class="btn sm adm-go" data-a="admEnter" title="Yönetim paneli (yalnızca sen görüyorsun)">${icon("users")}<span>Panel</span></button>` : ""}
@@ -5806,7 +5844,7 @@ function vAdminShell() {
   } catch (e) { console.error(e); body = `<div class="view"><div class="card"><h2>Bu bölüm açılamadı</h2><p class="muted" style="margin-top:8px">Sayfayı yenilemeyi dene.</p></div></div>`; }
   const live = admLive().filter(p => !p.isMe).length;
   return `<header class="top"><div class="top-in adm-in">
-    <span class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i class="f"></i><i></i><i></i><i></i></span><b>AKE <span>YÖNETİM</span></b></span>
+    <span class="brand">${logoTile("al")}<b class="wm">AKE <span>Yönetim</span></b></span>
     <div class="top-sp"></div>${live ? `<span class="pill ok">${live} kişi sitede</span>` : ""}
     <button class="btn sm" data-a="admExit" title="Öğrenci uygulamasına dön">${icon("home")}<span class="adm-hide">Uygulamaya dön</span></button></div></header>
   <div class="adm-wrap"><nav class="adm-tabs" aria-label="Yönetim bölümleri">${ADM_TABS.map(([k, l, ic]) => { const on = !ADM.sel && t === k; return `<button type="button" class="${on ? "on" : ""}" data-a="admTab" data-k="${k}"${on ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span></button>`; }).join("")}</nav>
@@ -6731,7 +6769,7 @@ function vYonetim() {
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
         : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
     ${soruBolumu()}`}
-    ${canliYonetim()}
+    ${canliYonetim()}${hataYonetim()}
   </div>`;
 }
 async function yonIstek(path, body) {
@@ -7005,7 +7043,7 @@ function canliKart(ev) {
 function canliSatir(d) {
   const now = Date.now(), dur = now < d.baslangic ? "yakinda" : now < d.bitis ? "acik" : "bitti", busy = SOS.busy === "katil:" + d.id;
   let pill, btn = "";
-  if (dur === "yakinda") pill = `<span class="pill">${kalanYazi(d.baslangic - now)} sonra</span>`;
+  if (dur === "yakinda") { pill = `<span class="pill">${kalanYazi(d.baslangic - now)} sonra</span>`; btn = `<button class="btn sm ghost" data-a="canliTakvim" data-id="${esc(d.id)}">${icon("cal")} Takvime ekle</button>`; }
   else if (dur === "acik") {
     pill = `<span class="pill ok">Şu an açık</span>`;
     btn = d.benim ? `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">Gönderildi</button>` : !sosAktif() ? `<a class="btn sm pri" href="#hesap">Katılmak için giriş yap</a>` : `<button class="btn sm pri" data-a="canliKatil" data-id="${esc(d.id)}"${busy ? " disabled" : ""}>${busy ? "Açılıyor…" : "Katıl"}</button>`;
@@ -7251,6 +7289,45 @@ const SOS_SUB = {
       { baslik: fd.get("baslik"), bas: fd.get("bas"), sure: fd.get("sure") });
   }
 };
+/* ---------- site hata kaydı: beklenmeyen hatalar yöneticiye iletilir (kişisel veri gönderilmez) ---------- */
+const HATA = { n: 0, gor: new Set() };
+function hataBildir(m, s, l) {
+  if (IN_CLAUDE || HATA.n >= 5) return;
+  m = String(m || "").slice(0, 300);
+  if (!m || HATA.gor.has(m) || /ResizeObserver loop|^Script error\.?$|Load failed|NetworkError|Failed to fetch/i.test(m)) return;
+  HATA.gor.add(m); HATA.n++;
+  try { fetch("/api/hata", { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ m, s: String(s || "").replace(location.origin, "").slice(-160), l: l || 0, p: (() => { try { return route(); } catch (e) { return ""; } })(), c: (() => { try { return devStr(DEV); } catch (e) { return ""; } })() }) }).catch(() => { }); } catch (e) { }
+}
+window.addEventListener("error", e => { if (e && e.message) hataBildir(e.message, e.filename, e.lineno); });
+window.addEventListener("unhandledrejection", e => { const r = e && e.reason; if (!r || r.code) return; hataBildir("Söz (promise): " + (r.message || String(r)), r.stack ? String(r.stack).split("\n")[1] : "", 0); });
+async function hataYukle() {
+  if (SOS.t.hata_b) return; SOS.t.hata_b = 1;
+  try { const r = await fetch("/api/hata", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); SOS.hata = r.ok ? j : { hatalar: [], hata: j.message || "Hata listesi alınamadı." }; } catch (e) { SOS.hata = { hatalar: [], hata: "Bağlantı kurulamadı." }; }
+  SOS.t.hata = Date.now(); SOS.t.hata_b = 0; render();
+}
+function hataYonetim() {
+  if (!SOS.t.hata_b && (!SOS.hata || Date.now() - (SOS.t.hata || 0) > 120000)) setTimeout(hataYukle, 0);
+  const H = SOS.hata, L = H && H.hatalar || [];
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Site hataları</h2><div class="row">${L.length ? `<button class="btn sm ghost" data-a="hataTemizle">Temizle</button>` : ""}<button class="btn sm ghost" data-a="hataYenile">Yenile</button></div></div>
+    <p class="small muted">Ziyaretçilerin tarayıcısında oluşan beklenmeyen hatalar burada toplanır; kişisel bilgi gönderilmez. Bir hata sık tekrarlanıyorsa mesajını bana ilet, düzelteyim.</p>
+    ${H && H.hata ? `<p class="note">${esc(H.hata)}</p>` : ""}
+    ${L.length ? `<div class="list">${L.map(h => `<div class="li mli"><div class="grow"><div class="t small" style="font-family:var(--f-mono);word-break:break-word">${esc(h.mesaj)}</div><div class="s">${esc(h.sayfa || "—")} · ${esc(h.cihaz || "")} · son ${saatYazi(h.son)}${h.kaynak ? ` · ${esc(h.kaynak)}` : ""}</div></div><span class="pill ${h.sayi >= 5 ? "bad" : ""}">${fmtN(h.sayi)} kez</span></div>`).join("")}</div>` : `<div class="empty">${H ? "Kayıtlı hata yok. Her şey yolunda." : "Yükleniyor…"}</div>`}</div>`;
+}
+const icsMetin = s => String(s || "").replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
+Object.assign(SOS_ACT, {
+  hataYenile() { SOS.hata = null; hataYukle(); },
+  async hataTemizle() { try { await fetch("/api/hata/temizle", { method: "POST", credentials: "same-origin" }); } catch (e) { } SOS.hata = null; hataYukle(); },
+  canliTakvim(d) {
+    const c = SOS.canli && (SOS.canli.denemeler || []).find(x => x.id === d.id); if (!c) return;
+    const f = ms => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//AKE Akademi//Canli Deneme//TR", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT", `UID:${c.id}@akeakademi.com`, `DTSTAMP:${f(Date.now())}`, `DTSTART:${f(c.baslangic)}`, `DTEND:${f(c.bitis)}`,
+      `SUMMARY:${icsMetin("AKE Akademi canlı deneme: " + c.baslik)}`, `DESCRIPTION:${icsMetin(`${c.adet} soru, ${c.sure} dakika. Katılmak için akeakademi.com > Denemeler`)}`, "URL:https://akeakademi.com/#deneme",
+      "BEGIN:VALARM", "TRIGGER:-PT15M", "ACTION:DISPLAY", `DESCRIPTION:${icsMetin("Canlı deneme 15 dakika sonra başlıyor")}`, "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" })), a = document.createElement("a");
+    a.href = url; a.download = "ake-canli-deneme.ics"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast("Takvim dosyası indirildi. Açtığında deneme, 15 dakika önceden hatırlatmalı olarak takvimine eklenir.");
+  }
+});
 /* Odak sayacı değişince odak odasını güncelle */
 ["pomoBasla", "pomoDur", "pomoSifirla", "pomoMod"].forEach(k => { const f = OZ_ACT[k]; if (f) OZ_ACT[k] = function () { const r = f.apply(this, arguments); odaGuncelle(); return r; }; });
 Object.assign(OZ_ACT, SOS_ACT); Object.assign(OZ_CHG, SOS_CHG);
@@ -7292,7 +7369,7 @@ const tl = v => { const n = Number(String(v || "").replace(/[^\d]/g, "")); retur
 const okLink = u => /^https:\/\/\S+$/i.test(String(u || ""));
 function planlar() {
   return [
-    { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Paragraf atölyesi", "Yanlış defteri ve tekrar kartları", "Çalışma planı ve gelişim takibi"] },
+    { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Canlı denemeler ve Türkiye sıralaması", "Arkadaş ligi ve odak odası", "Yanlış defteri, tekrar kartları ve paragraf atölyesi", "Çalışma planı, gelişim takibi ve sınıf paneli"] },
     { k: "orta", n: "Orta", tag: "dengeli", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
       feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
     { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },
@@ -7322,10 +7399,10 @@ function vPremium() {
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="a"${UI.prem.a ? " checked" : ""}><span><a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nu ve <a href="#mesafeli">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.</span></label>
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
       <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
-      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine ya da telefonuna en geç 24 saat içinde gönderilir; kodu AI öğretmen sayfasına girmen yeterli. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
+      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine birkaç dakika içinde otomatik gönderilir (en geç 24 saat). Siteye aynı e-postayla giriş yaptığında paket hesabına kendiliğinden tanımlanır; kodu Hesabım sayfasından da girebilirsin. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
     </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
-    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, denemeler ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
+    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
     <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık${(() => { const a = Number(String(AYAR.fiyatOrta).replace(/[^\d]/g, "")), y = Number(String(AYAR.yillikOrta).replace(/[^\d]/g, "")), f = a && y ? 12 - y / a : 0; return f >= 0.95 && Math.abs(f - Math.round(f)) < 0.05 ? " · " + Math.round(f) + " ay bedava" : ""; })()}</button></div>
     <div class="grid3 plans">${P.map(kart).join("")}</div>
     ${buy}
@@ -7398,7 +7475,7 @@ const LEGAL = {
     <h2>Süre ve yenileme</h2>
     <p>Paket, seçtiğin süre (1 ay için 30 gün, 1 yıl için 365 gün) boyunca geçerlidir; süre erişim kodunun gönderildiği gün başlar. Paket kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. Süre bitince devam etmek istersen yeniden satın alırsın.</p>
     <h2>Teslim</h2>
-    <p>Ödemen onaylandıktan sonra en geç 24 saat içinde, ödeme sırasında bildirdiğin e-posta adresine ya da telefonuna bir erişim kodu gönderilir. Hizmet, bu kodu Site'deki AI öğretmen sayfasına girmenle kullanıma açılır. Fiziksel teslimat yoktur.</p>
+    <p>Ödemen onaylandıktan sonra, ödeme sırasında bildirdiğin e-posta adresine erişim kodu otomatik olarak gönderilir; bu genellikle birkaç dakika sürer, en geç 24 saattir. Site'ye aynı e-posta adresiyle giriş yaptığında paket hesabına kendiliğinden tanımlanır; kodu Hesabım sayfasına girerek de kullanıma açabilirsin. Fiziksel teslimat yoktur.</p>
     <h2>Cayma hakkı</h2>
     <p>Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca, elektronik ortamda anında ifa edilen hizmetlerde ve cayma süresi bitmeden tüketicinin onayıyla ifasına başlanan hizmetlerde cayma hakkı kullanılamaz. Ödeme sırasında hizmetin hemen başlamasını onaylaman hâlinde cayma hakkın bulunmaz.</p>
     <h2>Şikâyet ve itiraz</h2>
@@ -7412,7 +7489,7 @@ const LEGAL = {
     <h2>Madde 3 – Hizmet ve bedel</h2>
     <p>Hizmetin kapsamı, paketlerin bedeli ve ödeme koşulları <a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nda belirtildiği gibidir. Ön Bilgilendirme Formu bu sözleşmenin ayrılmaz parçasıdır.</p>
     <h2>Madde 4 – İfa</h2>
-    <p>Hizmet, ödemenin onaylanmasından sonra en geç 24 saat içinde Alıcı'ya gönderilen erişim koduyla kullanıma açılır. Satıcı hizmeti kesintisiz sunmak için makul özeni gösterir. Planlı bakım ve teknik arızalar nedeniyle kısa süreli kesintiler olabilir. Uzun süren kesintilerde Alıcı'ya kullanamadığı süre kadar ek süre tanınır.</p>
+    <p>Hizmet, ödemenin onaylanmasından sonra Alıcı'nın e-posta adresine otomatik olarak (en geç 24 saat içinde) gönderilen erişim koduyla ya da Alıcı'nın aynı e-posta adresiyle açtığı hesaba paketin tanımlanmasıyla kullanıma açılır. Satıcı hizmeti kesintisiz sunmak için makul özeni gösterir. Planlı bakım ve teknik arızalar nedeniyle kısa süreli kesintiler olabilir. Uzun süren kesintilerde Alıcı'ya kullanamadığı süre kadar ek süre tanınır.</p>
     <h2>Madde 5 – Ödeme ve yenileme</h2>
     <p>Paket bedeli, seçilen dönem (1 ay ya da 1 yıl) için ${ay("odemeAracisi", "ÖDEME ARACISI")} aracılığıyla peşin tahsil edilir. Paket kendiliğinden yenilenmez ve Alıcı'nın kartından otomatik çekim yapılmaz. Fiyat değişiklikleri yalnızca sonraki satın almalarda uygulanır.</p>
     <h2>Madde 6 – Sona erme</h2>
@@ -7463,7 +7540,7 @@ function render() {
   else {
   let main;
   try { main = (RUN && UI.inRun) ? vRun() : ROUTES[r](); }
-  catch (e) { console.error(e); main = `<div class="view"><div class="card"><h2>Bu bölüm açılamadı</h2><p class="muted" style="margin-top:8px">Sayfayı yenilemeyi dene. Sorun sürerse ayarlardan yedek alıp verileri sıfırlayabilirsin.</p></div></div>`; }
+  catch (e) { console.error(e); hataBildir("Görünüm (" + r + "): " + (e && e.message), e && e.stack ? String(e.stack).split("\n")[1] : "", 0); main = `<div class="view"><div class="card"><h2>Bu bölüm açılamadı</h2><p class="muted" style="margin-top:8px">Sayfayı yenilemeyi dene. Sorun sürerse ayarlardan yedek alıp verileri sıfırlayabilirsin.</p></div></div>`; }
   APP.innerHTML = `${header()}<div class="shell"><aside class="side" aria-label="Bölümler">${navHTML(r)}</aside><main id="main">${(RUN && UI.inRun) ? "" : duyuruBanner()}${main}${(RUN && UI.inRun) ? "" : siteFoot()}</main></div>${tabbar(r)}${UI.menu ? menuSheet(r) : ""}${UI.modal ? modalHTML() : ""}${UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : ""}`;
   }
   if (aid) { const el = document.getElementById(aid); if (el && el !== document.activeElement) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) { } } }
@@ -7870,14 +7947,63 @@ window.addEventListener("hashchange", () => { sesDurdur(); UI.menu = false; UI.i
 ["mouseout", "focusout"].forEach(ev => APP.addEventListener(ev, e => tipHide(e.target)));
 
 /* ---------- açılış ---------- */
+/* Giriş efekti (oturum başına bir kez): ışık açılır, kuyruklu yıldız iz bırakarak ortaya iner, logo oluşur, yazı harf harf yükselir, logo başlıktaki yerine uçar */
 (function introGoster() {
   let once = false; try { once = sessionStorage.getItem("ake.intro") === "1"; sessionStorage.setItem("ake.intro", "1"); } catch (e) { }
-  if (once || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  if (once || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || document.visibilityState === "hidden") return;
+  const P = "M-140 770 C 230 790, 470 330, 830 250 C 1075 196, 1090 405, 720 450";
+  const harf = (w, o) => [...w].map((c, i) => `<i style="--i:${i + o}">${c}</i>`).join("");
   const d = document.createElement("div"); d.id = "intro"; d.setAttribute("aria-hidden", "true");
-  d.innerHTML = '<svg class="arc" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="iA" x1="0" x2="1"><stop offset="0" stop-color="#1f5bff" stop-opacity="0"/><stop offset=".3" stop-color="#2a63ff"/><stop offset=".72" stop-color="#00b8ff"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".1"/></linearGradient><filter id="iG" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs><path pathLength="1" d="M-80 720 C 260 720, 420 250, 720 250 S 1160 610, 1520 330" stroke="url(#iA)" stroke-width="10" opacity=".6" filter="url(#iG)"/><path pathLength="1" d="M-80 720 C 260 720, 420 250, 720 250 S 1160 610, 1520 330" stroke="url(#iA)" stroke-width="2.4"/></svg><div class="ic"><div class="ib"><i></i><i class="f"></i><i></i><i></i><i></i></div><div class="wm">AKE <span>AKADEMİ</span></div><div class="tg">YKS 2027</div></div>';
-  const kapat = () => { if (d.parentNode) d.parentNode.removeChild(d); };
-  d.addEventListener("click", kapat); d.addEventListener("animationend", e => { if (e.animationName === "introOut") kapat(); });
-  document.body.appendChild(d); setTimeout(kapat, 3000);
+  d.innerHTML = `<div class="izemin"><div class="ibg"></div><div class="ibl"></div>
+    <svg class="ia" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"><defs>
+      <linearGradient id="iA" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1100" y2="0"><stop offset="0" stop-color="#1f5bff" stop-opacity="0"/><stop offset=".32" stop-color="#2a63ff"/><stop offset=".78" stop-color="#22b8ff"/><stop offset="1" stop-color="#5ff0cf"/></linearGradient>
+      <radialGradient id="iH"><stop offset="0" stop-color="#fff"/><stop offset=".2" stop-color="#dbe7ff" stop-opacity=".95"/><stop offset=".55" stop-color="#3f7bff" stop-opacity=".38"/><stop offset="1" stop-color="#1f5bff" stop-opacity="0"/></radialGradient>
+      <linearGradient id="iK" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0"><stop offset="0" stop-color="#9fc0ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+      <filter id="iG" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="10"/></filter></defs>
+      <path class="it" d="${P}" stroke="url(#iA)" stroke-width="13" opacity=".5" filter="url(#iG)"/>
+      <path class="it it2" d="${P}" stroke="url(#iA)" stroke-width="2.4"/>
+      <path class="ik" d="${P}" stroke="url(#iK)" stroke-width="3.4" opacity=".95"/>
+      <g class="ihead"><circle r="34" fill="url(#iH)"/><circle r="4.4" fill="#fff"/></g></svg>
+    <div class="iburst"></div><div class="iring"></div></div>
+    <div class="ilg">${logoTile("in").replace(/<\/span>$/, '<span class="ishine"></span></span>')}</div>
+    <div class="iyazi"><div class="iwm"><span class="w">${harf("AKE", 0)}</span> <span class="w w2">${harf("Akademi", 3)}</span></div><div class="itg">YKS 2027 · Hedefine yüksel</div></div>`;
+  document.body.appendChild(d);
+  const yol = d.querySelector(".it2"), L = yol.getTotalLength(), izler = d.querySelectorAll(".it"), kuyruk = d.querySelector(".ik"), bas = d.querySelector(".ihead"), K = 150;
+  izler.forEach(p => { p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+  kuyruk.style.strokeDasharray = `${K} ${L + K}`; kuyruk.style.strokeDashoffset = K;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, SURE = 1150, GECIK = 160;
+  let t0 = 0, indi = false, bitti = false;
+  const kapat = () => { document.documentElement.classList.remove("intro-ucus"); if (d.parentNode) d.parentNode.removeChild(d); };
+  function in_() {
+    indi = true; d.classList.add("indi"); kuyruk.style.opacity = "0"; bas.style.opacity = "0";
+    setTimeout(cik, 1300);
+  }
+  function kare(now) {
+    if (bitti || indi) return;
+    if (!t0) t0 = now;
+    const t = Math.min(1, Math.max(0, (now - t0 - GECIK) / SURE)), poz = L * ease(t), pt = yol.getPointAtLength(poz);
+    izler.forEach(p => { p.style.strokeDashoffset = L - poz; });
+    kuyruk.style.strokeDashoffset = K - poz;
+    bas.setAttribute("transform", `translate(${pt.x} ${pt.y}) scale(${1 + .25 * Math.sin(Math.PI * t)})`);
+    bas.style.opacity = t > 0 ? "1" : "0";
+    if (t >= 1) in_(); else requestAnimationFrame(kare);
+  }
+  requestAnimationFrame(kare);
+  function cik() {
+    if (bitti) return; bitti = true;
+    const kaynak = d.querySelector(".ilg"), hedef = document.querySelector(".top .brand .logo-tile");
+    d.classList.add("cik");
+    const a = kaynak && kaynak.getBoundingClientRect(), b = hedef && hedef.getBoundingClientRect();
+    if (!indi || !a || !b || !b.width || b.bottom < 0 || b.top > innerHeight || !kaynak.animate) { d.style.transition = "opacity .45s ease"; d.style.opacity = "0"; setTimeout(kapat, 480); return; }
+    document.documentElement.classList.add("intro-ucus");
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), s = b.width / a.width;
+    const an = kaynak.animate([{ transform: "translate(0,0) scale(1)" }, { transform: `translate(${dx * .55}px,${dy * .42}px) scale(${.55 + s * .45})`, offset: .55 }, { transform: `translate(${dx}px,${dy}px) scale(${s})` }],
+      { duration: 820, easing: "cubic-bezier(.65,0,.2,1)", fill: "forwards" });
+    an.onfinish = kapat; setTimeout(kapat, 1400);
+  }
+  d.addEventListener("click", () => { if (indi) cik(); else { bitti = true; d.style.transition = "opacity .35s ease"; d.style.opacity = "0"; setTimeout(kapat, 380); } });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") kapat(); });
+  setTimeout(kapat, 7000);
 })();
 if (RUN && RUN.dur && RUN.mode === "exam" && RUN.start + RUN.dur * 1000 <= Date.now()) { UI.inRun = false; finishRun(true); }
 else { render(); if (RUN) startTick(); }

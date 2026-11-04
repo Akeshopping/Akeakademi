@@ -4948,7 +4948,8 @@ function navHTML(r) {
   if (LEGAL[r]) r = "yasal";
   r = NAVACT[r] || r;
   const cnt = { yanlislar: tekrarBekleyen().length, kartlar: dueCount() };
-  const groups = NAVG.map(g => g.slice());
+  const groups = NAVG.map(g => [g[0], g[1].slice()]);
+  if (!IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.user && HESAP.user.yonetici) groups[2][1].unshift(["yonetim", "Yönetim", "inbox"]);
   return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("");
 }
 function header() {
@@ -6554,7 +6555,7 @@ function vHesap() {
   const [, st] = saveLabel();
   return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>
     <div class="card stack"><h2>${esc(H.user.ad || "Hesap bilgilerin")}</h2><p><b>E-posta:</b> ${esc(H.user.eposta)}</p><p class="small muted"><b>Kayıt:</b> ${esc(st)}. Çalışma verilerin hesabında saklanır ve giriş yaptığın her cihazda eşitlenir.</p>
-      <div class="row"><button class="btn" data-a="cikis">Çıkış yap</button><button class="btn ghost" data-a="hesapSilAsk">Hesabımı sil</button></div></div>
+      <div class="row">${H.user.yonetici ? `<a class="btn pri" href="#yonetim">Yönetim</a>` : ""}<button class="btn" data-a="cikis">Çıkış yap</button><button class="btn ghost" data-a="hesapSilAsk">Hesabımı sil</button></div></div>
     ${paketKart()}</div>`;
 }
 function hesapOzetKart() {
@@ -6605,6 +6606,48 @@ const HESAP_SUB = {
     render();
   }
 };
+
+/* ===== Yönetim (yalnızca yönetici hesabı, akeakademi.com) ===== */
+const YON = { veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay" };
+async function yonYukle() {
+  YON.busy = "yukle"; render();
+  try { const r = await fetch("/api/yonetim/durum", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) YON.veri = j; else YON.err = j.message || "Yönetim bilgileri alınamadı."; } catch (e) { YON.err = "Bağlantı kurulamadı."; }
+  YON.busy = ""; render();
+}
+const SIP_DURUM = { gonderildi: ["ok", "Kod gönderildi"], deneme: ["", "Deneme"], kod_uretildi: ["warn", "Kod üretildi"], eposta_yok: ["bad", "E-posta yok"], eposta_hatasi: ["bad", "E-posta gitmedi"], paket_yok: ["", "Paket dışı ürün"] };
+function vYonetim() {
+  if (IN_CLAUDE || !HESAP.user || !HESAP.user.yonetici) return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Bu sayfa yalnızca site yöneticisine açık.</p></div></div>`;
+  const V = YON.veri;
+  if (!V && !YON.busy && !YON.err) setTimeout(yonYukle, 0);
+  const tik = (v, l) => `<div class="li"><span class="pill ${v ? "ok" : "bad"}">${v ? "Hazır" : "Eksik"}</span><div class="grow"><div class="t">${l}</div></div></div>`;
+  return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Satışlar, siparişler ve site kurulumu. Bu sayfa yalnızca sana görünür.</p></div>
+    ${YON.err ? `<p class="note">${esc(YON.err)}</p>` : ""}
+    ${!V ? `<div class="empty">Yükleniyor…</div>` : `
+    <div class="tiles">${tile(V.sayilar.kullanici || 0, "kayıtlı hesap")}${tile(V.sayilar.paket || 0, "paketli hesap")}${tile((V.siparisler || []).filter(s => s.durum === "gonderildi").length, "son siparişler")}${tile(V.webhook ? "Açık" : "Kapalı", "otomatik satış")}</div>
+    <div class="card stack"><h2>Otomatik satış (Shopier)</h2>
+      <div class="list">${tik(V.eposta, "E-posta servisi (Resend)")}${tik(V.pat, "Shopier anahtarı (SHOPIER_PAT)")}${tik(V.webhook, "Sipariş bildirimi (webhook)")}</div>
+      <p class="small muted">Kurulduğunda Shopier'de ödeme alınan her pakette kod kendiliğinden üretilir, alıcıya e-postayla gider; alıcı aynı e-postayla giriş yaptığında paket hesabına tanımlanır.</p>
+      <div class="row"><button class="btn pri" data-a="yonKur"${!V.pat || YON.busy ? " disabled" : ""}>${YON.busy === "kur" ? "Kuruluyor…" : V.webhook ? "Yeniden kur" : "Otomatik satışı kur"}</button></div>
+      <div class="row" style="border-top:1px solid var(--line2);padding-top:12px"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Orta · 1 ay"], ["orta-yil", "Orta · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
+        <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Deneme siparişi gönder"}</button></div>
+      <p class="xs muted">Deneme siparişi para çekmez; seçtiğin paket için gerçek bir kod üretip senin e-postana gönderir ve hesabına tanımlar.</p>
+      ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
+    <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
+      ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
+        : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>`}
+  </div>`;
+}
+async function yonIstek(path, body) {
+  const r = await fetch("/api/yonetim/" + path, { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) });
+  let j = {}; try { j = await r.json(); } catch (e) { } return { r, j };
+}
+Object.assign(OZ_ACT, {
+  yonYenile() { YON.veri = null; YON.err = ""; yonYukle(); },
+  async yonKur() { YON.busy = "kur"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("shopier-kur").catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok) { YON.msg = "Otomatik satış kuruldu. Bildirim adresi: " + j.url; await yonYukle(); } else { YON.err = j.message || "Kurulamadı."; render(); } },
+  async yonDeneme() { YON.busy = "deneme"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("deneme-siparis", { paket: YON.dpaket }).catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok && j.kodlar) { YON.msg = `Deneme kodu üretildi ve ${HESAP.user.eposta} adresine gönderildi: ${j.kodlar[0].kod}`; try { const b = await hesapIstek("ben"); if (b.r.ok) hesapUygula(b.j); } catch (e) { } await yonYukle(); } else { YON.err = j.message || "Deneme siparişi oluşturulamadı."; render(); } },
+  async yonTekrar(d) { const { r } = await yonIstek("tekrar-gonder", { id: d.id }).catch(() => ({ r: { ok: false } })); toast(r.ok ? "Kod e-postası yeniden gönderildi." : "Gönderilemedi."); if (r.ok) yonYukle(); }
+});
+Object.assign(OZ_CHG, { yonPaket(el) { YON.dpaket = el.value; } });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -6804,7 +6847,7 @@ function siteFoot() {
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap });
+Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
 function render() {

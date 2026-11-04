@@ -19,7 +19,7 @@
 //   POST kod-bagla {kod}              erişim kodunu hesaba bağlar
 //   POST sil                          hesabı ve verilerini siler
 
-import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon } from "../../../lib/ortak.js";
+import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
@@ -71,6 +71,7 @@ export async function onRequest({ request, env, params }) {
     if (hash !== g.hash) { await env.DB.prepare("UPDATE giris SET deneme = deneme + 1 WHERE eposta = ?").bind(eposta).run(); return fail(400, "kod_yanlis", "Kod yanlış."); }
     await env.DB.prepare("UPDATE giris SET hash = NULL, deneme = 0 WHERE eposta = ?").bind(eposta).run();
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
+    await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
     const u = { id: kid, eposta, ad: "" };
     return json(200, { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid) }, { "set-cookie": c });
   }
@@ -95,6 +96,7 @@ export async function onRequest({ request, env, params }) {
     /* Belirteç doğrudan Google'ın sunucusundan alındı; yine de temel alanlar kontrol edilir */
     if (p.aud !== env.GOOGLE_CLIENT_ID || !/accounts\.google\.com$/.test(p.iss || "") || (p.exp || 0) * 1000 < Date.now() || !p.email || !p.email_verified) return hata("google");
     const kid = await kullaniciBulVeyaAc(env, { eposta: p.email, ad: p.given_name || p.name || "", google: "g:" + p.sub });
+    await bekleyenKodlariBagla(env, kid, p.email).catch(() => { });
     const c = await oturumAc(env, kid);
     const h = new Headers({ location: url.origin + "/#hesap?giris=ok" }); h.append("set-cookie", c); h.append("set-cookie", cerezYaz("ake_g", "", 0));
     return new Response(null, { status: 302, headers: h });

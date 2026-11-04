@@ -4613,7 +4613,9 @@ function saveLabel() {
 function paintSave() { const el = document.getElementById("savest"); if (el) { const [c, t] = saveLabel(); el.className = "save " + c; el.innerHTML = `<i></i><span class="lbl">${t}</span>`; el.title = t; } }
 
 /* ---------- soru havuzu ---------- */
-const allQ = () => BANK.concat(S.aiQs);
+/* Onaylı ek sorular (yönetimde AI ile üretilip onaylananlar), sunucudan gelir ve bu cihazda saklanır */
+let EKQ = (() => { try { const a = JSON.parse(LS.get("ake.ek") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } })();
+const allQ = () => BANK.concat(EKQ, S.aiQs);
 function findQ(id) { return allQ().find(q => q.id === id) || (S.mistakes[id] && S.mistakes[id].q) || null; }
 /* Daha önce görülen üretilmiş soruları hatırla; aynı soru tekrar gelmesin */
 const SEEN = (() => { try { return new Set(JSON.parse(LS.get("ake.seen") || "[]")); } catch (e) { return new Set(); } })();
@@ -6502,6 +6504,7 @@ async function initHesap() {
     else HESAP.yok = true; /* hesap sunucusu henüz kurulmadı: eski kod sistemi çalışır */
   } catch (e) { HESAP.yok = true; }
   HESAP.hazir = true;
+  ekSorularYukle();
   const h = location.hash || "";
   if (/giris=ok/.test(h)) { toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor."); history.replaceState(null, "", "#hesap"); }
   else if (/hata=google/.test(h)) { toast("Google ile giriş tamamlanamadı. Tekrar dene ya da e-postayla giriş yap."); history.replaceState(null, "", "#hesap"); }
@@ -6634,7 +6637,8 @@ function vYonetim() {
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
     <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
-        : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>`}
+        : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
+    ${soruBolumu()}`}
   </div>`;
 }
 async function yonIstek(path, body) {
@@ -6648,6 +6652,71 @@ Object.assign(OZ_ACT, {
   async yonTekrar(d) { const { r } = await yonIstek("tekrar-gonder", { id: d.id }).catch(() => ({ r: { ok: false } })); toast(r.ok ? "Kod e-postası yeniden gönderildi." : "Gönderilemedi."); if (r.ok) yonYukle(); }
 });
 Object.assign(OZ_CHG, { yonPaket(el) { YON.dpaket = el.value; } });
+
+/* ===== Onaylı ek sorular: sunucudan al (web) ===== */
+const ekGecerli = q => q && typeof q.id === "string" && SUBJ[q.s] && typeof q.t === "string" && typeof q.q === "string" && Array.isArray(q.o) && q.o.length === 5 && Number.isInteger(q.a) && q.a >= 0 && q.a <= 4;
+async function ekSorularYukle() {
+  if (IN_CLAUDE || HESAP.yok) return;
+  try {
+    const r = await fetch("/api/sorular", { credentials: "same-origin" }); if (!r.ok) return;
+    const j = await r.json(), l = (j.sorular || []).filter(ekGecerli).slice(-3000);
+    const once = EKQ.length; EKQ = l; LS.set("ake.ek", JSON.stringify(l));
+    if (l.length !== once) render();
+  } catch (e) { }
+}
+
+/* ===== Yönetim: AI ile soru üretimi ve onay ===== */
+const SORU = { veri: null, busy: {}, err: "", s: "" };
+async function soruYukle() {
+  try { const r = await fetch("/api/yonetim/sorular", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) SORU.veri = j; else SORU.err = j.message || "Sorular alınamadı."; } catch (e) { SORU.err = "Bağlantı kurulamadı."; }
+  render();
+}
+function eksikKonular() {
+  const out = [];
+  Object.keys(SUBJ).forEach(s => { if (SORU.s && SORU.s !== s) return; topicsOf(s).forEach(t => { if (!t.g && t.n < 5) out.push({ s, t: t.t, n: t.n }); }); });
+  return out.sort((a, b) => a.n - b.n || a.s.localeCompare(b.s)).slice(0, 40);
+}
+function soruKart(q) {
+  return `<div class="card sunk stack" style="gap:8px"><div class="small muted">${esc(SUBJ[q.s] ? SUBJ[q.s].n : q.s)} · ${esc(q.t)} · ${DIFF[q.d] || ""}</div>
+    ${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}<b>${fq(q.q)}</b>
+    <ol type="A" style="margin:0;padding-left:22px">${q.o.map((o, i) => `<li style="${i === q.a ? "color:var(--ok);font-weight:700" : ""}">${fq(o)}${i === q.a ? " ✓" : ""}</li>`).join("")}</ol>
+    <p class="small">${fq(q.x)}</p>
+    <div class="row"><button class="btn sm pri" data-a="soruOnay" data-id="${esc(q.id)}">Onayla</button><button class="btn sm ghost" data-a="soruRed" data-id="${esc(q.id)}">Reddet</button></div></div>`;
+}
+function soruBolumu() {
+  if (!SORU.veri && !SORU.err) { setTimeout(soruYukle, 0); return `<div class="card"><h2>Soru üretimi</h2><div class="empty">Yükleniyor…</div></div>`; }
+  const V = SORU.veri || { bekleyen: [], sayi: {} }, eks = eksikKonular();
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru üretimi</h2><span class="small muted">${V.sayi.onayli || 0} onaylı · ${V.sayi.bekliyor || 0} bekliyor</span></div>
+    <p class="small muted">Hazır sorusu az olan konular aşağıda. "5 soru üret"e basınca AI soruları yazar, güçlü model cevapları ayrıca çözer; tutmayanlar atılır, kalanlar onayına düşer. Onayladıkların birkaç dakika içinde tüm öğrencilere gider.</p>
+    ${SORU.err ? `<p class="small" style="color:var(--bad)">${esc(SORU.err)}</p>` : ""}
+    <select class="in" data-c="soruDers" style="max-width:240px"><option value="">Tüm dersler</option>${Object.keys(SUBJ).map(k => `<option value="${k}"${SORU.s === k ? " selected" : ""}>${esc(SUBJ[k].n)}</option>`).join("")}</select>
+    <div class="list">${eks.length ? eks.map(x => { const k = x.s + "|" + x.t, b = SORU.busy[k]; return `<div class="li"><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(SUBJ[x.s].n)} · ${x.n} hazır soru</div></div><button class="btn sm" data-a="soruUret" data-s="${x.s}" data-t="${esc(x.t)}"${b ? " disabled" : ""}>${b ? "Üretiliyor…" : "5 soru üret"}</button></div>`; }).join("") : `<div class="empty">Bu derste sorusu az olan konu kalmadı.</div>`}</div></div>
+  <div class="card stack"><div class="card-h" style="margin:0"><h2>Onay bekleyenler</h2>${V.bekleyen.length > 1 ? `<button class="btn sm" data-a="soruHepsi">Hepsini onayla</button>` : ""}</div>
+    ${V.bekleyen.length ? V.bekleyen.slice(0, 30).map(soruKart).join("") : `<div class="empty">Onay bekleyen soru yok.</div>`}</div>`;
+}
+async function soruKarar(ids, karar) {
+  const r = await fetch("/api/yonetim/soru-karar", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: ids, karar }) }).catch(() => null);
+  if (!r || !r.ok) { toast("Kaydedilemedi, tekrar dene."); return; }
+  if (SORU.veri) { SORU.veri.bekleyen = SORU.veri.bekleyen.filter(q => !ids.includes(q.id)); if (karar === "onay") SORU.veri.sayi.onayli = (SORU.veri.sayi.onayli || 0) + ids.length; SORU.veri.sayi.bekliyor = Math.max(0, (SORU.veri.sayi.bekliyor || 0) - ids.length); }
+  toast(karar === "onay" ? `${ids.length} soru onaylandı.` : "Soru reddedildi."); render();
+  if (karar === "onay") setTimeout(ekSorularYukle, 1500);
+}
+Object.assign(OZ_ACT, {
+  async soruUret(d) {
+    const k = d.s + "|" + d.t; if (SORU.busy[k]) return; SORU.busy[k] = true; SORU.err = ""; render();
+    const ornek = allQ().filter(q => q.s === d.s && q.t === d.t).slice(0, 2).map(q => (q.p ? q.p.slice(0, 200) + " " : "") + q.q + " | " + q.o.join(" / "));
+    try {
+      const r = await fetch("/api/yonetim/soru-uret", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ s: d.s, t: d.t, sn: SUBJ[d.s].n, e: SUBJ[d.s].e, d: 2, n: 5, ornek }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) toast(`${j.gecen}/${j.uretilen} soru kontrolü geçti ve onayına düştü.`); else SORU.err = j.message || "Soru üretilemedi.";
+    } catch (e) { SORU.err = "Bağlantı kurulamadı."; }
+    delete SORU.busy[k]; await soruYukle();
+  },
+  soruOnay(d) { soruKarar([d.id], "onay"); },
+  soruRed(d) { soruKarar([d.id], "red"); },
+  soruHepsi() { const ids = ((SORU.veri && SORU.veri.bekleyen) || []).slice(0, 30).map(q => q.id); if (ids.length) soruKarar(ids, "onay"); }
+});
+Object.assign(OZ_CHG, { soruDers(el) { SORU.s = el.value; render(); } });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",

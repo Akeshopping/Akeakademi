@@ -3,7 +3,50 @@
 //   POST shopier-kur      Shopier'de sipariş bildirimini (webhook) kurar; SHOPIER_PAT gerekir
 //   POST deneme-siparis   Ödeme yapmadan sahte bir siparişle sistemi dener (kod e-postası yöneticiye gider)
 //   POST tekrar-gonder {id}  Bir siparişin kod e-postasını yeniden gönderir
-import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER } from "../../../lib/ortak.js";
+//   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, güçlü modelle kontrol eder, onaya koyar
+//   GET  sorular          onay bekleyen sorular ve sayılar
+//   POST soru-karar {id|[id], karar:"onay"|"red"}
+import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele } from "../../../lib/ortak.js";
+
+const LET = ["A", "B", "C", "D", "E"];
+/* AI soru üretimi: hızlı model yazar, güçlü model cevabı görmeden çözer; tutanlar onaya düşer */
+async function soruUret(env, b) {
+  const s = String(b.s || ""), t = String(b.t || "").slice(0, 80), sn = String(b.sn || s), e = String(b.e || "YKS"), d = [1, 2, 3].includes(+b.d) ? +b.d : 2, n = Math.max(1, Math.min(10, +b.n || 5));
+  const ornek = Array.isArray(b.ornek) ? b.ornek.slice(0, 2) : [], en = s === "ingilizce";
+  const prompt = `${e} ${sn} dersi, "${t}" konusu için ${n} adet ${["", "kolay", "orta", "zor"][d]} seviyede, özgün çoktan seçmeli soru yaz.
+Kurallar:
+- ÖSYM soru tarzına ve 2026-2027 YKS müfredatına uy; hiçbir kaynaktan soru kopyalama.
+- Her soruda tam 5 seçenek ve yalnızca bir kesin doğru cevap olsun; seçenekler birbirinden farklı ve makul olsun.
+- Doğru cevabın yeri sorudan soruya değişsin (hep aynı şık olmasın).
+- Sayısal sorularda sonucu iki kez hesapla. Sözel sorularda tartışmalı, yoruma açık ya da güncelliğini yitirebilecek bilgi kullanma.
+- ${en ? "Soru ve seçenekler İngilizce, açıklama Türkçe olsun." : "Soru, seçenekler ve açıklama Türkçe olsun."}
+- Paragraf sorusu yazıyorsan parçayı "p" alanına, soru kökünü "q" alanına koy; değilse "p" boş kalsın.
+- Matematik ifadelerini düz metinle yaz: x^2, √x, a/b. LaTeX kullanma. Şekil gerektiren soru yazma.
+- Açıklama 2-4 cümle olsun ve çözümü adım adım göstersin.
+${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı tarzda yeni soru yaz):\n" + ornek.map(o => "- " + String(o).slice(0, 400)).join("\n") + "\n" : ""}Yalnızca JSON dizisi döndür:
+[{"p":"","q":"Soru metni","o":["…","…","…","…","…"],"a":2,"x":"Açıklama"}]
+"a", doğru seçeneğin 0-4 arası sırasıdır.`;
+  let arr = jsonAyikla(await claude(env, { model: env.AKE_MODEL_HIZLI || "claude-haiku-5-5", prompt, effort: "high", max_tokens: 16000 }));
+  if (!Array.isArray(arr)) return { hata: "uretim" };
+  arr = arr.map(o => o && Object.assign({}, o, { a: Number(o.a) })).filter(o => o && typeof o.q === "string" && o.q.trim() && Array.isArray(o.o) && o.o.length === 5 && o.o.every(x => typeof x === "string" && x.trim()) && new Set(o.o.map(x => x.trim())).size === 5 && Number.isInteger(o.a) && o.a >= 0 && o.a <= 4).slice(0, n);
+  if (!arr.length) return { hata: "uretim" };
+  const vp = `Aşağıdaki YKS sorularını bağımsız ve dikkatle çöz. Her soru için doğru seçeneğin 0-4 arası sırasını ver (A=0 … E=4). Birden fazla doğru seçenek varsa, hiç doğru seçenek yoksa, soru belirsiz ya da bilgi hatası içeriyorsa -1 yaz.
+
+${arr.map((o, i) => `Soru ${i + 1}:
+${o.p && o.p.trim() ? o.p.trim() + "\n" : ""}${o.q}
+${o.o.map((x, j) => LET[j] + ") " + x).join("\n")}`).join("\n\n")}
+
+Yalnızca ${arr.length} sayıdan oluşan bir JSON dizisi döndür. Örnek: [2,0,-1]`;
+  const ver = jsonAyikla(await claude(env, { model: env.AKE_MODEL_GUCLU || "claude-sonnet-5-5", prompt: vp, effort: "high", max_tokens: 16000 }));
+  if (!Array.isArray(ver)) return { hata: "kontrol" };
+  const tut = arr.filter((o, i) => Number(ver[i]) === o.a);
+  for (const o of tut) {
+    const q = { id: "ok-" + rastgele(5), s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
+    if (typeof o.p === "string" && o.p.trim()) q.p = o.p.trim();
+    await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'bekliyor', ?, 0)").bind(q.id, s, t, d, JSON.stringify(q), Date.now()).run();
+  }
+  return { uretilen: arr.length, gecen: tut.length };
+}
 
 const API = "https://api.shopier.com/v1";
 async function shopier(env, path, opt) {
@@ -46,6 +89,28 @@ export async function onRequest({ request, env, params }) {
     const o = { id: "deneme-" + Date.now(), paymentStatus: "paid", billingInfo: { email: u.eposta, firstName: "Deneme" }, lineItems: [{ productId: urun, title: "AKE Akademi deneme", quantity: 1 }], totals: { total: "0" } };
     const r = await siparisIsle(env, o, true);
     return json(200, r);
+  }
+  if (ad === "soru-uret" && m === "POST") {
+    if (!env.ANTHROPIC_API_KEY) return fail(500, "yapilandirma");
+    await soruSema(env);
+    let b = {}; try { b = await request.json(); } catch (e) { }
+    if (!b.s || !b.t) return fail(400, "eksik");
+    const r = await soruUret(env, b);
+    return r.hata ? fail(502, r.hata, "AI soru üretemedi, tekrar dene.") : json(200, r);
+  }
+  if (ad === "sorular" && m === "GET") {
+    await soruSema(env);
+    const { results } = await env.DB.prepare("SELECT id, json, tarih FROM soru WHERE durum = 'bekliyor' ORDER BY tarih ASC LIMIT 100").all();
+    const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM soru WHERE durum = 'onayli') AS onayli, (SELECT COUNT(*) FROM soru WHERE durum = 'bekliyor') AS bekliyor").first();
+    const sayim = {}; ((await env.DB.prepare("SELECT s, t, COUNT(*) AS n FROM soru WHERE durum = 'onayli' GROUP BY s, t").all()).results || []).forEach(r => { sayim[r.s + "|" + r.t] = r.n; });
+    return json(200, { bekleyen: (results || []).map(r => JSON.parse(r.json)), sayi: say || {}, onayliKonu: sayim });
+  }
+  if (ad === "soru-karar" && m === "POST") {
+    await soruSema(env);
+    let b = {}; try { b = await request.json(); } catch (e) { }
+    const ids = [].concat(b.id || []).map(String).slice(0, 100), karar = b.karar === "onay" ? "onayli" : "red";
+    for (const id of ids) await env.DB.prepare("UPDATE soru SET durum = ?, karar = ? WHERE id = ? AND durum = 'bekliyor'").bind(karar, Date.now(), id).run();
+    return json(200, { ok: true, n: ids.length });
   }
   if (ad === "tekrar-gonder" && m === "POST") {
     let b = {}; try { b = await request.json(); } catch (e) { }

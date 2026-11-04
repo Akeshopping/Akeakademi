@@ -17,7 +17,14 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="/icons/icon-512.png">
+<meta property="og:image" content="https://akeakademi.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://akeakademi.com/">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://akeakademi.com/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AKE Akademi","url":"https://akeakademi.com/","inLanguage":"tr","description":"YKS 2027'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, paragraf atölyesi, yanlış defteri ve çalışma planı."}</script>
 <title>AKE Akademi</title>
 <script src="/ayar.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1898,14 +1905,18 @@ const xMinus = k => k === 0 ? "x" : (k > 0 ? "x − " + k : "x + " + (-k));
 
 function numChoices(c, cands, opt) {
   opt = opt || {};
-  const isInt = Number.isInteger(c);
-  const out = [c], seen = new Set([nf(c)]);
+  const isInt = Number.isInteger(c), seen = new Set([nf(c)]);
   const ok = v => typeof v === "number" && isFinite(v) && (opt.neg || c < 0 || v >= 0) && (!isInt || Number.isInteger(v)) && !seen.has(nf(v)) && (opt.zero !== false || v !== 0 || c === 0);
-  const add = v => { if (out.length < 5 && ok(v)) { out.push(v); seen.add(nf(v)); } };
-  cands.forEach(add);
+  const lo = [], hi = [], put = v => { if (ok(v)) { seen.add(nf(v)); (v < c ? lo : hi).push(v); } };
+  cands.forEach(put);
   const step = opt.step || (isInt ? Math.max(1, Math.round(Math.abs(c) / 8)) : Math.max(0.1, Math.abs(c) / 5));
-  for (let k = 1; out.length < 5 && k < 60; k++) { add(c + k * step); add(c - k * step); }
-  const sorted = out.slice().sort((x, y) => x - y);
+  for (let k = 1; k < 60 && (lo.length < 4 || hi.length < 4); k++) { if (lo.length < 4) put(c - k * step); if (hi.length < 4) put(c + k * step); }
+  /* Doğru cevap küçükten büyüğe sıralı seçeneklerde her konuma eşit olasılıkla düşsün (yalnızca B/C'de toplanmasın) */
+  const feas = [0, 1, 2, 3, 4].filter(t => lo.length >= t && hi.length >= 4 - t);
+  let pickd;
+  if (feas.length) { const t = feas[Math.floor(Math.random() * feas.length)]; pickd = lo.slice(0, t).concat(hi.slice(0, 4 - t)); }
+  else pickd = lo.concat(hi).slice(0, 4);
+  const sorted = pickd.concat([c]).sort((x, y) => x - y);
   return { o: sorted.map(v => nf(v) + (opt.unit || "")), a: sorted.indexOf(c) };
 }
 function strChoices(c, cands, sort) {
@@ -4604,18 +4615,25 @@ function markSeen(qs) {
   if (SEEN.size > 6000) { const keep = [...SEEN].slice(-5000); SEEN.clear(); keep.forEach(x => SEEN.add(x)); }
   LS.set("ake.seen", JSON.stringify([...SEEN]));
 }
+/* Sırası değişmemesi gereken seçenekler: sayılar (küçükten büyüğe) ya da "I ve II", "Yalnız I" gibi öncüllü seçenekler */
+const SIRALI_RE = /^(Yalnız |I{1,3}V?(\s|,|$)|IV(\s|,|$)|Hiçbiri|Hepsi|Tümü)/;
+const sabitSira = q => isNumOpts(q) || q.o.some(o => SIRALI_RE.test(String(o).trim()));
+/* Üretilen sorularda doğru cevap her şıkka eşit sıklıkla düşsün: hedef şık rastgele seçilir, sıralı seçenekli sorularda o şıkka denk gelen örnek aranır */
 function genQ(g, subj, used) {
-  let last = null;
+  let last = null, yedek = null; const hedef = Math.floor(Math.random() * 5);
   for (let i = 0; i < 30; i++) {
     const r = g.fn(); if (!r) continue;
-    const q = { id: "g:" + g.id + ":" + uid(), s: subj || g.subs[0], t: g.t, d: g.d, q: r.q, o: r.o, a: r.a, x: r.x, gen: g.id, fix: 1 };
+    const q = { id: "g:" + g.id + ":" + uid(), s: subj || g.subs[0], t: g.t, d: g.d, q: r.q, o: r.o, a: r.a, x: r.x, gen: g.id };
     if (r.p) q.p = r.p; if (r.fig) q.fig = r.fig;
+    if (sabitSira(q)) q.fix = 1;
     const h = hashQ(q);
     last = q;
     if (SEEN.has(h) || (used && used.has(h))) continue;
+    if (q.fix && q.a !== hedef && i < 26) { if (!yedek) yedek = { q, h }; continue; }
     if (used) used.add(h);
     return q;
   }
+  if (yedek) { if (used) used.add(yedek.h); return yedek.q; }
   if (last) last.stale = true;
   return last;
 }
@@ -5148,7 +5166,8 @@ function vMistakes() {
   const item = ([id, m]) => {
     const [tc, tl] = tekrarEtiket(m);
     return `<div class="li mli"><div class="grow"><div class="t">${esc(m.q.q.length > 120 ? m.q.q.slice(0, 120) + "…" : m.q.q)}</div>
-      <div class="s">${esc(SUBJ[m.q.s] ? SUBJ[m.q.s].n : "")} · ${esc(m.q.t)} · ${m.n} kez · ${m.last >= 0 ? "senin cevabın " + LET[m.last] : "boş"} · doğru ${LET[m.q.a]}</div>
+      <div class="s">${esc(SUBJ[m.q.s] ? SUBJ[m.q.s].n : "")} · ${esc(m.q.t)} · ${m.n} kez yanlış</div>
+      <div class="s">Doğru cevap: <b>${esc(plainQ(String(m.q.o[m.q.a])).slice(0, 80))}</b>${m.last >= 0 && m.q.o[m.last] != null ? ` · senin cevabın: ${esc(plainQ(String(m.q.o[m.last])).slice(0, 60))}` : " · boş bıraktın"}</div>
       ${M.tab === "open" ? `<div class="row" style="gap:6px;margin-top:6px"><span class="pill ${tc}">${tl}</span>${m.ok ? `<span class="pill ok">${Math.min(m.ok, TEKRAR_HEDEF)}/${TEKRAR_HEDEF} tekrar</span>` : ""}</div>` : ""}</div>
       <div class="li-act"><button class="btn sm" data-a="mistOne" data-id="${esc(id)}">Çöz</button><button class="btn sm ghost" data-a="benzerMist" data-id="${esc(id)}">Benzerini çöz</button>${M.tab === "done" ? "" : `<button class="btn sm ghost" data-a="mistLearn" data-id="${esc(id)}" title="Öğrendim olarak işaretle">Öğrendim</button>`}</div></div>`;
   };
@@ -5304,7 +5323,7 @@ function vTutor() {
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">7/24 yanında</span><h1>AI öğretmenim</h1><p>Takıldığın soruyu yaz${AI.images ? " ya da fotoğrafını ekle" : ""}; konu anlatımı, çözüm adımları ve çalışma önerisi iste. Öğretmenin alanını ve zayıf konularını bilir.</p></div>
   ${!AI.ready ? `<div class="empty">Claude'a bağlanılıyor…</div>` : !aiOn() ? tutorOff() : `
-  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map((m, ci) => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.role !== "user" ? `<div class="ai-tools">${m.g ? `<span class="mtag">Gelişmiş çözüm</span>` : ""}${sesBtn("sesChat", ` data-i="${ci}"`, "chat:" + ci, "Dinle")}</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
+  <div class="chat" id="chat">${UI.chat.length ? UI.chat.map((m, ci) => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.role !== "user" ? `<div class="ai-tools">${m.g ? `<span class="mtag">Gelişmiş çözüm</span>` : ""}${sesBtn("sesChat", ` data-n="${ci}"`, "chat:" + ci, "Dinle")}</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
     ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>` : ""}</div>
   <div class="composer">${UI.chatImg ? `<div class="row small" style="margin-bottom:6px"><span class="pill form">📎 ${esc(UI.chatImg.name || "görsel")}</span><button class="btn sm ghost" data-a="chatImgClear">Kaldır</button></div>` : ""}
     <form data-s="chat">${AI.images ? `<label class="btn ghost sm" title="Soru fotoğrafı ekle" style="min-height:40px">${icon("img")}<input type="file" accept="${esc((AI.imgTypes || ["image/jpeg", "image/png", "image/webp"]).join(","))}" data-c="chatImg" hidden></label>` : ""}
@@ -5330,7 +5349,7 @@ function startRun(cfg) {
   }
   const qs = cfg.qs.map(q => snap(q));
   RUN = { id: uid(), kind: cfg.kind, type: cfg.type || null, title: cfg.title, mode: cfg.mode || "study", qs,
-    perm: qs.map(q => (q.fix || isNumOpts(q)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])),
+    perm: qs.map(q => (q.fix || sabitSira(q)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])),
     ans: qs.map(() => null), rev: [], flag: [], times: [], start: Date.now(), dur: Math.round((cfg.dur || 0) * 60), cur: 0, qStart: Date.now(),
     secs: cfg.secs || [{ n: cfg.title, from: 0, to: qs.length }] };
   markSeen(qs);
@@ -6097,7 +6116,7 @@ function benzerYerlestir(add) {
   const k = add.length, at = R.cur + 1;
   const ins = (arr, vals) => { if (arr.length < at) arr.length = at; arr.splice(at, 0, ...vals); };
   ins(R.qs, add);
-  ins(R.perm, add.map(x => (x.fix || isNumOpts(x)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])));
+  ins(R.perm, add.map(x => (x.fix || sabitSira(x)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])));
   ins(R.ans, add.map(() => null)); ins(R.rev, add.map(() => false)); ins(R.flag, add.map(() => false)); ins(R.times, add.map(() => 0));
   R.secs.forEach(s => { if (s.from >= at) s.from += k; if (s.to >= at) s.to += k; });
   markSeen(add);
@@ -6199,7 +6218,7 @@ const OZ_ACT = {
   sesDene() { sesOku("Merhaba, ben AKE Akademi. Soruları ve AI öğretmenin cevaplarını sana sesli okuyabilirim.", "dene"); },
   sesSoru() { const R = RUN; if (!R) return; const q = R.qs[R.cur]; sesOku(soruMetni(q, R.perm[R.cur]), "soru:" + q.id, q.s === "ingilizce" ? "en-US" : "tr-TR"); },
   sesCozum() { const R = RUN; if (!R) return; const q = R.qs[R.cur]; sesOku(`Doğru cevap ${LET[R.perm[R.cur].indexOf(q.a)]}. ${plainQ(q.x)}`, "cozum:" + q.id); },
-  sesChat(d) { const m = UI.chat[+d.i]; if (m) sesOku(m.content, "chat:" + d.i); },
+  sesChat(d) { const m = UI.chat[+d.n]; if (m) sesOku(m.content, "chat:" + d.n); },
   sesAI(d) { const st = UI.ai[d.k]; if (st && st.text) sesOku(st.text, "ai:" + d.k); },
   benzerEkle() { if (!UI.benzerBusy) benzerEkle(); },
   benzerAIGo() { benzerAI(); },
@@ -6378,7 +6397,7 @@ function vKisa() {
   <div class="vhead"><h1>Kısa ders kartları</h1><p>Yukarı kaydırarak ilerle. Her kart bir dakikalık özet; hazır hissettiğinde o dersten soru çöz.</p></div>
   ${subTabs(TEKRAR_TABS, "kisa")}
   <div class="kisa-feed">${K.map((k, i) => `<article class="kisa"><span class="k-ders">${esc(SUBJ[k.s] ? SUBJ[k.s].n : "Genel")} · ${i + 1}/${K.length}</span><h2>${esc(k.n)}</h2><ul>${k.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    <div class="k-alt">${sesBtn("sesKisa", ` data-i="${i}"`, "kisa:" + i, "Dinle")}${SUBJ[k.s] ? `<button class="btn sm pri" data-a="dersKarisik" data-s="${k.s}">Bu dersten 10 soru</button>` : ""}</div></article>`).join("")}</div>
+    <div class="k-alt">${sesBtn("sesKisa", ` data-n="${i}"`, "kisa:" + i, "Dinle")}${SUBJ[k.s] ? `<button class="btn sm pri" data-a="dersKarisik" data-s="${k.s}">Bu dersten 10 soru</button>` : ""}</div></article>`).join("")}</div>
   </div>`;
 }
 
@@ -6402,7 +6421,7 @@ Object.assign(OZ_ACT, {
   pomoDur() { POMO.kalan = pomoKalan(); POMO.run = false; pomoKaydet(); render(); },
   pomoSifirla() { POMO.run = false; POMO.kalan = POMO_SURE[POMO.mode]; pomoKaydet(); render(); },
   dinle() { dinleBasla(); },
-  sesKisa(d) { const k = (UI.kisa || [])[+d.i]; if (k) sesOku(k.n + ". " + k.items.join(". "), "kisa:" + d.i); }
+  sesKisa(d) { const k = (UI.kisa || [])[+d.n]; if (k) sesOku(k.n + ". " + k.items.join(". "), "kisa:" + d.n); }
 });
 const OZ_CHG = { sesliMod(el) { SESLI.on = !!el.checked; LS.set("ake.sesli", SESLI.on ? "1" : "0"); render(); } };
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
@@ -6485,7 +6504,7 @@ const LEGAL = {
   "kvkk": { t: "KVKK Aydınlatma Metni", d: "Kişisel verilerinin nasıl işlendiği ve hakların", h: () => `
     <p><b>Veri sorumlusu:</b> ${ay("adSoyad", "AD SOYAD")} ("AKE Akademi"), Adres: ${ay("adres", "ADRES")}, E-posta: ${ay("eposta", "E-POSTA")}</p>
     <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, AKE Akademi internet sitesi ve uygulaması ("Site") kullanıcılarının kişisel verilerinin nasıl işlendiğini aşağıda açıklıyoruz.</p>
-    ${IN_CLAUDE ? "" : `<p class="note">Şu an Site'de üyelik yoktur. Profil bilgilerin, çözdüğün sorular, denemelerin ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. Aşağıda sayılan üyelik, ödeme ve yapay zekâ verileri bu özellikler açıldığında işlenecektir.</p>`}
+    ${IN_CLAUDE ? "" : `<p class="note">Şu an Site'de üyelik yoktur. Profil bilgilerin, çözdüğün sorular, denemelerin, odak süren ve çalışma planın yalnızca kendi tarayıcında saklanır, sunucularımıza gönderilmez. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
     ${!IN_CLAUDE ? "" : `<p class="note">Şu an Site'de ücretli üyelik yoktur. Site'yi Claude hesabınla açtığında ve hesabına kayıt iznin olduğunda ilerlemen, yalnızca sana açık ayrı bir alanda saklanır. Bu durumda çalışma özetin (Site'de yazdığın ad, alanın ve hedefin, çözdüğün soru sayısı ve başarı oranın, deneme sonuçların, giriş zamanların, gezdiğin bölümler, cihaz ve tarayıcı türün) ile Claude hesabındaki adın Site yöneticisinin panelinde görünür. Yanlış defterin, tekrar kartların, çalışma planın ve AI öğretmenle yazışmaların yöneticiye gönderilmez. Kayıt iznin yoksa ilerlemen yalnızca kendi tarayıcında saklanır; Site'yi açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün yöneticiye anlık görünebilir. Aşağıda sayılan üyelik ve ödeme verileri bu özellikler açıldığında işlenecektir.</p>`}
     <h2>İşlenen kişisel veriler</h2>
     <ul><li><b>Kimlik:</b> ad, soyad</li><li><b>İletişim:</b> e-posta adresi, varsa telefon numarası</li><li><b>Müşteri işlem:</b> abonelik planı, ödeme tarihi ve tutarı, fatura bilgileri. Kart bilgilerin bizde tutulmaz, doğrudan ödeme kuruluşu tarafından işlenir.</li><li><b>Kullanım:</b> çalışılan dersler, deneme sonuçları, ilerleme kayıtları, AI öğretmene yazdığın sorular ve aldığın cevaplar</li><li><b>İşlem güvenliği:</b> IP adresi, giriş kayıtları, cihaz ve tarayıcı bilgisi</li></ul>

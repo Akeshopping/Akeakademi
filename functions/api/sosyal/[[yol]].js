@@ -25,6 +25,7 @@ import { sosyalSema, haftaAnahtar, haftaBitis, davetKodu, kodTemiz, yeniId, net,
 
 const SINIR = { ligUye: 8, ligKur: 3, ligKisi: 50, sinifKur: 10, sinifKisi: 300, sinifUye: 3, gunXp: 2500 };
 const ipHits = new Map();
+const ONBELLEK = new Map(); /* canlı deneme sıralaması önbelleği (bu sunucu örneğinde) */
 function ipSinir(request, anahtar, adet, ms) {
   const ip = request.headers.get("cf-connecting-ip") || "?", k = anahtar + "|" + ip, now = Date.now();
   const l = (ipHits.get(k) || []).filter(t => now - t < ms); if (l.length >= adet) return false;
@@ -287,10 +288,17 @@ export async function onRequest({ request, env, params }) {
     }
     if (islem === "sonuc" && m === "GET") {
       const ben = benim ? { d: benim.d, y: benim.y, b: benim.b, net: benim.net, sure: benim.sure } : null;
-      const say = await env.DB.prepare("SELECT COUNT(*) AS n FROM canli_sonuc WHERE canli = ?").bind(c.id).first();
+      /* Bitmiş denemenin sıralaması 20 sn önbelleğe alınır: binlerce kişi aynı anda sonuca bakınca veritabanı yorulmaz */
+      const onb = ONBELLEK.get(c.id), taze = onb && now - onb.t < 20000 && now >= bitis;
+      const say = taze ? onb.say : await env.DB.prepare("SELECT COUNT(*) AS n FROM canli_sonuc WHERE canli = ?").bind(c.id).first();
       const temel = { id: c.id, baslik: c.baslik, tur: c.tur, baslangic: c.baslangic, bitis, sure: c.sure, adet: c.adet, durum, katilan: say.n, benim: ben };
       if (now < bitis) return json(200, Object.assign(temel, { acik: false }), { "cache-control": "no-store" });
-      const { results } = await env.DB.prepare("SELECT s.kid, COALESCE(t.ad, NULLIF(k.ad, ''), 'Öğrenci') AS takma, s.d, s.y, s.b, s.net, s.sure FROM canli_sonuc s LEFT JOIN takma t ON t.kid = s.kid LEFT JOIN kullanici k ON k.id = s.kid WHERE s.canli = ? ORDER BY s.net DESC, s.sure ASC LIMIT 100").bind(c.id).all();
+      let results;
+      if (taze) results = onb.results;
+      else {
+        const r0 = await env.DB.prepare("SELECT s.kid, COALESCE(t.ad, NULLIF(k.ad, ''), 'Öğrenci') AS takma, s.d, s.y, s.b, s.net, s.sure FROM canli_sonuc s LEFT JOIN takma t ON t.kid = s.kid LEFT JOIN kullanici k ON k.id = s.kid WHERE s.canli = ? ORDER BY s.net DESC, s.sure ASC LIMIT 100").bind(c.id).all();
+        results = r0.results; if (ONBELLEK.size > 50) ONBELLEK.clear(); ONBELLEK.set(c.id, { t: now, say, results });
+      }
       let sira = null;
       if (ben) { const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM canli_sonuc WHERE canli = ? AND (net > ? OR (net = ? AND sure < ?))").bind(c.id, ben.net, ben.net, ben.sure).first(); sira = r.n + 1; }
       const ilk = (results || []).map((r, i) => ({ sira: i + 1, takma: String(r.takma || "Öğrenci").split(" ")[0], d: r.d, y: r.y, b: r.b, net: r.net, ben: r.kid === u.id }));

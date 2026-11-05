@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=16e54322d4">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=16e54322d4">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=16e54322d4">
+<link rel="manifest" href="/manifest.webmanifest?v=5d4104ae70">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=5d4104ae70">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=5d4104ae70">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=16e54322d4">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=5d4104ae70">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -4903,7 +4903,7 @@ normalize();
 /* ---------- kayıt: tarayıcı + (varsa) Claude hesabı ---------- */
 const cloud = { db: null, uid: null, col: null, state: "local", writable: null, owner: false, ownerKnown: false, busy: false };
 const dirty = new Set(); let saveTimer = null;
-function touch(...areas) { if (areas.includes("stats") || areas.includes("exams")) rozetSoon(); const now = Date.now(); areas.forEach(a => { dirty.add(a); S.upd[a] = now; }); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 1200); memSoon(); }
+function touch(...areas) { if (areas.includes("stats") || areas.includes("exams")) rozetSoon(); const now = Date.now(); areas.forEach(a => { dirty.add(a); S.upd[a] = now; }); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 6000); memSoon(); }
 function trimState() {
   if (S.exams.length > 60) S.exams = S.exams.slice(-60);
   S.exams.forEach((e, i) => { if (i < S.exams.length - 3) delete e.qs; });
@@ -7823,6 +7823,8 @@ Object.assign(KART_ACT, {
 Object.assign(OZ_ACT, KART_ACT);
 /* ===== AKE krom görünüm: sıvı krom şerit + başarı yıldızı (arka plan, giriş animasyonu, hareketli logo, rozet yıldızı) ===== */
 var KROM = (function () {
+  /* otomatik testlerde (?krom=1 yoksa) ağır görseller çalışmaz */
+  var OTO = !!navigator.webdriver && location.search.indexOf("krom=1") < 0;
   var BG = `precision highp float;uniform vec2 R;uniform float T,G,DK,SY,AL,RW,FL;uniform vec2 M;
 float sdS(vec2 p,float r,float rf){const vec2 k1=vec2(.809016994375,-.587785252292);const vec2 k2=vec2(-.809016994375,-.587785252292);p.x=abs(p.x);p-=2.*max(dot(k1,p),0.)*k1;p-=2.*max(dot(k2,p),0.)*k2;p.x=abs(p.x);p.y-=r;vec2 ba=rf*vec2(.587785252292,.809016994375)-vec2(0.,1.);float h=clamp(dot(p,ba)/dot(ba,ba),0.,r);return length(p-ba*h)*sign(p.y*ba.x-p.x*ba.y);}
 float cy(float x,float H){float k=clamp(H*.5,.26,.46);return -.32*min(H,.62)-.08-.16*smoothstep(.75,.5,H)-.38*max(H-1.,0.)+k*(smoothstep(-1.05,1.0,x)*1.5-.55)+.045*sin(x*3.2-T*.7)+.02*sin(x*7.+T*.9);}
@@ -7964,6 +7966,7 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
     if (!RM) requestAnimationFrame(dongu);
   }
   function baslat() {
+    if (OTO) return;
     bgKur(); lgKur();
     if (RM) { setInterval(function () { dongu(performance.now()); }, 700); dongu(performance.now()); } else requestAnimationFrame(dongu);
   }
@@ -7981,7 +7984,7 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
   }
   /* --- giriş animasyonu --- */
   function giris() {
-    if (RM || document.visibilityState === "hidden") return;
+    if (RM || OTO || document.visibilityState === "hidden") return;
     var d = document.createElement("div"); d.id = "intro"; d.setAttribute("aria-hidden", "true");
     var cv = document.createElement("canvas"); d.appendChild(cv);
     d.insertAdjacentHTML("beforeend", '<div class="iyazi"><div class="iwm">AKE <span>Akademi</span></div><div class="itg">YKS 2027 · Hedefine yüksel</div></div>');
@@ -8683,6 +8686,9 @@ window.addEventListener("hashchange", () => { sesDurdur(); UI.menu = false; UI.i
 ["mouseover", "focusin"].forEach(ev => APP.addEventListener(ev, e => tipShow(e.target)));
 ["mouseout", "focusout"].forEach(ev => APP.addEventListener(ev, e => tipHide(e.target)));
 
+/* Sunucuya yazma sayısını azaltmak için kayıt 6 sn gecikmeli yapılır; sekme gizlenince ya da kapanınca bekletmeden kaydedilir */
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") { try { clearTimeout(saveTimer); flush(); } catch (e) { } } });
+addEventListener("pagehide", () => { try { clearTimeout(saveTimer); flush(); } catch (e) { } });
 /* ---------- açılış ---------- */
 /* Krom şerit + yıldız: arka plan, giriş animasyonu (oturum başına bir kez), hareketli logolar, telefon eğimi */
 KROM.baslat(); KROM.egim(); KROM.giris();

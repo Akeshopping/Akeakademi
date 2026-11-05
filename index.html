@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=55caa53084">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=55caa53084">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=55caa53084">
+<link rel="manifest" href="/manifest.webmanifest?v=4c7670a8a6">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=4c7670a8a6">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=4c7670a8a6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=55caa53084">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=4c7670a8a6">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -662,6 +662,10 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:36px;cursor:poin
 .giris-fayda{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
 .giris-fayda li{display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:3px solid var(--form)}
 .giris-fayda b{font-size:15px}.giris-fayda span{font-size:13.5px;color:var(--ink2);line-height:1.5}
+.ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ob-chip{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font:600 14.5px var(--f-body,inherit);color:var(--ink);cursor:pointer;min-height:44px}
+.ob-chip.on{background:var(--form);border-color:var(--form);color:#fff}
+.ob-nokta{display:flex;gap:6px}.ob-nokta i{width:22px;height:5px;border-radius:3px;background:var(--line2)}.ob-nokta i.on{background:var(--form)}
 </style>
 </head>
 <body>
@@ -5328,11 +5332,7 @@ function vHome() {
   const dateStr = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
   return `<div class="view">${resumeBanner()}
   <div class="home-head vitrin">${arcSVG("hv")}<div><h1>${p.name ? `Merhaba ${esc(p.name)}` : "Merhaba"}</h1><p class="muted">${esc(dateStr)} · YKS 2027'ye <b>${daysLeft()}</b> gün</p></div><a class="btn pri" href="#studyo">Soru çöz</a></div>
-  ${p.ok ? "" : `<form class="card" data-s="onboard"><div class="card-h"><h2>Seni tanıyalım</h2><span class="pill form">1 dakika</span></div>
-    <div class="fields"><label class="f">Adın<input class="in" name="name" autocomplete="given-name" placeholder="Adını yaz"></label>
-    <label class="f">Alanın<select class="in" name="alan">${Object.entries(ALAN).map(([k, v]) => `<option value="${k}"${p.alan === k ? " selected" : ""}>${v}</option>`).join("")}</select></label>
-    <label class="f">Günlük soru hedefi<input class="in" name="gunluk" type="number" min="5" max="500" value="${goal}"></label></div>
-    <div class="row" style="margin-top:12px"><button class="btn pri">Kaydet</button><span class="small muted">Alanına göre deneme ve testler hazırlanır.</span></div></form>`}
+  ${p.ok ? "" : obKart(goal)}
   <section class="card today"><div class="card-h"><h2>Bugünün programı</h2><span class="small muted">${done}/${prog.length} tamam</span></div>
     <div class="bar ${today.q >= goal ? "ok" : ""}"><i style="width:${Math.min(100, pct(today.q, goal))}%"></i></div>
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
@@ -7728,6 +7728,32 @@ function veriUyari() {
   if (IN_CLAUDE || (typeof HESAP !== "undefined" && HESAP.user) || !totals().q) return "";
   return `<div class="card sunk veri-uyari"><div class="grow"><b>İlerlemen şu an yalnızca bu cihazda.</b><p class="small muted" style="margin:4px 0 0">Üye olmadan çözdüğün sorular ve netlerin bu tarayıcıda saklanır; tarayıcı verisini temizlersen ya da telefon değiştirirsen silinir. Ücretsiz hesap açarsan her cihazda seninle olur.</p></div><a class="btn sm pri" href="#hesap">Hesap aç</a></div>`;
 }
+
+/* ---------- karşılama turu: ad + alan → hedef puan → günlük hedef ---------- */
+const OB = { adim: 1, name: "", alan: "", hedef: 0, gunluk: 0 };
+function obKart(goal) {
+  const A = OB.adim, alan = OB.alan || S.profile.alan || "SAY", gun = OB.gunluk || goal || 40;
+  const chip = (act, k, v, l, on) => `<button type="button" class="ob-chip${on ? " on" : ""}" data-a="${act}" data-k="${k}" data-v="${v}">${l}</button>`;
+  const govde = A === 1 ? `<label class="f">Adın<input class="in" id="obAd" autocomplete="given-name" placeholder="Adını yaz" value="${esc(OB.name)}" maxlength="40"></label>
+      <div class="f"><span>Alanın</span><div class="ob-chips">${Object.entries(ALAN).map(([k, v]) => chip("obSec", "alan", k, v, alan === k)).join("")}</div></div>`
+    : A === 2 ? `<div class="f"><span>Hedef YKS puanın ne? <small class="muted">(sonra değiştirebilirsin)</small></span><div class="ob-chips">${[350, 400, 450, 480].map(v => chip("obSec", "hedef", v, v, OB.hedef === v)).join("")}${chip("obSec", "hedef", 0, "Bilmiyorum", !OB.hedef)}</div></div><p class="small muted" style="margin:0">Hedefine göre her ders için kaç net gerektiğini Gelişimim sayfasında göstereceğiz.</p>`
+    : `<div class="f"><span>Günde kaç soru çözmek istersin?</span><div class="ob-chips">${[20, 40, 60, 100].map(v => chip("obSec", "gunluk", v, v + " soru", gun === v)).join("")}</div></div><p class="small muted" style="margin:0">Alışkanlık oluşturmak için küçük başla; hedefi istediğin zaman değiştirebilirsin.</p>`;
+  return `<div class="card stack ob"><div class="card-h" style="margin:0"><h2>${A === 1 ? "Seni tanıyalım" : A === 2 ? "Hedefin ne?" : "Günlük hedefin"}</h2><span class="ob-nokta">${[1, 2, 3].map(i => `<i class="${i <= A ? "on" : ""}"></i>`).join("")}</span></div>
+    ${govde}<div class="row">${A > 1 ? `<button type="button" class="btn ghost" data-a="obAdim" data-v="-1">Geri</button>` : ""}<button type="button" class="btn pri" data-a="obAdim" data-v="1">${A === 3 ? "Başla" : "Devam"}</button></div></div>`;
+}
+Object.assign(KART_ACT, {
+  obSec(d) { const ad = document.getElementById("obAd"); if (ad) OB.name = ad.value.trim().slice(0, 40); OB[d.k] = d.k === "alan" ? d.v : +d.v; render(); },
+  obAdim(d) {
+    const ad = document.getElementById("obAd"); if (ad) OB.name = ad.value.trim().slice(0, 40);
+    if (+d.v > 0 && OB.adim === 3) {
+      S.profile.name = OB.name || S.profile.name; S.profile.alan = OB.alan || S.profile.alan || "SAY";
+      S.profile.hedefPuan = OB.hedef || 0; S.profile.gunluk = OB.gunluk || S.profile.gunluk || 40; S.profile.ok = true;
+      touch("profile"); render(); toast("Hazırsın! Bugünün programı aşağıda."); return;
+    }
+    OB.adim = Math.max(1, Math.min(3, OB.adim + (+d.v))); render();
+  }
+});
+Object.assign(OZ_ACT, KART_ACT);
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",

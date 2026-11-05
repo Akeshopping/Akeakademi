@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=db2e3b0f96">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=db2e3b0f96">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=db2e3b0f96">
+<link rel="manifest" href="/manifest.webmanifest?v=55caa53084">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=55caa53084">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=55caa53084">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=db2e3b0f96">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=55caa53084">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -645,6 +645,23 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 @media (max-width:350px){.brand .wm span{display:none}}
 .hak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .veri-uyari{display:flex;gap:12px;align-items:flex-start}
+
+/* ---- cilalama: seçim kutuları, liste işaretleri, altbilgi, boş durumlar ---- */
+select.in{appearance:none;-webkit-appearance:none;padding-right:36px;cursor:pointer;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8f9c' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 12px center;border-radius:12px}
+.in,select.in,textarea.in{border-radius:12px;transition:border-color .15s,box-shadow .15s}
+.in:focus,select.in:focus,textarea.in:focus{outline:none;border-color:var(--form);box-shadow:0 0 0 3px var(--form-soft)}
+.pf-i.on{background:var(--ok-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300a37e' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat;border-color:transparent}
+.foot{gap:12px}.foot nav{gap:8px 18px}.foot p{margin:0}
+.pomo .vhead,.pomo h2{align-self:flex-start;text-align:left}
+.empty{border-radius:16px}
+.giris-sayfa{display:grid;gap:20px;max-width:880px;margin:8px auto 0;grid-template-columns:1fr}
+@media (min-width:820px){.giris-sayfa{grid-template-columns:minmax(0,440px) 1fr;align-items:center;gap:40px;margin-top:40px}}
+.giris-kart h1{font-size:24px;margin:0}.giris-logo .logo-tile{width:52px;height:52px}
+.giris-fayda{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.giris-fayda li{display:flex;flex-direction:column;gap:2px;padding-left:16px;border-left:3px solid var(--form)}
+.giris-fayda b{font-size:15px}.giris-fayda span{font-size:13.5px;color:var(--ink2);line-height:1.5}
 </style>
 </head>
 <body>
@@ -5423,7 +5440,7 @@ function vBank() {
   const B = UI.bank, tops = B.s ? topicsOf(B.s).filter(t => t.n) : [], list = bankFiltered();
   const ai = S.aiQs.length;
   return `<div class="view">
-  <div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1><p>${BANK.length} özgün, çözümü yazılmış soru${ai ? ` ve senin ürettiğin ${ai} AI sorusu` : ""}. Bunlara ek olarak ${GENS.length} soru kalıbı en az ${nfx(QSTATS.distinct)} farklı soru üretir; kalıp soruları denemelerde ve Çalışma stüdyosunda karşına çıkar, gördüğün bir soru bir daha gelmez.</p></div>
+  <div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1><p>${BANK.length} özgün, çözümü yazılmış soru${ai ? ` ve senin ürettiğin ${ai} AI sorusu` : ""}. Denemelerde ve Çalışma stüdyosunda bunlara ek olarak her seferinde yeni sayılarla üretilen sorular da gelir; gördüğün soru tekrar karşına çıkmaz.</p></div>
   ${subTabs(SORU_TABS, "banka")}
   <div class="card stack">
     <div class="fields">
@@ -6877,8 +6894,9 @@ function vHesap() {
   const H = HESAP;
   if (IN_CLAUDE || H.yok) return `<div class="view"><div class="vhead"><h1>Hesabım</h1><p>${IN_CLAUDE ? "Bu sürümde ilerlemen Claude hesabına bağlı olarak saklanır." : "Hesap sistemi çok yakında açılıyor. O zamana kadar ilerlemen bu cihazda saklanır; Ayarlar'dan yedek alabilirsin."}</p></div></div>`;
   if (!H.hazir) return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div><div class="empty">Yükleniyor…</div></div>`;
-  if (!H.user) return `<div class="view"><div class="vhead"><h1>Giriş yap</h1><p>Hesabınla ilerlemen, yanlış defterin ve paketin her cihazda seninle olur. Telefonunu değiştirsen de hiçbir şey kaybolmaz. Hesap açmazsan verilerin yalnızca bu cihazda kalır; tarayıcı verisini silersen ya da telefon değiştirirsen gider. Hesap açmak ücretsiz.</p></div>
-    <div class="card stack" style="max-width:520px">${girisFormu()}</div></div>`;
+  if (!H.user) return `<div class="view"><div class="giris-sayfa">
+    <div class="card stack giris-kart"><div class="giris-logo">${logoTile ? logoTile("lg-giris", "") : ""}</div><h1>AKE Akademi'ye hoş geldin</h1><p class="muted" style="margin:0">Ücretsiz hesapla ilerlemen her cihazda seninle olur.</p>${girisFormu()}</div>
+    <ul class="giris-fayda"><li><b>Her cihazda seninle</b><span>Telefonu değiştirsen de çözdüğün sorular, yanlış defterin ve netlerin kaybolmaz.</span></li><li><b>Arkadaş ligi ve canlı denemeler</b><span>Her pazar Türkiye genelinde sıralamaya gir, rozet kazan.</span></li><li><b>Hesapsız da kullanabilirsin</b><span>Ama verilerin yalnızca bu cihazda kalır; tarayıcı verisi silinirse gider.</span></li></ul></div></div>`;
   const [, st] = saveLabel();
   return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>
     <div class="card stack"><h2>${esc(H.user.ad || "Hesap bilgilerin")}</h2><p><b>E-posta:</b> ${esc(H.user.eposta)}</p><p class="small muted"><b>Kayıt:</b> ${esc(st)}. Çalışma verilerin hesabında saklanır ve giriş yaptığın her cihazda eşitlenir.</p>

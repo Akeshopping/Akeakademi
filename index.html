@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=356b1c2fa3">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=356b1c2fa3">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=356b1c2fa3">
+<link rel="manifest" href="/manifest.webmanifest?v=674586fe7e">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=674586fe7e">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=674586fe7e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=356b1c2fa3">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=674586fe7e">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -111,7 +111,8 @@ sup,sub{font-size:.72em}
 .save.cloud i{background:var(--ok)} .save.retry i{background:var(--warn)}
 .shell{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1240px;margin:0 auto;gap:28px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.side{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));align-self:start;padding-block:22px;max-height:calc(100vh - 58px);overflow:auto}
+.side{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));align-self:start;padding-block:22px;max-height:calc(100vh - 58px);overflow:auto;background:var(--paper);border-radius:0 0 18px 0}
+@media (min-width:900px){.side{box-shadow:1px 0 0 var(--glass-line)}}
 .side h4,.menu-sheet h4{font:600 12px/1 var(--f-body);color:var(--ink3);margin:18px 10px 8px}
 .menu-sheet h4:first-child{margin-top:4px}
 .side h4:first-child{margin-top:0}

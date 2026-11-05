@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=e5740f10fd">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e5740f10fd">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e5740f10fd">
+<link rel="manifest" href="/manifest.webmanifest?v=db2e3b0f96">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=db2e3b0f96">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=db2e3b0f96">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=e5740f10fd">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=db2e3b0f96">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5298,7 +5298,7 @@ function resumeBanner() {
 function aiBox(key, idle) {
   const st = UI.ai[key];
   if (!st) return idle || "";
-  if (st.busy && !st.text) return `<div class="ai-out" id="ai-${key}"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>`;
+  if (st.busy && !st.text) return `<div class="ai-out" id="ai-${key}"><span class="thinking"><i></i><i></i><i></i> AKE düşünüyor</span></div>`;
   return `<div class="ai-out" id="ai-${key}">${md(st.text || "")}${st.err ? `<p class="small" style="color:var(--bad)">${esc(st.err)}</p>` : ""}${!st.busy && st.text ? `<div class="ai-tools">${sesBtn("sesAI", ` data-k="${esc(key)}"`, "ai:" + key, "Dinle")}</div>` : ""}</div>`;
 }
 
@@ -5392,7 +5392,7 @@ function vResult() {
   ${R.sections && R.sections.length > 1 ? `<div class="card"><h2 style="margin-bottom:10px">Ders ders</h2><div class="tbl-wrap"><table class="sectbl"><thead><tr><th>Bölüm</th><th style="text-align:right">D</th><th style="text-align:right">Y</th><th style="text-align:right">B</th><th style="text-align:right">Net</th></tr></thead><tbody>
     ${R.sections.map(s => `<tr><td>${esc(s.n)}</td><td class="n">${s.d}</td><td class="n">${s.y}</td><td class="n">${s.b}</td><td class="n"><b>${nfx(s.net)}</b></td></tr>`).join("")}</tbody></table></div></div>` : ""}
   <div class="card stack"><div class="card-h" style="margin:0"><h2>AI değerlendirmesi</h2>${aiOn() ? `<button class="btn sm" data-a="aiResult" data-id="${R.id}" ${UI.ai[key] && UI.ai[key].busy ? "disabled" : ""}>${UI.ai[key] ? "Yeniden yorumla" : "Sonucumu yorumla"}</button>` : ""}</div>
-    ${aiOn() ? aiBox(key, `<p class="small muted">Claude, ders netlerine ve yanlış yaptığın konulara bakarak bir sonraki haftan için öneri yazar.</p>`) : premNote("AI değerlendirmesi için Claude'a izin vermen gerekir.", "Deneme sonucunun AI yorumu")}</div>
+    ${aiOn() ? aiBox(key, `<p class="small muted">AKE öğretmen, ders netlerine ve yanlış yaptığın konulara bakarak bir sonraki haftan için öneri yazar.</p>`) : premNote("AI değerlendirmesi için Claude'a izin vermen gerekir.", "Deneme sonucunun AI yorumu")}</div>
   ${R.qs && R.qs.length ? `<div class="card stack"><h2>Soruları incele</h2>${R.qs.map((q, i) => reviewItem(q, i)).join("")}</div>` : `<p class="note">Eski denemelerin soru ayrıntıları yer kazanmak için saklanmaz; son üç denemenin soruları açılabilir.</p>`}
   <div class="row"><button class="btn pri" data-a="go" data-h="deneme">Yeni deneme</button>${R.kind === "exam" ? `<button class="btn" data-a="kartAc" data-t="deneme" data-id="${esc(R.id)}">Hikâyede paylaş</button>` : ""}<button class="btn" data-a="go" data-h="yanlislar">Yanlış defterim</button></div>
   </div>`;
@@ -5469,7 +5469,7 @@ function uretKartlari(s, gs, G2) {
   </div>
   <div class="card stack"><div class="card-h" style="margin:0"><h2>Konu özeti</h2></div>
     ${aiOn() ? `<form class="row" data-s="summary"><select class="in" name="s" style="max-width:200px">${subjOpts(s)}</select><input class="in" name="t" placeholder="Konu, örn. Logaritma" required style="flex:1;min-width:160px"><button class="btn">Özetle</button></form>${aiBox("sum")}`
-      : premNote("Konu özetleri Claude ile hazırlanır.", "AI konu özetleri", "note")}
+      : premNote("Konu özetleri AI ile hazırlanır.", "AI konu özetleri", "note")}
   </div>
 `;
 }
@@ -5651,9 +5651,9 @@ function vTutor() {
   const sug = ["Türevde zincir kuralını bir örnekle anlat", "Paragraf sorularında nasıl hızlanırım?", "Bugün ne çalışmalıyım?", "Mol kavramını sıfırdan anlat", "Divan edebiyatı nazım şekillerini özetle", "Present perfect ile past simple farkı ne?"];
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">7/24 yanında</span><h1>AI öğretmenim</h1><p>Takıldığın soruyu yaz${AI.images ? " ya da fotoğrafını ekle" : ""}; konu anlatımı, çözüm adımları ve çalışma önerisi iste. Öğretmenin alanını ve zayıf konularını bilir.</p></div>
-  ${!AI.ready ? `<div class="empty">Claude'a bağlanılıyor…</div>` : !aiOn() ? tutorOff() : `
+  ${!AI.ready ? `<div class="empty">AKE'ye bağlanılıyor…</div>` : !aiOn() ? tutorOff() : `
   <div class="chat" id="chat">${UI.chat.length ? UI.chat.map((m, ci) => `<div class="msg ${m.role === "user" ? "u" : "a"}">${m.img ? `<div class="att">📎 Görsel eklendi</div>` : ""}${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : md(m.content)}${m.role !== "user" ? `<div class="ai-tools">${m.g ? `<span class="mtag">Gelişmiş çözüm</span>` : ""}${sesBtn("sesChat", ` data-n="${ci}"`, "chat:" + ci, "Dinle")}</div>` : ""}</div>`).join("") : `<div class="card sunk"><p class="small muted" style="margin-bottom:10px">Şunlardan biriyle başlayabilirsin:</p><div class="sugg">${sug.map(s => `<button data-a="chatSug" data-t="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
-    ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> Claude düşünüyor</span></div>` : ""}</div>
+    ${UI.chatBusy ? `<div class="msg a" id="chat-live"><span class="thinking"><i></i><i></i><i></i> AKE düşünüyor</span></div>` : ""}</div>
   <div class="composer">${UI.chatImg ? `<div class="row small" style="margin-bottom:6px"><span class="pill form">📎 ${esc(UI.chatImg.name || "görsel")}</span><button class="btn sm ghost" data-a="chatImgClear">Kaldır</button></div>` : ""}
     <form data-s="chat">${AI.images ? `<label class="btn ghost sm" title="Soru fotoğrafı ekle" style="min-height:40px">${icon("img")}<input type="file" accept="${esc((AI.imgTypes || ["image/jpeg", "image/png", "image/webp"]).join(","))}" data-c="chatImg" hidden></label>` : ""}
       ${tutorSesAraclari()}<textarea id="chatIn" data-i="chatDraft" rows="1" placeholder="${srObj ? "Dinliyorum…" : "Sorunu yaz…"}" aria-label="Mesaj">${esc(UI.chatDraft)}</textarea>

@@ -10,13 +10,13 @@ window.AKE_AYAR = {
   eposta: "alikaaneren13@gmail.com",   // İletişim e-postası
   telefon: "",        // Telefon (isteğe bağlı)
   odemeAracisi: "Shopier",   // Ödeme kuruluşu
-  fiyatOrta: "199",       // Orta paket aylık fiyat (TL, sadece sayı)
-  yillikOrta: "2189",     // Orta paket yıllık fiyat
+  fiyatOrta: "199",       // Atılım paketi aylık fiyat (TL, sadece sayı)
+  yillikOrta: "2189",     // Atılım paketi yıllık fiyat
   fiyatPremium: "399",    // Premium paket aylık fiyat
   yillikPremium: "4389",  // Premium paket yıllık fiyat
-  aiOrta: "200",          // Orta paket aylık AI mesaj hakkı
+  aiOrta: "200",          // Atılım paketi aylık AI mesaj hakkı
   aiPremium: "500",       // Premium paket aylık AI mesaj hakkı
-  cozumOrta: "20",        // Orta paket: bu mesajların kaçı gelişmiş modelle soru çözümü olsun
+  cozumOrta: "20",        // Atılım paketi: bu mesajların kaçı gelişmiş modelle soru çözümü olsun
   cozumPremium: "60",     // Premium paket: bu mesajların kaçı gelişmiş modelle soru çözümü olsun
   linkOrtaAy: "https://www.shopier.com/AKESHOPPING/52547800",   // Ödeme linkleri (https:// ile başlar). Boş olan paket "Çok yakında" görünür.
   linkOrtaYil: "https://www.shopier.com/AKESHOPPING/52547904",

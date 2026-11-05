@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=780b76f2a9">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=780b76f2a9">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=780b76f2a9">
+<link rel="manifest" href="/manifest.webmanifest?v=e5740f10fd">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e5740f10fd">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e5740f10fd">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=780b76f2a9">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=e5740f10fd">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -639,6 +639,12 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 .rz:not(.on) .rz-m{background:var(--line2);color:var(--ink2);box-shadow:none}
 .rz b{font-size:13px} .rz small{font-size:11px;color:var(--ink2);line-height:1.3}
 .kart-on{display:flex;justify-content:center;margin-bottom:10px} .kart-on img{max-height:56vh;max-width:100%;border-radius:18px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+
+/* ---- dar ekran güvenliği: giriş düğmesi ve sayaç logo yazısının üstüne binmesin ---- */
+.brand{flex:0 1 auto;overflow:hidden}.top-in>.giris-btn,.top-in>.tema-btn,.top-in>.chip-cd{flex-shrink:0}
+@media (max-width:350px){.brand .wm span{display:none}}
+.hak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.veri-uyari{display:flex;gap:12px;align-items:flex-start}
 </style>
 </head>
 <body>
@@ -2082,6 +2088,79 @@ const BANK = [];
     "a₇ − a₃ = 4d = 12 ise d = 3'tür. a₁ = 7 − 2·3 = 1 ve a₁₀ = 1 + 9·3 = 28'dir.");
   q("amat", "Kombinasyon", 2, "8 kişilik bir gruptan 3 kişilik bir komisyon kaç farklı şekilde seçilebilir?", ["48", "52", "56", "64", "70"], 2,
     "C(8, 3) = (8 · 7 · 6) / (3 · 2 · 1) = 56'dır.");
+})();
+/* ===== Özgün soru bankası · 5. bölüm: Türkçe dil bilgisi (ince kalan konular) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  let k = 0;
+  /* doğru cevap, sırayla A–E arasında dağıtılır */
+  function q(t, d, text, dogru, yanlis, x) {
+    const pos = (k++ * 2 + 1) % 5, o = yanlis.slice(); o.splice(pos, 0, dogru);
+    cnt.turkce = (cnt.turkce || 0) + 1;
+    BANK.push({ id: "turkce-" + cnt.turkce, s: "turkce", t, d, q: text, o, a: pos, x });
+  }
+
+  /* ---------- Cümlenin ögeleri ---------- */
+  q("Cümlenin ögeleri", 2, "Aşağıdaki cümlelerin hangisinde özne gizlidir?", "Eve geç geldim.", ["Ali okula gitti.", "Yağmur dindi.", "Kuşlar uçtu.", "Hava soğudu."],
+    "\"Eve geç geldim.\" cümlesinde \"gelen\" kişi yüklemin ekinden anlaşılır (ben), ama cümlede açıkça yazılmamıştır; bu yüzden özne gizlidir. Diğerlerinde özne açıkça yazılmıştır.");
+  q("Cümlenin ögeleri", 2, "Aşağıdaki cümlelerin hangisinde yüklem isim soylu bir sözcüktür?", "Bu kitap çok ilginç.", ["Çocuk koşarak geldi.", "Annem yemek yapıyor.", "Dün akşam herkes erken uyudu.", "Öğrenciler sınıfa girdi."],
+    "\"Bu kitap çok ilginç.\" cümlesinin yüklemi \"ilginç\" (isim soylu) sözcüktür. Diğer cümlelerin yüklemleri (geldi, yapıyor, uyudu, girdi) fiildir.");
+  q("Cümlenin ögeleri", 2, "Aşağıdaki cümlelerin hangisinde belirtili nesne vardır?", "Zeynep mektubu yazdı.", ["Ahmet kitap okudu.", "Çocuklar bahçede oynadı.", "Babam eve geldi.", "Hava çok güzeldi."],
+    "Belirtili nesne, -i hâl ekini alır: \"mektubu\". \"Ahmet kitap okudu.\" cümlesinde \"kitap\" ek almadığı için belirtisiz nesnedir; diğer cümlelerde nesne yoktur.");
+  q("Cümlenin ögeleri", 3, "Aşağıdaki cümlelerin hangisinde yönelme hâlindeki (-e) bir dolaylı tümleç vardır?", "Ayşe arkadaşına mektup yazdı.", ["Ali kitabı aldı.", "Kardeşim sinemadan döndü.", "Çocuk yavaşça yürüdü.", "Onu çok sevdim."],
+    "\"Arkadaşına\" sözcüğü -e (yönelme) hâl ekini almıştır ve yükleme \"kime?\" sorusuyla bağlanır. \"Sinemadan\" çıkma hâlindedir; \"onu\" nesnedir; \"yavaşça\" zarftır.");
+
+  /* ---------- Fiilimsiler ---------- */
+  q("Fiilimsiler", 2, "Aşağıdaki cümlelerin hangisinde isim-fiil (mastar) kullanılmıştır?", "Çalışmak başarının anahtarıdır.", ["Koşarak okula yetişti.", "Yanan ateşin başında ısındık.", "Gülerek içeri girdi.", "Okuyan öğrenciler başarılı oldu."],
+    "\"Çalışmak\" sözcüğü -mak ekiyle isim görevinde kullanılan bir isim-fiildir. \"Koşarak\" ve \"gülerek\" zarf-fiil, \"yanan\" ve \"okuyan\" sıfat-fiildir.");
+  q("Fiilimsiler", 2, "Aşağıdaki cümlelerin hangisinde sıfat-fiil vardır?", "Geçen yıl bu zamanlar Ankara'daydım.", ["Hızlıca koştu.", "Sevinçle bağırdı.", "Ders çalışmak istiyorum.", "Gülerek kapıyı açtı."],
+    "\"Geçen\" sözcüğü -en ekiyle \"yıl\" adını niteleyen bir sıfat-fiildir. \"Çalışmak\" isim-fiil, \"gülerek\" zarf-fiildir; \"hızlıca\" ve \"sevinçle\" fiilimsi değildir.");
+  q("Fiilimsiler", 2, "Aşağıdaki cümlelerin hangisinde zarf-fiil vardır?", "Eve gelince seni aradım.", ["Yorgun bir yolcu geldi.", "Uyuyan çocuğu uyandırma.", "Okumak güzel bir alışkanlıktır.", "Yazılan mektup ulaştı."],
+    "\"Gelince\" sözcüğü -ince ekiyle yüklemin (aradım) zamanını bildiren bir zarf-fiildir. \"Uyuyan\" ve \"yazılan\" sıfat-fiil, \"okumak\" isim-fiildir.");
+  q("Fiilimsiler", 1, "\"Annem, mutfakta yemek yaparken şarkı söylüyordu.\" cümlesindeki \"yaparken\" sözcüğü hangi fiilimsidir?", "Zarf-fiil", ["İsim-fiil", "Sıfat-fiil", "Ek-fiil", "Çekimli fiil"],
+    "-ken eki, eylemin yapıldığı zamanı bildiren zarf-fiil (bağ-fiil) ekidir; \"yaparken\" de \"söylüyordu\" eylemini zaman yönünden tamamlar.");
+
+  /* ---------- Noktalama ---------- */
+  q("Noktalama", 1, "Aşağıdaki cümlelerin hangisinde noktalama işareti yanlış kullanılmıştır?", "Kaç yaşındasın.", ["Ne zaman geleceksin?", "Eyvah, geç kaldık!", "Ahmet, bana kitabı getir.", "Yarın sınav var."],
+    "\"Kaç yaşındasın\" bir soru cümlesidir; sonuna nokta değil soru işareti (?) konur.");
+  q("Noktalama", 2, "Aşağıdaki cümlelerin hangisinde iki nokta (:) doğru kullanılmıştır?", "Sepete şunları koydum: elma, armut ve muz.", ["Sepete: elma, armut ve muz koydum.", "Ali: yarın geliyor.", "Gel: dedi.", "Yarın: sinemaya gideceğiz."],
+    "İki nokta, açıklanacak ya da sıralanacak bir şeyi duyuran bir ifadeden sonra gelir: \"şunları koydum:\". Diğer cümlelerde iki nokta gereksiz yere kullanılmıştır.");
+  q("Noktalama", 2, "Aşağıdaki cümlelerin hangisinde kesme işareti yanlış kullanılmıştır?", "Türk'ler çalışkan bir millettir.", ["Ankara'ya gittik.", "Atatürk'ün sözlerini okuduk.", "Ali'ler bize geldi.", "Türkiye'nin başkenti Ankara'dır."],
+    "Millet adları özel ad sayılmadığı için kesme işareti almaz: \"Türkler\". Kişi, yer ve ülke adlarına gelen ekler ise kesmeyle ayrılır (Ali'ler, Ankara'ya, Atatürk'ün, Türkiye'nin).");
+  q("Noktalama", 2, "Aşağıdaki cümlelerin hangisinde virgül, sıralı cümleleri birbirinden ayırmak için kullanılmıştır?", "Yağmur yağdı, sokaklar ıslandı.", ["Ahmet, buraya gel.", "Elma, armut, muz aldım.", "Evet, haklısın.", "Ankara, Türkiye'nin başkentidir."],
+    "\"Yağmur yağdı\" ve \"sokaklar ıslandı\" birbirinden bağımsız iki cümledir ve virgülle ayrılmıştır. \"Ahmet,\" hitap; \"Elma, armut, muz\" sıralı sözcük; \"Evet,\" cevap sözcüğü içindir.");
+
+  /* ---------- Cümle türleri ---------- */
+  q("Cümle türleri", 2, "Aşağıdaki cümlelerden hangisi yüklemine göre isim cümlesidir?", "Hava çok soğuktu.", ["Çocuk koştu.", "Kitabı okudum.", "Yarın gelecek.", "Pencereyi açtı."],
+    "\"Soğuktu\" yüklemi isim soylu bir sözcük (soğuk) ile ek-fiilden oluşur, bu yüzden cümle isim cümlesidir. Diğerlerinin yüklemi fiildir.");
+  q("Cümle türleri", 3, "Aşağıdaki cümlelerden hangisi birleşik cümledir?", "Gözlerini kapatıp uyudu.", ["Ali geldi.", "Hava soğuk.", "Kitap okudu.", "Yağmur yağdı."],
+    "\"Kapatıp\" sözcüğü zarf-fiil olduğundan cümle, fiilimsi içeren bir birleşik cümledir. Diğerleri tek yargılı basit cümlelerdir.");
+  q("Cümle türleri", 1, "Aşağıdaki cümlelerden hangisi soru cümlesi değildir?", "Ne güzel bir gün!", ["Kim geldi?", "Bu kitabı sen mi aldın?", "Hangi gün gideceksin?", "Okula ne zaman başlıyorsun?"],
+    "\"Ne güzel bir gün!\" cümlesindeki \"ne\" soru değil, ünlem sözcüğüdür; cümle bir şaşkınlık ve beğeni bildirir.");
+
+  /* ---------- Anlatım bozukluğu ---------- */
+  q("Anlatım bozukluğu", 3, "Aşağıdaki cümlelerin hangisinde anlatım bozukluğu yoktur?", "Sınavda başarılı olmak için hem çok çalışmalı hem de düzenli uyumalısın.",
+    ["Bu konuyu daha ayrıntılı olarak daha detaylı anlatacağım.", "Dün akşam yemeğinde yaklaşık olarak on kişi gibi vardık.", "Kitabı okumak ve izlemek hoşuma gitti.", "Bu yemeğin tadı ve kokusu çok güzel görünüyor."],
+    "Doğru cümlede sözcükler anlam bakımından birbirine uygundur. Diğerlerinde gereksiz sözcük (ayrıntılı-detaylı; yaklaşık-gibi), mantık hatası (kitap izlenmez) ve anlam uyumsuzluğu (tat ve koku \"görünmez\") vardır.");
+  q("Anlatım bozukluğu", 2, "Aşağıdaki cümlelerin hangisinde gereksiz sözcük kullanımından kaynaklanan bir anlatım bozukluğu vardır?", "Geri dönüp tekrar yeniden denedi.", ["Yarın erkenden yola çıkacağız.", "Çocuklar bahçede oynuyor.", "Kitabı masaya bıraktı.", "Sabah erken kalktım."],
+    "\"Tekrar\" ve \"yeniden\" aynı anlamı taşır; \"geri dönüp\" ifadesi de bunlarla birlikte gereksiz tekrar oluşturur.");
+  q("Anlatım bozukluğu", 2, "Aşağıdaki cümlelerin hangisinde özne-yüklem uyumsuzluğu vardır?", "Biz yarın sinemaya gideceksiniz.", ["Öğrenciler sınıfa girdi.", "Sen çok çalışıyorsun.", "Onlar geldi.", "Ben okula gidiyorum."],
+    "Özne \"biz\" (1. çoğul kişi) olduğu hâlde yüklem \"gideceksiniz\" 2. çoğul kişi ekini taşımaktadır. Doğrusu \"gideceğiz\" olmalıdır.");
+
+  /* ---------- Sözcük türleri ---------- */
+  q("Sözcük türleri", 2, "Aşağıdaki cümlelerin hangisinde \"güzel\" sözcüğü zarf olarak kullanılmıştır?", "Güzel konuşuyor.", ["Güzel bir kız geldi.", "Güzeli seçti.", "O çok güzel.", "Güzel günler yakındır."],
+    "\"Güzel konuşuyor\" cümlesinde \"güzel\", fiili (konuşuyor) niteleyerek zarf olmuştur. \"Güzel bir kız\"da sıfat, \"güzeli\"de isim, \"o çok güzel\"de yüklem olarak kullanılmıştır.");
+  q("Sözcük türleri", 2, "Aşağıdaki cümlelerin hangisinde işaret zamiri vardır?", "Şunu bana ver.", ["Bu kalemi sen mi aldın?", "O çocuk çok akıllı.", "Bu evde oturuyorum.", "Şu masayı kaldır."],
+    "\"Şunu\" tek başına bir ismin yerini tutarak zamir olmuştur. Diğer cümlelerde \"bu, o, şu\" bir adın önünde gelerek işaret sıfatı olmuştur.");
+  q("Sözcük türleri", 3, "Aşağıdaki cümlelerin hangisinde \"ki\" bağlaç olarak kullanılmıştır?", "Öyle yoruldum ki hemen uyudum.", ["Sınıftaki öğrenciler sustu.", "Evdeki hesap çarşıya uymaz.", "Dünkü sınav zordu.", "Duvardaki resim düştü."],
+    "Bağlaç olan \"ki\" ayrı yazılır ve iki cümleyi bağlar: \"Öyle yoruldum ki hemen uyudum.\" Diğerlerindeki \"-ki\" bir ilgi ekidir ve bitişik yazılır.");
+
+  /* ---------- Yazım kuralları ---------- */
+  q("Yazım kuralları", 2, "Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?", "Yarın ki toplantıya gelecek misin?", ["Hiçbir şey söylemedi.", "Herkes bu sonuçtan memnundu.", "Ayrıca yarın görüşelim.", "Bu yüzden geç kaldım."],
+    "İlgi eki olan \"-ki\" bitişik yazılır: \"yarınki toplantı\". Diğer cümlelerdeki yazımlar doğrudur.");
+  q("Yazım kuralları", 2, "Aşağıdaki cümlelerin hangisinde soru eki \"mi\" yanlış yazılmıştır?", "Çok güzelmi?", ["Geldin mi?", "Okula gittin mi?", "Sen de mi geliyorsun?", "Bunu yaptın mı?"],
+    "Soru eki \"mi\" her zaman ayrı yazılır: \"Çok güzel mi?\"");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -5096,7 +5175,7 @@ function aiErr(e) {
     invalid_json: "Yanıt beklenen biçimde gelmedi. Tekrar dene.", image_rejected: "Görsel kabul edilmedi. JPEG, PNG ya da WebP biçiminde, daha küçük bir dosya dene.",
     images_unavailable: "Bu görünümde görsel gönderilemiyor.", prompt_too_large: "Metin çok uzun. Daha kısa bir parça gönder.",
     empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "",
-    kod: "Erişim kodun geçerli değil. Yeni kod için bizimle iletişime geç.", giris: "AI öğretmeni kullanmak için giriş yap.", paket: "AI öğretmen için Orta ya da Premium paketin olmalı. Kodun varsa Hesabım sayfasından ekle.", baska_hesap: "Bu erişim kodu başka bir hesaba bağlı. Kodlar kişiseldir; bir sorun varsa bize yaz.", suresi: "Paketinin süresi doldu. Devam etmek için Paketler sayfasından yenileyebilirsin.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
+    kod: "Erişim kodun geçerli değil. Yeni kod için bizimle iletişime geç.", giris: "AI öğretmeni kullanmak için giriş yap.", paket: "AI öğretmen için Atılım ya da Premium paketin olmalı. Kodun varsa Hesabım sayfasından ekle.", baska_hesap: "Bu erişim kodu başka bir hesaba bağlı. Kodlar kişiseldir; bir sorun varsa bize yaz.", suresi: "Paketinin süresi doldu. Devam etmek için Paketler sayfasından yenileyebilirsin.", kota: "Bu ayki AI mesaj hakkın doldu. Yeni ay başında yenilenir.",
     network: "İnternet bağlantısını kontrol edip tekrar dene.", overloaded: "AI şu an çok yoğun. Birkaç dakika sonra tekrar dene.",
     yapilandirma: "AI sunucusu henüz ayarlanmamış. Biraz sonra tekrar dene.", server: "AI şu an yanıt veremedi. Tekrar dene." })[code] ?? "Bağlantıda bir sorun oldu. Tekrar dene.";
 }
@@ -5242,9 +5321,9 @@ function vHome() {
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
     <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
-  ${canliKart(true)}${ligMini()}
+  ${veriUyari()}${canliKart(true)}${ligMini()}
   <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
-    <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${o.n ? `${o.n} soru · %${o.acc} doğru` : "Henüz başlamadın"}</small></button>`; }).join("")}</div></section>
+    <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
   <div class="grid2">
     <section class="card"><div class="card-h"><h2>Son deneme</h2>${last ? `<button class="btn sm ghost" data-a="openResult" data-id="${last.id}">Sonucu aç</button>` : ""}</div>
       ${last ? `<div class="row" style="gap:22px"><div class="net-big"><b class="num">${nfx(last.net)}</b><span class="muted">net</span></div><div class="stack" style="gap:4px"><b>${esc(last.title)}</b><span class="small muted">${fmtDate(last.date)} · ${last.d} doğru, ${last.y} yanlış, ${last.b} boş</span></div></div>` : `<div class="empty">Henüz deneme çözmedin.<div style="margin-top:10px"><button class="btn sm pri" data-a="quick" data-k="mini">Mini deneme başlat</button></div></div>`}</section>
@@ -6107,16 +6186,16 @@ const AYAR_F = [
   ["adres", "Adres", "Mesafeli satış sözleşmesi için", true],
   ["telefon", "Telefon", "Örn. 0555 000 00 00", false],
   ["odemeAracisi", "Ödeme kuruluşu", "Örn. iyzico, Shopier", true],
-  ["fiyatOrta", "Orta paket · aylık fiyat (TL)", "199", false],
-  ["yillikOrta", "Orta paket · yıllık fiyat (TL)", "2189", false],
+  ["fiyatOrta", "Atılım paketi · aylık fiyat (TL)", "199", false],
+  ["yillikOrta", "Atılım paketi · yıllık fiyat (TL)", "2189", false],
   ["fiyatPremium", "Premium paket · aylık fiyat (TL)", "399", false],
   ["yillikPremium", "Premium paket · yıllık fiyat (TL)", "4389", false],
-  ["aiOrta", "Orta paket · aylık AI mesaj hakkı", "200", false],
+  ["aiOrta", "Atılım paketi · aylık AI mesaj hakkı", "200", false],
   ["aiPremium", "Premium paket · aylık AI mesaj hakkı", "500", false],
-  ["cozumOrta", "Orta paket · aylık gelişmiş soru çözümü", "20", false],
+  ["cozumOrta", "Atılım paketi · aylık gelişmiş soru çözümü", "20", false],
   ["cozumPremium", "Premium paket · aylık gelişmiş soru çözümü", "60", false],
-  ["linkOrtaAy", "Ödeme linki · Orta aylık", "https://…", false],
-  ["linkOrtaYil", "Ödeme linki · Orta yıllık", "https://…", false],
+  ["linkOrtaAy", "Ödeme linki · Atılım aylık", "https://…", false],
+  ["linkOrtaYil", "Ödeme linki · Atılım yıllık", "https://…", false],
   ["linkPremiumAy", "Ödeme linki · Premium aylık", "https://…", false],
   ["linkPremiumYil", "Ödeme linki · Premium yıllık", "https://…", false],
   ["guncelleme", "Yasal metinlerin güncelleme tarihi", "Örn. 3 Kasım 2026", false]
@@ -6199,7 +6278,7 @@ const ADM_SUB = {
 /* ---------- erişim kodları: satılan her paket için süreli, imzalı kod (akeakademi.com sunucusu doğrular) ---------- */
 Object.assign(IC, { key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>' });
 const KB32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", KEPOCH = Date.UTC(2026, 0, 1);
-const KPAKET = [["orta-ay", "Orta · 1 ay", "orta", 30], ["orta-yil", "Orta · 1 yıl", "orta", 365], ["premium-ay", "Premium · 1 ay", "premium", 30], ["premium-yil", "Premium · 1 yıl", "premium", 365]];
+const KPAKET = [["orta-ay", "Atılım · 1 ay", "orta", 30], ["orta-yil", "Atılım · 1 yıl", "orta", 365], ["premium-ay", "Premium · 1 ay", "premium", 30], ["premium-yil", "Premium · 1 yıl", "premium", 365]];
 const KODG = { sec: null, loaded: false, list: null, son: null, busy: false, err: "", sel: "premium-ay", goster: false };
 const kIso = n => new Date(KEPOCH + n * 86400000).toISOString().slice(0, 10);
 const kTarih = iso => new Date(iso + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
@@ -6486,6 +6565,14 @@ function alanDersleri() {
   return out;
 }
 function dersOzet(s) { let c = 0, n = 0; Object.entries(S.topic).forEach(([k, v]) => { if (k.split("|")[0] === s) { c += v[0]; n += v[0] + v[1] + v[2]; } }); return { n, acc: n ? pct(c, n) : null }; }
+const DERS_BILGI = {};
+function dersBilgi(s) {
+  if (DERS_BILGI[s]) return DERS_BILGI[s];
+  const T = new Set(); let n = 0;
+  BANK.forEach(q => { if (q.s === s) { T.add(String(q.t).split(" · ")[0]); n++; } });
+  GENS.forEach(g => { if ((g.subs || []).includes(s)) T.add(String(g.t).split(" · ")[0]); });
+  return (DERS_BILGI[s] = { konu: T.size, soru: n, kalip: GENS.some(g => (g.subs || []).includes(s)) });
+}
 function konuOzet(s, t) { const v = S.topic[s + "|" + t], n = v ? v[0] + v[1] + v[2] : 0; return { n, acc: n ? pct(v[0], n) : null }; }
 const isiSinif = acc => acc == null ? "h0" : acc < 40 ? "h1" : acc < 55 ? "h2" : acc < 70 ? "h3" : acc < 85 ? "h4" : "h5";
 const heatLegend = () => [["h0", "Çözülmedi"], ["h1", "%40 altı"], ["h2", "%40–55"], ["h3", "%55–70"], ["h4", "%70–85"], ["h5", "%85 ve üstü"]].map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join("");
@@ -6777,11 +6864,11 @@ function girisFormu(kisa) {
 function paketKart() {
   const H = HESAP, p = H.paket, k = H.kullanim || { mesaj: 0, guclu: 0 }, L = H.limit;
   return `<div class="card stack"><h2>Paketin</h2>
-    ${p ? `<p><b>${p.plan === "premium" ? "Premium" : "Orta"}</b>${p.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(p.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""}</p>
+    ${p ? `<p><b>${p.plan === "premium" ? "Premium" : "Atılım"}</b>${p.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(p.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""}</p>
       ${L ? `<div class="stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="small">Bu ay AI mesajı</span><span class="small mono">${k.mesaj} / ${L.mesaj}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.mesaj, L.mesaj))}%"></i></div>
       <div class="row" style="justify-content:space-between"><span class="small">Gelişmiş soru çözümü</span><span class="small mono">${k.guclu} / ${L.guclu}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.guclu, L.guclu))}%"></i></div></div>` : ""}
       <div class="row"><a class="btn pri" href="#ogretmen">AI öğretmene git</a></div>`
-    : `<p class="muted">Şu an ücretsiz paketi kullanıyorsun. AI öğretmen Orta ve Premium paketlerde var.</p><div class="row"><a class="btn pri" href="#premium">Paketleri incele</a></div>`}
+    : `<p class="muted">Şu an ücretsiz paketi kullanıyorsun. AI öğretmen Atılım ve Premium paketlerde var.</p><div class="row"><a class="btn pri" href="#premium">Paketleri incele</a></div>`}
     <form data-s="kodBagla" class="stack" style="gap:8px;border-top:1px solid var(--line2);padding-top:12px"><b class="small">${p ? "Yeni ya da yenileme kodun mu var?" : "Erişim kodun var mı?"}</b>
       <div class="row"><input class="in" name="kod" placeholder="AKE-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Erişim kodu" style="flex:1;min-width:200px"><button class="btn"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Hesabıma ekle"}</button></div>
       ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}<p class="xs muted">Kod hesabına bağlanır; başka bir hesapta kullanılamaz.</p></form></div>`;
@@ -6790,7 +6877,7 @@ function vHesap() {
   const H = HESAP;
   if (IN_CLAUDE || H.yok) return `<div class="view"><div class="vhead"><h1>Hesabım</h1><p>${IN_CLAUDE ? "Bu sürümde ilerlemen Claude hesabına bağlı olarak saklanır." : "Hesap sistemi çok yakında açılıyor. O zamana kadar ilerlemen bu cihazda saklanır; Ayarlar'dan yedek alabilirsin."}</p></div></div>`;
   if (!H.hazir) return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div><div class="empty">Yükleniyor…</div></div>`;
-  if (!H.user) return `<div class="view"><div class="vhead"><h1>Giriş yap</h1><p>Hesabınla ilerlemen, yanlış defterin ve paketin her cihazda seninle olur. Telefonunu değiştirsen de hiçbir şey kaybolmaz. Hesap açmak ücretsiz.</p></div>
+  if (!H.user) return `<div class="view"><div class="vhead"><h1>Giriş yap</h1><p>Hesabınla ilerlemen, yanlış defterin ve paketin her cihazda seninle olur. Telefonunu değiştirsen de hiçbir şey kaybolmaz. Hesap açmazsan verilerin yalnızca bu cihazda kalır; tarayıcı verisini silersen ya da telefon değiştirirsen gider. Hesap açmak ücretsiz.</p></div>
     <div class="card stack" style="max-width:520px">${girisFormu()}</div></div>`;
   const [, st] = saveLabel();
   return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>
@@ -6801,15 +6888,15 @@ function vHesap() {
 function hesapOzetKart() {
   if (IN_CLAUDE) return "";
   const H = HESAP;
-  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Orta"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
-  return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${H.paket.plan === "premium" ? "Premium" : "Orta"} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
+  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Atılım"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
+  return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${H.paket.plan === "premium" ? "Premium" : "Atılım"} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
     : `<p class="small muted">Giriş yaparsan ilerlemen hesabında saklanır ve telefonunu değiştirsen de kaybolmaz.</p><div class="row"><a class="btn pri" href="#hesap">Giriş yap</a></div>`}</div>`;
 }
 /* AI öğretmen kapısı (web) */
 function tutorGirisKapisi() {
   if (HESAP.yok) return null;
   if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
-  if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Orta ve Premium</span><h2>AI öğretmen için giriş yap</h2>
+  if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Atılım ve Premium</span><h2>AI öğretmen için giriş yap</h2>
     <p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularını bilen AI öğretmen paketlerle açılır. Önce giriş yap; paket kodun hesabına bağlanır.</p>${girisFormu(true)}<a class="btn ghost" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
   if (!HESAP.paket) return paketKart();
   return null;
@@ -6868,7 +6955,7 @@ function vYonetim() {
       <div class="list">${tik(V.eposta, "E-posta servisi (Resend)")}${tik(V.pat, "Shopier anahtarı (SHOPIER_PAT)")}${tik(V.webhook, "Sipariş bildirimi (webhook)")}</div>
       <p class="small muted">Kurulduğunda Shopier'de ödeme alınan her pakette kod kendiliğinden üretilir, alıcıya e-postayla gider; alıcı aynı e-postayla giriş yaptığında paket hesabına tanımlanır.</p>
       <div class="row"><button class="btn pri" data-a="yonKur"${!V.pat || YON.busy ? " disabled" : ""}>${YON.busy === "kur" ? "Kuruluyor…" : V.webhook ? "Yeniden kur" : "Otomatik satışı kur"}</button></div>
-      <div class="row" style="border-top:1px solid var(--line2);padding-top:12px"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Orta · 1 ay"], ["orta-yil", "Orta · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
+      <div class="row" style="border-top:1px solid var(--line2);padding-top:12px"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Atılım · 1 ay"], ["orta-yil", "Atılım · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
         <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Deneme siparişi gönder"}</button></div>
       <p class="xs muted">Deneme siparişi para çekmez; seçtiğin paket için gerçek bir kod üretip senin e-postana gönderir ve hesabına tanımlar.</p>
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
@@ -7594,6 +7681,35 @@ function yolHaritasi() {
     <div class="list">${satir.map(x => `<div class="li"><div class="grow"><div class="t">${esc(SUBJ[x.s].n)}</div><div class="s">Hedef ~${nfx(x.hedefNet)}/${x.n} net · ${x.sim == null ? "seviyeni görmek için en az 10 soru çöz" : `şu an ~${nfx(x.sim)} net`}</div></div>${x.fark == null ? "" : x.fark <= 0 ? `<span class="pill ok">Hedefte</span>` : `<span class="pill ${x.fark > 3 ? "bad" : "warn"}">Haftada +${nfx(x.fark / hafta)} net</span>`}</div>`).join("")}</div>
     <p class="small muted">Bu bir tahmindir: puan, net sayısıyla yaklaşık doğrusal ilerler varsayıldı; gerçek puan her yıl sınava girenlerin başarısına göre değişir. Resmî ÖSYM yerleştirme verileri eklenince bölüm taban puanlarına bağlanacak. "Şu an" değerleri çözdüğün sorulardaki doğru/yanlış oranından hesaplanır.</p></div>`;
 }
+
+/* ---------- Hakkımızda ve veri uyarısı ---------- */
+function vHakkimizda() {
+  const konu = new Set(); BANK.forEach(q => konu.add(q.s + "|" + String(q.t).split(" · ")[0])); GENS.forEach(g => (g.subs || []).forEach(s => konu.add(s + "|" + String(g.t).split(" · ")[0])));
+  return `<div class="view">
+  <div class="vhead"><span class="eyebrow">Biz kimiz</span><h1>Hakkımızda</h1><p>AKE Akademi, YKS'ye hazırlanan öğrenciler için tek kişi tarafından geliştirilen, bağımsız bir çalışma platformudur.</p></div>
+  <div class="card stack"><h2>Arkadaki kişi</h2>
+    <p><b>${ay("adSoyad", "AD SOYAD")}</b> · kurucu ve geliştirici<br><span class="muted small">Adapazarı, Sakarya</span></p>
+    <p>AKE Akademi'yi, YKS'ye hazırlanırken öğrencinin ihtiyacı olan her şeyi tek yerde, reklamsız ve sade bir arayüzle sunmak için kurdum. Bir kurum ya da büyük bir ekip değil, tek bir kişiyim; bu yüzden her mesaja ve hata bildirimine kendim bakıyorum.</p></div>
+  <div class="card stack"><h2>Soruları nasıl hazırlıyoruz?</h2>
+    <p>Soru havuzu sitenin kalbi; bu yüzden nasıl dolduğunu açıkça yazıyoruz:</p>
+    <div class="hak-grid">
+      <div class="card sunk"><b class="num" style="font-size:28px">${fmtN(BANK.length)}</b><div class="small muted">elle yazılmış, çözümlü soru</div></div>
+      <div class="card sunk"><b class="num" style="font-size:28px">${fmtN(GENS.length)}</b><div class="small muted">sayıları her seferinde değişen soru kalıbı</div></div>
+      <div class="card sunk"><b class="num" style="font-size:28px">${fmtN(konu.size)}</b><div class="small muted">konu başlığı</div></div></div>
+    <ul class="small" style="margin:0;padding-left:18px;line-height:1.7"><li>Her soru, ÖSYM'nin güncel sınav yapısına ve mevcut lise müfredatına göre yazılır; her birinin açıklamalı çözümü vardır.</li>
+      <li>Sayısal soruların cevapları kodla bağımsız olarak yeniden hesaplanır; uyuşmayan soru siteye alınmaz.</li>
+      <li>Yapay zekâyla üretilen sorular iki ayrı çözümle kontrol edilir ve yönetici onayından geçmeden havuza girmez.</li>
+      <li>Bazı konularda henüz az soru var ve bunları her hafta çoğaltıyoruz. Yanlış ya da hatalı bir soru görürsen soru ekranındaki <b>Bildir</b> düğmesi doğrudan bize ulaşır.</li></ul></div>
+  <div class="card stack"><h2>Verilerin</h2><p class="small muted">Hesabın yokken çalışma verilerin (çözdüğün sorular, netlerin, yanlış defterin) yalnızca bu cihazın tarayıcısında durur; tarayıcı verisini silersen ya da telefonu değiştirirsen kaybolur. Hesap açarsan her cihazda seninle olur. Ayrıntılar için <a href="#kvkk">KVKK Aydınlatma Metni</a>.</p></div>
+  <div class="card stack"><h2>İletişim</h2>
+    <p>Soru, öneri, hata ya da paketlerle ilgili her şey için: ${AYAR.eposta ? `<a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ay("eposta", "E-POSTA")}</p>
+    <p class="small muted">Ücretli paketler, satıcı bilgileri ve iade koşulları için <a href="#on-bilgi">Ön Bilgilendirme Formu</a> ve <a href="#mesafeli">Mesafeli Satış Sözleşmesi</a>'ne bakabilirsin.</p></div></div>`;
+}
+/* hesapsız kullanıcıya: veriler bu cihazda, kaybolabilir */
+function veriUyari() {
+  if (IN_CLAUDE || (typeof HESAP !== "undefined" && HESAP.user) || !totals().q) return "";
+  return `<div class="card sunk veri-uyari"><div class="grow"><b>İlerlemen şu an yalnızca bu cihazda.</b><p class="small muted" style="margin:4px 0 0">Üye olmadan çözdüğün sorular ve netlerin bu tarayıcıda saklanır; tarayıcı verisini temizlersen ya da telefon değiştirirsen silinir. Ücretsiz hesap açarsan her cihazda seninle olur.</p></div><a class="btn sm pri" href="#hesap">Hesap aç</a></div>`;
+}
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -7610,7 +7726,7 @@ Object.assign(IC, {
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
 if (!IN_CLAUDE) { NAVG[2][1].unshift(["hesap", "Hesabım", "users"], ["sinif", "Sınıfım", "okul"]); NAVG[1][1].push(["lig", "Arkadaş ligi", "kupa"]); }
-NAVG[2][1].push(["premium", "Paketler", "star"], ["yasal", "Yasal metinler", "doc"]);
+NAVG[2][1].push(["premium", "Paketler", "star"], ["hakkimizda", "Hakkımızda", "users"], ["yasal", "Yasal metinler", "doc"]);
 
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";
@@ -7620,22 +7736,22 @@ function premNote(orig, feat, cls) {
 function tutorOff() {
   const kapi = !IN_CLAUDE && tutorGirisKapisi(); if (kapi) return kapi;
   if (IN_CLAUDE) return `<div class="card"><h2>AI öğretmen şu an kapalı</h2><p class="muted" style="margin-top:8px">Bu bölüm Claude ile çalışır. Sayfayı Claude hesabınla açtığında ilk soruda izin istenir. İzin vermezsen ya da hesabında Claude kullanılamıyorsa diğer tüm bölümler çalışmaya devam eder.</p></div>`;
-  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Orta ve Premium</span><h2>AI öğretmen paketlerle açılıyor</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen Orta ve Premium paketlerde var. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor.</p>
+  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Atılım ve Premium</span><h2>AI öğretmen paketlerle açılıyor</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen Atılım ve Premium paketlerde var. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor.</p>
     <form data-s="aiKod" class="row"><input class="in" name="kod" placeholder="Erişim kodun" autocomplete="off" autocapitalize="characters" spellcheck="false" style="max-width:240px" aria-label="Erişim kodu"><button class="btn pri"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Kodu etkinleştir"}</button></form>
     ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}
     <a class="btn acc" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
 }
 
-/* Premium: Ücretsiz, Orta ve Premium paketleri; aylık ya da yıllık (yıllıkta 1 ay bedava) */
+/* Premium: Ücretsiz, Atılım ve Premium paketleri; aylık ya da yıllık (yıllıkta 1 ay bedava) */
 const tl = v => { const n = Number(String(v || "").replace(/[^\d]/g, "")); return n ? n.toLocaleString("tr-TR") : ""; };
 const okLink = u => /^https:\/\/\S+$/i.test(String(u || ""));
 function planlar() {
   return [
     { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Canlı denemeler ve Türkiye sıralaması", "Arkadaş ligi ve odak odası", "Yanlış defteri, tekrar kartları ve paragraf atölyesi", "Çalışma planı, gelişim takibi ve sınıf paneli"] },
-    { k: "orta", n: "Orta", tag: "dengeli", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
+    { k: "orta", n: "Atılım", tag: "yükseliş", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
       feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
     { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },
-      feats: ["Orta paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
+      feats: ["Atılım paketindeki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
   ];
 }
 function vPremium() {
@@ -7662,9 +7778,9 @@ function vPremium() {
       <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
       <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
       <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine birkaç dakika içinde otomatik gönderilir (en geç 24 saat). Siteye aynı e-postayla giriş yaptığında paket hesabına kendiliğinden tanımlanır; kodu Hesabım sayfasından da girebilirsin. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
-    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Orta ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
+    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Atılım ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
-    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Orta ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
+    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Atılım ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
     <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık${(() => { const a = Number(String(AYAR.fiyatOrta).replace(/[^\d]/g, "")), y = Number(String(AYAR.yillikOrta).replace(/[^\d]/g, "")), f = a && y ? 12 - y / a : 0; return f >= 0.95 && Math.abs(f - Math.round(f)) < 0.05 ? " · " + Math.round(f) + " ay bedava" : ""; })()}</button></div>
     <div class="grid3 plans">${P.map(kart).join("")}</div>
     ${buy}
@@ -7716,7 +7832,7 @@ const LEGAL = {
       <li><b>Verilerin:</b> Üyelik sistemi açılana kadar çalışma verilerin yalnızca kendi cihazında tutulur. Tarayıcı verilerini silersen ilerlemen kaybolabilir; düzenli yedek almanı öneririz.</li>
       <li><b>Hesap:</b> Üyelik oluştururken doğru bilgi vermek ve şifreni korumak senin sorumluluğundadır. Hesap kişiseldir; başkalarıyla paylaşılamaz ve devredilemez. Hesap paylaşımı tespit edilirse hesap askıya alınabilir.</li>
       <li><b>18 yaş altı:</b> 18 yaşından küçükler veli veya vasilerinin onayıyla üye olabilir. Ücretli abonelik ödemeleri veli veya vasi tarafından ya da onların onayıyla yapılmalıdır.</li>
-      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. AI kullanımı Orta pakette ayda ${ayN("aiOrta", "LİMİT")}, Premium pakette ayda ${ayN("aiPremium", "LİMİT")} mesajla sınırlıdır. Gelişmiş modelle soru çözümü bu mesaj hakkının içindedir (Orta ayda ${ayN("cozumOrta", "LİMİT")}, Premium ayda ${ayN("cozumPremium", "LİMİT")} soru); bu hak bitince sorular standart modelle çözülmeye devam eder. Haklar her takvim ayının başında yenilenir.</li>
+      <li><b>Yapay zekâ:</b> AI öğretmenin cevapları yapay zekâ tarafından otomatik üretilir ve hata içerebilir. Önemli bilgileri ders kitabı ve resmî kaynaklardan kontrol et. AI kullanımı Atılım paketinde ayda ${ayN("aiOrta", "LİMİT")}, Premium pakette ayda ${ayN("aiPremium", "LİMİT")} mesajla sınırlıdır. Gelişmiş modelle soru çözümü bu mesaj hakkının içindedir (Atılım ayda ${ayN("cozumOrta", "LİMİT")}, Premium ayda ${ayN("cozumPremium", "LİMİT")} soru); bu hak bitince sorular standart modelle çözülmeye devam eder. Haklar her takvim ayının başında yenilenir.</li>
       <li><b>İçerik hakları:</b> Site'deki sorular, açıklamalar, metinler, görseller ve tasarım AKE Akademi'ye aittir. İzinsiz kopyalanamaz, çoğaltılamaz, satılamaz veya başka platformlarda paylaşılamaz.</li>
       <li><b>Yasak kullanım:</b> Site'nin güvenliğini bozmaya çalışmak, otomatik araçlarla içerik toplamak, AI özelliklerini kötüye kullanmak veya hukuka aykırı içerik paylaşmak yasaktır. Bu durumlarda üyelik sona erdirilebilir.</li>
       <li><b>Başarı garantisi yoktur:</b> AKE Akademi çalışmana destek olur, ancak sınav sonucu ve puan konusunda garanti vermez.</li>
@@ -7725,13 +7841,13 @@ const LEGAL = {
       <li><b>Değişiklikler ve hukuk:</b> Bu koşullar güncellenebilir; önemli değişiklikler Site üzerinden duyurulur. Türkiye Cumhuriyeti hukuku uygulanır.</li>
     </ol>` },
 
-  "on-bilgi": { t: "Ön Bilgilendirme Formu", d: "Premium aboneliği satın almadan önce bilmen gerekenler", h: () => `
+  "on-bilgi": { t: "Ön Bilgilendirme Formu", d: "Paketleri satın almadan önce bilmen gerekenler", h: () => `
     <h2>Satıcı</h2>
     <p>${ay("adSoyad", "AD SOYAD")}<br>Adres: ${ay("adres", "ADRES")}<br>E-posta: ${ay("eposta", "E-POSTA")}${AYAR.telefon ? `<br>Telefon: ${ay("telefon", "TELEFON")}` : ""}</p>
     <h2>Hizmet</h2>
-    <p>AKE Akademi Orta ve Premium paketleri. <b>Orta paket:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ayN("aiOrta", "LİMİT")} mesaj; bunun ${ayN("cozumOrta", "LİMİT")} tanesi gelişmiş modelle soru çözümü), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Orta paketteki her şeye ek olarak AI öğretmen (ayda ${ayN("aiPremium", "LİMİT")} mesaj; bunun ${ayN("cozumPremium", "LİMİT")} tanesi gelişmiş modelle soru çözümü), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
+    <p>AKE Akademi Atılım ve Premium paketleri. <b>Atılım paketi:</b> Site'nin ücretsiz bölümlerine ek olarak AI öğretmen (ayda ${ayN("aiOrta", "LİMİT")} mesaj; bunun ${ayN("cozumOrta", "LİMİT")} tanesi gelişmiş modelle soru çözümü), AI ile soru üretme ve AI konu özetleri. <b>Premium paket:</b> Atılım paketindeki her şeye ek olarak AI öğretmen (ayda ${ayN("aiPremium", "LİMİT")} mesaj; bunun ${ayN("cozumPremium", "LİMİT")} tanesi gelişmiş modelle soru çözümü), deneme sonuçlarına AI yorumu ve AI ile kişisel haftalık çalışma planı.</p>
     <h2>Fiyat</h2>
-    <p>Orta paket aylık ${ayN("fiyatOrta", "FİYAT")} TL veya yıllık ${ayN("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ayN("fiyatPremium", "FİYAT")} TL veya yıllık ${ayN("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
+    <p>Atılım paketi aylık ${ayN("fiyatOrta", "FİYAT")} TL veya yıllık ${ayN("yillikOrta", "FİYAT")} TL; Premium paket aylık ${ayN("fiyatPremium", "FİYAT")} TL veya yıllık ${ayN("yillikPremium", "FİYAT")} TL. Fiyatlara tüm vergiler dahildir, ek ücret yoktur.</p>
     <h2>Ödeme</h2>
     <p>${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden banka veya kredi kartıyla, satın alınan dönem için peşin olarak.</p>
     <h2>Süre ve yenileme</h2>
@@ -7743,11 +7859,11 @@ const LEGAL = {
     <h2>Şikâyet ve itiraz</h2>
     <p>Şikâyetlerini ${ay("eposta", "E-POSTA")} adresine iletebilirsin. Uyuşmazlıklarda, Ticaret Bakanlığınca her yıl belirlenen parasal sınırlar dahilinde yerleşim yerindeki veya işlemin yapıldığı yerdeki Tüketici Hakem Heyeti'ne, bu sınırların üzerindeki uyuşmazlıklarda Tüketici Mahkemesi'ne başvurabilirsin.</p>` },
 
-  "mesafeli": { t: "Mesafeli Satış Sözleşmesi", d: "Premium abonelik sözleşmesi", h: () => `
+  "mesafeli": { t: "Mesafeli Satış Sözleşmesi", d: "Atılım ve Premium abonelik sözleşmesi", h: () => `
     <h2>Madde 1 – Taraflar</h2>
     <p><b>Satıcı:</b> ${ay("adSoyad", "AD SOYAD")}, ${ay("adres", "ADRES")}, ${ay("eposta", "E-POSTA")}${AYAR.telefon ? ", " + ay("telefon", "TELEFON") : ""}<br><b>Alıcı:</b> Site'de üyelik oluşturan ve ödeme yapan kişi. Bilgileri sipariş sırasında alınır.</p>
     <h2>Madde 2 – Konu</h2>
-    <p>Bu sözleşme, Alıcı'nın Site üzerinden satın aldığı Premium abonelik hizmetinin satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.</p>
+    <p>Bu sözleşme, Alıcı'nın Site üzerinden satın aldığı Atılım veya Premium abonelik hizmetinin satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.</p>
     <h2>Madde 3 – Hizmet ve bedel</h2>
     <p>Hizmetin kapsamı, paketlerin bedeli ve ödeme koşulları <a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nda belirtildiği gibidir. Ön Bilgilendirme Formu bu sözleşmenin ayrılmaz parçasıdır.</p>
     <h2>Madde 4 – İfa</h2>
@@ -7788,12 +7904,12 @@ function vLegal(k) {
   </div>`;
 }
 function siteFoot() {
-  return `<footer class="foot"><nav aria-label="Yasal metinler">${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
+  return `<footer class="foot"><nav aria-label="Yasal metinler"><a href="#hakkimizda">Hakkımızda</a>${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
 }
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
+Object.assign(ROUTES, { hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
 function render() {
@@ -8171,7 +8287,7 @@ Object.assign(SUB, {
     try {
       const r = await fetch("/api/ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code, check: true }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok && j.ok) { WEBAI.code = code; WEBAI.plan = j.plan === "premium" ? "premium" : "orta"; WEBAI.bitis = /^\d{4}-\d{2}-\d{2}$/.test(j.bitis || "") ? j.bitis : ""; LS.set("ake.kod", code); LS.set("ake.plan", WEBAI.plan); if (WEBAI.bitis) LS.set("ake.bitis", WEBAI.bitis); else LS.del("ake.bitis"); webAIAc(); toast(`AI öğretmen açıldı · ${WEBAI.plan === "premium" ? "Premium" : "Orta"} paket`); }
+      if (r.ok && j.ok) { WEBAI.code = code; WEBAI.plan = j.plan === "premium" ? "premium" : "orta"; WEBAI.bitis = /^\d{4}-\d{2}-\d{2}$/.test(j.bitis || "") ? j.bitis : ""; LS.set("ake.kod", code); LS.set("ake.plan", WEBAI.plan); if (WEBAI.bitis) LS.set("ake.bitis", WEBAI.bitis); else LS.del("ake.bitis"); webAIAc(); toast(`AI öğretmen açıldı · ${WEBAI.plan === "premium" ? "Premium" : "Atılım"} paket`); }
       else UI.kodErr = r.status === 401 ? (j.error === "suresi" ? "Bu kodun süresi dolmuş. Paketini yenilemek için Paketler sayfasına bak." : "Bu kod geçerli değil. Harfleri ve tireleri kontrol edip tekrar dene.") : "Kod şu an kontrol edilemedi. Biraz sonra tekrar dene.";
     } catch (e) { UI.kodErr = "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene."; }
     UI.kodBusy = false; render();

@@ -7,7 +7,7 @@
 window.AKE_AYAR = {
   adSoyad: "Ali Kaan Eren",   // Ad soyad ya da şirket unvanı (satıcı / veri sorumlusu)
   adres: "Güneşler Yeni Mahalle 5203. Sokak No:4 Kat:1 Adapazarı/Sakarya",   // Açık adres
-  eposta: "alikaaneren13@gmail.com",   // İletişim e-postası
+  eposta: "info@akeakademi.com",   // İletişim e-postası
   telefon: "",        // Telefon (isteğe bağlı)
   odemeAracisi: "Shopier",   // Ödeme kuruluşu
   fiyatOrta: "199",       // Atılım paketi aylık fiyat (TL, sadece sayı)

@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=5d4104ae70">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=5d4104ae70">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=5d4104ae70">
+<link rel="manifest" href="/manifest.webmanifest?v=45999a5615">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=45999a5615">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=45999a5615">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=5d4104ae70">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=45999a5615">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5115,6 +5115,19 @@ const ayarSayi = k => typeof AYAR !== "undefined" ? (Number(String(AYAR[k] || ""
 /* Hesap varsa kullanım ve haklar sunucudan gelir (asıl sayaç sunucudadır); yoksa bu cihazdaki sayaç */
 const sunucuSayac = () => typeof HESAP !== "undefined" && HESAP.user && HESAP.kullanim;
 function aiUsage() { return sunucuSayac() ? HESAP.kullanim.mesaj : ayOku("ake.aiay"); }
+function planAd(p) { return p === "premium" ? "Premium" : p === "deneme" ? "7 günlük deneme" : "Atılım"; }
+/* Ücretsiz kullanım sınırı: günde 20 soru, ayda 1 deneme (canlı denemeler serbest) */
+function ucretsizMi() {
+  if (HESAP.paket) return false;
+  if (WEBAI.plan && (!WEBAI.bitis || WEBAI.bitis >= new Date().toISOString().slice(0, 10))) return false;
+  return true;
+}
+function ucretsizHak(tur) {
+  let d = {}; try { d = JSON.parse(LS.get("ake.ucr") || "{}") || {}; } catch (e) { d = {}; }
+  const g = new Date().toISOString().slice(0, 10), ay = g.slice(0, 7);
+  if (d.g !== g) { d.g = g; d.n = 0; } if (d.ay !== ay) { d.ay = ay; d.d = 0; }
+  return { d, g, ay, kalanSoru: Math.max(0, 20 - (d.n || 0)), kalanDeneme: Math.max(0, 1 - (d.d || 0)), kaydet() { LS.set("ake.ucr", JSON.stringify(d)); } };
+}
 function aiLimit() { return sunucuSayac() && HESAP.limit ? HESAP.limit.mesaj : ayarSayi(WEBAI.plan === "premium" ? "aiPremium" : "aiOrta"); }
 function aiCount() { ayArt("ake.aiay"); }
 /* gelişmiş çözüm: soru çözümünde güçlü model, aylık hak (mesaj hakkının içinde) */
@@ -5758,6 +5771,17 @@ function startRun(cfg) {
     openModal("Yarım kalan oturum var", `<p>"${esc(RUN.title)}" oturumun henüz bitmedi. Yeni oturum başlarsa o oturumdaki cevaplar silinir.</p>`,
       [{ l: "Vazgeç", a: "modalClose" }, { l: "Eskisine devam et", a: "resume" }, { l: "Yenisini başlat", a: "runReplace", k: "pri" }]);
     return;
+  }
+  if (!cfg.canli && ucretsizMi()) {
+    const h = ucretsizHak(), exam = cfg.mode === "exam";
+    const git = `<a class="btn pri" href="#premium" data-a="modalClose">Paketlere bak</a>`;
+    if (exam ? h.kalanDeneme < 1 : h.kalanSoru < 1) {
+      openModal(exam ? "Bu ayki ücretsiz denemen bitti" : "Bugünkü ücretsiz sorun bitti", `<p>${exam ? "Ücretsiz pakette ayda 1 deneme çözebilirsin." : "Ücretsiz pakette günde 20 soru çözebilirsin. Yarın yenilenir."} Sınırsız soru ve deneme için paketlere bakabilirsin.</p><div class="row">${git}</div>`, [{ l: "Tamam", a: "modalClose" }]);
+      return;
+    }
+    if (exam) h.d.d = (h.d.d || 0) + 1;
+    else { if (cfg.qs.length > h.kalanSoru) { cfg = Object.assign({}, cfg, { qs: cfg.qs.slice(0, h.kalanSoru) }); toast("Ücretsiz pakette bugün " + h.kalanSoru + " soru hakkın kaldı."); } h.d.n = (h.d.n || 0) + cfg.qs.length; }
+    h.kaydet();
   }
   const qs = cfg.qs.map(q => snap(q));
   RUN = { id: uid(), kind: cfg.kind, type: cfg.type || null, title: cfg.title, mode: cfg.mode || "study", qs,
@@ -6948,7 +6972,7 @@ function girisFormu(kisa) {
 function paketKart() {
   const H = HESAP, p = H.paket, k = H.kullanim || { mesaj: 0, guclu: 0 }, L = H.limit;
   return `<div class="card stack"><h2>Paketin</h2>
-    ${p ? `<p><b>${p.plan === "premium" ? "Premium" : "Atılım"}</b>${p.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(p.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""}</p>
+    ${p ? `<p><b>${planAd(p.plan)}</b>${p.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(p.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""}</p>
       ${L ? `<div class="stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="small">Bu ay AI mesajı</span><span class="small mono">${k.mesaj} / ${L.mesaj}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.mesaj, L.mesaj))}%"></i></div>
       <div class="row" style="justify-content:space-between"><span class="small">Gelişmiş soru çözümü</span><span class="small mono">${k.guclu} / ${L.guclu}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.guclu, L.guclu))}%"></i></div></div>` : ""}
       <div class="row"><a class="btn pri" href="#ogretmen">AI öğretmene git</a></div>`
@@ -6973,8 +6997,8 @@ function vHesap() {
 function hesapOzetKart() {
   if (IN_CLAUDE) return "";
   const H = HESAP;
-  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${WEBAI.plan === "premium" ? "Premium" : "Atılım"}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
-  return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${H.paket.plan === "premium" ? "Premium" : "Atılım"} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
+  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${planAd(WEBAI.plan)}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
+  return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${planAd(H.paket.plan)} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
     : `<p class="small muted">Giriş yaparsan ilerlemen hesabında saklanır ve telefonunu değiştirsen de kaybolmaz.</p><div class="row"><a class="btn pri" href="#hesap">Giriş yap</a></div>`}</div>`;
 }
 /* AI öğretmen kapısı (web) */
@@ -7933,6 +7957,8 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
   }
   function rota() { var h = (location.hash || "").replace(/^#\/?/, "").split(/[/?]/)[0]; return h; }
   function seviye() { var r = rota(); return r === "giris" ? .95 : (r === "" || r === "bugun") ? .36 : .2; }
+  /* dikkat gereken sayfalarda arka plan şeridi tamamen kapalı */
+  var ODAK = { deneme: 1, banka: 1, paragraf: 1, yanlislar: 1, kartlar: 1, studyo: 1, sonuc: 1, canli: 1, ogretmen: 1, kisa: 1 };
   var AL = .36, ringT0 = 0, bitisT = 0, flashT0 = 0;
   /* --- logolar: tek ortak WebGL, görünen her .lg-cv tuvaline kopyalanır --- */
   var lgc = null, L = null;
@@ -7951,7 +7977,7 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
     if (!RM && now - son < 30) { requestAnimationFrame(dongu); return; } son = now;
     var T = RM ? 3 : (now - T0) / 1000;
     M.x += (MT.x - M.x) * .08; M.y += (MT.y - M.y) * .08;
-    var kos = typeof UI !== "undefined" && UI && UI.inRun;
+    var kos = (typeof UI !== "undefined" && UI && UI.inRun) || ODAK[rota()] === 1;
     if (B && bgc) {
       if (kos) { if (!kapali) { bgc.style.display = "none"; kapali = true; } }
       else {
@@ -8106,7 +8132,7 @@ const tl = v => { const n = Number(String(v || "").replace(/[^\d]/g, "")); retur
 const okLink = u => /^https:\/\/\S+$/i.test(String(u || ""));
 function planlar() {
   return [
-    { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Soru bankası ve deneme merkezi", "Canlı denemeler ve Türkiye sıralaması", "Arkadaş ligi ve odak odası", "Yanlış defteri, tekrar kartları ve paragraf atölyesi", "Çalışma planı, gelişim takibi ve sınıf paneli"] },
+    { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Günde 20 soru, ayda 1 deneme", "Canlı denemeler ve Türkiye sıralaması", "Arkadaş ligi ve odak odası", "Yanlış defteri ve tekrar kartları", "AI öğretmen paketlerde"] },
     { k: "orta", n: "Atılım", tag: "yükseliş", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
       feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
     { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },

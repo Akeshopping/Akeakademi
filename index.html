@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=6d9394b5a2">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=6d9394b5a2">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=6d9394b5a2">
+<link rel="manifest" href="/manifest.webmanifest?v=f8031339b9">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f8031339b9">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=f8031339b9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=6d9394b5a2">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=f8031339b9">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -627,6 +627,18 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 :root[data-theme="dark"] .vitrin .arc{opacity:1}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(31,91,255,.32),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(0,217,163,.10),transparent 62%),#0e1019}:root:not([data-theme="light"]) .vitrin .arc{opacity:1}}
 @media (max-width:640px){.vitrin{padding:20px 18px;border-radius:16px}.vitrin .arc{top:auto;bottom:0;height:46%}}
+
+/* ---- rozetler, seri, paylaşım kartı ---- */
+.seri-satir{display:flex;align-items:center;gap:16px}
+.seri-no{display:flex;flex-direction:column;align-items:center;min-width:84px;padding:10px 14px;border-radius:18px;background:var(--form-soft);color:var(--form-ink)}
+.seri-no b{font-size:34px;line-height:1} .seri-no span{font-size:12px;font-weight:600}
+.rz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.rz{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:12px 8px;border-radius:16px;border:1px solid var(--line);opacity:.5;filter:grayscale(1)}
+.rz.on{opacity:1;filter:none;background:var(--glass);border-color:var(--glass-line)}
+.rz-m{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#1F5BFF,#00B8FF);box-shadow:0 6px 16px -6px rgba(31,91,255,.6)}
+.rz:not(.on) .rz-m{background:var(--line2);color:var(--ink2);box-shadow:none}
+.rz b{font-size:13px} .rz small{font-size:11px;color:var(--ink2);line-height:1.3}
+.kart-on{display:flex;justify-content:center;margin-bottom:10px} .kart-on img{max-height:56vh;max-width:100%;border-radius:18px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
@@ -4621,15 +4633,16 @@ const LS = {
 function defState() {
   return { v: 1, upd: {}, profile: { name: "", alan: "SAY", hedef: "", gunluk: 40, examDate: EXAM_DEFAULT, ok: false },
     ans: {}, topic: {}, daily: {}, para: { times: [], c: 0, w: 0 }, exams: [], mistakes: {}, cards: {}, myCards: [],
-    plan: { tasks: [] }, aiQs: [], reports: {} };
+    plan: { tasks: [] }, aiQs: [], reports: {}, badges: {} };
 }
-const AREA = { profile: ["profile"], stats: ["ans", "topic", "daily", "para"], exams: ["exams"], mistakes: ["mistakes"], cards: ["cards", "myCards"], plan: ["plan"], ai: ["aiQs"], reports: ["reports"] };
+const AREA = { profile: ["profile"], stats: ["ans", "topic", "daily", "para", "badges"], exams: ["exams"], mistakes: ["mistakes"], cards: ["cards", "myCards"], plan: ["plan"], ai: ["aiQs"], reports: ["reports"] };
 function normalize() {
   const d = defState();
   for (const k in d) if (S[k] === undefined || S[k] === null) S[k] = d[k];
   S.profile = Object.assign(d.profile, S.profile);
   S.para = Object.assign(d.para, S.para);
   if (!Array.isArray(S.plan.tasks)) S.plan.tasks = [];
+  if (!S.badges || typeof S.badges !== "object") S.badges = {};
 }
 let S = (() => { try { const r = LS.get("ake.state"); if (r) return JSON.parse(r); } catch (e) { } return defState(); })();
 normalize();
@@ -4637,7 +4650,7 @@ normalize();
 /* ---------- kayıt: tarayıcı + (varsa) Claude hesabı ---------- */
 const cloud = { db: null, uid: null, col: null, state: "local", writable: null, owner: false, ownerKnown: false, busy: false };
 const dirty = new Set(); let saveTimer = null;
-function touch(...areas) { const now = Date.now(); areas.forEach(a => { dirty.add(a); S.upd[a] = now; }); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 1200); memSoon(); }
+function touch(...areas) { if (areas.includes("stats") || areas.includes("exams")) rozetSoon(); const now = Date.now(); areas.forEach(a => { dirty.add(a); S.upd[a] = now; }); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 1200); memSoon(); }
 function trimState() {
   if (S.exams.length > 60) S.exams = S.exams.slice(-60);
   S.exams.forEach((e, i) => { if (i < S.exams.length - 3) delete e.qs; });
@@ -4819,12 +4832,19 @@ function weakTopics(limit) {
   return Object.entries(S.topic).map(([k, v]) => { const [s, t] = k.split("|"); const n = v[0] + v[1] + v[2]; return { s, t, n, acc: pct(v[0], n) }; })
     .filter(x => x.n >= 3 && SUBJ[x.s]).sort((a, b) => a.acc - b.acc || b.n - a.n).slice(0, limit || 5);
 }
-function streak() {
-  let n = 0; const d = new Date();
-  if (!(S.daily[dayKey(d)] && S.daily[dayKey(d)].q)) d.setDate(d.getDate() - 1);
-  while (S.daily[dayKey(d)] && S.daily[dayKey(d)].q) { n++; d.setDate(d.getDate() - 1); }
-  return n;
+/* Seri: haftada bir gün atlarsan seri bozulmaz (seri koruma; hafta Pazartesi başlar) */
+function haftaYerel(d) { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return dayKey(x); }
+function streakInfo() {
+  let n = 0; const d = new Date(), has = x => S.daily[dayKey(x)] && S.daily[dayKey(x)].q, used = {}, bridged = [];
+  if (!has(d)) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 4000; i++) {
+    if (has(d)) n++;
+    else { const p = new Date(d), w = haftaYerel(d); p.setDate(p.getDate() - 1); if (!used[w] && has(p)) { used[w] = 1; bridged.push(dayKey(d)); } else break; }
+    d.setDate(d.getDate() - 1);
+  }
+  return { n, bridged, hazir: !used[haftaYerel(new Date())] };
 }
+function streak() { return streakInfo().n; }
 function totals() { let q = 0, c = 0; Object.values(S.daily).forEach(d => { q += d.q; c += d.c; }); return { q, c }; }
 function daysLeft() {
   const t = new Date((S.profile.examDate || EXAM_DEFAULT) + "T10:15:00+03:00").getTime();
@@ -5208,7 +5228,7 @@ function vResult() {
   <div class="card stack"><div class="card-h" style="margin:0"><h2>AI değerlendirmesi</h2>${aiOn() ? `<button class="btn sm" data-a="aiResult" data-id="${R.id}" ${UI.ai[key] && UI.ai[key].busy ? "disabled" : ""}>${UI.ai[key] ? "Yeniden yorumla" : "Sonucumu yorumla"}</button>` : ""}</div>
     ${aiOn() ? aiBox(key, `<p class="small muted">Claude, ders netlerine ve yanlış yaptığın konulara bakarak bir sonraki haftan için öneri yazar.</p>`) : premNote("AI değerlendirmesi için Claude'a izin vermen gerekir.", "Deneme sonucunun AI yorumu")}</div>
   ${R.qs && R.qs.length ? `<div class="card stack"><h2>Soruları incele</h2>${R.qs.map((q, i) => reviewItem(q, i)).join("")}</div>` : `<p class="note">Eski denemelerin soru ayrıntıları yer kazanmak için saklanmaz; son üç denemenin soruları açılabilir.</p>`}
-  <div class="row"><button class="btn pri" data-a="go" data-h="deneme">Yeni deneme</button><button class="btn" data-a="go" data-h="yanlislar">Yanlış defterim</button></div>
+  <div class="row"><button class="btn pri" data-a="go" data-h="deneme">Yeni deneme</button>${R.kind === "exam" ? `<button class="btn" data-a="kartAc" data-t="deneme" data-id="${esc(R.id)}">Hikâyede paylaş</button>` : ""}<button class="btn" data-a="go" data-h="yanlislar">Yanlış defterim</button></div>
   </div>`;
 }
 function reviewItem(q, i) {
@@ -5408,7 +5428,7 @@ function vProgress() {
   <div class="grid2">
     <div class="card"><h2 style="margin-bottom:10px">Ders bazında doğruluk</h2>${subs.length ? subs.map(x => `<div class="hbar"><span>${esc(SUBJ[x.s].n)}</span><span class="tr"><i style="width:${x.acc}%;background:${x.acc >= 70 ? "var(--ok)" : x.acc >= 50 ? "var(--warn)" : "var(--bad)"}"></i></span><span class="v">%${x.acc}</span></div>`).join("") : `<div class="empty">Henüz veri yok.</div>`}</div>
     <div class="card"><h2 style="margin-bottom:10px">Öncelikli konular</h2>${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : w.acc < 70 ? "warn" : "ok"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözünce sıralama oluşur.</div>`}</div>
-  </div>${netTahminKart()}
+  </div>${rozetKart()}${yolHaritasi()}${netTahminKart()}
   ${isiHaritasi()}
   ${veliRaporKart()}
   </div>`;
@@ -6871,6 +6891,7 @@ async function sosYukle(k, zorla) {
     else { SOS.err[k] = r.status === 401 ? "" : (j.message || "Şu an yüklenemedi. Biraz sonra tekrar dene."); if (r.status === 401 && k !== "canli") HESAP.user = null; }
   } catch (e) { SOS.err[k] = "Bağlantı kurulamadı."; }
   SOS.t[k] = Date.now(); SOS.t[k + "_b"] = 0;
+  if (k === "canli") pazarOto();
   if (k === "ben" && SOS.ben && SOS.ben.sinif) ozetSoon();
   render();
 }
@@ -7015,7 +7036,7 @@ function ligKart(l) {
   return `<section class="card"><div class="card-h"><h2>${esc(l.ad)}</h2><span class="small muted">${l.uyeler.length} kişi</span></div>
     <div class="list lb">${l.uyeler.map((u, i) => `<div class="li lb-row${u.ben ? " ben" : ""}"><span class="lb-n${i < 3 && u.xp > 0 ? " m" + (i + 1) : ""}">${i + 1}</span><div class="grow"><div class="t">${esc(u.takma)}${u.ben ? ` <span class="pill form">sen</span>` : ""}</div><div class="bar"><i style="width:${Math.round(100 * u.xp / max)}%"></i></div></div><b class="mono">${fmtN(u.xp)}</b></div>`).join("")}</div>
     ${l.gecenBirinci ? `<p class="small muted" style="margin-top:10px">Geçen haftanın birincisi: <b>${esc(l.gecenBirinci.takma)}</b> · ${fmtN(l.gecenBirinci.xp)} puan${l.gecenBirinci.ben ? " · tebrikler!" : ""}</p>` : ""}
-    <div class="row davet"><span class="small muted">Davet kodu</span><code class="kod">${esc(l.kod)}</code><button class="btn sm" data-a="davetPaylas" data-k="${esc(l.kod)}" data-n="${esc(l.ad)}" data-t="lig">Paylaş</button><span class="grow"></span><button class="btn sm ghost" data-a="ligAyrilAsk" data-id="${esc(l.id)}" data-n="${esc(l.ad)}">Ligden ayrıl</button></div></section>`;
+    <div class="row davet"><span class="small muted">Davet kodu</span><code class="kod">${esc(l.kod)}</code><button class="btn sm" data-a="davetPaylas" data-k="${esc(l.kod)}" data-n="${esc(l.ad)}" data-t="lig">Davet et</button><button class="btn sm" data-a="kartAc" data-t="lig" data-id="${esc(l.id)}">Hikâyede paylaş</button><span class="grow"></span><button class="btn sm ghost" data-a="ligAyrilAsk" data-id="${esc(l.id)}" data-n="${esc(l.ad)}">Ligden ayrıl</button></div></section>`;
 }
 
 function ligMini() {
@@ -7094,7 +7115,7 @@ async function sonucYukle(id) {
   SOS.t[k + "_b"] = 1;
   try {
     const { r, j } = await sosIstek("canli/" + id + "/sonuc");
-    if (r.ok) { SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], j, { gonderiliyor: false, hata: "" }); if (j.acik && j.cevabim) canliIceAktar(j); }
+    if (r.ok) { SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], j, { gonderiliyor: false, hata: "" }); if (j.acik && j.cevabim) canliIceAktar(j); rozetSonuc(j); }
     else SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], { hata: r.status === 401 ? "giris" : (j.message || "Sonuç yüklenemedi.") });
   } catch (e) { SOS.sonuc[id] = Object.assign({}, SOS.sonuc[id], { hata: "Bağlantı kurulamadı." }); }
   SOS.t[k] = Date.now(); SOS.t[k + "_b"] = 0; render();
@@ -7135,7 +7156,7 @@ function vCanli() {
   const L = R.siralama || [], benSatir = ben && R.sira > L.length ? `<div class="li lb-row ben"><span class="lb-n">${R.sira}</span><div class="grow"><div class="t">${esc(SOS.ben ? SOS.ben.takma : "Sen")} <span class="pill form">sen</span></div></div><span class="small muted">${ben.d}D ${ben.y}Y</span><b class="mono">${nfx(ben.net)}</b></div>` : "";
   return `<div class="view">${head}${skor}
     ${ben ? `<div class="card sira-kart"><div><b class="num">${fmtN(R.sira)}.</b><span class="muted"> / ${fmtN(R.katilan)} katılımcı</span></div><p class="small muted">Sıralama nete göre, eşitlikte daha kısa sürede bitiren öne geçer.</p>
-      <div class="row">${ex ? `<button class="btn pri" data-a="openResult" data-id="${esc(ex.id)}">Ders ders sonucum ve çözümler</button>` : ""}</div></div>`
+      <div class="row">${ex ? `<button class="btn pri" data-a="openResult" data-id="${esc(ex.id)}">Ders ders sonucum ve çözümler</button>` : ""}<button class="btn" data-a="kartAc" data-t="canli" data-id="${esc(id)}">Hikâyede paylaş</button></div></div>`
       : `<div class="card stack"><p class="muted">Bu denemeye katılmadın. Aynı soruları şimdi süreli çözüp kendini sıralamayla karşılaştırabilirsin.</p><button class="btn pri" style="align-self:flex-start" data-a="canliSonradan" data-id="${esc(id)}">Bu denemeyi şimdi çöz</button></div>`}
     <section class="card"><div class="card-h"><h2>Sıralama</h2><span class="small muted">İlk ${L.length}</span></div>
       ${L.length ? `<div class="list lb">${L.map(s => `<div class="li lb-row${s.ben ? " ben" : ""}"><span class="lb-n${s.sira <= 3 ? " m" + s.sira : ""}">${s.sira}</span><div class="grow"><div class="t">${esc(s.takma)}${s.ben ? ` <span class="pill form">sen</span>` : ""}</div></div><span class="small muted">${s.d}D ${s.y}Y</span><b class="mono">${nfx(s.net)}</b></div>`).join("")}${benSatir}</div>` : `<div class="empty">Bu denemeye kimse katılmadı.</div>`}</section>
@@ -7195,10 +7216,10 @@ async function sinifDetayYukle(id) {
 
 /* ---------- yönetim: canlı deneme planla ---------- */
 function canliYonetim() {
-  sosTaze("canli", 60000);
+  sosTaze("canli", 60000); pazarOto();
   const Y = UI.cy || (UI.cy = { tur: defaultExam(), boy: "quarter" }), { adet, dk } = cyHesap(Y);
   const C = SOS.canli && SOS.canli.denemeler || [];
-  return `<div class="card stack"><h2>Canlı deneme planla</h2>
+  return pazarYonetim() + `<div class="card stack"><h2>Canlı deneme planla</h2>
     <p class="small muted">Sorular şimdi bankadan ve soru kalıplarından seçilir, sunucuya kaydedilir. Başlangıç saatinde herkes aynı soruları çözer; cevap anahtarı deneme bitene kadar kimseye gönderilmez.</p>
     <form class="stack" data-s="canliPlanla">
       <div class="fields"><label class="f">Başlık<input class="in" name="baslik" maxlength="40" required placeholder="Örn. Pazar TYT kampı" value="${esc(sf("planla", "baslik"))}"></label>
@@ -7332,6 +7353,160 @@ Object.assign(SOS_ACT, {
 ["pomoBasla", "pomoDur", "pomoSifirla", "pomoMod"].forEach(k => { const f = OZ_ACT[k]; if (f) OZ_ACT[k] = function () { const r = f.apply(this, arguments); odaGuncelle(); return r; }; });
 Object.assign(OZ_ACT, SOS_ACT); Object.assign(OZ_CHG, SOS_CHG);
 if (POMO.run && POMO.mode === "odak") setTimeout(odaGuncelle, 1500);
+/* ===== Başarı katmanı: rozetler + seri koruma, paylaşılır sonuç kartı, Pazar Türkiye Denemesi, hedef yol haritası ===== */
+
+/* ---------- rozetler ---------- */
+const ROZET = [
+  { id: "ilk", n: "İlk adım", s: "1", t: "İlk sorunu çöz", ok: c => c.q >= 1 },
+  { id: "q100", n: "Yüzlük", s: "100", t: "100 soru çöz", ok: c => c.q >= 100 },
+  { id: "q500", n: "Beş yüz", s: "500", t: "500 soru çöz", ok: c => c.q >= 500 },
+  { id: "q1000", n: "Bin soru", s: "1K", t: "1.000 soru çöz", ok: c => c.q >= 1000 },
+  { id: "q5000", n: "Soru makinesi", s: "5K", t: "5.000 soru çöz", ok: c => c.q >= 5000 },
+  { id: "s3", n: "Isınma", s: "3g", t: "3 gün üst üste çalış", ok: c => c.best >= 3 },
+  { id: "s7", n: "Haftalık seri", s: "7g", t: "7 gün üst üste çalış", ok: c => c.best >= 7 },
+  { id: "s14", n: "İki hafta", s: "14g", t: "14 gün üst üste çalış", ok: c => c.best >= 14 },
+  { id: "s30", n: "Demir irade", s: "30g", t: "30 gün üst üste çalış", ok: c => c.best >= 30 },
+  { id: "dn1", n: "İlk deneme", s: "D1", t: "İlk denemeni çöz", ok: c => c.den >= 1 },
+  { id: "dn5", n: "Deneme avcısı", s: "D5", t: "5 deneme çöz", ok: c => c.den >= 5 },
+  { id: "cl1", n: "İlk canlı deneme", s: "CL", t: "Bir canlı denemeye katıl", ok: c => c.canli >= 1 },
+  { id: "dk", n: "Odak ustası", s: "10s", t: "Toplam 10 saat odaklı çalış", ok: c => c.fm >= 600 },
+  { id: "kes", n: "Keskin nişancı", s: "%80", t: "En az 200 soruda %80 doğruluk", ok: c => c.q >= 200 && c.acc >= 80 },
+  { id: "yn", n: "Hata avcısı", s: "20", t: "20 yanlışını öğrenildi say", ok: c => c.ogr >= 20 },
+  { id: "pdm", n: "Podyum", s: "3.", t: "Bir canlı denemede ilk 3'e gir", ok: () => false, ozel: true },
+  { id: "tr10", n: "Türkiye ilk 10", s: "10", t: "Pazar Türkiye Denemesi'nde ilk 10'a gir", ok: () => false, ozel: true }
+];
+var rozetT = null;
+function rozetSoon() { clearTimeout(rozetT); rozetT = setTimeout(rozetKontrol, 600); }
+function rozetCtx() {
+  const t = totals(); let fm = 0, best = 0, run = 0, prev = null;
+  Object.keys(S.daily).sort().forEach(k => { const d = S.daily[k]; fm += d.fm || 0; if (d.q) { const dt = new Date(k + "T12:00:00"); run = prev && Math.round((dt - prev) / 86400000) === 1 ? run + 1 : 1; prev = dt; best = Math.max(best, run); } });
+  best = Math.max(best, streak());
+  return { q: t.q, acc: pct(t.c, t.q), fm, best, den: S.exams.filter(e => e.kind === "exam").length, canli: S.exams.filter(e => String(e.id).startsWith("canli:")).length, ogr: Object.values(S.mistakes).filter(m => m.learned).length };
+}
+function rozetVer(ids) {
+  if (!S.badges) S.badges = {}; const yeni = ROZET.filter(r => ids.includes(r.id) && !S.badges[r.id]);
+  if (!yeni.length) return; yeni.forEach(r => { S.badges[r.id] = Date.now(); }); touch("stats");
+  toast(yeni.length > 2 ? `${yeni.length} yeni rozet kazandın! Gelişimim sayfasında.` : "Yeni rozet: " + yeni.map(r => r.n).join(", "));
+}
+function rozetKontrol() { const c = rozetCtx(); rozetVer(ROZET.filter(r => !r.ozel && r.ok(c)).map(r => r.id)); }
+function rozetSonuc(R) { /* canlı sonuç açılınca: podyum ve Türkiye ilk 10 */
+  if (!R || !R.acik || !R.sira) return; const ids = [];
+  if (R.sira <= 3) ids.push("pdm"); if (R.sira <= 10 && /^Pazar Türkiye/.test(R.baslik || "")) ids.push("tr10");
+  rozetVer(ids);
+}
+const medal = (r, kazandi) => `<div class="rz${kazandi ? " on" : ""}" title="${esc(r.t)}"><span class="rz-m">${esc(r.s)}</span><b>${esc(r.n)}</b><small>${esc(r.t)}</small></div>`;
+function rozetKart() {
+  const si = streakInfo(), kaz = ROZET.filter(r => S.badges[r.id]).length;
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Rozetler ve seri</h2><span class="small muted">${kaz}/${ROZET.length} rozet</span></div>
+    <div class="seri-satir"><div class="seri-no"><b class="num">${si.n}</b><span>gün seri</span></div>
+      <p class="small muted" style="margin:0">Haftada <b>bir gün</b> çalışmayı atlasan seri bozulmaz (seri koruma). Bu hafta koruman: <b>${si.hazir ? "hazır" : "kullanıldı"}</b>.</p></div>
+    <div class="rz-grid">${ROZET.map(r => medal(r, !!S.badges[r.id])).join("")}</div>
+    <div class="row"><button class="btn" data-a="kartAc" data-t="seri">Seri kartını paylaş</button>${S.exams.length ? `<button class="btn" data-a="kartAc" data-t="deneme" data-id="${esc(S.exams[S.exams.length - 1].id)}">Son denemeyi paylaş</button>` : ""}</div></div>`;
+}
+
+/* ---------- paylaşılır sonuç kartı (1080×1920, hikâye boyutu) ---------- */
+function kartVeri(t, id) {
+  const tp = totals(), si = streakInfo();
+  if (t === "deneme") { const R = S.exams.find(e => e.id === id); if (!R) return null; return { ust: R.kind === "exam" ? "DENEME SONUCU" : "ÇALIŞMA SONUCU", baslik: R.title, buyuk: nfx(R.net), alt: "net", satir: [["Doğru", R.d], ["Yanlış", R.y], ["Boş", R.b], ["Doğruluk", "%" + pct(R.d, R.d + R.y)]] }; }
+  if (t === "canli") { const R = SOS.sonuc[id]; if (!R || !R.sira) return null; const b = R.benim || {}; return { ust: "CANLI DENEME SIRALAMASI", baslik: R.baslik, buyuk: R.sira + ".", alt: `${fmtN(R.katilan)} katılımcı içinde`, satir: [["Net", nfx(b.net || 0)], ["Doğru", b.d || 0], ["Yanlış", b.y || 0]] }; }
+  if (t === "lig") { const L = SOS.lig && SOS.lig.ligler || [], l = L.find(x => x.id === id) || L[0]; if (!l) return null; const i = Math.max(0, l.uyeler.findIndex(u => u.ben)), me = l.uyeler[i] || { xp: 0 }; return { ust: "HAFTALIK LİG", baslik: l.ad, buyuk: (i + 1) + ".", alt: `${l.uyeler.length} kişi içinde`, satir: [["Bu hafta", fmtN(me.xp) + " puan"], ["Seri", si.n + " gün"]] }; }
+  if (t === "rozet") { const r = ROZET.find(x => x.id === id); if (!r) return null; return { ust: "YENİ ROZET", baslik: r.t, buyuk: r.s, alt: r.n, satir: [["Soru", fmtN(tp.q)], ["Seri", si.n + " gün"]] }; }
+  return { ust: "ÇALIŞMA SERİSİ", baslik: S.profile.name ? S.profile.name + " · YKS 2027" : "YKS 2027", buyuk: String(si.n), alt: "gün üst üste", satir: [["Çözülen soru", fmtN(tp.q)], ["Doğruluk", "%" + pct(tp.c, tp.q)], ["Rozet", Object.keys(S.badges).length + "/" + ROZET.length], ["Kalan gün", daysLeft()]] };
+}
+async function kartCiz(v) {
+  const W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d"), F = "Urbanist, Inter, system-ui, -apple-system, sans-serif";
+  try { await Promise.race([document.fonts.load("800 120px Urbanist"), new Promise(r => setTimeout(r, 900))]); } catch (e) { }
+  g.fillStyle = "#0b0c12"; g.fillRect(0, 0, W, H);
+  let gr = g.createRadialGradient(W * 0.92, 120, 0, W * 0.92, 120, 900); gr.addColorStop(0, "rgba(31,91,255,.55)"); gr.addColorStop(1, "rgba(31,91,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  gr = g.createRadialGradient(80, H - 160, 0, 80, H - 160, 800); gr.addColorStop(0, "rgba(0,217,163,.35)"); gr.addColorStop(1, "rgba(0,217,163,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); };
+  /* logo */
+  const lg = g.createLinearGradient(80, 100, 220, 240); lg.addColorStop(0, "#1F5BFF"); lg.addColorStop(1, "#00B8FF"); g.fillStyle = lg; rr(80, 100, 120, 120, 34); g.fill();
+  g.strokeStyle = "#fff"; g.lineWidth = 12; g.lineCap = "round"; g.beginPath(); g.moveTo(112, 190); g.quadraticCurveTo(140, 110, 176, 130); g.stroke();
+  g.fillStyle = "#00D9A3"; g.beginPath(); g.arc(176, 130, 11, 0, 7); g.fill();
+  g.fillStyle = "#fff"; g.textBaseline = "alphabetic"; g.textAlign = "left"; g.font = `800 56px ${F}`; g.fillText("AKE", 228, 176); const w1 = g.measureText("AKE ").width; g.fillStyle = "rgba(255,255,255,.62)"; g.font = `600 56px ${F}`; g.fillText("Akademi", 228 + w1, 176);
+  /* içerik */
+  g.fillStyle = "#7fb0ff"; g.font = `700 36px ${F}`; if ("letterSpacing" in g) g.letterSpacing = "6px"; g.fillText(v.ust, 80, 560); if ("letterSpacing" in g) g.letterSpacing = "0px";
+  g.fillStyle = "rgba(255,255,255,.86)"; g.font = `600 46px ${F}`; const bas = String(v.baslik || ""); g.fillText(bas.length > 34 ? bas.slice(0, 33) + "…" : bas, 80, 636);
+  g.fillStyle = "#fff"; let fs = 420; g.font = `800 ${fs}px ${F}`; while (g.measureText(v.buyuk).width > W - 160 && fs > 160) { fs -= 20; g.font = `800 ${fs}px ${F}`; }
+  const tg = g.createLinearGradient(80, 700, 80 + g.measureText(v.buyuk).width, 1000); tg.addColorStop(0, "#fff"); tg.addColorStop(1, "#9fd4ff"); g.fillStyle = tg; g.fillText(v.buyuk, 70, 640 + fs * 0.92);
+  g.fillStyle = "rgba(255,255,255,.7)"; g.font = `600 54px ${F}`; g.fillText(v.alt, 84, 640 + fs * 0.92 + 84);
+  const n = v.satir.length, cols = n > 3 ? 2 : 1, rh = 150, top = 1170;
+  v.satir.forEach(([l, val], i) => {
+    const cw = cols === 2 ? (W - 160 - 24) / 2 : W - 160, x = 80 + (cols === 2 ? (i % 2) * (cw + 24) : 0), y = top + (cols === 2 ? Math.floor(i / 2) : i) * (rh + 24);
+    g.fillStyle = "rgba(255,255,255,.07)"; rr(x, y, cw, rh, 36); g.fill(); g.strokeStyle = "rgba(255,255,255,.12)"; g.lineWidth = 2; rr(x, y, cw, rh, 36); g.stroke();
+    g.fillStyle = "rgba(255,255,255,.62)"; g.font = `600 34px ${F}`; g.fillText(l, x + 40, y + 62); g.fillStyle = "#fff"; g.font = `800 52px ${F}`; g.fillText(String(val), x + 40, y + 124);
+  });
+  g.fillStyle = "rgba(255,255,255,.55)"; g.font = `600 38px ${F}`; g.textAlign = "center"; g.fillText("akeakademi.com  ·  YKS 2027", W / 2, H - 110);
+  return await new Promise(r => c.toBlob(r, "image/png"));
+}
+const SHARE = { blob: null, url: "", ad: "ake-sonuc.png" };
+const KART_ACT = {
+  async kartAc(d) {
+    const v = kartVeri(d.t, d.id); if (!v) { toast("Bu kart için henüz veri yok."); return; }
+    toast("Kart hazırlanıyor…"); let b; try { b = await kartCiz(v); } catch (e) { b = null; }
+    if (!b) { toast("Kart oluşturulamadı; tekrar dene."); return; }
+    if (SHARE.url) URL.revokeObjectURL(SHARE.url); SHARE.blob = b; SHARE.url = URL.createObjectURL(b); SHARE.ad = "ake-akademi-" + d.t + ".png";
+    openModal("Paylaşılır kart", `<div class="kart-on"><img src="${SHARE.url}" alt="Sonuç kartı önizlemesi"></div><p class="small muted">Instagram hikâyesi boyutunda (1080×1920). Paylaş'a dokununca uygulamayı seçersin; olmazsa indirip galeriden ekleyebilirsin.</p>`, [{ l: "Kapat", a: "modalClose" }, { l: "İndir", a: "kartIndir" }, { l: "Paylaş", a: "kartPaylas", k: "pri" }]);
+  },
+  kartIndir() { const a = document.createElement("a"); a.href = SHARE.url; a.download = SHARE.ad; document.body.appendChild(a); a.click(); a.remove(); },
+  async kartPaylas() {
+    const f = new File([SHARE.blob], SHARE.ad, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: "AKE Akademi", text: "AKE Akademi · akeakademi.com" }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    KART_ACT.kartIndir(); toast("Görsel indirildi; galeriden hikâyene ekleyebilirsin.");
+  }
+};
+
+/* ---------- Her pazar Türkiye denemesi (yönetici siteyi açınca sonraki haftalar otomatik planlanır) ---------- */
+function pazarlar(k) {
+  const out = [], now = Date.now(); let d = new Date(now + 3 * 3600000); /* TR saati */
+  for (let i = 0; i < 90 && out.length < k; i++, d = new Date(d.getTime() + 86400000)) {
+    if (d.getUTCDay() !== 0) continue; const t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 17, 0); /* 20:00 TR */
+    if (t > now + 3600000) out.push(t);
+  }
+  return out;
+}
+const pazarBaslik = t => "Pazar Türkiye Denemesi · " + new Date(t + 3 * 3600000).toLocaleDateString("tr-TR", { day: "numeric", month: "short", timeZone: "UTC" });
+async function pazarPlanla(k, sessiz) {
+  if (SOS.pazarBusy || !HESAP.user || !HESAP.user.yonetici) return; SOS.pazarBusy = 1;
+  let yeni = 0;
+  try {
+    const var_ = new Set((SOS.canli && SOS.canli.denemeler || []).map(d => d.baslik));
+    for (const t of pazarlar(k)) {
+      const baslik = pazarBaslik(t); if (var_.has(baslik)) continue;
+      const h = canliSorulariHazirla("TYT", "half");
+      const { r } = await sosIstek("canli/olustur", { baslik, tur: "TYT", baslangic: t, sure: Math.max(60, h.dk), sorular: h.qs, secs: h.secs });
+      if (r.ok) yeni++; else break;
+    }
+  } catch (e) { }
+  SOS.pazarBusy = 0; if (yeni) { sosYukle("canli", true); if (!sessiz) toast(`${yeni} Pazar denemesi planlandı.`); } else if (!sessiz) toast("Önümüzdeki pazarlar zaten planlı.");
+}
+function pazarOto() { if (SOS.pazarOto || !HESAP.user || !HESAP.user.yonetici) return; SOS.pazarOto = 1; setTimeout(() => pazarPlanla(4, true), 800); }
+function pazarYonetim() {
+  return `<div class="card stack"><h2>Her pazar Türkiye denemesi</h2><p class="small muted">Her Pazar 20:00'de yarım boy TYT canlı denemesi. Sen siteyi açınca önümüzdeki 4 pazar otomatik planlanır; ilk 10'a girenler "Türkiye ilk 10" rozeti alır.</p>
+    <button class="btn" style="align-self:flex-start" data-a="pazarPlanla"${SOS.pazarBusy ? " disabled" : ""}>${SOS.pazarBusy ? "Hazırlanıyor…" : "Önümüzdeki 8 pazarı planla"}</button></div>`;
+}
+Object.assign(KART_ACT, { pazarPlanla() { pazarPlanla(8, false); } });
+Object.assign(OZ_ACT, KART_ACT);
+
+/* ---------- hedef yol haritası (tahmini) ---------- */
+function yolHaritasi() {
+  const hp = +S.profile.hedefPuan || 0, ex = EXAMS.TYT, hafta = Math.max(1, Math.ceil(daysLeft() / 7));
+  const giris = `<label class="f">Hedef YKS puanın (100–500)<input class="in" type="number" min="150" max="500" step="5" data-c="prof" data-k="hedefPuan" value="${hp || ""}" placeholder="Örn. 450"></label>`;
+  if (hp < 150 || hp > 500) return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Hedef yol haritası</h2></div><p class="small muted">Hedef puanını yaz; her derste kaç net gerektiğini ve haftada ne kadar ilerlemen gerektiğini hesaplayalım.</p><div class="fields">${giris}</div></div>`;
+  const f = (hp - 100) / 400, bySub = {};
+  ex.sec.forEach(sec => sec.p.forEach(([s, n]) => { bySub[s] = (bySub[s] || 0) + n; }));
+  const satir = Object.entries(bySub).filter(([s]) => SUBJ[s]).map(([s, n]) => {
+    const hedefNet = n * f, v = Object.entries(S.topic).filter(([k]) => k.split("|")[0] === s).reduce((a, [, x]) => [a[0] + x[0], a[1] + x[1], a[2] + x[2]], [0, 0, 0]), top = v[0] + v[1] + v[2];
+    const sim = top >= 10 ? Math.max(0, (v[0] - v[1] / 4) / top) * n : null, fark = sim == null ? null : hedefNet - sim;
+    return { s, n, hedefNet, sim, fark };
+  }).sort((a, b) => (b.fark == null ? -1 : b.fark) - (a.fark == null ? -1 : a.fark));
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Hedef yol haritası</h2><span class="small muted">${hafta} hafta kaldı</span></div>
+    <div class="fields">${giris}</div>
+    <p>Hedefin <b>${hp} puan</b> için TYT'de yaklaşık <b>${Math.round(120 * f)} net</b> ve AYT'de yaklaşık <b>${Math.round(80 * f)} net</b> gerekir.</p>
+    <div class="list">${satir.map(x => `<div class="li"><div class="grow"><div class="t">${esc(SUBJ[x.s].n)}</div><div class="s">Hedef ~${nfx(x.hedefNet)}/${x.n} net · ${x.sim == null ? "seviyeni görmek için en az 10 soru çöz" : `şu an ~${nfx(x.sim)} net`}</div></div>${x.fark == null ? "" : x.fark <= 0 ? `<span class="pill ok">Hedefte</span>` : `<span class="pill ${x.fark > 3 ? "bad" : "warn"}">Haftada +${nfx(x.fark / hafta)} net</span>`}</div>`).join("")}</div>
+    <p class="small muted">Bu bir tahmindir: puan, net sayısıyla yaklaşık doğrusal ilerler varsayıldı; gerçek puan her yıl sınava girenlerin başarısına göre değişir. Resmî ÖSYM yerleştirme verileri eklenince bölüm taban puanlarına bağlanacak. "Şu an" değerleri çözdüğün sorulardaki doğru/yanlış oranından hesaplanır.</p></div>`;
+}
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -7869,7 +8044,7 @@ const CHG = {
   studioS(el) { UI.studio.s = el.value; UI.gen.s = el.value; render(); },
   genF(el) { const k = el.dataset.k; UI.gen[k] = (k === "d" || k === "n") ? +el.value : el.value; if (k === "s") render(); },
   mistS(el) { UI.mist.s = el.value; render(); },
-  prof(el) { const k = el.dataset.k; S.profile[k] = k === "gunluk" ? Math.max(5, Math.min(500, Math.round(+el.value) || 40)) : (k === "examDate" ? (el.value || EXAM_DEFAULT) : el.value.trim()); S.profile.ok = true; touch("profile"); render(); },
+  prof(el) { const k = el.dataset.k; S.profile[k] = k === "hedefPuan" ? Math.max(0, Math.min(500, Math.round(+el.value) || 0)) : k === "gunluk" ? Math.max(5, Math.min(500, Math.round(+el.value) || 40)) : (k === "examDate" ? (el.value || EXAM_DEFAULT) : el.value.trim()); S.profile.ok = true; touch("profile"); render(); },
   taskDone(el) { const t = S.plan.tasks.find(x => x.id === el.dataset.id); if (t) { t.done = el.checked; touch("plan"); render(); } },
   chatImg(el) { const f = el.files && el.files[0]; if (f) { UI.chatImg = f; render(); } },
   importFile(el) { const f = el.files && el.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { const ta = document.getElementById("impTxt"); if (ta) ta.value = String(r.result || ""); }; r.readAsText(f); }

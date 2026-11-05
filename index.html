@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=f8031339b9">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f8031339b9">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=f8031339b9">
+<link rel="manifest" href="/manifest.webmanifest?v=780b76f2a9">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=780b76f2a9">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=780b76f2a9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=f8031339b9">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=780b76f2a9">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -1995,6 +1995,93 @@ const BANK = [];
     ["Karşıt kavramlar bir arada kullanılmıştır.", "Ünlem yoluyla seslenme vardır.", "Cevap beklenmeyen sorular sorulmuştur.", "Geçmişe duyulan özlem dile getirilmiştir.", "Hatıralara dönüş vardır."], 0,
     "\"Ah\" ünlemi (nida), cevap beklenmeyen sorular (istifham) ve geçmiş bayramların özlemi dizelerde vardır; karşıt kavramlar (tezat) yoktur.",
     { p: "Ah, o eski bayram sabahları!\nNerede şimdi o kalabalık sofralar?\nKim unutabilir annemin sesini,\nKapıda bekleyen o güler yüzleri?" });
+})();
+/* ===== Özgün soru bankası · 4. bölüm: TYT Matematik, Geometri ve AYT Matematik (cevapları ayrı bir testle bağımsız hesaplanır) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x, extra) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    BANK.push(Object.assign({ id: s + "-" + cnt[s], s, t, d, q: text, o, a, x }, extra || {}));
+  }
+
+  /* ---------- TYT MATEMATİK ---------- */
+  q("mat", "Üslü sayılar", 2, "2^(x+1) + 2^x = 48 olduğuna göre x kaçtır?", ["2", "3", "4", "5", "6"], 2,
+    "2^(x+1) = 2·2^x olduğundan 2·2^x + 2^x = 3·2^x = 48 olur. Buradan 2^x = 16 ve x = 4 bulunur.");
+  q("mat", "Köklü sayılar", 2, "√50 + √18 − √8 işleminin sonucu kaçtır?", ["4√2", "5√2", "6√2", "7√2", "8√2"], 2,
+    "√50 = 5√2, √18 = 3√2, √8 = 2√2 olduğundan 5√2 + 3√2 − 2√2 = 6√2 bulunur.");
+  q("mat", "Oran orantı", 2, "a/b = 3/5 ve b/c = 2/3 olduğuna göre a/c oranı kaçtır?", ["1/5", "2/5", "3/5", "4/5", "6/5"], 1,
+    "Ortak terim b'yi eşitleyelim: a : b = 6 : 10 ve b : c = 10 : 15. Buradan a : c = 6 : 15 = 2/5 olur.");
+  q("mat", "Yüzde problemleri", 2, "Bir malın fiyatına önce %20 zam yapılıyor, sonra yeni fiyat üzerinden %20 indirim yapılıyor. Son fiyat 480 TL olduğuna göre malın ilk fiyatı kaç TL'dir?", ["450", "480", "500", "520", "540"], 2,
+    "Son fiyat = ilk fiyat · 1,2 · 0,8 = 0,96 · ilk fiyat olur. İlk fiyat = 480 / 0,96 = 500 TL'dir.");
+  q("mat", "EBOB - EKOK", 3, "İki doğal sayının EBOB'u 6, EKOK'u 180'dir. Bu sayılardan biri 36 olduğuna göre diğeri kaçtır?", ["18", "24", "30", "45", "60"], 2,
+    "İki sayının çarpımı EBOB · EKOK'a eşittir: 36 · x = 6 · 180 = 1080, buradan x = 30 olur. Kontrol: EBOB(36, 30) = 6 ve EKOK(36, 30) = 180.");
+  q("mat", "Denklem sistemleri", 2, "3x − 2y = 7 ve x + y = 4 olduğuna göre x² + y² değeri kaçtır?", ["8", "9", "10", "11", "13"], 2,
+    "y = 4 − x yazılırsa 3x − 2(4 − x) = 7 olur: 5x = 15, x = 3 ve y = 1 bulunur. x² + y² = 9 + 1 = 10'dur.");
+  q("mat", "Problemler", 2, "Ali'nin yaşı oğlunun yaşının 4 katıdır. 5 yıl sonra Ali'nin yaşı oğlunun yaşının 3 katı olacağına göre Ali'nin şimdiki yaşı kaçtır?", ["32", "36", "40", "44", "48"], 2,
+    "Oğlunun yaşı x olsun. 4x + 5 = 3(x + 5) denkleminden x = 10 bulunur. Ali 4 · 10 = 40 yaşındadır.");
+  q("mat", "Hareket problemleri", 3, "Bir araç A şehrinden B şehrine saatte 60 km hızla gidiyor, aynı yoldan saatte 90 km hızla dönüyor. Aracın gidiş-dönüş boyunca ortalama hızı saatte kaç km'dir?", ["70", "72", "75", "76", "80"], 1,
+    "Yol 180 km alınırsa gidiş 3 saat, dönüş 2 saat sürer. Toplam yol 360 km, toplam süre 5 saat olduğundan ortalama hız 72 km/sa'tir. (Ortalama hız, hızların aritmetik ortalaması değildir.)");
+  q("mat", "İş problemleri", 2, "Bir işi A musluğu tek başına 12 saatte, B musluğu tek başına 6 saatte bitiriyor. İkisi birlikte çalışırsa iş kaç saatte biter?", ["3", "4", "5", "6", "8"], 1,
+    "Bir saatte yapılan iş 1/12 + 1/6 = 3/12 = 1/4'tür. Bu nedenle iş 4 saatte biter.");
+  q("mat", "Fonksiyonlar", 2, "f(x) = 2x − 3 ve g(x) = x² + 1 olduğuna göre (g∘f)(3) değeri kaçtır?", ["5", "9", "10", "13", "17"], 2,
+    "f(3) = 2·3 − 3 = 3 olur. (g∘f)(3) = g(3) = 3² + 1 = 10'dur.");
+  q("mat", "Permütasyon", 3, "Aralarında Ayşe ile Burak'ın da bulunduğu 5 kişi, bir sırada yan yana dizilecektir. Ayşe ile Burak yan yana olacağına göre kaç farklı dizilişi vardır?", ["24", "36", "48", "60", "72"], 2,
+    "Ayşe ile Burak tek bir blok sayılırsa 4 öğe 4! = 24 şekilde dizilir. Blok içinde ikisi 2! = 2 şekilde yer değiştirir. Toplam 24 · 2 = 48 dizilişi vardır.");
+  q("mat", "Olasılık", 3, "Bir torbada 4 kırmızı ve 6 mavi bilye vardır. Torbadan geri koymadan ardı ardına 2 bilye çekiliyor. İkisinin de kırmızı olma olasılığı kaçtır?", ["1/15", "2/15", "4/25", "1/5", "2/5"], 1,
+    "İlk bilyenin kırmızı olma olasılığı 4/10, ikincinin 3/9'dur. Çarpım: (4/10)·(3/9) = 12/90 = 2/15'tir.");
+  q("mat", "Mutlak değer", 2, "|2x − 6| < 4 eşitsizliğini sağlayan x tam sayılarının toplamı kaçtır?", ["6", "7", "9", "10", "12"], 2,
+    "−4 < 2x − 6 < 4 ise 2 < 2x < 10 ve 1 < x < 5 olur. Tam sayılar 2, 3, 4'tür; toplamları 9'dur.");
+  q("mat", "İkinci dereceden denklemler", 2, "x² − 5x + k = 0 denkleminin köklerinden biri 2 olduğuna göre k kaçtır?", ["3", "4", "5", "6", "8"], 3,
+    "x = 2 denklemde yerine yazılırsa 4 − 10 + k = 0 olur, k = 6 bulunur. (Kökler toplamı 5 olduğundan diğer kök 3'tür; çarpımları 6'dır.)");
+  q("mat", "Bölenler", 3, "360 sayısının pozitif tam bölenlerinin sayısı kaçtır?", ["18", "20", "24", "30", "36"], 2,
+    "360 = 2³ · 3² · 5¹ şeklinde asal çarpanlarına ayrılır. Bölen sayısı (3 + 1)(2 + 1)(1 + 1) = 4 · 3 · 2 = 24'tür.");
+  q("mat", "Üslü sayılar", 3, "7^100 sayısının birler basamağındaki rakam kaçtır?", ["1", "3", "7", "9", "0"], 0,
+    "7'nin kuvvetlerinin birler basamağı 7, 9, 3, 1 şeklinde 4'lü periyotla tekrar eder. 100, 4'e tam bölündüğü için birler basamağı periyodun son terimi olan 1'dir.");
+  q("mat", "Ortalama", 2, "5 sayının aritmetik ortalaması 12'dir. Bu sayılara 6 sayısı da eklenirse yeni ortalama kaç olur?", ["9", "10", "11", "12", "13"], 2,
+    "5 sayının toplamı 60'tır. 6 eklenince toplam 66, sayı adedi 6 olur. Yeni ortalama 66 / 6 = 11'dir.");
+  q("mat", "Kümeler", 2, "40 kişilik bir sınıfta 25 kişi İngilizce, 18 kişi Almanca bilmektedir; 5 kişi bu dillerin hiçbirini bilmemektedir. İki dili de bilen kaç kişi vardır?", ["4", "6", "8", "10", "12"], 2,
+    "En az bir dil bilen 40 − 5 = 35 kişidir. 35 = 25 + 18 − x olduğundan iki dili bilen x = 8 kişidir.");
+
+  /* ---------- TYT GEOMETRİ ---------- */
+  q("geo", "Dik üçgen", 2, "Dik kenar uzunlukları 9 cm ve 12 cm olan bir dik üçgende hipotenüse ait yükseklik kaç cm'dir?", ["6", "7", "7,2", "7,5", "8"], 2,
+    "Hipotenüs 15 cm'dir (9-12-15 üçgeni). Alan iki şekilde yazılır: (9·12)/2 = (15·h)/2, h = 108/15 = 7,2 cm.");
+  q("geo", "Çember ve daire", 2, "Yarıçapı 5 cm olan bir çemberde, merkeze uzaklığı 3 cm olan kirişin uzunluğu kaç cm'dir?", ["6", "7", "8", "9", "10"], 2,
+    "Merkezden kirişe indirilen dikme kirişi ortalar. Yarım kiriş √(5² − 3²) = 4 cm olur, kiriş 8 cm'dir.");
+  q("geo", "Dörtgenler", 2, "Komşu kenarları 6 cm ve 8 cm olan bir paralelkenarda bu kenarlar arasındaki açı 30°'dir. Paralelkenarın alanı kaç cm²'dir?", ["12", "24", "24√3", "36", "48"], 1,
+    "Alan = a · b · sin α = 6 · 8 · sin 30° = 48 · 1/2 = 24 cm²'dir.");
+  q("geo", "Dörtgenler", 2, "Köşegen uzunluğu 10 cm, kısa kenarı 6 cm olan bir dikdörtgenin alanı kaç cm²'dir?", ["36", "42", "48", "52", "60"], 2,
+    "Uzun kenar √(10² − 6²) = 8 cm'dir. Alan 6 · 8 = 48 cm²'dir.");
+  q("geo", "Çokgenler", 3, "Bir kenarı 4 cm olan düzgün altıgenin alanı kaç cm²'dir?", ["12√3", "16√3", "24√3", "36√3", "48√3"], 2,
+    "Düzgün altıgen, kenarı 4 cm olan 6 eşkenar üçgenden oluşur. Bir eşkenar üçgenin alanı (√3/4)·16 = 4√3'tür. Toplam alan 6 · 4√3 = 24√3 cm²'dir.");
+  q("geo", "Katı cisimler", 2, "Taban yarıçapı 3 cm, yüksekliği 5 cm olan dik dairesel silindirin hacmi kaç π cm³'tür?", ["15", "30", "45", "60", "90"], 2,
+    "Hacim = π r² h = π · 9 · 5 = 45π cm³'tür.");
+  q("geo", "Analitik geometri", 2, "Analitik düzlemde A(1, 2) ve B(7, 10) noktaları arasındaki uzaklık kaç birimdir?", ["6", "8", "10", "12", "14"], 2,
+    "|AB| = √((7 − 1)² + (10 − 2)²) = √(36 + 64) = √100 = 10 birimdir.");
+  q("geo", "Benzerlik", 3, "ABC üçgeninde D ∈ [AB], E ∈ [AC] ve DE // BC'dir. |AD| = 4 cm, |DB| = 2 cm ve |DE| = 8 cm olduğuna göre |BC| kaç cm'dir?", ["10", "12", "14", "16", "18"], 1,
+    "ADE ile ABC üçgenleri benzerdir: |DE| / |BC| = |AD| / |AB| = 4 / 6. 8 / |BC| = 4/6 olduğundan |BC| = 12 cm'dir.");
+  q("geo", "Çokgenler", 2, "İç açılarının toplamı 1440° olan çokgenin kaç kenarı vardır?", ["8", "9", "10", "11", "12"], 2,
+    "İç açılar toplamı (n − 2) · 180°'dir. (n − 2) · 180 = 1440 ise n − 2 = 8 ve n = 10'dur.");
+
+  /* ---------- AYT MATEMATİK ---------- */
+  q("amat", "Limit", 2, "lim (x → 1) (x³ − 1) / (x − 1) değeri kaçtır?", ["0", "1", "2", "3", "Limit yoktur"], 3,
+    "x³ − 1 = (x − 1)(x² + x + 1) olduğundan sadeleştirme sonrası limit 1² + 1 + 1 = 3'tür.");
+  q("amat", "Türev uygulamaları", 3, "f(x) = x³ − 3x² + 2 fonksiyonunun yerel minimum değeri kaçtır?", ["−4", "−2", "0", "2", "4"], 1,
+    "f'(x) = 3x² − 6x = 3x(x − 2) = 0 ise x = 0 veya x = 2'dir. f'' (x) = 6x − 6 olduğundan x = 2'de f'' > 0 (yerel minimum). f(2) = 8 − 12 + 2 = −2'dir.");
+  q("amat", "İntegral", 2, "∫ (0'dan 2'ye) (3x² + 2x) dx integralinin değeri kaçtır?", ["8", "10", "12", "14", "16"], 2,
+    "Ters türev x³ + x²'dir. x = 2'de 8 + 4 = 12, x = 0'da 0 olduğundan sonuç 12'dir.");
+  q("amat", "Logaritma", 3, "log₂(x − 1) + log₂(x + 1) = 3 denklemini sağlayan x değeri kaçtır?", ["2", "3", "4", "5", "6"], 1,
+    "Logaritmalar birleştirilirse log₂(x² − 1) = 3 olur; x² − 1 = 8 ve x = ±3 bulunur. Tanım kümesi için x > 1 gerektiğinden x = 3'tür.");
+  q("amat", "Trigonometri", 3, "x ∈ (π/2, π) ve sin x = 3/5 olduğuna göre tan x kaçtır?", ["−4/3", "−3/4", "3/4", "4/3", "−5/4"], 1,
+    "II. bölgede cos x negatiftir: cos x = −√(1 − 9/25) = −4/5. tan x = sin x / cos x = (3/5) / (−4/5) = −3/4'tür.");
+  q("amat", "Karmaşık sayılar", 2, "z = (2 + i)(1 − 3i) karmaşık sayısının sanal kısmı kaçtır?", ["−5", "−1", "1", "5", "7"], 0,
+    "z = 2 − 6i + i − 3i² = 2 − 5i + 3 = 5 − 5i olur. Sanal kısım −5'tir.");
+  q("amat", "Parabol", 2, "f(x) = x² − 4x + 7 fonksiyonunun alabileceği en küçük değer kaçtır?", ["1", "2", "3", "4", "7"], 2,
+    "Tepe noktasının apsisi x = 4/2 = 2'dir. f(2) = 4 − 8 + 7 = 3 en küçük değerdir. (Tam kare: (x − 2)² + 3.)");
+  q("amat", "Diziler", 2, "Bir aritmetik dizide a₃ = 7 ve a₇ = 19 olduğuna göre a₁₀ kaçtır?", ["25", "26", "27", "28", "30"], 3,
+    "a₇ − a₃ = 4d = 12 ise d = 3'tür. a₁ = 7 − 2·3 = 1 ve a₁₀ = 1 + 9·3 = 28'dir.");
+  q("amat", "Kombinasyon", 2, "8 kişilik bir gruptan 3 kişilik bir komisyon kaç farklı şekilde seçilebilir?", ["48", "52", "56", "64", "70"], 2,
+    "C(8, 3) = (8 · 7 · 6) / (3 · 2 · 1) = 56'dır.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));

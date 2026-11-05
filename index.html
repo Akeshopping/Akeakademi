@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
-<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b0c12" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=674586fe7e">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=674586fe7e">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=674586fe7e">
+<meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest?v=16e54322d4">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=16e54322d4">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=16e54322d4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=674586fe7e">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=16e54322d4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -641,6 +641,16 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:36px;cursor:poin
 .ob-chip{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font:600 14.5px var(--f-body,inherit);color:var(--ink);cursor:pointer;min-height:44px}
 .ob-chip.on{background:var(--form);border-color:var(--form);color:#fff}
 .ob-nokta{display:flex;gap:6px}.ob-nokta i{width:22px;height:5px;border-radius:3px;background:var(--line2)}.ob-nokta i.on{background:var(--form)}
+
+/* ---------- SSS ---------- */
+.sss{border-bottom:1px solid var(--line2);padding:2px 0}.sss:last-child{border-bottom:0}
+.sss summary{cursor:pointer;list-style:none;font-weight:700;padding:14px 26px 14px 0;position:relative;font-size:15.5px}
+.sss summary::-webkit-details-marker{display:none}
+.sss summary::after{content:"+";position:absolute;right:2px;top:10px;font-size:22px;font-weight:500;color:var(--ink3);transition:transform .2s}
+.sss[open] summary::after{transform:rotate(45deg)}
+.sss summary:focus-visible{outline:2px solid var(--form);outline-offset:2px;border-radius:6px}
+.sss p{margin:0 0 14px;color:var(--ink2);line-height:1.6}
+textarea.in{resize:vertical;min-height:110px;font:inherit}
 </style>
 </head>
 <body>
@@ -2157,6 +2167,87 @@ const BANK = [];
     "İlgi eki olan \"-ki\" bitişik yazılır: \"yarınki toplantı\". Diğer cümlelerdeki yazımlar doğrudur.");
   q("Yazım kuralları", 2, "Aşağıdaki cümlelerin hangisinde soru eki \"mi\" yanlış yazılmıştır?", "Çok güzelmi?", ["Geldin mi?", "Okula gittin mi?", "Sen de mi geliyorsun?", "Bunu yaptın mı?"],
     "Soru eki \"mi\" her zaman ayrı yazılır: \"Çok güzel mi?\"");
+})();
+/* ===== Özgün soru bankası · 6. bölüm: TYT/AYT Fizik ve Kimya hesaplamalı sorular (cevapları ayrı bir testle bağımsız hesaplanır) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    BANK.push({ id: s + "-" + cnt[s], s, t, d, q: text, o, a, x });
+  }
+  q("fizik", "Hareket", 1, "Sabit 72 km/sa hızla giden bir araç 20 saniyede kaç metre yol alır?", ["200", "300", "400", "500", "600"], 2,
+    "72 km/sa = 72 · (1000/3600) = 20 m/s olur. Yol = hız · zaman = 20 · 20 = 400 m bulunur.");
+  q("fizik", "Hareket", 2, "Durgun halden harekete geçen bir cisim 4 m/s² sabit ivmeyle 5 saniye hızlanıyor. Bu sürede aldığı yol kaç metredir?", ["25", "40", "50", "75", "100"], 2,
+    "Başlangıç hızı sıfır olduğundan x = ½ · a · t² = ½ · 4 · 25 = 50 m olur.");
+  q("fizik", "Newton'un hareket yasaları", 1, "Kütlesi 6 kg olan bir cisme sürtünmesiz yatay düzlemde 18 N net kuvvet uygulanıyor. Cismin ivmesi kaç m/s² olur?", ["1", "2", "3", "4", "6"], 2,
+    "Net kuvvet F = m · a olduğundan a = 18 / 6 = 3 m/s² bulunur.");
+  q("fizik", "İş, enerji ve güç", 1, "Bir cismi kuvvet yönünde 5 m yer değiştiren 20 N'luk sabit kuvvetin yaptığı iş kaç joule'dür?", ["25", "50", "100", "150", "200"], 2,
+    "İş = kuvvet · yer değiştirme = 20 · 5 = 100 J olur.");
+  q("fizik", "İş, enerji ve güç", 1, "12 saniyede 600 joule iş yapan bir makinenin gücü kaç watt'tır?", ["20", "30", "40", "50", "72"], 3,
+    "Güç = iş / zaman = 600 / 12 = 50 W olur.");
+  q("fizik", "Basınç", 1, "Ağırlığı 200 N olan bir cisim yatay zeminde 0,5 m² alana oturuyor. Zemine uyguladığı basınç kaç pascal'dır?", ["100", "200", "400", "800", "1000"], 2,
+    "Basınç = kuvvet / alan = 200 / 0,5 = 400 Pa olur.");
+  q("fizik", "Madde ve özellikleri", 1, "Kütlesi 300 g, hacmi 100 cm³ olan düzgün bir cismin özkütlesi kaç g/cm³'tür?", ["1", "2", "3", "4", "5"], 2,
+    "Özkütle = kütle / hacim = 300 / 100 = 3 g/cm³ olur.");
+  q("fizik", "Elektrik", 1, "Uçları arasındaki potansiyel farkı 12 V olan 4 Ω'luk bir dirençten geçen akım kaç amperdir?", ["1", "2", "3", "4", "6"], 2,
+    "Ohm yasasına göre I = V / R = 12 / 4 = 3 A olur.");
+  q("fizik", "Elektrik", 2, "2 Ω, 3 Ω ve 5 Ω'luk dirençler seri bağlanıp 20 V'luk üretece bağlanıyor. Devreden geçen akım kaç amperdir?", ["1", "2", "4", "5", "10"], 1,
+    "Seri bağlı dirençlerde eş değer direnç 2 + 3 + 5 = 10 Ω'dur. I = V / R = 20 / 10 = 2 A olur.");
+  q("fizik", "Elektrik", 2, "6 Ω ve 3 Ω'luk iki direnç paralel bağlandığında eş değer direnç kaç Ω olur?", ["1", "2", "3", "4,5", "9"], 1,
+    "Paralelde 1/R = 1/6 + 1/3 = 3/6 = 1/2 olduğundan R = 2 Ω bulunur.");
+  q("fizik", "İş, enerji ve güç", 1, "Kütlesi 2 kg olan bir cisim 6 m/s hızla hareket ediyor. Kinetik enerjisi kaç joule'dür?", ["12", "18", "24", "36", "72"], 3,
+    "Kinetik enerji = ½ · m · v² = ½ · 2 · 36 = 36 J olur.");
+  q("fizik", "Isı ve sıcaklık", 2, "Özısısı 4,2 J/(g·°C) olan 200 g suyun sıcaklığı 10 °C artırılıyor. Suya verilen ısı kaç joule'dür?", ["840", "2100", "4200", "8400", "16800"], 3,
+    "Q = m · c · ΔT = 200 · 4,2 · 10 = 8400 J olur.");
+  q("kimya", "Mol kavramı", 1, "36 gram su kaç mol'dür? (H₂O = 18 g/mol)", ["1", "2", "3", "4", "18"], 1,
+    "Mol sayısı = kütle / mol kütlesi = 36 / 18 = 2 mol olur.");
+  q("kimya", "Mol kavramı", 1, "0,5 mol CO₂ kaç gramdır? (C = 12, O = 16)", ["11", "22", "44", "66", "88"], 1,
+    "CO₂'nin mol kütlesi 12 + 32 = 44 g/mol'dür. Kütle = 0,5 · 44 = 22 g olur.");
+  q("kimya", "Gazlar", 1, "Normal koşullarda 2 mol gaz kaç litre hacim kaplar?", ["22,4", "33,6", "44,8", "67,2", "89,6"], 2,
+    "Normal koşullarda 1 mol gaz 22,4 L olduğundan 2 mol gaz 44,8 L hacim kaplar.");
+  q("kimya", "Karışımlar", 1, "0,5 mol tuz içeren 250 mL çözeltinin molar derişimi kaç mol/L'dir?", ["0,5", "1", "2", "4", "8"], 2,
+    "Derişim = mol / hacim(L) = 0,5 / 0,25 = 2 M olur.");
+  q("kimya", "Karışımlar", 2, "100 mL 2 M'lık çözelti saf su eklenerek toplam hacmi 400 mL'ye tamamlanıyor. Yeni derişim kaç M olur?", ["0,25", "0,5", "1", "2", "4"], 1,
+    "Seyrelmede mol sayısı değişmez: 2 · 100 = M · 400 olduğundan M = 0,5 M bulunur.");
+  q("kimya", "Karışımlar", 1, "20 gram tuz 80 gram suda çözülüyor. Çözeltinin kütlece yüzde derişimi kaçtır?", ["10", "15", "20", "25", "40"], 2,
+    "Çözelti kütlesi 100 g'dır. Yüzde = 20 / 100 · 100 = %20 olur.");
+  q("kimya", "Atom yapısı", 1, "17 protonu ve 18 nötronu olan bir atomun kütle numarası kaçtır?", ["17", "18", "34", "35", "36"], 3,
+    "Kütle numarası proton ve nötron sayılarının toplamıdır: 17 + 18 = 35.");
+  q("kimya", "Atom yapısı", 2, "Atom numarası 11 olan Na atomu bir elektron vererek Na⁺ iyonu oluşturuyor. Na⁺ iyonunda kaç elektron vardır?", ["9", "10", "11", "12", "23"], 1,
+    "Nötr Na atomunda 11 elektron vardır. Bir elektron verince 11 − 1 = 10 elektron kalır.");
+  q("kimya", "Kimyasal hesaplamalar", 2, "N₂ + 3H₂ → 2NH₃ tepkimesinde 6 mol H₂ yeterli N₂ ile tepkimeye girerse kaç mol NH₃ oluşur?", ["2", "3", "4", "6", "12"], 2,
+    "3 mol H₂ 2 mol NH₃ verdiğinden 6 mol H₂ için 6 · 2 / 3 = 4 mol NH₃ oluşur.");
+  q("kimya", "Asitler ve bazlar", 2, "[H⁺] = 10⁻³ M olan bir çözeltinin pH değeri kaçtır?", ["1", "3", "7", "11", "14"], 1,
+    "pH = −log[H⁺] = −log(10⁻³) = 3 olur.");
+  q("kimya", "Asitler ve bazlar", 2, "25 °C'de pOH değeri 4 olan sulu çözeltinin pH değeri kaçtır?", ["4", "7", "10", "11", "14"], 2,
+    "25 °C'de pH + pOH = 14 olduğundan pH = 14 − 4 = 10 bulunur.");
+  q("kimya", "Gazlar", 2, "Sabit sıcaklıkta 2 atm basınçta 6 L hacim kaplayan gaz, basıncı 3 atm'ye çıkarılıyor. Yeni hacim kaç litre olur?", ["2", "3", "4", "9", "12"], 2,
+    "Boyle yasasında P₁V₁ = P₂V₂ olduğundan 2 · 6 = 3 · V₂ ve V₂ = 4 L bulunur.");
+  q("afizik", "Düşey atışlar", 2, "45 m yükseklikten serbest bırakılan cisim yere kaç saniyede çarpar? (g = 10 m/s², sürtünme yok)", ["2", "3", "4,5", "5", "9"], 1,
+    "h = ½ · g · t² olduğundan 45 = 5 · t² ve t² = 9 olur. Buradan t = 3 s bulunur.");
+  q("afizik", "Basit harmonik hareket", 3, "Uzunluğu 2,5 m olan basit sarkacın periyodu kaç saniyedir? (g = 10 m/s²)", ["π/2", "π", "2π", "4π", "5π"], 1,
+    "T = 2π√(L/g) = 2π√(2,5/10) = 2π · 0,5 = π saniye olur.");
+  q("afizik", "Elektrik alan ve Coulomb kuvveti", 3, "1 µC'luk iki noktasal yük arasındaki uzaklık 0,3 m'dir. Aralarındaki elektriksel kuvvet kaç N'dur? (k = 9·10⁹ N·m²/C²)", ["0,01", "0,1", "1", "10", "100"], 1,
+    "F = k · q₁ · q₂ / r² = 9·10⁹ · 10⁻⁶ · 10⁻⁶ / 0,09 = 9·10⁻³ / 0,09 = 0,1 N olur.");
+  q("afizik", "Dalgalar", 2, "Dalga boyu 2 m, frekansı 150 Hz olan bir dalganın yayılma hızı kaç m/s'dir?", ["75", "150", "300", "450", "600"], 2,
+    "Dalga hızı v = λ · f = 2 · 150 = 300 m/s olur.");
+  q("afizik", "İtme ve momentum", 3, "Kütlesi 3 kg olan cisim 4 m/s hızla gidip durgun 1 kg'lık cisme çarpıp yapışıyor. Birleşik sistemin hızı kaç m/s olur?", ["1", "2", "3", "4", "6"], 2,
+    "Momentum korunur: 3 · 4 = (3 + 1) · v olduğundan v = 12 / 4 = 3 m/s bulunur.");
+  q("afizik", "Elektrik alan ve Coulomb kuvveti", 2, "4 µC'luk bir yük elektrik alan içinde 0,02 N'luk kuvvet görüyor. Alanın şiddeti kaç N/C'dir?", ["500", "2000", "5000", "8000", "50000"], 2,
+    "E = F / q = 0,02 / (4·10⁻⁶) = 5000 N/C olur.");
+  q("akimya", "Kimyasal denge", 3, "N₂ + 3H₂ ⇌ 2NH₃ tepkimesi dengedeyken [NH₃] = 2 M, [N₂] = 1 M ve [H₂] = 1 M'dır. Denge sabiti Kc kaçtır?", ["1", "2", "4", "8", "16"], 2,
+    "Kc = [NH₃]² / ([N₂] · [H₂]³) = 4 / (1 · 1) = 4 bulunur.");
+  q("akimya", "Kimyasal tepkimelerde enerji", 2, "Bir tepkimenin iki basamağının entalpi değişimleri −100 kJ ve −50 kJ'dür. Toplam tepkimenin entalpi değişimi kaç kJ'dür?", ["−50", "−100", "−150", "50", "150"], 2,
+    "Hess yasasına göre basamakların entalpileri toplanır: −100 + (−50) = −150 kJ.");
+  q("akimya", "Çözünürlük dengesi", 3, "25 °C'de AgCl'nin çözünürlük çarpımı Kçç = 10⁻¹⁰'dur. AgCl'nin saf sudaki çözünürlüğü kaç mol/L'dir?", ["10⁻¹⁰", "10⁻⁷", "10⁻⁵", "10⁻³", "10⁻²"], 2,
+    "AgCl → Ag⁺ + Cl⁻ olduğundan Kçç = s · s = s² = 10⁻¹⁰ ve s = 10⁻⁵ mol/L olur.");
+  q("akimya", "Elektrokimya", 3, "Cu²⁺ + 2e⁻ → Cu tepkimesine göre 3 mol elektronla kaç gram Cu kaplanır? (Cu = 64 g/mol)", ["32", "64", "96", "128", "192"], 2,
+    "2 mol elektron 1 mol Cu oluşturur. 3 mol elektron 1,5 mol Cu verir ve kütle 1,5 · 64 = 96 g olur.");
+  q("akimya", "Tepkime hızları", 2, "Hız bağıntısı r = k·[A]² olan bir tepkimede A'nın derişimi iki katına çıkarılırsa hız kaç katına çıkar?", ["2", "3", "4", "6", "8"], 2,
+    "[A] iki katına çıkınca hız 2² = 4 katına çıkar.");
+  q("akimya", "Atom ve periyodik sistem", 2, "Bir elementin %20'si 10 kütle numaralı, %80'i 11 kütle numaralı izotoptur. Elementin ortalama atom kütlesi kaçtır?", ["10,2", "10,5", "10,8", "11", "11,2"], 2,
+    "Ortalama atom kütlesi = 0,20 · 10 + 0,80 · 11 = 2 + 8,8 = 10,8 olur.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -7930,6 +8021,51 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
   }
   return { baslat: baslat, giris: giris, egim: egim, pop: pop, kick: function () { }, koyu: koyu };
 })();
+/* ===== Sık sorulan sorular ve geri bildirim formu ===== */
+var SSS = [
+  ["AKE Akademi nedir?", "YKS'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, her pazar canlı Türkiye denemesi, kişisel AI öğretmen, yanlış defteri ve çalışma planını tek yerde toplayan bağımsız bir çalışma sitesidir."],
+  ["Ücretsiz mi?", "Evet, soru bankası, denemeler, yanlış defteri, plan ve ilerleme takibi ücretsizdir ve ücretsiz kalacaktır. AI öğretmen ve gelişmiş çözümler ücretli paketlerde (Atılım ve Premium) bulunur. Güncel fiyatlar <a href=\"#premium\">Paketler</a> sayfasındadır."],
+  ["Hesap açmam şart mı?", "Hayır. Hesap açmadan da siteyi kullanabilirsin; bu durumda verilerin yalnızca kendi tarayıcında saklanır. Hesap açarsan ilerlemen cihazlar arasında (telefon, tablet, bilgisayar) eşitlenir."],
+  ["İlerlemem silinir mi?", "Tarayıcı verilerini temizlersen hesapsız kullanımdaki kayıtlar silinir. Bunu önlemek için hesap aç ya da <a href=\"#ayarlar\">Hedefler ve ayarlar</a> bölümünden düzenli yedek al."],
+  ["Sorular nereden geliyor?", "Soru bankasındaki sorular bu site için özgün hazırlanır ve cevapları kontrol edilir. Yapay zekâ ile üretilen sorular yayına girmeden önce yönetici tarafından onaylanır. Gerçek ÖSYM soruları kullanılmaz, kullanıma uygun olmayan telif içerikleri alınmaz."],
+  ["Bir soruda hata gördüm, ne yapmalıyım?", "Aşağıdaki formdan \"Soru hatası\" seçip soruyu ve ne düşündüğünü yaz. Her bildirimi okuyoruz ve doğrulanan hataları hemen düzeltiyoruz."],
+  ["AI öğretmen yanılabilir mi?", "Evet. AI öğretmen güçlü bir yardımcıdır ama her yapay zekâ gibi hata yapabilir. Özellikle hesaplamalı çözümleri kendin kontrol et; emin değilsen soruyu bir öğretmene danış."],
+  ["Canlı deneme nasıl işliyor?", "Her pazar 20:00'de (Türkiye saati) herkes aynı denemeyi aynı anda çözer. Sınav bitince net ve Türkiye geneli sıralaman çıkar. Katılmak için hesap gerekir, sıralamada yalnızca seçtiğin görünen ad yer alır."],
+  ["Ödemeyi nasıl yaparım?", "Paket ödemesi Shopier üzerinden yapılır. Ödemeden sonra sana bir erişim kodu gelir; bu kodu hesabına bağlayınca paketin açılır."],
+  ["İade yapabilir miyim?", "Dijital ürünlerde iade ve cayma koşulları yasal metinlerde açıkça yazılıdır: <a href=\"#iade\">İptal ve iade</a> ve <a href=\"#mesafeli\">Mesafeli satış sözleşmesi</a> sayfalarına bak."],
+  ["Verilerim güvende mi?", "Kişisel verilerin yalnızca hizmeti sunmak için işlenir, üçüncü kişilere satılmaz. Ayrıntılar <a href=\"#kvkk\">KVKK Aydınlatma Metni</a>'nde. Hesabını Hesabım sayfasından istediğin zaman silebilirsin."]
+];
+var GB = { durum: "", mesaj: "" };
+function vSSS() {
+  return `<div class="view"><div class="vhead"><span class="eyebrow">Yardım</span><h1>Sık sorulan sorular</h1><p>Aklındakini burada bulamazsan aşağıdaki formdan bize yaz.</p></div>
+  <div class="card stack" style="gap:0;padding:6px 18px">${SSS.map((s, i) => `<details class="sss"${i === 0 ? " open" : ""}><summary>${esc(s[0])}</summary><p>${s[1]}</p></details>`).join("")}</div>
+  <form class="card stack" data-s="geriBildirim" id="gbForm"><h2>Bize yaz</h2>
+    <p class="muted small">Öneri, hata, soru hatası ya da paketlerle ilgili her şeyi yazabilirsin. E-posta bırakırsan sana dönebiliriz.</p>
+    <label class="small" for="gbTur">Konu</label>
+    <select class="in" id="gbTur" name="tur"><option value="oneri">Öneri</option><option value="hata">Hata bildirimi</option><option value="soru">Soru hatası</option><option value="paket">Paket / ödeme</option><option value="diger">Diğer</option></select>
+    <label class="small" for="gbMesaj">Mesajın</label>
+    <textarea class="in" id="gbMesaj" name="mesaj" rows="5" maxlength="2000" required placeholder="Yaz…">${esc(GB.mesaj)}</textarea>
+    <label class="small" for="gbEposta">E-posta (isteğe bağlı)</label>
+    <input class="in" id="gbEposta" name="eposta" type="email" autocomplete="email" maxlength="120" placeholder="ornek@mail.com">
+    <input type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    ${GB.durum ? `<p class="small" role="status" style="color:${GB.durum === "ok" ? "var(--ok)" : "var(--bad)"}">${GB.durum === "ok" ? "Mesajın bize ulaştı, teşekkürler." : esc(GB.durum)}</p>` : ""}
+    <div class="row"><button class="btn pri" type="submit"${GB.busy ? " disabled" : ""}>${GB.busy ? "Gönderiliyor…" : "Gönder"}</button></div>
+  </form></div>`;
+}
+var SSS_SUB = {
+  async geriBildirim(fd) {
+    if (GB.busy) return;
+    const mesaj = String(fd.get("mesaj") || "").trim(); GB.mesaj = mesaj;
+    if (mesaj.length < 5) { GB.durum = "Mesajın çok kısa."; render(); return; }
+    GB.busy = true; GB.durum = ""; render();
+    try {
+      const r = await fetch("/api/geribildirim", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tur: fd.get("tur"), mesaj, eposta: fd.get("eposta"), web: fd.get("web") }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) { GB.durum = "ok"; GB.mesaj = ""; } else GB.durum = j.message || "Mesaj gönderilemedi. Lütfen e-posta ile yaz.";
+    } catch (e) { GB.durum = "Bağlantı kurulamadı. Lütfen e-posta ile yaz."; }
+    GB.busy = false; render();
+  }
+};
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -7946,7 +8082,7 @@ Object.assign(IC, {
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
 if (!IN_CLAUDE) { NAVG[2][1].unshift(["hesap", "Hesabım", "users"], ["sinif", "Sınıfım", "okul"]); NAVG[1][1].push(["lig", "Arkadaş ligi", "kupa"]); }
-NAVG[2][1].push(["premium", "Paketler", "star"], ["hakkimizda", "Hakkımızda", "users"], ["yasal", "Yasal metinler", "doc"]);
+NAVG[2][1].push(["premium", "Paketler", "star"], ["sss", "Yardım ve SSS", "doc"], ["hakkimizda", "Hakkımızda", "users"], ["yasal", "Yasal metinler", "doc"]);
 
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";
@@ -8124,16 +8260,19 @@ function vLegal(k) {
   </div>`;
 }
 function siteFoot() {
-  return `<footer class="foot"><nav aria-label="Yasal metinler"><a href="#hakkimizda">Hakkımızda</a>${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
+  return `<footer class="foot"><nav aria-label="Yasal metinler"><a href="#sss">SSS</a><a href="#hakkimizda">Hakkımızda</a>${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
 }
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
+Object.assign(ROUTES, { sss: vSSS, hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
+const SAYFA_BASLIK = { bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
+function sayfaBasligi(r) { try { const t = SAYFA_BASLIK[r] || (LEGAL[r] && LEGAL[r].t) || ""; document.title = t && r !== "bugun" ? t + " · AKE Akademi" : "AKE Akademi · YKS 2027"; } catch (e) { } }
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;
+  sayfaBasligi(r);
   if (adminMode()) APP.innerHTML = vAdminShell();
   else {
   let main;
@@ -8515,7 +8654,7 @@ Object.assign(SUB, {
 });
 ACT.aiKodSil = () => { openModal("Kod kaldırılsın mı?", "<p>Bu cihazda AI öğretmen kapanır. Kodunu tekrar girerek istediğin zaman açabilirsin.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Kaldır", a: "aiKodSilGo", k: "pri" }]); };
 ACT.aiKodSilGo = () => { webAIKapat(); UI.modal = null; render(); toast("Erişim kodu bu cihazdan kaldırıldı."); };
-Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(SUB, HESAP_SUB, SOS_SUB); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
+Object.assign(ACT, ADM_ACT, OZ_ACT); Object.assign(CHG, ADM_CHG, OZ_CHG); Object.assign(SUB, HESAP_SUB, SOS_SUB, SSS_SUB); Object.assign(INP, ADM_INP); Object.assign(SUB, ADM_SUB);
 
 /* ---------- olay bağlama ---------- */
 APP.addEventListener("click", e => {

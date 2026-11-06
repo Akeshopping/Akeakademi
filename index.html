@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=188c53fa07">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=188c53fa07">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=188c53fa07">
+<link rel="manifest" href="/manifest.webmanifest?v=697f874de9">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=697f874de9">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=697f874de9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=188c53fa07">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=697f874de9">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -121,6 +121,18 @@ sup,sub{font-size:.72em}
 .nav a:hover{background:var(--line2);color:var(--ink)}
 .nav a.on{background:var(--card);color:var(--ink);box-shadow:inset 3px 0 0 var(--c1),var(--shadow)}
 .nav a.on svg{color:var(--c1)}
+.side-pro{display:flex;flex-direction:column;gap:4px;margin:18px 4px 0;padding:14px;border-radius:14px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#1f5bff,#00b8ff);box-shadow:0 8px 22px -8px rgba(31,91,255,.55)}
+.side-pro i{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.2);display:grid;place-items:center;margin-bottom:4px}
+.side-pro i svg{width:16px;height:16px;color:#fff}
+.side-pro b{font:700 15px/1.2 var(--f-disp)}
+.side-pro span{font-size:12.5px;line-height:1.35;opacity:.92}
+.side-pro em{font-style:normal;font-weight:600;font-size:12.5px;margin-top:6px;background:rgba(255,255,255,.2);align-self:flex-start;padding:5px 10px;border-radius:8px}
+.side-pro.on-pro{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line2)}
+.side-pro.on-pro span{color:var(--ink2);opacity:1}
+.side-info{display:flex;flex-wrap:wrap;gap:4px 14px;margin:16px 12px 0;font-size:12.5px}
+.side-info a{color:var(--ink3);text-decoration:none}.side-info a:hover{color:var(--ink);text-decoration:underline}
+.menu-sheet .side-pro{margin-top:16px}
+
 .nav a .cnt{margin-left:auto;font:600 11.5px/1 var(--f-mono);color:var(--form-ink);background:var(--form-soft);padding:3px 6px;border-radius:6px}
 main{min-width:0;padding-block:24px 64px}
 .view{display:flex;flex-direction:column;gap:20px;max-width:880px}
@@ -6338,6 +6350,35 @@ G("grafik-iklim", ["cografya", "cografya2"], "İklim tipleri · grafik", 2, () =
   return { q: "Bir meteoroloji istasyonuna ait sıcaklık ve yağış grafiği aşağıda verilmiştir.\nBu istasyonun iklim tipi ve bulunduğu yarım küre aşağıdakilerin hangisinde doğru verilmiştir?", fig: f, ...strChoices(c, ds),
     x: `${K.x} En sıcak aylar ${south ? "Aralık, Ocak ve Şubat olduğundan istasyon Güney" : "Haziran, Temmuz ve Ağustos olduğundan istasyon Kuzey"} Yarım Küre'dedir.` };
 });
+/* ===== Konu adlarını tek tipe getir (aynı konu birden çok adla görünmesin) ===== */
+var KONU_ESLE = (function () {
+  const M = {
+    "*": { "Anlatım bozukluğu": "Anlatım Bozuklukları", "Ses bilgisi": "Ses Olayları", "Osmanlı Devleti": "Osmanlı Tarihi", "Osmanlı tarihi": "Osmanlı Tarihi", "İnkılap Tarihi": "Atatürk İlkeleri ve İnkılapları", "Atatürk ilke ve inkılapları": "Atatürk İlkeleri ve İnkılapları", "Atatürk İlkeleri": "Atatürk İlkeleri ve İnkılapları", "Osmanlı kuruluş": "Osmanlı Kuruluş ve Yükselme", "Osmanlı yükselme": "Osmanlı Kuruluş ve Yükselme", "Osmanlı kuruluş ve yükselme": "Osmanlı Kuruluş ve Yükselme", "Osmanlı duraklama": "Osmanlı Duraklama ve Gerileme", "Osmanlı duraklama ve gerileme": "Osmanlı Duraklama ve Gerileme", "Selçuklu": "Anadolu Selçuklu Devleti", "Anadolu Selçuklu": "Anadolu Selçuklu Devleti", "Türkiye Selçukluları": "Anadolu Selçuklu Devleti", "Türk-İslam devletleri": "Türk-İslam Devletleri", "Uygarlık ve ticaret": "Uygarlık ve Ticaret", "Dünya'nın şekli ve hareketleri": "Dünya'nın Hareketleri", "Türkiye'nin fiziki coğrafyası": "Türkiye'nin Yer Şekilleri", "Yer şekilleri": "Türkiye'nin Yer Şekilleri", "İç ve dış kuvvetler": "Yerin Şekillenmesi", "Felsefeye giriş": "Felsefeye Giriş", "Felsefenin Doğuşu": "Felsefeye Giriş", "İslam ve İbadet": "İbadetler", "İslam düşüncesinde yorumlar": "İslam Düşüncesi", "Ahlak": "Ahlak ve Değerler", "Oran orantı": "Oran-Orantı", "Oran-orantı": "Oran-Orantı", "EBOB - EKOK": "EBOB-EKOK", "Permütasyon": "Permütasyon ve Kombinasyon", "Kombinasyon": "Permütasyon ve Kombinasyon", "Yüzdeler": "Yüzde Problemleri", "İşçi-havuz problemleri": "İş Problemleri", "Yaş problemleri": "Yaş Problemleri", "Hareket problemleri": "Hareket Problemleri", "İş, güç ve enerji": "İş, Güç ve Enerji", "İş, enerji ve güç": "İş, Güç ve Enerji", "İş, Enerji, Momentum": "İş, Güç ve Enerji", "Enerji": "İş, Güç ve Enerji", "Newton'un hareket yasaları": "Kuvvet ve Hareket", "Kuvvet ve hareket": "Kuvvet ve Hareket", "Atom yapısı": "Atomun Yapısı", "Atom ve yapısı": "Atomun Yapısı", "Atom modelleri": "Atomun Yapısı", "Solunum": "Hücresel Solunum", "Hücresel solunum": "Hücresel Solunum", "İtme ve momentum": "Momentum", "Düşey atışlar": "Atışlar", "Tepkime hızları": "Tepkime Hızı", "Tepkime hızı": "Tepkime Hızı", "Kimyasal tepkimelerde hız": "Tepkime Hızı", "Edebi Sanatlar": "Söz Sanatları", "Söz sanatları": "Söz Sanatları", "Milli Edebiyat": "Millî Edebiyat", "Eser-yazar bilgisi": "Eser-Yazar", "Şairler ve sanatçılar": "Şairler", "Güdüler": "Güdülenme", "Duygu ve Güdü": "Güdülenme ve Duygu", "Güdülenme": "Güdülenme ve Duygu", "Sosyal Değişme": "Toplumsal Değişme", "Sosyal Kurumlar": "Toplumsal Kurumlar", "Sosyoloji tarihi": "Sosyolojik Düşünce", "Kavram": "Kavramlar", "Mantık": "Önermeler", "Grammar": "Tenses", "If clauses": "Conditionals", "Passive voice": "Passive Voice", "Relative clauses": "Relative Clauses", "Translation (EN → TR)": "Translation", "Cumhuriyet dönemi halk şiiri": "Cumhuriyet Dönemi Halk Şiiri", "Ahenk unsurları": "Hece Ölçüsü", "Toplumsal yapı": "Toplumsal Yapı", "Toplumsal hareketlilik": "Toplumsal Değişme", "Hücre Bölünmesi": "Hücre Bölünmeleri", "Hücre bölünmeleri": "Hücre Bölünmeleri", "Hücre bölünmesi": "Hücre Bölünmeleri", "Popülasyon genetiği": "Popülasyon Genetiği", "Hareket": "Kuvvet ve Hareket", "Basit harmonik hareket": "Basit Harmonik Hareket", "Doğal afetler": "Doğal Afetler", "Bilgi felsefesi": "Bilgi Felsefesi", "Ahlak felsefesi": "Ahlak Felsefesi"
+  },
+  mat: {}
+};
+  const buyuk = s => s.split("").filter(c => c !== c.toLocaleLowerCase("tr")).length;
+  const anahtar = s => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşüâîû0-9]/g, "");
+  const secilen = {};
+  function ad(s, t) {
+    if (!t) return t;
+    t = String(t).split(" · ")[0].trim();
+    if (/^Paragraf/.test(t)) return "Paragraf";
+    const m = Object.assign({}, M["*"], M[s] || {});
+    t = m[t] || t;
+    const k = anahtar(t), cur = secilen[k];
+    if (!cur || buyuk(t) > buyuk(cur)) secilen[k] = t;
+    return secilen[k];
+  }
+  return ad;
+})();
+(function () {
+  BANK.forEach(b => { b.t = KONU_ESLE(b.s, b.t); });
+  GENS.forEach(g => { g.t = KONU_ESLE((g.subs || [])[0], g.t); });
+  /* ikinci geçiş: ilk görülen yazım, sonradan gelen daha doğru yazımla değişmiş olabilir */
+  BANK.forEach(b => { b.t = KONU_ESLE(b.s, b.t); });
+  GENS.forEach(g => { g.t = KONU_ESLE((g.subs || [])[0], g.t); });
+})();
 
 /* Kalıpların ürettiği farklı soru sayısı: her kalıptan 20.000 örnek alınarak ölçülen alt sınır, aşağı yuvarlanmış */
 const QSTATS = { distinct: 280000 };
@@ -6955,7 +6996,11 @@ function navHTML(r) {
   const cnt = { yanlislar: tekrarBekleyen().length, kartlar: dueCount() };
   const groups = NAVG.map(g => [g[0], g[1].slice()]);
   if (!IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.user && HESAP.user.yonetici) groups[2][1].unshift(["yonetim", "Yönetim", "inbox"]);
-  return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("");
+  const paketli = !IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.paket, premium = IN_CLAUDE ? "" : paketli
+    ? `<a class="side-pro on-pro" href="#premium"><b>${esc(planAd(HESAP.paket.plan))} paket</b><span>Paketini yönet</span></a>`
+    : `<a class="side-pro" href="#premium"><i>${icon("star")}</i><b>AKE Premium</b><span>AI öğretmen, daha fazla soru ve deneme</span><em>Paketleri gör</em></a>`;
+  const bilgi = `<nav class="side-info" aria-label="Bilgi"><a href="#sss">Yardım ve SSS</a><a href="#hakkimizda">Hakkımızda</a><a href="#yasal">Yasal</a></nav>`;
+  return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("") + premium + bilgi;
 }
 function header() {
   const [c, t] = saveLabel();
@@ -8715,7 +8760,7 @@ async function ekSorularYukle() {
   if (IN_CLAUDE || HESAP.yok) return;
   try {
     const r = await fetch("/api/sorular", { credentials: "same-origin" }); if (!r.ok) return;
-    const j = await r.json(), l = (j.sorular || []).filter(ekGecerli).slice(-3000);
+    const j = await r.json(), l = (j.sorular || []).filter(ekGecerli).slice(-3000).map(q => { try { q.t = KONU_ESLE(q.s, q.t); } catch (e) { } return q; });
     const once = EKQ.length; EKQ = l; LS.set("ake.ek", JSON.stringify(l));
     if (l.length !== once) render();
   } catch (e) { }
@@ -9988,7 +10033,7 @@ Object.assign(IC, {
   doc: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'
 });
 if (!IN_CLAUDE) { NAVG[2][1].unshift(["hesap", "Hesabım", "users"], ["sinif", "Sınıfım", "okul"]); NAVG[1][1].push(["lig", "Arkadaş ligi", "kupa"]); }
-NAVG[2][1].push(["premium", "Paketler", "star"], ["sss", "Yardım ve SSS", "doc"], ["hakkimizda", "Hakkımızda", "users"], ["yasal", "Yasal metinler", "doc"]);
+
 
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";

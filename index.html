@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=9586f523fd">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=9586f523fd">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=9586f523fd">
+<link rel="manifest" href="/manifest.webmanifest?v=62d178a15f">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=62d178a15f">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=62d178a15f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=9586f523fd">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=62d178a15f">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2429,6 +2429,93 @@ const BANK = [];
     1, "Garip akımını 1941'de Orhan Veli Kanık, Oktay Rıfat ve Melih Cevdet Anday başlatmıştır.");
   q("edebiyat", "Cumhuriyet Dönemi Romanı", 2, "‘Çalıkuşu’ romanının yazarı kimdir?",
     ["Halide Edib Adıvar", "Reşat Nuri Güntekin", "Peyami Safa", "Yakup Kadri Karaosmanoğlu", "Ahmet Hamdi Tanpınar"], 1, "Çalıkuşu (1922), Reşat Nuri Güntekin'in romanıdır.");
+})();
+/* ===== Özgün soru bankası · 9. bölüm: AYT sözel (edebiyat, tarih-2, coğrafya-2, psikoloji, sosyoloji, mantık) (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    const id = s + "-9-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
+  }
+  /* ---- EDEBİYAT ---- */
+  q("edebiyat", "Tanzimat Dönemi", 3, "Aşağıdaki eserlerden hangisi Namık Kemal'in eseri DEĞİLDİR?",
+    ["Vatan yahut Silistre", "İntibah", "Cezmi", "Araba Sevdası", "Gülnihal"], 3, "Araba Sevdası, Recaizade Mahmut Ekrem'in romanıdır. Diğerleri Namık Kemal'in eserleridir.");
+  q("edebiyat", "Servet-i Fünun", 2, "‘Mai ve Siyah’ romanının yazarı kimdir?",
+    ["Halit Ziya Uşaklıgil", "Mehmet Rauf", "Hüseyin Rahmi Gürpınar", "Ahmet Mithat", "Yakup Kadri"], 0, "Mai ve Siyah (1897), Servet-i Fünun'un en önemli romancısı Halit Ziya Uşaklıgil'e aittir.");
+  q("edebiyat", "Milli Edebiyat", 3, "Aşağıdakilerden hangisi Beş Hececiler'den biri DEĞİLDİR?",
+    ["Faruk Nafiz Çamlıbel", "Orhan Seyfi Orhon", "Yusuf Ziya Ortaç", "Ahmet Haşim", "Halit Fahri Ozansoy"], 3, "Beş Hececiler: Faruk Nafiz, Orhan Seyfi, Yusuf Ziya, Halit Fahri ve Enis Behiç. Ahmet Haşim, Fecr-i Ati/sembolist çizgide yer alır.");
+  q("edebiyat", "Divan Edebiyatı", 2, "Lale Devri'nin en önemli şairi aşağıdakilerden hangisidir?",
+    ["Fuzuli", "Nedim", "Baki", "Nabi", "Şeyh Galip"], 1, "Nedim, Lale Devri'nin neşeli, zevk ve eğlenceyi işleyen şairidir.");
+  q("edebiyat", "Halk Edebiyatı", 2, "‘Kara Toprak’ şiiri aşağıdaki halk şairlerinden hangisine aittir?",
+    ["Karacaoğlan", "Pir Sultan Abdal", "Âşık Veysel", "Dadaloğlu", "Köroğlu"], 2, "Kara Toprak, Âşık Veysel'in en ünlü şiirlerindendir.");
+  q("edebiyat", "İslamiyet Öncesi/Sonrası", 3, "Dede Korkut Hikâyeleri'nin bilinen en eksiksiz nüshası kaç hikâye içerir?",
+    ["8", "10", "12", "14", "6"], 2, "Dresden nüshası 12 hikâye ve bir önsöz içerir; Vatikan nüshasında 6 hikâye bulunur.");
+  q("edebiyat", "Cumhuriyet Dönemi Romanı", 2, "‘İnce Memed’ romanının yazarı kimdir?",
+    ["Orhan Kemal", "Yaşar Kemal", "Kemal Tahir", "Fakir Baykurt", "Tarık Buğra"], 1, "İnce Memed (1955), Yaşar Kemal'in Çukurova'yı anlatan romanıdır.");
+  q("edebiyat", "Cumhuriyet Dönemi Şiiri", 3, "‘Kuvayi Milliye’ destanı ve serbest nazım denemeleriyle tanınan şair kimdir?",
+    ["Nazım Hikmet", "Ahmet Hamdi Tanpınar", "Necip Fazıl", "Ahmet Kutsi Tecer", "Cahit Külebi"], 0, "Nazım Hikmet, serbest nazmı Türk şiirine yerleştirmiş, Kuvayi Milliye Destanı'nı yazmıştır.");
+  q("edebiyat", "Servet-i Fünun", 3, "Tevfik Fikret'in ‘Rübab-ı Şikeste’ eseri hangi edebî türdedir?",
+    ["Roman", "Şiir kitabı", "Tiyatro", "Anı", "Makale"], 1, "Rübab-ı Şikeste (Kırık Saz), Tevfik Fikret'in şiir kitabıdır.");
+  q("edebiyat", "Halk Edebiyatı", 3, "Yunus Emre'nin Anadolu'da Türkçeyi sade ve içten bir dille kullanarak yazdığı eserlerin başında aşağıdakilerden hangisi gelir?",
+    ["Risaletü'n-Nushiyye ve Divan", "Kutadgu Bilig", "Divanü Lügati't-Türk", "Atabetü'l-Hakayık", "Hüsn ü Aşk"], 0, "Yunus Emre'nin eserleri Divan ve Risaletü'n-Nushiyye'dir. Kutadgu Bilig Yusuf Has Hacib'in eseridir.");
+  /* ---- TARİH-2 ---- */
+  q("tarih2", "Osmanlı Devleti", 3, "Osmanlı Devleti'nde yıllık geliri 100.000 akçeyi aşan dirlik türü aşağıdakilerden hangisidir?",
+    ["Tımar", "Zeamet", "Has", "Vakıf", "Mülk"], 2, "Dirlikler yıllık gelire göre ayrılır: tımar (20.000'e kadar), zeamet (20.000–100.000), has (100.000 üstü).");
+  q("tarih2", "Osmanlı Devleti", 3, "Devşirme sisteminin düzenli hâle gelmesi ve Yeniçeri Ocağı'nın kuruluşu aşağıdaki padişahlardan hangisi dönemindedir?",
+    ["I. Murat", "Yıldırım Bayezid", "Fatih Sultan Mehmet", "Osman Gazi", "Orhan Gazi"], 0, "Pençik ve devşirme sistemiyle Yeniçeri Ocağı I. Murat döneminde kurulmuştur.");
+  q("tarih2", "Osmanlı Devleti", 3, "Ankara Savaşı (1402) sonrasında Osmanlı Devleti'nde başlayan ve şehzadeler arasında taht mücadelesi yaşanan döneme ne ad verilir?",
+    ["Duraklama Dönemi", "Fetret Devri", "Lale Devri", "Gerileme Dönemi", "Tanzimat Dönemi"], 1, "Ankara Savaşı'ndan sonra 1413'e kadar süren şehzade mücadelelerine Fetret Devri denir.");
+  q("tarih2", "Osmanlı Devleti", 3, "Prut Antlaşması (1711) hangi Osmanlı padişahı döneminde imzalanmıştır?",
+    ["II. Mustafa", "III. Ahmet", "I. Abdülhamid", "II. Mahmut", "III. Selim"], 1, "Prut Savaşı ve Antlaşması, Baltacı Mehmet Paşa komutasında III. Ahmet döneminde yapılmıştır.");
+  q("tarih2", "Osmanlı Devleti", 3, "1538 Preveze Deniz Savaşı'nın sonucu aşağıdakilerden hangisidir?",
+    ["Osmanlı donanması yenilmiş, Akdeniz'in hâkimiyeti Venedik'e geçmiştir.", "Osmanlı donanması Haçlı donanmasını yenerek Akdeniz'de üstünlük kazanmıştır.", "İstanbul kuşatılmıştır.", "Cezayir Osmanlı'dan ayrılmıştır.", "Rodos fethedilmiştir."],
+    1, "Barbaros Hayrettin Paşa komutasındaki Osmanlı donanması, Haçlı donanmasını yenmiştir.");
+  q("tarih2", "Cumhuriyet Dönemi", 2, "Halifeliğin kaldırılması ve Tevhid-i Tedrisat Kanunu'nun kabul edilmesi hangi tarihte gerçekleşmiştir?",
+    ["29 Ekim 1923", "3 Mart 1924", "10 Kasım 1938", "23 Nisan 1920", "1 Kasım 1922"], 1, "3 Mart 1924'te Halifelik kaldırılmış, Tevhid-i Tedrisat ve Şer'iye ve Evkaf Vekâleti'nin kaldırılması kanunları kabul edilmiştir.");
+  q("tarih2", "Kurtuluş Savaşı", 3, "Sivas Kongresi'nde alınan kararlardan hangisi ‘manda ve himaye’ fikrini doğrudan reddetmiştir?",
+    ["Manda ve himaye kabul edilmeyecek, ulusal güç ve ulusal irade esas alınacaktır.", "Saltanat kaldırılacaktır.", "Halifelik kaldırılacaktır.", "Cumhuriyet ilan edilecektir.", "Meclis İstanbul'da toplanacaktır."],
+    0, "Sivas Kongresi'nde ‘manda ve himaye kabul edilemez’ kararı alınmış ve Temsil Heyeti kurulmuştur.");
+  /* ---- COĞRAFYA-2 ---- */
+  q("cografya2", "Nüfus", 2, "Bir ülkede yıllık doğum hızı ‰30, ölüm hızı ‰10 ise nüfusun doğal artış hızı yüzde kaçtır?",
+    ["%0,2", "%2", "%20", "%4", "%0,4"], 1, "Doğal artış hızı = doğum − ölüm = ‰30 − ‰10 = ‰20 = %2.");
+  q("cografya2", "Ekonomik Coğrafya", 2, "Türkiye'nin dünya rezervlerinde en önemli paya sahip olduğu madenlerden biri aşağıdakilerden hangisidir?",
+    ["Petrol", "Bor", "Taşkömürü", "Uranyum", "Altın"], 1, "Türkiye, dünya bor rezervinin büyük bölümüne sahiptir (Eskişehir, Balıkesir, Kütahya).");
+  q("cografya2", "Tarım", 2, "Türkiye'de çay tarımının yoğun olarak yapıldığı il aşağıdakilerden hangisidir?",
+    ["Rize", "Konya", "Antalya", "Manisa", "Van"], 0, "Çay, bol yağış ve nemli iklim nedeniyle Doğu Karadeniz'de, özellikle Rize'de yetiştirilir.");
+  q("cografya2", "Topraklar", 3, "Bozkır (step) iklimi bölgelerinde oluşan, humus bakımından zengin ve tahıl tarımına elverişli toprak tipi aşağıdakilerden hangisidir?",
+    ["Podzol", "Çernozem", "Laterit", "Tundra toprağı", "Çöl toprağı"], 1, "Çernozem, step bölgelerinin verimli, koyu renkli topraklarıdır.");
+  q("cografya2", "Dünya İklimleri", 3, "Yıl boyunca yüksek sıcaklık ve her gün öğleden sonra yağış görülmesi hangi iklimin özelliğidir?",
+    ["Akdeniz iklimi", "Ekvatoral iklim", "Karasal iklim", "Çöl iklimi", "Okyanusal iklim"], 1, "Ekvatoral iklimde sıcaklık yıl boyunca yüksektir ve konveksiyonel (yükselim) yağışlar hemen her gün görülür.");
+  q("cografya2", "Dünya İklimleri", 3, "Yazın denizden karaya, kışın karadan denize esen mevsimlik rüzgârların etkili olduğu iklim tipi hangisidir?",
+    ["Muson iklimi", "Tundra iklimi", "Karasal iklim", "Akdeniz iklimi", "Çöl iklimi"], 0, "Muson iklimi, Güney ve Güneydoğu Asya'da mevsimlik rüzgâr yönü değişiminin yarattığı iklimdir.");
+  q("cografya2", "Doğal Sistemler", 3, "Gelgit (met-cezir) olayının oluşmasındaki temel neden aşağıdakilerden hangisidir?",
+    ["Dünya'nın eksen eğikliği", "Ay ve Güneş'in çekim gücü", "Rüzgârların esmesi", "Dünya'nın yıllık hareketi", "Denizlerin tuzluluğu"], 1, "Gelgit, özellikle Ay'ın (ve daha az olarak Güneş'in) çekim kuvvetinin deniz suyu üzerindeki etkisiyle oluşur.");
+  /* ---- PSİKOLOJİ · SOSYOLOJİ · MANTIK ---- */
+  q("psikoloji", "Psikolojinin Temel Süreçleri", 2, "Maslow'un ihtiyaçlar hiyerarşisinde en üst basamakta aşağıdakilerden hangisi yer alır?",
+    ["Fizyolojik ihtiyaçlar", "Güvenlik ihtiyacı", "Kendini gerçekleştirme", "Sevgi ve ait olma", "Saygı görme"], 2, "Maslow'a göre en üst basamak, kendini gerçekleştirme ihtiyacıdır.");
+  q("psikoloji", "Gelişim", 3, "Piaget'nin bilişsel gelişim kuramında ‘duyusal-motor dönem’ kaç yaş aralığını kapsar?",
+    ["0–2", "2–7", "7–11", "11 ve üzeri", "12–18"], 0, "Duyusal-motor dönem 0–2 yaş arasıdır; işlem öncesi 2–7, somut işlemler 7–11, soyut işlemler 11 ve üstüdür.");
+  q("psikoloji", "Kişilik", 3, "Freud'un kişilik kuramında ‘haz ilkesi’ ile çalışan ve anında doyum arayan kişilik yapısı hangisidir?",
+    ["Ego", "Süperego", "İd", "Persona", "Kolektif bilinçdışı"], 2, "İd, doğuştan gelen dürtüleri temsil eder ve haz ilkesine göre çalışır.");
+  q("psikoloji", "Öğrenme", 3, "Davranışın sonuçlarıyla (ödül, ceza) şekillendiğini savunan ve ‘edimsel koşullanma’ kavramını geliştiren psikolog kimdir?",
+    ["Pavlov", "B. F. Skinner", "Piaget", "Freud", "Rogers"], 1, "Skinner, davranışın pekiştirme ve ceza gibi sonuçlarıyla öğrenildiğini açıklayan edimsel koşullanmanın temsilcisidir.");
+  q("sosyoloji", "Sosyal Gruplar", 2, "Aşağıdakilerden hangisi birincil (ilk) gruba örnektir?",
+    ["Sendika", "Siyasi parti", "Aile", "Şirket", "Dernek"], 2, "Birincil gruplar yüz yüze, samimi ve sürekli ilişkilerin olduğu gruplardır: aile, yakın arkadaş grubu.");
+  q("sosyoloji", "Sosyolojik Düşünce", 3, "‘İntihar’ adlı çalışmasında toplumsal olguların bireyden bağımsız bir gerçeklik olduğunu savunan sosyolog kimdir?",
+    ["Auguste Comte", "Max Weber", "Emile Durkheim", "Karl Marx", "Herbert Spencer"], 2, "Durkheim, ‘İntihar’ çalışmasında toplumsal olguları istatistiksel verilerle ele almıştır.");
+  q("sosyoloji", "Toplumsal Değişme", 2, "Aşağıdakilerden hangisi göçü başlatan ‘itici’ etkenlere örnektir?",
+    ["Yüksek ücret", "İşsizlik", "İyi eğitim imkânı", "Sağlık hizmetleri", "Gelişmiş altyapı"], 1, "İşsizlik, yaşanılan yerden uzaklaştıran (itici) etkendir; diğerleri gidilen yerin çekici etkenleridir.");
+  q("mantik", "Akıl Yürütme", 2, "“Her insan ölümlüdür. Sokrates insandır. O hâlde Sokrates ölümlüdür.” akıl yürütmesi aşağıdakilerden hangisine örnektir?",
+    ["Tümevarım", "Tümdengelim (kıyas)", "Analoji", "Çelişki", "Hipotez"], 1, "Genel bir önermeden tek bir duruma varıldığı için tümdengelimdir.");
+  q("mantik", "Mantık İlkeleri", 3, "“Bir şey hem A hem A değil olamaz.” ifadesi aşağıdaki mantık ilkelerinden hangisini anlatır?",
+    ["Özdeşlik ilkesi", "Çelişmezlik ilkesi", "Üçüncü hâlin imkânsızlığı", "Yeter neden ilkesi", "Nedensellik"], 1, "Bir şeyin aynı anda hem doğru hem yanlış olamayacağını söyleyen ilke çelişmezlik ilkesidir.");
+  q("mantik", "Akıl Yürütme", 3, "Her gün güneşin doğudan doğduğunun gözlenmesiyle ‘Güneş her gün doğudan doğar.’ sonucuna varılması hangi akıl yürütmedir?",
+    ["Tümdengelim", "Tümevarım", "Kıyas", "Dolaylı çıkarım", "Postülat"], 1, "Tek tek gözlemlerden genel bir yargıya ulaşıldığı için tümevarımdır.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -5446,6 +5533,69 @@ G("mitoz-kromatit", ["biyoloji"], "Hücre bölünmesi", 2, () => {
   return { q: `2n = ${n2} kromozomlu bir hücre mitoz bölünmenin ${evre[0]} evresindeyken hücrede toplam kaç ${sor} bulunur? (Eşlenmeden önceki G₁ hücresi 2n = ${n2}'dir.)`,
     ...numChoices(c, [n2, 2 * n2, 4 * n2, n2 / 2, c + 2], { step: 2 }),
     x: evre[0] === "anafaz" ? `Anafazda kardeş kromatitler ayrılır; her biri ayrı kromozom sayılır: ${2 * n2} kromozom.` : `S evresinde DNA eşlendiği için her kromozom 2 kromatitlidir: ${n2} kromozom, ${2 * n2} kromatit.` };
+});
+/* ===== 5. tur: kolay seviye kalıpları (temel beceriler; cevaplar iki yoldan doğrulanır) ===== */
+const chk10 = (a, b) => { if (Math.abs(a - b) > 1e-9) throw new Error("gen10 tutarsiz"); return a; };
+G("kolay-kitap", ["mat"], "Problemler", 1, () => {
+  const T = rnd(10, 40) * 10, g = rnd(2, 6), d = rnd(3, 9), oku = g * d, kalan = T - oku; if (kalan <= 0) return null; chk10(kalan, T - d * g);
+  return { q: `${T} sayfalık bir kitabın her gün ${g} sayfası okunuyor. ${d} gün sonra kitabın kaç sayfası kalır?`,
+    ...numChoices(kalan, [T - g, T - d, T + oku, oku, T - oku + g, T - oku - g], { step: g }),
+    x: `${d} günde okunan: ${g}·${d} = ${oku} sayfa. Kalan: ${T} − ${oku} = ${kalan} sayfa.` };
+});
+G("kolay-indirim", ["mat"], "Yüzdeler", 1, () => {
+  const fyt = rnd(2, 20) * 50, p = pick([10, 20, 25, 40, 50]), ind = fyt * p / 100, son = fyt - ind; if (!ok3(son)) return null; chk10(son, fyt * (100 - p) / 100);
+  return { q: `Etiket fiyatı ${fyt} TL olan bir ürüne %${p} indirim uygulanıyor. Ürünün indirimli fiyatı kaç TL'dir?`,
+    ...numChoices(son, [ind, fyt + ind, fyt - p, fyt * p / 100 + 10, son + 10, son - 10], { step: 10 }),
+    x: `İndirim: ${fyt}·${p}/100 = ${nf(ind)} TL. Yeni fiyat: ${fyt} − ${nf(ind)} = ${nf(son)} TL.` };
+});
+G("kolay-ortalama", ["mat"], "Ortalama", 1, () => {
+  const n = rnd(3, 5), a = Array.from({ length: n }, () => rnd(40, 100)), s = a.reduce((x, y) => x + y, 0); if (s % n) return null; const ort = s / n; chk10(ort * n, s);
+  return { q: `Bir öğrencinin ${n} sınavdan aldığı puanlar ${a.join(", ")} olduğuna göre puan ortalaması kaçtır?`,
+    ...numChoices(ort, [Math.max(...a), Math.min(...a), s, Math.round((Math.max(...a) + Math.min(...a)) / 2), ort + 2, ort - 3], { step: 2 }),
+    x: `Toplam: ${a.join(" + ")} = ${s}. Ortalama = ${s}/${n} = ${ort}.` };
+});
+G("kolay-kare", ["geo"], "Dörtgenler", 1, () => {
+  const k = rnd(3, 15), c = 4 * k, A = k * k; const sor = pick(["çevre", "alan"]), v = sor === "çevre" ? c : A;
+  return { q: `Bir kenarı ${k} cm olan karenin ${sor}sı ${sor === "alan" ? "" : ""}kaçtır? (${sor === "çevre" ? "cm" : "cm²"})`.replace("çevresı", "çevresi").replace("alansı", "alanı").replace("alan ı", "alanı"),
+    ...numChoices(v, [sor === "çevre" ? A : c, 2 * k, k * 2 + k, v + k, v - k, 2 * v], { step: k }),
+    x: sor === "çevre" ? `Çevre = 4·${k} = ${c} cm.` : `Alan = ${k}·${k} = ${A} cm².` };
+});
+G("kolay-aci", ["geo"], "Üçgenler", 1, () => {
+  const a = rnd(30, 80), b = rnd(30, 90), c = 180 - a - b; if (c < 15) return null; chk10(a + b + c, 180);
+  return { q: `Bir üçgenin iki iç açısı ${a}° ve ${b}° olduğuna göre üçüncü iç açısı kaç derecedir?`,
+    ...numChoices(c, [180 - a, 180 - b, 360 - a - b, a + b, c + 10, c - 10], { step: 5 }),
+    x: `Üçgenin iç açılarının toplamı 180°'dir. 180 − ${a} − ${b} = ${c}°.` };
+});
+G("kolay-hiz", ["fizik"], "Hareket", 1, () => {
+  const v = rnd(2, 20) * 5, t = rnd(2, 10), x = v * t; chk10(x / t, v);
+  return { q: `Sabit ${v} m/s hızla giden bir araç ${t} saniyede kaç metre yol alır?`,
+    ...numChoices(x, [v + t, v / t, x + v, x - t, x * 2, v * (t + 1)], { step: v }),
+    x: `Yol = hız × zaman = ${v}·${t} = ${x} m.` };
+});
+G("kolay-is", ["fizik"], "İş, güç ve enerji", 1, () => {
+  const F = rnd(2, 20) * 5, d = rnd(2, 10), W = F * d, P = W / (t => t)(1);
+  return { q: `Bir cisme ${F} N'luk kuvvet uygulanarak cisim kuvvet yönünde ${d} m yer değiştiriyor. Kuvvetin yaptığı iş kaç joule'dür?`,
+    ...numChoices(W, [F + d, F / d, W + F, W - d, W * 2, F * d + d], { step: F }),
+    x: `W = F·d = ${F}·${d} = ${W} J.` };
+});
+G("kolay-nötron", ["kimya"], "Atomun yapısı", 1, () => {
+  const [ad, Z] = pick([["Na", 11], ["Mg", 12], ["Al", 13], ["Ca", 20], ["Fe", 26], ["K", 19], ["Cl", 17]]), A = Z * 2 + rnd(0, 3) + (Z > 20 ? 4 : 0), n = A - Z; chk10(Z + n, A);
+  return { q: `Atom numarası ${Z}, kütle numarası ${A} olan ${ad} atomunun nötron sayısı kaçtır?`,
+    ...numChoices(n, [Z, A, A + Z, n + 1, n - 1, Z - 1], { step: 1 }),
+    x: `Nötron sayısı = kütle numarası − atom numarası = ${A} − ${Z} = ${n}.` };
+});
+G("kolay-su-mol", ["kimya"], "Mol kavramı", 1, () => {
+  const k = rnd(1, 8), g = 18 * k; chk10(g / 18, k);
+  return { q: `${g} gram su (H₂O) kaç moldür? (H: 1, O: 16)`,
+    ...numChoices(k, [g, g / 16, g / 2, k + 1, k * 2, 18], { step: 1 }),
+    x: `H₂O'nun mol kütlesi 2·1 + 16 = 18 g/mol. n = ${g}/18 = ${k} mol.` };
+});
+G("kolay-kromozom", ["biyoloji"], "Hücre bölünmesi", 1, () => {
+  const n2 = pick([8, 10, 12, 14, 20, 46]), mito = n2, mayoz = n2 / 2;
+  const sor = pick([["mitoz bölünme sonunda oluşan her yavru hücrede", mito], ["mayoz bölünme sonunda oluşan her gamet hücresinde", mayoz]]);
+  return { q: `2n = ${n2} kromozomlu bir hücrede ${sor[0]} kaç kromozom bulunur?`,
+    ...numChoices(sor[1], [n2 * 2, n2, n2 / 2, n2 / 4, n2 + 2, n2 - 2].filter(v => v !== sor[1]), { step: 2 }),
+    x: sor[1] === mito ? `Mitoz bölünmede kromozom sayısı korunur: ${n2}.` : `Mayozda kromozom sayısı yarıya iner: n = ${mayoz}.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=62d178a15f">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=62d178a15f">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=62d178a15f">
+<link rel="manifest" href="/manifest.webmanifest?v=b69e98820b">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=b69e98820b">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=b69e98820b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=62d178a15f">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=b69e98820b">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5963,9 +5963,9 @@ const LS = {
 function defState() {
   return { v: 1, upd: {}, profile: { name: "", alan: "SAY", hedef: "", gunluk: 40, examDate: EXAM_DEFAULT, ok: false },
     ans: {}, topic: {}, daily: {}, para: { times: [], c: 0, w: 0 }, exams: [], mistakes: {}, cards: {}, myCards: [],
-    plan: { tasks: [] }, aiQs: [], reports: {}, badges: {} };
+    plan: { tasks: [] }, aiQs: [], reports: {}, badges: {}, tr: {}, td: {} };
 }
-const AREA = { profile: ["profile"], stats: ["ans", "topic", "daily", "para", "badges"], exams: ["exams"], mistakes: ["mistakes"], cards: ["cards", "myCards"], plan: ["plan"], ai: ["aiQs"], reports: ["reports"] };
+const AREA = { profile: ["profile"], stats: ["ans", "topic", "daily", "para", "badges", "tr", "td"], exams: ["exams"], mistakes: ["mistakes"], cards: ["cards", "myCards"], plan: ["plan"], ai: ["aiQs"], reports: ["reports"] };
 function normalize() {
   const d = defState();
   for (const k in d) if (S[k] === undefined || S[k] === null) S[k] = d[k];
@@ -6146,6 +6146,7 @@ function record(q, res, chosen) { // res: 1 doğru, 0 yanlış, -1 boş
   const key = q.s + "|" + q.t, t = S.topic[key] || (S.topic[key] = [0, 0, 0]);
   if (res !== -1) { day.q++; if (res === 1) day.c++; day.tp = day.tp || {}; day.tp[key] = (day.tp[key] || 0) + 1; }
   t[res === 1 ? 0 : res === 0 ? 1 : 2]++;
+  if (res !== -1) { S.tr = S.tr || {}; S.td = S.td || {}; S.tr[key] = ((S.tr[key] || "") + res).slice(-12); const td = S.td[key] || (S.td[key] = [[0, 0], [0, 0], [0, 0]]), di = Math.min(2, Math.max(0, (q.d || 2) - 1)); td[di][res === 1 ? 0 : 1]++; }
   if (!q.gen) { const a = S.ans[q.id] || (S.ans[q.id] = [0, 0, 0, 0, 0]); a[res === 1 ? 0 : res === 0 ? 1 : 2]++; a[3] = Date.now(); a[4] = res; }
   if (res !== -1) xpEkle(res === 1 ? "d" : "y");
   if (res !== 1) addMistake(q, chosen);
@@ -6426,7 +6427,7 @@ const NAVG = [
   ["Hesap", [["ayarlar", "Ayarlar", "gear"]]]
 ];
 /* alt sayfalar hangi ana menüye ait */
-const NAVACT = { banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
+const NAVACT = { koc: "gelisim", banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
 const SORU_TABS = [["studyo", "Konular"], ["banka", "Soru ara"], ["paragraf", "Paragraf"], ["uret", "AI ile üret"]];
 const TEKRAR_TABS = [["yanlislar", "Yanlışlarım"], ["kartlar", "Kartlar"], ["kisa", "Kısa dersler"]];
 const subTabs = (tabs, cur) => `<nav class="subtabs" aria-label="Bölüm">${tabs.map(([k, l]) => `<a href="#${k}" class="${k === cur ? "on" : ""}"${k === cur ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav>`;
@@ -6494,7 +6495,7 @@ function vHome() {
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
     <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
-  ${kartGunSorusu()}${veriUyari()}${canliKart(true)}${ligMini()}
+  ${kartGunSorusu()}${kartKoc()}${veriUyari()}${canliKart(true)}${ligMini()}
   <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
     <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
   <div class="grid2">
@@ -6761,6 +6762,7 @@ function vProgress() {
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">Veriye bak, plana dön</span><h1>Gelişimim</h1></div>
   ${hataKarti()}
+  ${kocToplam() >= 15 ? `<div class="card row"><div class="grow"><b>Sana özel çalışma</b><div class="small muted">Zayıf konuların için kişisel analiz, örnek ve test.</div></div><a class="btn pri sm" href="#koc">Aç</a></div>` : ""}
   <div class="tiles">${tile(tot.q, "çözülen soru")}${tile("%" + pct(tot.c, tot.q), "doğruluk")}${tile(S.exams.length, "deneme")}${tile(S.exams.length ? nfx(S.exams[S.exams.length - 1].net) : "–", "son net")}</div>
   <div class="card"><div class="card-h"><h2>Deneme netleri</h2><div class="row small">${series.map((s, i) => `<span class="row" style="gap:6px"><i style="width:10px;height:10px;border-radius:50%;background:${["var(--form)", "var(--pencil)", "var(--ok)", "var(--warn)", "var(--bad)"][i % 5]}"></i>${esc(s.n)}</span>`).join("")}</div></div>
     ${series.length ? lineChart(series) : `<div class="empty">İlk denemeni çözdüğünde net grafiğin burada oluşur.</div>`}</div>
@@ -9341,6 +9343,116 @@ function pushKart() {
 }
 Object.assign(OZ_ACT, { pushAc() { pushAc(); }, pushKaydet() { pushAc(); }, pushKapat() { pushKapat(); } });
 Object.assign(OZ_CHG, { pushSlot(el) { const k = el.dataset.k; PUSHU.slots = el.checked ? [...new Set([...PUSHU.slots, k])] : PUSHU.slots.filter(x => x !== k); } });
+/* ===== Sana özel koç: çözdüğün sorulardan zayıf konularını kod ile analiz eder, sana özel çözümlü örnek ve test hazırlar (yapay zekâ kullanmaz, ücretsizdir) ===== */
+var KOC = { ex: null, key: "" };
+const KOC_MIN = 4;
+const kocSay = (s) => (s.match(/1/g) || []).length;
+function kocAnaliz() {
+  const keys = new Set(Object.keys(S.topic));
+  Object.values(S.mistakes).forEach(m => { if (!m.learned && m.q) keys.add(m.q.s + "|" + m.q.t); });
+  const out = [];
+  keys.forEach(k => {
+    const [s, t] = k.split("|"); if (!SUBJ[s]) return;
+    const v = S.topic[k] || [0, 0, 0], n = v[0] + v[1];
+    const open = Object.values(S.mistakes).filter(m => !m.learned && m.q && m.q.s === s && m.q.t === t).length;
+    if (n < KOC_MIN && !open) return;
+    const sm = (v[0] + 1) / (n + 2), tr = (S.tr && S.tr[k]) || "", rec = tr.length >= 4 ? kocSay(tr) / tr.length : null;
+    const trend = tr.length >= 8 ? kocSay(tr.slice(-4)) / 4 - kocSay(tr.slice(-8, -4)) / 4 : 0;
+    const base = rec != null ? 0.6 * (1 - rec) + 0.4 * (1 - sm) : 1 - sm;
+    const score = base * (0.6 + 0.4 * Math.min(1, n / 8)) + Math.min(0.15, open * 0.03);
+    const ea = rec != null ? rec : (n ? v[0] / n : 0.5), seviye = ea < 0.4 ? 1 : ea < 0.7 ? 2 : 3;
+    const td = (S.td && S.td[k]) || [[0, 0], [0, 0], [0, 0]], byD = td.map(([c, w]) => ({ n: c + w, acc: c + w ? Math.round(100 * c / (c + w)) : null }));
+    const why = [];
+    if (n) why.push(`Bu konuda ${n} sorunun ${v[0]}'ini doğru yaptın (%${Math.round(100 * v[0] / n)}).`);
+    if (rec != null) why.push(`Son ${tr.length} sorunun ${kocSay(tr)}'i doğru.`);
+    const dz = byD.findIndex((b, i) => b.n >= 3 && b.acc < 50);
+    if (dz >= 0) why.push(`${DIFF[dz + 1]} sorularda zorlanıyorsun (%${byD[dz].acc}).`);
+    if (open) why.push(`Henüz öğrenemediğin ${open} yanlışın var.`);
+    if (trend <= -0.25) why.push("Son sorularda düşüş var.");
+    else if (trend >= 0.25) why.push("Son sorularda yükseliş var, böyle devam.");
+    out.push({ k, s, t, n, c: v[0], acc: n ? Math.round(100 * v[0] / n) : null, rec, trend, open, score, seviye, byD, why, durum: score >= 0.5 ? "Zayıf" : score >= 0.3 ? "Gelişmeli" : "İyi" });
+  });
+  return out.sort((a, b) => b.score - a.score);
+}
+const kocZayif = (lim) => kocAnaliz().filter(x => x.score >= 0.3 && x.n + x.open >= KOC_MIN).slice(0, lim || 5);
+const kocGuclu = (lim) => kocAnaliz().filter(x => x.n >= 6 && x.score < 0.2).sort((a, b) => a.score - b.score).slice(0, lim || 3);
+const kocToplam = () => Object.values(S.topic).reduce((a, v) => a + v[0] + v[1], 0);
+/* sana özel 10 soruluk test: seviyene göre kolay-orta-zor karışımı + açık yanlışlarından en fazla 2 soru */
+function kocSet(s, t, n) {
+  n = n || 10;
+  const a = kocAnaliz().find(x => x.s === s && x.t === t), L = a ? a.seviye : 2;
+  const mq = Object.values(S.mistakes).filter(m => !m.learned && m.q && m.q.s === s && m.q.t === t && !m.q.fig).sort((x, y) => y.n - x.n).slice(0, 2).map(m => Object.assign({}, m.q));
+  const kalan = n - mq.length, w = [[6, 3, 1], [2, 5, 3], [1, 3, 6]][L - 1], top = w[0] + w[1] + w[2];
+  let sayi = w.map(x => Math.round(kalan * x / top)); sayi[1] += kalan - sayi.reduce((p, c) => p + c, 0);
+  const take = []; const ids = new Set(mq.map(q => q.id));
+  sayi.forEach((c, i) => { if (c > 0) buildSet([[s, c]], { topic: t, diff: i + 1, unsolvedFirst: true }).qs.forEach(q => { if (!ids.has(q.id)) { ids.add(q.id); take.push(q); } }); });
+  if (take.length < kalan) buildSet([[s, kalan - take.length + 3]], { topic: t, unsolvedFirst: true }).qs.forEach(q => { if (take.length < kalan && !ids.has(q.id)) { ids.add(q.id); take.push(q); } });
+  /* konu havuzu küçükse (özellikle sözel dersler) aynı dersten yeni sorularla tamamla */
+  const top2 = mq.length + take.length; if (top2 < 8) buildSet([[s, 8 - top2 + 2]], { unsolvedFirst: true }).qs.forEach(q => { if (mq.length + take.length < 8 && !ids.has(q.id)) { ids.add(q.id); take.push(q); } });
+  return { qs: shuffle(mq.concat(take)), L };
+}
+/* çözümlü örnekler: önce bankadaki açıklamalı sorular, sonra üretilen sorular */
+function kocOrnekler(s, t, L) {
+  const hedef = L || 2, havuz = poolOf(s, { topic: t }).filter(q => !q.gen && !q.fig && q.x && q.o && q.o.length >= 4);
+  const sirali = shuffle(havuz).sort((a, b) => Math.abs(a.d - hedef) - Math.abs(b.d - hedef) || (S.ans[a.id] ? 1 : 0) - (S.ans[b.id] ? 1 : 0));
+  const out = sirali.slice(0, 2), used = new Set();
+  const gens = gensOf(s, t); for (let i = 0; i < 6 && out.length < 3 && gens.length; i++) { const g = pick(gens), q = genQ(g, s, used); if (q && !q.stale) out.push(q); }
+  return out.slice(0, 3).map(q => ({ q: q.q, p: q.p, o: q.o, a: q.a, x: q.x, d: q.d }));
+}
+const kocOrnekKart = (e, i) => `<div class="card stack" style="background:var(--line2)"><div class="card-h" style="margin:0"><b>Çözümlü örnek ${i + 1}</b><span class="pill">${DIFF[e.d] || ""}</span></div>
+  ${e.p ? `<div class="para small">${fq(e.p)}</div>` : ""}<div class="qtext">${fq(e.q)}</div>
+  <div class="opts">${e.o.map((o, j) => `<div class="opt ${j === e.a ? "right" : ""}"><span class="bub">${LET[j]}</span><span class="ot">${fq(o)}</span></div>`).join("")}</div>
+  <div class="expl"><div class="res ok">Doğru cevap ${LET[e.a]}</div><p>${fq(e.x)}</p></div></div>`;
+function kocGunluk() {
+  const z = kocZayif(2); if (!z.length) return [];
+  const gun = dayKey(), tp = (S.daily[gun] && S.daily[gun].tp) || {}, steps = [];
+  steps.push({ k: "ornek", s: z[0].s, t: z[0].t, l: `${z[0].t}: çözümlü örnekleri incele`, done: LS.get("ake.koc." + gun + "." + z[0].k) === "1" });
+  steps.push({ k: "test", s: z[0].s, t: z[0].t, l: `${z[0].t}: 10 soruluk test`, done: (tp[z[0].k] || 0) >= 8 });
+  if (z[1]) steps.push({ k: "test", s: z[1].s, t: z[1].t, l: `${z[1].t}: 10 soruluk test`, done: (tp[z[1].k] || 0) >= 8 });
+  return steps;
+}
+const kocDurumPill = d => `<span class="pill ${d === "İyi" ? "ok" : d === "Zayıf" ? "bad" : ""}">${d}</span>`;
+function kocKonuKart(x) {
+  return `<div class="card stack"><div class="card-h" style="margin:0"><div><b>${esc(x.t)}</b><div class="small muted">${esc(SUBJ[x.s].n)}</div></div>${kocDurumPill(x.durum)}</div>
+    <div class="bar"><i style="width:${x.acc || 0}%"></i></div>
+    <ul class="small" style="margin:0;padding-left:18px">${x.why.map(w => `<li>${esc(w)}</li>`).join("")}</ul>
+    <div class="row"><button class="btn pri sm" data-a="kocAc" data-s="${x.s}" data-t="${esc(x.t)}">Konu çalışması</button><button class="btn sm" data-a="kocTest" data-s="${x.s}" data-t="${esc(x.t)}">Test çöz</button></div></div>`;
+}
+function vKoc() {
+  if (KOC.key) {
+    const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t);
+    const ms = Object.values(S.mistakes).filter(m => !m.learned && m.q && m.q.s === s && m.q.t === t && !m.q.fig && m.q.o).sort((x, y) => y.n - x.n).slice(0, 3);
+    return `<div class="view"><div class="vhead"><h1>${esc(t)}</h1><p>${esc(SUBJ[s].n)} · sana özel konu çalışması</p></div>
+      <div class="row"><button class="btn sm ghost" data-a="kocGeri">← Sana özel</button></div>
+      ${a ? `<div class="card stack"><div class="card-h" style="margin:0"><h2>Durumun</h2>${kocDurumPill(a.durum)}</div>
+        <div class="tiles">${tile(a.acc != null ? "%" + a.acc : "-", "genel doğruluk")}${tile(a.rec != null ? "%" + Math.round(a.rec * 100) : "-", "son sorularda")}${tile(a.open, "öğrenilmemiş yanlış")}</div>
+        <div class="stack">${a.byD.map((b, i) => `<div><div class="small" style="display:flex;justify-content:space-between"><span>${DIFF[i + 1]}</span><span class="muted">${b.n ? "%" + b.acc + " · " + b.n + " soru" : "henüz çözmedin"}</span></div><div class="bar"><i style="width:${b.acc || 0}%"></i></div></div>`).join("")}</div>
+        <p class="small muted" style="margin:0">Önerilen başlangıç seviyesi: <b>${["", "Temel (kolay ağırlıklı)", "Orta", "İleri (zor ağırlıklı)"][a.seviye]}</b>. Testin buna göre hazırlanır.</p></div>` : `<div class="card"><p style="margin:0">Bu konuda henüz yeterli verin yok. Önce örnekleri incele, sonra testi çöz.</p></div>`}
+      <div class="stack"><h2 style="margin:0">Çözümlü örnekler</h2>${(KOC.ex || []).map(kocOrnekKart).join("") || `<div class="empty">Bu konu için örnek bulunamadı.</div>`}<div class="row"><button class="btn sm" data-a="kocYeniOrnek">Başka örnekler getir</button></div></div>
+      ${ms.length ? `<div class="stack"><h2 style="margin:0">Senin yanlışların</h2>${ms.map(m => `<div class="card stack"><div class="qtext">${fq(m.q.q)}</div><p class="small" style="margin:0">${m.last != null && m.last >= 0 ? `Senin cevabın <b>${LET[m.last]}</b>, doğru cevap <b>${LET[m.q.a]}</b>.` : `Doğru cevap <b>${LET[m.q.a]}</b>: ${fq(m.q.o[m.q.a])}`}</p><div class="expl"><p>${fq(m.q.x)}</p></div></div>`).join("")}</div>` : ""}
+      <div class="card stack"><h2 style="margin:0">Hazırsan test zamanı</h2><p class="small muted" style="margin:0">10 soru: seviyene uygun yeni sorular ve varsa öğrenmediğin yanlışlarından 2 tanesi.</p><div class="row"><button class="btn pri" data-a="kocTest" data-s="${s}" data-t="${esc(t)}">Testi başlat</button></div></div></div>`;
+  }
+  const top = kocToplam(), z = kocZayif(5), g = kocGuclu(3), adim = kocGunluk();
+  const bolum = Object.entries(S.topic).reduce((m, [k, v]) => { const d = k.split("|")[0]; if (!SUBJ[d]) return m; const e = m[d] || (m[d] = [0, 0]); e[0] += v[0]; e[1] += v[0] + v[1]; return m; }, {});
+  return `<div class="view"><div class="vhead"><h1>Sana özel</h1><p>Çözdüğün sorulardan zayıf yönlerin bulunur; sana özel örnek ve test hazırlanır. Yapay zekâ kullanılmaz, ücretsizdir.</p></div>
+    ${top < 15 ? `<div class="card stack"><h2 style="margin:0">Analiz için biraz daha soru çöz</h2><p style="margin:0">Şu ana kadar ${top} soru çözdün. Yaklaşık 15 sorudan sonra güçlü ve zayıf konuların burada görünür.</p><div class="row"><button class="btn pri" data-a="quick" data-k="mix">Karma test çöz</button></div></div>` : ""}
+    ${adim.length ? `<div class="card stack"><h2 style="margin:0">Bugünkü kişisel programın</h2><div class="list">${adim.map((a, i) => `<div class="li"><span class="pill ${a.done ? "ok" : ""}">${a.done ? "Tamam" : i + 1 + ". adım"}</span><div class="grow"><div class="t">${esc(a.l)}</div></div><button class="btn sm${a.done ? " ghost" : ""}" data-a="${a.k === "ornek" ? "kocAc" : "kocTest"}" data-s="${a.s}" data-t="${esc(a.t)}">${a.k === "ornek" ? "Aç" : "Başla"}</button></div>`).join("")}</div></div>` : ""}
+    ${z.length ? `<div class="stack"><h2 style="margin:0">Öncelikli konuların</h2>${z.map(kocKonuKart).join("")}</div>` : top >= 15 ? `<div class="card"><p style="margin:0">Şu an belirgin bir zayıf konun görünmüyor. Harika gidiyorsun; zor sorularla kendini zorlayabilirsin.</p></div>` : ""}
+    ${g.length ? `<div class="card stack"><h2 style="margin:0">Güçlü yönlerin</h2><div class="row" style="flex-wrap:wrap">${g.map(x => `<span class="pill ok">${esc(x.t)} · %${x.acc}</span>`).join("")}</div></div>` : ""}
+    ${Object.keys(bolum).length ? `<div class="card stack"><h2 style="margin:0">Derslere göre doğruluk</h2>${Object.entries(bolum).filter(([, e]) => e[1] >= 3).sort((a, b) => a[1][0] / a[1][1] - b[1][0] / b[1][1]).map(([d, e]) => `<div><div class="small" style="display:flex;justify-content:space-between"><span>${esc(SUBJ[d].n)}</span><span class="muted">%${Math.round(100 * e[0] / e[1])} · ${e[1]} soru</span></div><div class="bar"><i style="width:${Math.round(100 * e[0] / e[1])}%"></i></div></div>`).join("")}</div>` : ""}
+    <p class="xs muted">Analiz, çözdüğün sorulardaki doğru/yanlış sayılarından, son sonuçlarından ve zorluk düzeyinden hesaplanır. Ne kadar çok soru çözersen o kadar isabetli olur.</p></div>`;
+}
+function kartKoc() {
+  if (kocToplam() < 15) return "";
+  const z = kocZayif(1)[0]; if (!z) return "";
+  return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Sana özel çalışma</h2>${kocDurumPill(z.durum)}</div><p style="margin:0"><b>${esc(z.t)}</b> (${esc(SUBJ[z.s].n)}) şu an en çok destek gereken konun. ${esc(z.why[0] || "")}</p><div class="row"><button class="btn pri sm" data-a="kocAc" data-s="${z.s}" data-t="${esc(z.t)}">Çalışmaya başla</button><a class="btn sm" href="#koc">Tüm analizim</a></div></section>`;
+}
+Object.assign(OZ_ACT, {
+  kocAc(d) { const a = kocAnaliz().find(x => x.s === d.s && x.t === d.t); KOC.key = d.s + "|" + d.t; KOC.ex = kocOrnekler(d.s, d.t, a ? a.seviye : 2); try { LS.set("ake.koc." + dayKey() + "." + KOC.key, "1"); } catch (e) { } go("koc"); window.scrollTo(0, 0); },
+  kocGeri() { KOC.key = ""; KOC.ex = null; render(); window.scrollTo(0, 0); },
+  kocYeniOrnek() { const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t); KOC.ex = kocOrnekler(s, t, a ? a.seviye : 2); render(); },
+  kocTest(d) { const b = kocSet(d.s, d.t, 10); startRun({ kind: "practice", title: `Sana özel · ${d.t}`, mode: "study", qs: b.qs }); }
+});
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -9540,10 +9652,10 @@ function siteFoot() {
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
 const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
-Object.assign(ROUTES, { sss: vSSS, hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli });
+Object.assign(ROUTES, { sss: vSSS, hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli, koc: vKoc });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
-const SAYFA_BASLIK = { bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
+const SAYFA_BASLIK = { koc: "Sana özel", bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
 function sayfaBasligi(r) { try { const t = SAYFA_BASLIK[r] || (LEGAL[r] && LEGAL[r].t) || ""; document.title = t && r !== "bugun" ? t + " · AKE Akademi" : "AKE Akademi · YKS 2027"; } catch (e) { } }
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;

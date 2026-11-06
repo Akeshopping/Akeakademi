@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=54fa94de6b">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=54fa94de6b">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=54fa94de6b">
+<link rel="manifest" href="/manifest.webmanifest?v=34c6be3b49">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=34c6be3b49">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=34c6be3b49">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=54fa94de6b">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=34c6be3b49">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2516,6 +2516,52 @@ const BANK = [];
     ["Özdeşlik ilkesi", "Çelişmezlik ilkesi", "Üçüncü hâlin imkânsızlığı", "Yeter neden ilkesi", "Nedensellik"], 1, "Bir şeyin aynı anda hem doğru hem yanlış olamayacağını söyleyen ilke çelişmezlik ilkesidir.");
   q("mantik", "Akıl Yürütme", 3, "Her gün güneşin doğudan doğduğunun gözlenmesiyle ‘Güneş her gün doğudan doğar.’ sonucuna varılması hangi akıl yürütmedir?",
     ["Tümdengelim", "Tümevarım", "Kıyas", "Dolaylı çıkarım", "Postülat"], 1, "Tek tek gözlemlerden genel bir yargıya ulaşıldığı için tümevarımdır.");
+})();
+/* ===== Özgün soru bankası · 10. bölüm: az sorulu sözel konular (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    const id = s + "-10-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
+  }
+
+  q("tarih","Antlaşmalar",2,"Osmanlı Devleti'nin Avrupa'da toprak kaybetmeye başladığını gösteren ilk antlaşma aşağıdakilerden hangisidir?",["Karlofça", "Pasarofça", "Küçük Kaynarca", "Yaş", "Zitvatorok"],0,"1699 Karlofça Antlaşması ile Osmanlı ilk kez büyük toprak kaybetti (Macaristan, Transilvanya vb.).");
+  q("tarih","Antlaşmalar",3,"Kırım Hanlığı'nın bağımsızlığını tanıyan ve Osmanlı'nın ilk kez savaş tazminatı ödediği antlaşma hangisidir?",["Küçük Kaynarca", "Yaş", "Bükreş", "Edirne", "Pasarofça"],0,"1774 Küçük Kaynarca Antlaşması ile Kırım bağımsız oldu, Osmanlı tazminat ödedi ve Rusya Ortodokslar üzerinde hak kazandı.");
+  q("tarih","Antlaşmalar",2,"Aşağıdaki antlaşmalardan hangisi Kurtuluş Savaşı'nda imzalanan bir antlaşma DEĞİLDİR?",["Sevr", "Gümrü", "Moskova", "Ankara (Fransa)", "Mudanya"],0,"Sevr (1920) İstanbul Hükümeti'nin imzaladığı, TBMM'nin tanımadığı antlaşmadır. Diğerleri TBMM döneminde imzalanmıştır.");
+  q("tarih","Kronoloji",2,"Aşağıdaki olayların doğru kronolojik sıralaması hangisidir?",["Malazgirt – Miryokefalon – Kösedağ", "Kösedağ – Malazgirt – Miryokefalon", "Miryokefalon – Malazgirt – Kösedağ", "Malazgirt – Kösedağ – Miryokefalon", "Kösedağ – Miryokefalon – Malazgirt"],0,"Malazgirt 1071, Miryokefalon 1176, Kösedağ 1243.");
+  q("tarih","Kronoloji",2,"Aşağıdakilerden hangisi en erken gerçekleşmiştir?",["İstanbul'un fethi", "Mohaç Savaşı", "Çaldıran Savaşı", "Mercidabık Savaşı", "Preveze Deniz Savaşı"],0,"İstanbul'un fethi 1453; Çaldıran 1514, Mercidabık 1516, Mohaç 1526, Preveze 1538.");
+  q("tarih","Osmanlı Kültür ve Medeniyeti",2,"Osmanlı'da devlet işlerinin görüşüldüğü, padişahın başkanlık ettiği en yüksek kurul hangisidir?",["Divan-ı Hümayun", "Meclis-i Mebusan", "Şûra-yı Devlet", "Meşihat", "Bâbıâli"],0,"Divan-ı Hümayun, devlet yönetiminin merkezi olan kuruldur.");
+  q("tarih","Osmanlı Kültür ve Medeniyeti",2,"Osmanlı'da gayrimüslim tebaanın kendi dinî ve hukukî işlerini yönettiği topluluklara ne ad verilir?",["Millet sistemi", "Devşirme", "Mukataa", "Tımar", "Lonca"],0,"Millet sistemi, dinî cemaatlere iç işlerinde özerklik tanıyan düzendir.");
+  q("tarih","Osmanlı Kültür ve Medeniyeti",3,"Osmanlı'da ‘tımar sistemi’nin temel amacı aşağıdakilerden hangisidir?",["Merkezî hazineye yük olmadan atlı asker yetiştirmek", "Ticareti vergiden muaf tutmak", "Köylüleri şehre göç ettirmek", "Deniz ticaretini geliştirmek", "Padişahın saray masraflarını karşılamak"],0,"Tımar sahipleri geliriyle cebelü adı verilen atlı asker besler, bu sayede ordu maliyeti düşük tutulurdu.");
+  q("tarih","Anadolu Selçuklu",2,"Anadolu Selçuklu Devleti'nin kurucusu kimdir?",["Süleymanşah", "Kılıç Arslan I", "Alparslan", "Melikşah", "Gıyaseddin Keyhüsrev"],0,"Kutalmışoğlu Süleymanşah, 1075'te İznik'te Anadolu Selçuklu Devleti'ni kurdu.");
+  q("tarih","Anadolu Selçuklu",3,"Anadolu Selçuklu Devleti'nde en parlak dönem ve Alâeddin Keykubad dönemindeki gelişmelerden biri aşağıdakilerden hangisidir?",["Alanya ve Sinop'un alınması", "Malazgirt Savaşı'nın kazanılması", "Haçlılarla Birinci Haçlı Seferi", "Kösedağ'ın kazanılması", "İstanbul'un kuşatılması"],0,"Alâeddin Keykubad döneminde Alanya (Kalonoros) ve Sinop alındı, ticaret ve kervansaraylar gelişti.");
+  q("cografya","Akarsular",2,"Türkiye'de Karadeniz'e dökülen en uzun akarsu aşağıdakilerden hangisidir?",["Kızılırmak", "Yeşilırmak", "Sakarya", "Çoruh", "Filyos"],0,"Kızılırmak (1355 km) Türkiye'nin en uzun akarsuyudur ve Karadeniz'e dökülür.");
+  q("cografya","Akarsular",3,"Aşağıdaki akarsulardan hangisi Akdeniz'e dökülür?",["Seyhan", "Gediz", "Büyük Menderes", "Sakarya", "Meriç"],0,"Seyhan, Akdeniz'e dökülür. Gediz ve Büyük Menderes Ege'ye, Sakarya Karadeniz'e, Meriç Ege'ye dökülür.");
+  q("cografya","Göller",2,"Aşağıdaki göllerden hangisi tektonik kökenlidir?",["Eğirdir Gölü", "Tortum Gölü", "Abant Gölü", "Nemrut Krater Gölü", "Salda Gölü"],0,"Eğirdir Gölü tektonik çukurlukta oluşmuştur. Tortum heyelan, Abant heyelan, Nemrut krater gölüdür.");
+  q("cografya","Enerji kaynakları",2,"Aşağıdakilerden hangisi yenilenebilir enerji kaynağıdır?",["Rüzgâr", "Doğal gaz", "Kömür", "Petrol", "Uranyum"],0,"Rüzgâr, güneş, jeotermal, hidroelektrik gibi kaynaklar yenilenebilirdir.");
+  q("cografya","Yer şekilleri",3,"Aşağıdakilerden hangisi akarsuların biriktirdiği yer şekillerinden biridir?",["Delta ovası", "Kanyon", "V biçimli vadi", "Peribacası", "Dev kazanı"],0,"Delta ovası, akarsuyun taşıdığı malzemeyi ağzında biriktirmesiyle oluşur.");
+  q("felsefe","Felsefenin Alanları",2,"‘Doğru bilgi nedir, bilgiye nasıl ulaşılır?’ sorusu felsefenin hangi alanının konusudur?",["Epistemoloji", "Ontoloji", "Etik", "Estetik", "Mantık"],0,"Bilginin kaynağı ve doğruluğu epistemoloji (bilgi felsefesi) alanındadır.");
+  q("felsefe","Felsefenin Alanları",2,"‘Var olan nedir?’ sorusuyla ilgilenen felsefe alanı hangisidir?",["Ontoloji", "Epistemoloji", "Etik", "Siyaset felsefesi", "Sanat felsefesi"],0,"Varlığın ne olduğu ontoloji (varlık felsefesi) alanında incelenir.");
+  q("felsefe","İlk Çağ Felsefesi",2,"Evrenin temel maddesinin ‘su’ olduğunu savunan ilk Çağ filozofu kimdir?",["Thales", "Anaksimenes", "Herakleitos", "Anaksimandros", "Demokritos"],0,"Thales arkhe'yi su; Anaksimenes hava; Herakleitos ateş; Anaksimandros apeiron olarak görür.");
+  q("felsefe","İlk Çağ Felsefesi",3,"‘Aynı ırmakta iki kez yıkanılmaz’ sözüyle bilinen filozof kimdir?",["Herakleitos", "Parmenides", "Platon", "Aristoteles", "Sokrates"],0,"Herakleitos, değişimin evrensel olduğunu savunur.");
+  q("din","Temel Kavramlar",2,"İslam inancında Allah'ın kitaplarına, peygamberlerine, meleklere inanmak hangi kavramın kapsamındadır?",["İman", "Fıkıh", "Ahlak", "Hadis", "Kelam"],0,"İman, altı temel esasa (Allah, melek, kitap, peygamber, ahiret, kader) inanmaktır.");
+  q("din","Temel Kavramlar",3,"İslam hukukunda ‘ictihad’ ne demektir?",["Kur'an ve sünnetten hüküm çıkarmak için gösterilen çaba", "Namazın vakitlerini belirlemek", "Hac ibadetini yerine getirmek", "Zekât hesabı yapmak", "Hadis uydurmak"],0,"İctihad, nass bulunmayan konularda delillerden hüküm çıkarmaktır.");
+  q("edebiyat","Nazım Şekilleri",2,"Dört dizeden oluşan ve genellikle ‘aaxa’ şeklinde kafiyelenen halk edebiyatı nazım biçimi hangisidir?",["Mani", "Koşma", "Semai", "Varsağı", "Destan"],0,"Mani, dört dizeli, aaxa kafiyeli anonim halk şiiridir.");
+  q("edebiyat","Nazım Şekilleri",3,"Aşağıdakilerden hangisi divan edebiyatı nazım biçimi DEĞİLDİR?",["Koşma", "Gazel", "Kaside", "Mesnevi", "Rubai"],0,"Koşma halk edebiyatı nazım şeklidir.");
+  q("edebiyat","Edebî Akımlar",3,"‘Sanat sanat içindir’ anlayışını benimseyen Türk edebiyatı topluluğu hangisidir?",["Servet-i Fünun", "Fecr-i Âti", "Millî Edebiyat", "Garip", "Beş Hececiler"],0,"Servet-i Fünun sanat sanat içindir ilkesini benimsemiştir.");
+  q("edebiyat","Eser-Yazar",2,"‘Çalıkuşu’ romanı kime aittir?",["Reşat Nuri Güntekin", "Yakup Kadri Karaosmanoğlu", "Halide Edip Adıvar", "Refik Halit Karay", "Peyami Safa"],0,"Çalıkuşu (1922), Reşat Nuri Güntekin'in romanıdır.");
+  q("edebiyat","Eser-Yazar",3,"‘Sinekli Bakkal’ romanının yazarı kimdir?",["Halide Edip Adıvar", "Reşat Nuri Güntekin", "Yakup Kadri", "Orhan Kemal", "Sabahattin Ali"],0,"Sinekli Bakkal (1936) Halide Edip Adıvar'ın romanıdır.");
+  q("edebiyat","Hece Ölçüsü",2,"‘Hecelerin sayısı eşit olan dizelerden oluşan ölçü’ aşağıdakilerden hangisidir?",["Hece ölçüsü", "Aruz ölçüsü", "Serbest ölçü", "Duraklı ölçü", "Vezinsiz ölçü"],0,"Hece ölçüsünde dizelerdeki hece sayısı ve duraklar önemlidir.");
+  q("psikoloji","Öğrenme",2,"Pavlov'un köpeklerle yaptığı deneyde zil sesi hangi tür uyarıcıdır?",["Nötr uyarıcıdan şartlı uyarıcıya dönüşen", "Şartsız tepki", "Şartsız uyarıcı", "Pekiştireç", "Ceza"],0,"Zil önce nötrdür, yemekle eşleştirilince şartlı uyarıcı olur.");
+  q("sosyoloji","Toplumsal Yapı",2,"Toplumda bireylerin davranışlarını yönlendiren yazılı olmayan kurallara ne denir?",["Norm / örf-adet", "Yasa", "Yönetmelik", "Anayasa", "Tüzük"],0,"Toplumsal normlar yazılı olmayan kurallar olarak da bulunur (gelenek, görenek).");
+  q("sosyoloji","Sosyal Değişme",3,"Toplumsal değişmenin sonuçlarından biri olan ‘kültürel gecikme’ kavramını ortaya atan sosyolog kimdir?",["William Ogburn", "Auguste Comte", "Emile Durkheim", "Max Weber", "Karl Marx"],0,"William Ogburn, maddi kültürün manevi kültürden hızlı değişmesini kültürel gecikme olarak adlandırdı.");
+  q("mantik","Önermeler",2,"‘Eğer yağmur yağarsa, yer ıslanır.’ önermesi hangi tür birleşik önermedir?",["Koşullu", "Ayrık", "Birleşik", "Olumsuz", "Karşıt"],0,"Eğer ... ise ... kalıbı koşullu önermedir.");
+  q("mantik","Önermeler",3,"‘Her insan ölümlüdür’ önermesinin değili aşağıdakilerden hangisidir?",["Bazı insanlar ölümlü değildir", "Hiçbir insan ölümlü değildir", "Bazı insanlar ölümlüdür", "Her insan ölümsüzdür", "Hiçbir insan ölümsüz değildir"],0,"Tümel olumlunun değili özel olumsuzdur: Bazı insanlar ölümlü değildir.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));

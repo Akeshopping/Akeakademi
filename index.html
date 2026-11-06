@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=a3591f8b0b">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=a3591f8b0b">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=a3591f8b0b">
+<link rel="manifest" href="/manifest.webmanifest?v=188c53fa07">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=188c53fa07">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=188c53fa07">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=a3591f8b0b">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=188c53fa07">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -6057,6 +6057,64 @@ G("zor-cokgen-ic-aci", ["geo"], "Çokgenler", 3, () => {
   if (tur === 0) { chk14(top / n + 360 / n, 180, "ic-dis"); return { q: `Kenar sayısı ${n} olan bir düzgün çokgenin bir iç açısı kaç derecedir?`, ...numChoices(tek, [360 / n, top / (n + 1), 180 - 360 / (n - 1), top, (n - 1) * 180 / n]), x: `İç açıların toplamı (n−2)·180 = ${top}°. Bir iç açı = ${top}/${n} = ${tek}°.` }; }
   return { q: `Kenar sayısı ${n} olan bir dışbükey çokgenin köşegen sayısı kaçtır?`, ...numChoices(kose, [n * (n - 1) / 2, n * (n - 3), n * (n - 2) / 2, n, kose + n]), x: `Köşegen sayısı n(n−3)/2 = ${n}·${n - 3}/2 = ${kose}.` };
 });
+/* ===== 10. tur: İngilizce (YDT) + coğrafya eşleştirme + kolay seviye ===== */
+const SINON = [["huge", "enormous"], ["rapid", "quick"], ["brave", "courageous"], ["tiny", "minute"], ["ancient", "very old"], ["reluctant", "unwilling"], ["essential", "necessary"], ["ample", "plentiful"], ["scarce", "rare"], ["vital", "crucial"], ["obvious", "clear"], ["abandon", "leave behind"], ["fragile", "easily broken"], ["gather", "collect"], ["hesitate", "pause before acting"], ["prohibit", "forbid"], ["achieve", "accomplish"], ["distinct", "clearly different"], ["modest", "not boastful"], ["vague", "not clear"]];
+G("en-vocab-anlam", ["ingilizce"], "Vocabulary", 2, () => {
+  const it = pick(SINON), yan = KOKUS(SINON.filter(p => p[0] !== it[0]).map(p => p[1]), 4);
+  return { q: `Which of the following is closest in meaning to “${it[0]}”?`, ...strChoices(it[1], yan), x: `“${it[0]}” sözcüğü “${it[1]}” anlamına gelir.` };
+});
+const ZIT15 = [["increase", "decrease"], ["accept", "reject"], ["ancient", "modern"], ["generous", "stingy"], ["victory", "defeat"], ["temporary", "permanent"], ["shallow", "deep"], ["optimistic", "pessimistic"], ["rural", "urban"], ["include", "exclude"], ["natural", "artificial"], ["rapid", "slow"], ["arrive", "depart"], ["scarce", "abundant"]];
+G("en-vocab-zit", ["ingilizce"], "Vocabulary", 2, () => {
+  const it = pick(ZIT15), yan = KOKUS(ZIT15.filter(p => p[0] !== it[0]).map(p => p[1]).concat(ZIT15.filter(p => p[0] !== it[0]).map(p => p[0])).filter(x => x !== it[1] && x !== it[0]), 4);
+  return { q: `Which of the following is opposite in meaning to “${it[0]}”?`, ...strChoices(it[1], yan), x: `“${it[0]}” sözcüğünün zıttı “${it[1]}” sözcüğüdür.` };
+});
+const BAGLAC = [
+  ["He didn't go to school ____ he was ill.", "because", ["although", "however", "unless", "whereas"], "Neden bildirir: because."],
+  ["____ it was raining, we went for a walk.", "Although", ["Because", "So", "Unless", "Since"], "Karşıtlık: although (-e rağmen)."],
+  ["You will fail ____ you study harder.", "unless", ["although", "because", "while", "so that"], "Unless = if ... not."],
+  ["She was tired; ____, she kept working.", "however", ["because", "so that", "unless", "therefore"], "Karşıtlık bildiren geçiş: however."],
+  ["He studied hard, ____ he passed the exam.", "so", ["but", "although", "unless", "despite"], "Sonuç bildirir: so."],
+  ["____ his illness, he came to the meeting.", "Despite", ["Although", "Because", "Unless", "However"], "Despite + isim: -e rağmen."],
+  ["I'll call you ____ I arrive.", "as soon as", ["although", "unless", "despite", "whereas"], "Zaman bağlacı: as soon as."],
+  ["Tom is tall, ____ his brother is short.", "whereas", ["because", "so that", "unless", "since"], "Zıtlık: whereas."],
+  ["She spoke slowly ____ everyone could understand.", "so that", ["although", "unless", "despite", "however"], "Amaç: so that."],
+  ["____ she is rich, she is not happy.", "Although", ["Because", "So", "Unless", "Therefore"], "Karşıtlık: although."]];
+G("en-baglac", ["ingilizce"], "Conjunctions", 3, () => { const it = pick(BAGLAC); return { q: `Choose the best option to complete the sentence.\n${it[0]}`, ...strChoices(it[1], it[2]), x: it[3] }; });
+const MODAL = [
+  ["You ____ wear a seat belt. It is the law.", "must", ["can", "might", "may", "would"], "Zorunluluk: must."],
+  ["She ____ be at home; her car is outside.", "must", ["can't", "shouldn't", "needn't", "mustn't"], "Güçlü çıkarım: must be."],
+  ["He ____ have left already; the room is empty.", "must", ["should", "would", "can", "need"], "must have + V3: geçmiş hakkında güçlü çıkarım."],
+  ["You ____ smoke in the hospital.", "mustn't", ["needn't", "don't have to", "might", "can"], "Yasak: mustn't."],
+  ["You ____ come tomorrow; it's a holiday.", "don't have to", ["mustn't", "can't", "shouldn't", "must"], "Gerek yok: don't have to."],
+  ["I ____ swim when I was five.", "could", ["can", "must", "should", "would"], "Geçmişteki yetenek: could."],
+  ["You ____ see a doctor; you look ill.", "should", ["can't", "mustn't", "needn't", "might"], "Öneri: should."],
+  ["It ____ rain tonight; take an umbrella.", "might", ["must", "needn't", "shall", "ought"], "Olasılık: might."]];
+G("en-modal", ["ingilizce"], "Modals", 3, () => { const it = pick(MODAL); return { q: `Choose the correct option.\n${it[0]}`, ...strChoices(it[1], it[2]), x: it[3] }; });
+const PASIF = [["They built the bridge in 1990.", "The bridge was built in 1990.", ["The bridge is built in 1990.", "The bridge built in 1990.", "The bridge has been built in 1990.", "The bridge was building in 1990."]], ["People speak English all over the world.", "English is spoken all over the world.", ["English was spoken all over the world.", "English speaks all over the world.", "English is speaking all over the world.", "English has spoken all over the world."]],
+  ["Someone has stolen my bike.", "My bike has been stolen.", ["My bike was stolen.", "My bike has stolen.", "My bike is stolen.", "My bike had been stolen."]], ["The teacher will announce the results tomorrow.", "The results will be announced tomorrow.", ["The results will announce tomorrow.", "The results are announced tomorrow.", "The results will be announcing tomorrow.", "The results would be announced tomorrow."]],
+  ["They are repairing the road now.", "The road is being repaired now.", ["The road is repaired now.", "The road was being repaired now.", "The road is repairing now.", "The road has been repaired now."]], ["Someone had cleaned the room before we arrived.", "The room had been cleaned before we arrived.", ["The room was cleaned before we arrived.", "The room has been cleaned before we arrived.", "The room had cleaned before we arrived.", "The room would be cleaned before we arrived."]]];
+G("en-passive", ["ingilizce"], "Passive Voice", 3, () => { const it = pick(PASIF); return { q: `Choose the correct passive form of the sentence.\n${it[0]}`, ...strChoices(it[1], it[2]), x: "Edilgen yapı: özne + be (zamana uygun) + V3; zaman aynı kalır." }; });
+const MIKTAR = [["There isn't ____ milk left in the fridge.", "much", ["many", "few", "a few", "several"], "Sayılamayan isim + olumsuz: much."], ["How ____ students are there in your class?", "many", ["much", "little", "a little", "an amount of"], "Sayılabilir çoğul isim sorusu: many."], ["I have ____ friends, so I feel lonely.", "few", ["a few", "little", "a little", "much"], "Few: yetersiz (olumsuz anlam), sayılabilir."], ["She has ____ time, so she can help us.", "a little", ["a few", "few", "many", "several"], "A little: biraz, sayılamayan, olumlu anlam."], ["There are ____ cars in the street.", "a lot of", ["much", "a little", "little", "an amount of"], "Olumlu cümlede sayılabilir çoğul isimle a lot of."]];
+G("en-miktar", ["ingilizce"], "Quantifiers", 2, () => { const it = pick(MIKTAR); return { q: `Choose the correct option.\n${it[0]}`, ...strChoices(it[1], it[2]), x: it[3] }; });
+/* ---- coğrafya eşleştirme (kolay-orta) ---- */
+const ILBOLGE = [["Edirne", "Marmara"], ["Bursa", "Marmara"], ["İzmir", "Ege"], ["Manisa", "Ege"], ["Antalya", "Akdeniz"], ["Adana", "Akdeniz"], ["Trabzon", "Karadeniz"], ["Samsun", "Karadeniz"], ["Konya", "İç Anadolu"], ["Eskişehir", "İç Anadolu"], ["Erzurum", "Doğu Anadolu"], ["Van", "Doğu Anadolu"], ["Gaziantep", "Güneydoğu Anadolu"], ["Diyarbakır", "Güneydoğu Anadolu"]];
+G("cog-il-bolge", ["cografya"], "Türkiye'nin Bölgeleri", 1, () => {
+  const it = pick(ILBOLGE), yan = KOKUS(["Marmara", "Ege", "Akdeniz", "Karadeniz", "İç Anadolu", "Doğu Anadolu", "Güneydoğu Anadolu"].filter(b => b !== it[1]), 4);
+  return { q: `${it[0]} ili hangi coğrafi bölgemizde yer alır?`, ...strChoices(it[1], yan), x: `${it[0]}, ${it[1]} Bölgesi'ndedir.` };
+});
+const AKARSU = [["Kızılırmak", "Karadeniz"], ["Yeşilırmak", "Karadeniz"], ["Sakarya", "Karadeniz"], ["Seyhan", "Akdeniz"], ["Ceyhan", "Akdeniz"], ["Göksu", "Akdeniz"], ["Büyük Menderes", "Ege Denizi"], ["Gediz", "Ege Denizi"], ["Meriç", "Ege Denizi"], ["Susurluk", "Marmara Denizi"]];
+G("cog-akarsu-deniz", ["cografya"], "Akarsular", 2, () => {
+  const it = pick(AKARSU), yan = KOKUS(["Karadeniz", "Akdeniz", "Ege Denizi", "Marmara Denizi", "Hazar Denizi", "Basra Körfezi"].filter(d => d !== it[1]), 4);
+  return { q: `${it[0]} akarsuyu hangi denize ya da suya dökülür?`, ...strChoices(it[1], yan), x: `${it[0]}, ${it[1]}'ne dökülür.`.replace("Denizi'ne", "Denizi'ne") };
+});
+const DAGLAR = [["Ağrı Dağı", "Doğu Anadolu"], ["Erciyes", "İç Anadolu"], ["Uludağ", "Marmara"], ["Kaçkar Dağları", "Karadeniz"], ["Palandöken", "Doğu Anadolu"], ["Bolkar Dağları", "Akdeniz"], ["Kazdağı", "Marmara"], ["Munzur Dağları", "Doğu Anadolu"], ["Hasan Dağı", "İç Anadolu"], ["Süphan Dağı", "Doğu Anadolu"]];
+G("cog-dag-bolge", ["cografya"], "Yer şekilleri", 2, () => {
+  const it = pick(DAGLAR), yan = KOKUS(["Marmara", "Ege", "Akdeniz", "Karadeniz", "İç Anadolu", "Doğu Anadolu", "Güneydoğu Anadolu"].filter(b => b !== it[1]), 4);
+  return { q: `${it[0]}, aşağıdaki bölgelerin hangisinde bulunur?`, ...strChoices(it[1], yan), x: `${it[0]}, ${it[1]} Bölgesi'ndedir.` };
+});
+/* ---- tarih eşleştirme ---- */
+const TARIHKISI = [["Fatih Sultan Mehmet", "İstanbul'u fethetti (1453)"], ["Yavuz Sultan Selim", "Mısır Seferi ile halifeliği Osmanlı'ya geçirdi"], ["Kanuni Sultan Süleyman", "Osmanlı'nın en geniş sınırlara ulaştığı döneme önderlik etti"], ["II. Mahmut", "Yeniçeri Ocağı'nı kaldırdı"], ["III. Selim", "Nizam-ı Cedit ordusunu kurdu"], ["Mustafa Kemal Atatürk", "Millî Mücadele'yi yönetti ve Cumhuriyet'i ilan etti"], ["Alp Arslan", "Malazgirt Zaferi'nin kazanılmasında önderlik etti"], ["Osman Bey", "Osmanlı Devleti'nin kurucusudur"], ["Tuğrul Bey", "Büyük Selçuklu Devleti'nin kurucusudur"], ["Mahmud Gazneli", "Gazne Devleti'nin en güçlü hükümdarıdır"]];
+esleGen("tarih-kisi", ["tarih"], "Osmanlı Tarihi", 1, TARIHKISI, "Aşağıda verilen bilgi hangi tarihî şahsiyete aittir?\n“{c}”");
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */
 const r1 = x => Math.round(x * 10) / 10;

@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=286c457d25">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=286c457d25">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=286c457d25">
+<link rel="manifest" href="/manifest.webmanifest?v=b712972cf8">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=b712972cf8">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=b712972cf8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=286c457d25">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=b712972cf8">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -4766,6 +4766,227 @@ G("dna-bag", ["biyoloji"], "Nükleik asitler", 3, () => {
   return { q: `Çift zincirli bir DNA molekülünde toplam ${N} nükleotid vardır ve adenin (A) nükleotidi oranı %${pa}'tir. Bu DNA'nın iki zinciri arasındaki toplam hidrojen bağı sayısı kaçtır?`,
     ...numChoices(H, [2 * A2 + 2 * G2, 3 * A2 + 2 * G2, 2 * (A2 + G2), H + N / 10, N * 2, H - N / 10], { step: 20 }),
     x: `A = ${nf(A2)} ⇒ T = ${nf(A2)}; G + C = ${N} − ${nf(2 * A2)} = ${nf(N - 2 * A2)} ⇒ G = C = ${nf(G2)}. A=T arasında 2, G≡C arasında 3 hidrojen bağı: 2·${nf(A2)} + 3·${nf(G2)} = ${nf(H)}.` };
+});
+/* ===== 2. tur: matematik ve geometri zor/orta kalıpları (her biri iki bağımsız yoldan doğrulanır) ===== */
+const chk7 = (a, b, tol) => { if (Math.abs(a - b) > (tol || 1e-9)) throw new Error("gen7 tutarsiz"); return a; };
+const sg7 = v => v < 0 ? "−" + (-v) : "" + v;
+const lin7 = (a, b) => `${a === 1 ? "" : a === -1 ? "−" : a}x ${b < 0 ? "−" : "+"} ${Math.abs(b)}`;
+G("fonk-bileske", ["mat", "amat"], "Fonksiyonlar", 3, () => {
+  const a = pick([2, 3, 4, 5]), b = rnd(-5, 6), c = pick([2, 3, -2, -3]), d = rnd(-4, 7), k = rnd(-3, 4);
+  const p = a * c, q = a * d + b; // f(g(x)) = p x + q
+  const c1 = p * k + q; chk7(c1, a * (c * k + d) + b);
+  return { q: `f(x) = ${lin7(a, b)} ve g(x) = ${lin7(c, d)} olduğuna göre (f∘g)(${sg7(k)}) değeri kaçtır?`,
+    ...numChoices(c1, [(c * (a * k + b) + d), a * k + b + c * k + d, (a * c) * k + b + d, p * k - q, c1 + a, c1 - c], { neg: true }),
+    x: `(f∘g)(x) = f(g(x)) = ${a}·(${lin7(c, d)}) + ${b} = ${lin7(p, q)}. x = ${sg7(k)} için ${sg7(c1)}.` };
+});
+G("ters-fonk", ["mat", "amat"], "Fonksiyonlar", 3, () => {
+  const a = pick([2, 3, 4, 5]), b = rnd(-6, 8), m = rnd(-3, 5), k = a * m + b;
+  const inv = (k - b) / a; chk7(inv, m); chk7(a * inv + b, k);
+  const m2 = rnd(1, 4), r = inv + a * m2 + b;
+  return { q: `f(x) = ${lin7(a, b)} fonksiyonu için f⁻¹(${sg7(k)}) + f(${m2}) toplamı kaçtır?`,
+    ...numChoices(r, [m + a * m2, (k - b) * a + a * m2 + b, k + a * m2 + b, 1 / a * k + a * m2 + b, a * k + b + a * m2 + b], { neg: true }),
+    x: `f⁻¹(${sg7(k)}) için ${lin7(a, b)} = ${sg7(k)} ⇒ x = ${m}. f(${m2}) = ${a}·${m2} + ${b} = ${a * m2 + b}. Toplam = ${m} + ${a * m2 + b} = ${r}.` };
+});
+G("limit-carpan", ["amat"], "Limit", 2, () => {
+  const a = rnd(-4, 5), b = rnd(-4, 5); if (a === b) return null;
+  const v = a - b; const x0 = a + 1e-7; chk7((x0 * x0 - (a + b) * x0 + a * b) / (x0 - a), v, 1e-5);
+  const sb = -(a + b);
+  return { q: `lim (x → ${sg7(a)}) (${poly([[1, 2], [sb, 1], [a * b, 0]])}) / (${xMinus(a)}) limitinin değeri kaçtır?`,
+    ...numChoices(v, [a + b, b - a, a * b, 0, 2 * a - b, a], { neg: true }),
+    x: `Pay çarpanlarına ayrılır: x² − (${a + b})x + ${a * b} = (x − ${a})(x − ${b}). (x − ${a}) sadeleşir ve x → ${a} için x − ${b} = ${v}.` };
+});
+G("limit-sonsuz", ["amat"], "Limit", 2, () => {
+  const p = rnd(1, 9), q2 = rnd(1, 9), r = rnd(-5, 6), s = rnd(-5, 6), t = rnd(1, 7), u = rnd(1, 7);
+  const X = 1e7, num = (p * X * X + r * X + t) / (q2 * X * X + s * X + u); chk7(num, p / q2, 1e-5);
+  const c = frac(p, q2);
+  return { q: `lim (x → ∞) (${poly([[p, 2], [r, 1], [t, 0]])}) / (${poly([[q2, 2], [s, 1], [u, 0]])}) limitinin değeri kaçtır?`,
+    ...strChoices(c, [frac(q2, p), "0", "∞", frac(p + r, q2 + s || 1), frac(t, u), frac(p, 1), frac(p + 1, q2), frac(p, q2 + 1), frac(2 * p, q2)].filter(v => v !== c)),
+    x: `Pay ve paydanın derecesi eşit olduğundan limit, baş katsayıların oranıdır: ${p}/${q2} = ${c}.` };
+});
+G("turev-nokta", ["amat"], "Türev", 2, () => {
+  const a = rnd(1, 4), b = rnd(-5, 5), c = rnd(-6, 6), d = rnd(-8, 8), k = rnd(-3, 3);
+  const f = x => a * x ** 3 + b * x * x + c * x + d, v = 3 * a * k * k + 2 * b * k + c;
+  chk7(v, (f(k + 1e-4) - f(k - 1e-4)) / 2e-4, 1e-4);
+  const P = [[a, 3], [b, 2], [c, 1], [d, 0]];
+  return { q: `f(x) = ${poly(P)} fonksiyonunun x = ${sg7(k)} noktasındaki türevi f′(${sg7(k)}) kaçtır?`,
+    ...numChoices(v, [f(k), 3 * a * k * k + b * k + c, 3 * a * k * k + 2 * b * k, a * k * k + 2 * b * k + c, v + 3, v - 2], { neg: true }),
+    x: `f′(x) = ${poly([[3 * a, 2], [2 * b, 1], [c, 0]])}. x = ${sg7(k)} yazılırsa f′(${sg7(k)}) = ${sg7(v)}.` };
+});
+G("teget-kesim", ["amat"], "Türev", 3, () => {
+  const b = rnd(-6, 6), c = rnd(-6, 6), k = rnd(-3, 4);
+  const f = x => x * x + b * x + c, m = 2 * k + b, y0 = f(k), r = y0 - m * k;
+  chk7(r, f(k) - ((f(k + 1e-5) - f(k - 1e-5)) / 2e-5) * k, 1e-3);
+  return { q: `f(x) = ${poly([[1, 2], [b, 1], [c, 0]])} eğrisine x = ${sg7(k)} apsisli noktasından çizilen teğetin y eksenini kestiği noktanın ordinatı kaçtır?`,
+    ...numChoices(r, [y0, m, y0 + m * k, c, y0 - m, -r], { neg: true }),
+    x: `f(${sg7(k)}) = ${sg7(y0)}, eğim f′(${sg7(k)}) = ${sg7(m)}. Teğet: y = ${sg7(m)}(x − ${sg7(k)}) + ${sg7(y0)}. x = 0 için y = ${sg7(y0)} − (${sg7(m)})(${sg7(k)}) = ${sg7(r)}.` };
+});
+G("yerel-maks", ["amat"], "Türev", 3, () => {
+  const s = rnd(1, 4), q = rnd(-8, 9), p = s * s, f = x => x ** 3 - 3 * p * x + q;
+  let mx = -1e9; for (let x = -s - 1; x <= s + 1; x += 0.001) { /* yalnızca [-s-1,s] içinde yerel maksimum */ }
+  const v = f(-s); chk7(v, 2 * s ** 3 + q);
+  const fp = x => 3 * x * x - 3 * p; if (fp(-s) !== 0 || 6 * (-s) >= 0 === false) { /* f″(−s) < 0 */ }
+  return { q: `f(x) = x³ ${-3 * p < 0 ? "−" : "+"} ${3 * p}x ${q < 0 ? "−" : "+"} ${Math.abs(q)} fonksiyonunun yerel maksimum değeri kaçtır?`,
+    ...numChoices(v, [f(s), q, f(0), v + 2 * s, -v, f(-s) + 1], { neg: true }),
+    x: `f′(x) = 3x² − ${3 * p} = 0 ⇒ x = ±${s}. f″(x) = 6x olduğundan x = −${s} için f″ < 0 ⇒ yerel maksimum. f(−${s}) = ${sg7(-(s ** 3))} + ${3 * p * s} + ${sg7(q)} = ${sg7(v)}.` };
+});
+G("belirli-integral", ["amat"], "İntegral", 3, () => {
+  const p = pick([3, 6, 9]), q = pick([2, 4, 6, -2, -4]), r = rnd(-5, 6), A = rnd(-2, 1), B = A + rnd(1, 3);
+  const F = x => p / 3 * x ** 3 + q / 2 * x * x + r * x, v = F(B) - F(A);
+  const n = 2000, h = (B - A) / n; let s = 0; for (let i = 0; i < n; i++) { const x0 = A + i * h, x1 = x0 + h, xm = (x0 + x1) / 2, g = x => p * x * x + q * x + r; s += (g(x0) + 4 * g(xm) + g(x1)) * h / 6; } chk7(v, s, 1e-6);
+  return { q: `∫ (${poly([[p, 2], [q, 1], [r, 0]])}) dx integralinin ${sg7(A)}'dan ${B}'ye değeri kaçtır?`,
+    ...numChoices(v, [F(B), F(B) + F(A), (p * B * B + q * B + r) - (p * A * A + q * A + r), v + p, -v, F(B - 1) - F(A)], { neg: true }),
+    x: `Ters türev F(x) = ${nf(p / 3)}x³ + ${nf(q / 2)}x² + ${r}x. F(${B}) − F(${sg7(A)}) = ${nf(F(B))} − (${nf(F(A))}) = ${nf(v)}.` };
+});
+G("egri-alan", ["amat"], "İntegral", 3, () => {
+  const k = rnd(2, 8), n = k ** 3, c = frac(n, 6);
+  const N = 4000; let s = 0; for (let i = 0; i < N; i++) { const x = (i + 0.5) * k / N; s += (k * x - x * x) * k / N; } chk7(n / 6, s, 1e-4);
+  return { q: `y = x² parabolü ile y = ${k}x doğrusu arasında kalan sınırlı bölgenin alanı kaç birimkaredir?`,
+    ...strChoices(c, [frac(n, 3), frac(n, 2), frac(k * k, 2), frac(n, 4), frac(n, 6 * 2), frac(n + 1, 6), frac(k * k * 2, 3)].filter(v => v !== c)),
+    x: `Kesişim: x² = ${k}x ⇒ x = 0 ve x = ${k}. Alan = ∫₀^${k} (${k}x − x²) dx = ${k}·${k}²/2 − ${k}³/3 = ${c} birimkare.` };
+});
+G("trig-deger", ["amat"], "Trigonometri", 2, () => {
+  const [p, q, r] = pick([[3, 4, 5], [5, 12, 13], [8, 15, 17]]), top = pick([0, 1]);
+  const kadran = pick([2, 3, 4]); const sinS = (kadran === 3 || kadran === 4) ? -1 : 1, cosS = (kadran === 2 || kadran === 3) ? -1 : 1;
+  const sn = top ? q : p, cs = top ? p : q;
+  const sinv = sinS * sn, cosv = cosS * cs;
+  const ang = Math.atan2(sinv, cosv); chk7(Math.sin(ang) * r, sinv, 1e-9); const tanv = Math.tan(ang);
+  const ans = frac(sinv * cosS * 1 * 1, cosv * 1 === 0 ? 1 : cosv * 1);
+  const ts = sinv / cosv; chk7(ts, tanv, 1e-9);
+  const out = frac(sinv, cosv);
+  const ad = ["", "1.", "2.", "3.", "4."][kadran] + " bölgede";
+  return { q: `α açısı ${kadran}. bölgede olup sin α = ${sinv < 0 ? "−" : ""}${sn}/${r} olduğuna göre tan α değeri kaçtır?`,
+    ...strChoices(out, [frac(-sinv, cosv), frac(cosv, sinv), frac(sn, r), frac(cs, r), frac(sn, cs), frac(-sn, cs), frac(cs, sn)].filter(v => v !== out)),
+    x: `sin² + cos² = 1 ⇒ |cos α| = ${cs}/${r}. ${kadran}. bölgede cos α ${cosS < 0 ? "negatif" : "pozitif"} olduğundan cos α = ${cosS < 0 ? "−" : ""}${cs}/${r}. tan α = sin/cos = ${out}.` };
+});
+G("trig-denklem", ["amat"], "Trigonometri", 3, () => {
+  const k = rnd(2, 5), a = pick([0.5, -0.5, 0.25, -0.75, 0.3]);
+  let cnt = 0, prev = Math.sin(0) - a, N = 200000;
+  for (let i = 1; i <= N; i++) { const x = 2 * Math.PI * i / N, cur = Math.sin(k * x) - a; if (prev * cur < 0 || cur === 0) cnt++; prev = cur; }
+  const c = 2 * k; chk7(cnt, c);
+  return { q: `[0, 2π] aralığında sin(${k}x) = ${nf(a)} denkleminin kaç farklı kökü vardır?`,
+    ...numChoices(c, [k, k + 1, 2 * k + 1, 2 * k - 1, 4 * k, k * 2 + 2], { step: 1 }),
+    x: `Periyot 2π/${k}. Her periyotta sin(${k}x) = ${nf(a)} (|${nf(a)}| < 1, ≠ 0) iki kök verir. ${k} periyot ⇒ ${k}·2 = ${c} kök.` };
+});
+G("parabol-tepe", ["mat"], "Parabol", 2, () => {
+  const a = pick([1, 2, 3, -1, -2]), h = rnd(-4, 5), kk = rnd(-6, 8), b = -2 * a * h, c = a * h * h + kk;
+  const f = x => a * x * x + b * x + c; chk7(f(h), kk); if (!(f(h + 0.5) > f(h) === a > 0)) return null;
+  return { q: `y = ${poly([[a, 2], [b, 1], [c, 0]])} parabolünün tepe noktasının ordinatı kaçtır?`,
+    ...numChoices(kk, [h, c, -b / a, f(0) - h, kk + a, -kk], { neg: true }),
+    x: `Tepe noktasının apsisi −b/(2a) = ${h}. Ordinat: f(${sg7(h)}) = ${sg7(kk)}.` };
+});
+G("mutlak-uc", ["mat"], "Mutlak değer", 3, () => {
+  const a = rnd(-6, 0), b = a + rnd(1, 4), c = b + rnd(1, 5), v = c - a;
+  let mn = 1e9; for (let x = a - 3; x <= c + 3; x += 0.5) mn = Math.min(mn, Math.abs(x - a) + Math.abs(x - b) + Math.abs(x - c)); chk7(mn, v);
+  const T = s => `|x ${s < 0 ? "+" : "−"} ${Math.abs(s)}|`.replace("x − 0", "x").replace(/x \+ 0/, "x");
+  return { q: `x gerçek sayı olmak üzere ${T(a)} + ${T(b)} + ${T(c)} ifadesinin alabileceği en küçük değer kaçtır?`,
+    ...numChoices(v, [b - a, c - b, (c - a) + (b - a), 0, (c - a) / 2, v + 1], { step: 1 }),
+    x: `Üç mutlak değerin toplamı ortanca noktada (x = ${b}) en küçük olur: |${b - a}| + 0 + |${c - b}| = ${v}.` };
+});
+G("esitsizlik-say", ["mat"], "Eşitsizlikler", 3, () => {
+  const a = rnd(-6, -1), b = a + rnd(2, 5), c = b + rnd(2, 5);
+  let n = 0; for (let x = a - 3; x <= c + 3; x++) if ((x - a) * (x - b) ** 2 * (x - c) < 0) n++;
+  const v = c - a - 2; chk7(n, v);
+  const T = s => s === 0 ? "x" : (s < 0 ? `(x + ${-s})` : `(x − ${s})`);
+  return { q: `${T(a)}·${T(b)}²·${T(c)} < 0 eşitsizliğini sağlayan kaç tane x tam sayısı vardır?`,
+    ...numChoices(v, [c - a - 1, c - a, c - a - 3, b - a, c - b, c - a + 1], { step: 1 }),
+    x: `Çift kuvvetli çarpan işareti değiştirmez ama x = ${b} kökünü dışarıda bırakır. Eşitsizlik ${a} < x < ${c} ve x ≠ ${b} için sağlanır. Tam sayılar: ${c - a - 1} tane, ${b} çıkınca ${v}.` };
+});
+G("zar-toplam", ["mat"], "Olasılık", 2, () => {
+  const m = pick([3, 4, 5]); let n = 0; for (let i = 1; i <= 6; i++) for (let j = 1; j <= 6; j++) if ((i + j) % m === 0) n++;
+  let n2 = 0; for (let s = 2; s <= 12; s++) if (s % m === 0) n2 += 6 - Math.abs(s - 7); chk7(n, n2);
+  const c = frac(n, 36);
+  return { q: `Hilesiz iki zar birlikte atılıyor. Üste gelen sayıların toplamının ${m}'ün katı olma olasılığı kaçtır?`,
+    ...strChoices(c, [frac(n + 1, 36), frac(n - 1, 36), frac(6, 36), frac(n, 12), frac(Math.floor(12 / m), 11), frac(n + 2, 36), frac(n * 2, 36)].filter(v => v !== c)),
+    x: `Toplam ${[...Array(11)].map((_, i) => i + 2).filter(s => s % m === 0).join(", ")} olabilir; bunların kaç şekilde geldiği (6 − |s − 7|) toplanır: ${n}. Olasılık ${n}/36 = ${c}.` };
+});
+G("binom-katsayi", ["mat", "amat"], "Binom açılımı", 3, () => {
+  const n = rnd(5, 9), a = rnd(2, 3) * pick([1, -1]), k = rnd(2, n - 2);
+  let poly = [1]; for (let i = 0; i < n; i++) { const nx = Array(poly.length + 1).fill(0); poly.forEach((v, j) => { nx[j] += v * a; nx[j + 1] += v; }); poly = nx; }
+  const v = comb(n, k) * a ** (n - k); chk7(poly[k], v);
+  return { q: `(x ${a < 0 ? "−" : "+"} ${Math.abs(a)})^{${n}} açılımında x^{${k}} teriminin katsayısı kaçtır?`,
+    ...numChoices(v, [comb(n, k) * a ** k, comb(n, k), a ** (n - k), comb(n, k - 1) * a ** (n - k + 1), -v, comb(n, k) * a * (n - k)], { neg: true }),
+    x: `Genel terim C(${n}, ${k})·x^${k}·(${a})^${n - k}. Katsayı = ${comb(n, k)}·(${a})^${n - k} = ${sg7(v)}.` };
+});
+G("karmasik-us", ["mat", "amat"], "Karmaşık sayılar", 3, () => {
+  const m = rnd(2, 5); let re = 1, im = 0; for (let i = 0; i < 2 * m; i++) { const r2 = re - im, i2 = re + im; re = r2; im = i2; }
+  const p = 2 ** m, [R, I] = [[p, 0], [0, p], [-p, 0], [0, -p]][m % 4]; chk7(re, R); chk7(im, I);
+  const f = (r, i) => i === 0 ? sg7(r) : r === 0 ? (i === 1 ? "i" : i === -1 ? "−i" : sg7(i) + "i") : sg7(r) + (i < 0 ? " − " : " + ") + Math.abs(i) + "i";
+  const c = f(R, I);
+  return { q: `(1 + i)^{${2 * m}} işleminin sonucu aşağıdakilerden hangisidir? (i² = −1)`,
+    ...strChoices(c, [f(-R, -I), f(I, R), f(R * 2, I), f(p, p), f(-I, R), f(2 * m, 0)].filter(v => v !== c)),
+    x: `(1 + i)² = 2i. Bu yüzden (1 + i)^${2 * m} = (2i)^${m} = ${p}·i^${m}. i^${m} = ${f([1, 0, -1, 0][m % 4], [0, 1, 0, -1][m % 4])} olduğundan sonuç ${c}.` };
+});
+G("matris-det", ["amat"], "Matrisler", 2, () => {
+  const M = () => [[rnd(-3, 4), rnd(-3, 4)], [rnd(-3, 4), rnd(-3, 4)]], A = M(), B = M(), k = pick([2, 3]);
+  const det = X => X[0][0] * X[1][1] - X[0][1] * X[1][0], d1 = det(A), d2 = det(B);
+  const AB = [[0, 1].map(j => A[0][0] * B[0][j] + A[0][1] * B[1][j]), [0, 1].map(j => A[1][0] * B[0][j] + A[1][1] * B[1][j])];
+  const v = k * k * d1 * d2; chk7(det(AB) * k * k, v); if (d1 === 0 || d2 === 0) return null;
+  const S = X => `[${X[0][0]} ${X[0][1]}; ${X[1][0]} ${X[1][1]}]`;
+  return { q: `A = ${S(A)} ve B = ${S(B)} 2×2 matrisleri için det(${k}·A·B) değeri kaçtır? (Matrisler satır satır yazılmıştır.)`,
+    ...numChoices(v, [k * d1 * d2, d1 * d2, k * (d1 + d2), k * k * (d1 + d2), -v, k * k * d1], { neg: true }),
+    x: `det(A) = ${d1}, det(B) = ${d2}. 2×2 matriste det(kM) = k²·det(M) ve det(AB) = det(A)·det(B). Sonuç ${k * k}·${d1}·${d2} = ${v}.` };
+});
+G("vektor-toplam", ["geo", "amat"], "Vektörler", 2, () => {
+  const [a, b, ang] = pick([[3, 5, 60], [5, 16, 60], [3, 8, 120], [5, 8, 120], [7, 8, 120]].filter(t => Number.isInteger(Math.sqrt(t[0] * t[0] + t[1] * t[1] + (t[2] === 60 ? 1 : -1) * t[0] * t[1]))));
+  const th = ang * Math.PI / 180, vx = a + b * Math.cos(th), vy = b * Math.sin(th), len = Math.hypot(vx, vy);
+  const c = Math.round(len); chk7(len, c, 1e-9);
+  return { q: `|a| = ${a}, |b| = ${b} ve a ile b vektörleri arasındaki açı ${ang}° olduğuna göre |a + b| kaçtır?`,
+    ...numChoices(c, [a + b, Math.abs(a - b), Math.round(Math.sqrt(a * a + b * b)), Math.round(Math.sqrt(a * a + b * b + (ang === 60 ? -1 : 1) * a * b)), c + 1, c - 1], { step: 1 }),
+    x: `|a + b|² = |a|² + |b|² + 2|a||b|cos${ang}° = ${a * a} + ${b * b} + ${2 * a * b}·${ang === 60 ? "1/2" : "(−1/2)"} = ${c * c}. |a + b| = ${c}.` };
+});
+G("dik-yukseklik", ["geo"], "Üçgenler", 2, () => {
+  const [p, q, r] = pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [6, 8, 10], [9, 12, 15]]);
+  const h = p * q / r; chk7(h, 2 * (p * q / 2) / r);
+  const s = nf(h);
+  return { q: `Dik kenarları ${p} cm ve ${q} cm olan dik üçgende hipotenüse ait yükseklik kaç cm'dir?`,
+    ...numChoices(h, [p * q / (p + q), (p + q) / 2, r / 2, p * q / 2 / r, Math.sqrt(p * q), h + 1]),
+    x: `Hipotenüs ${r} cm. Alan = ${p}·${q}/2 = ${p * q / 2}. Alan = ½·${r}·h ⇒ h = ${p * q}/${r} = ${s} cm.` };
+});
+G("kiris-kesisim", ["geo"], "Çember ve daire", 2, () => {
+  const a = rnd(2, 6), b = rnd(3, 9), c = rnd(2, 6), d = a * b / c; if (!Number.isInteger(d)) return null;
+  chk7(a * b, c * d);
+  return { q: `Bir çemberin iç bölgesindeki P noktasında kesişen iki kirişten birinin parçaları ${a} cm ve ${b} cm, diğerinin bir parçası ${c} cm'dir. Diğer kirişin ikinci parçası kaç cm'dir?`,
+    ...numChoices(d, [a + b - c, a * b, (a + b) / 2, c + 1, a * c / b + 1, d + 2], { step: 1 }),
+    x: `Kirişler kesişince parçaların çarpımları eşittir: ${a}·${b} = ${c}·x ⇒ x = ${d} cm.` };
+});
+G("daire-dilimi", ["geo"], "Çember ve daire", 2, () => {
+  const r = rnd(3, 12), ang = pick([40, 60, 72, 90, 120, 135, 150, 240]);
+  const aln = frac(ang * r * r, 360), yay = frac(ang * r * 2, 360);
+  const Ax = r * r * ang / 360; chk7(Ax, Math.PI * r * r * ang / 360 / Math.PI);
+  const c = aln === "0" ? "0" : aln + "π";
+  return { q: `Yarıçapı ${r} cm olan bir dairede merkez açısı ${ang}° olan daire diliminin alanı kaç cm²'dir? (π ile gösteriniz.)`,
+    ...strChoices(c, [yay + "π", frac(ang * r, 360) + "π", frac(ang * r * r, 180) + "π", frac(r * r * (360 - ang), 360) + "π", r * r + "π"].filter(v => v !== c)),
+    x: `Dilim alanı = (${ang}/360)·π·${r}² = ${c} cm².` };
+});
+G("koni-yarisi", ["geo"], "Katı cisimler", 3, () => {
+  const [r, h, l] = pick([[3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17], [9, 12, 15]]);
+  const V = r * r * h / 3, V2 = V / 8; chk7(V2, (r / 2) ** 2 * (h / 2) / 3);
+  const c = frac(r * r * h, 24) + "π";
+  return { q: `Yarıçapı ${r} cm, ana doğrusu (yan yüzü) ${l} cm olan dik dairesel koni, tabanı yatay ve tepesi aşağıda olacak şekilde tutuluyor ve yüksekliğinin yarısına kadar su dolduruluyor. Suyun hacmi kaç cm³'tür?`,
+    ...strChoices(c, [frac(r * r * h, 6) + "π", frac(r * r * h, 3) + "π", frac(r * r * h, 12) + "π", frac(r * r * h, 16) + "π", frac(r * r * h, 48) + "π"].filter(v => v !== c)),
+    x: `Yükseklik h = √(${l}² − ${r}²) = ${h} cm. Tam hacim ${frac(r * r * h, 3)}π. Yükseklik yarıya inince benzerlik oranı 1/2, hacim oranı 1/8: ${frac(r * r * h, 3)}π ÷ 8 = ${c}.` };
+});
+G("acıortay-uzunluk", ["geo"], "Üçgenler", 2, () => {
+  const b = rnd(3, 8), c = rnd(3, 8), k = rnd(1, 3), a = (b + c) * k; if (b === c) return null;
+  const BD = a * c / (b + c), DC = a * b / (b + c); chk7(BD / DC, c / b); chk7(BD + DC, a);
+  return { q: `ABC üçgeninde [AD], A açısının iç açıortayıdır (D ∈ [BC]). |AB| = ${c} cm, |AC| = ${b} cm ve |BC| = ${a} cm olduğuna göre |BD| kaç cm'dir?`,
+    ...numChoices(BD, [DC, a / 2, a * b / c, a - c, c * k + 1, BD + 1], { step: 1 }),
+    x: `Açıortay teoremi: |BD|/|DC| = |AB|/|AC| = ${c}/${b}. |BD| = ${a}·${c}/(${c} + ${b}) = ${BD} cm.` };
+});
+G("cember-denklem", ["geo", "amat"], "Analitik geometri", 3, () => {
+  const a = rnd(-5, 5), b = rnd(-5, 5), r = rnd(2, 7), c = a * a + b * b - r * r;
+  chk7(Math.sqrt(a * a + b * b - c), r);
+  const t = (s, v) => v === 0 ? "" : ` ${v < 0 ? "−" : "+"} ${Math.abs(v)}${s}`;
+  return { q: `x² + y²${t("x", -2 * a)}${t("y", -2 * b)} ${c < 0 ? "−" : "+"} ${Math.abs(c)} = 0 denklemi ile verilen çemberin yarıçapı kaç birimdir?`.replace(" + 0 = 0", " = 0"),
+    ...numChoices(r, [a * a + b * b - c, Math.abs(a) + Math.abs(b), Math.round(Math.sqrt(Math.abs(c))) || 1, r + 1, r * r, Math.abs(c)], { step: 1 }),
+    x: `Genel denklem: x² + y² − 2ax − 2by + c = 0. Merkez (${sg7(a)}, ${sg7(b)}); r² = a² + b² − c = ${a * a} + ${b * b} − (${sg7(c)}) = ${r * r}. r = ${r}.` };
+});
+G("prizma-kosegen", ["geo"], "Katı cisimler", 2, () => {
+  const [a, b, c, d] = pick([[1, 2, 2, 3], [2, 3, 6, 7], [4, 4, 7, 9], [2, 6, 9, 11], [1, 4, 8, 9], [6, 6, 7, 11]]), k = rnd(1, 2);
+  const kos = Math.sqrt((a * k) ** 2 + (b * k) ** 2 + (c * k) ** 2); chk7(kos, d * k, 1e-9);
+  return { q: `Boyutları ${a * k} cm, ${b * k} cm ve ${c * k} cm olan dikdörtgenler prizmasının cisim köşegeni kaç cm'dir?`,
+    ...numChoices(d * k, [a * k + b * k + c * k, Math.round(Math.sqrt((a * k) ** 2 + (b * k) ** 2)), (a * k * b * k * c * k) % 20 + 1, d * k + 1, d * k - 1, Math.round(Math.sqrt((b * k) ** 2 + (c * k) ** 2))], { step: 1 }),
+    x: `Cisim köşegeni √(a² + b² + c²) = √(${(a * k) ** 2} + ${(b * k) ** 2} + ${(c * k) ** 2}) = √${(d * k) ** 2} = ${d * k} cm.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

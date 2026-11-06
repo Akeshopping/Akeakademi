@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=a92f85d03d">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=a92f85d03d">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=a92f85d03d">
+<link rel="manifest" href="/manifest.webmanifest?v=7014bf3f84">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7014bf3f84">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7014bf3f84">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=a92f85d03d">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=7014bf3f84">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2673,6 +2673,86 @@ const BANK = [];
   q("edebiyat","Hece Ölçüsü",3,"11'li hece ölçüsüyle yazılmış şiirde genellikle durak nerede olur?",["6. hecede", "5. hecede", "7. hecede", "4. hecede", "8. hecede"],0,"11'li hece ölçüsünde genellikle 6+5 duraklı kalıp kullanılır.");
   q("edebiyat","Eser Türleri",3,"Aşağıdakilerden hangisi tiyatro türüdür?",["Komedi", "Gazel", "Mesnevi", "Halk hikâyesi", "Mani"],0,"Komedi, tiyatroda güldürü türüdür; diğerleri şiir ve anlatı türleridir.");
   q("turkce","Paragraf",3,"Bir paragrafta anlatılmak istenen ana duygu ya da düşünceye ne denir?",["Ana düşünce", "Yardımcı düşünce", "Konu", "Başlık", "Özet"],0,"Ana düşünce, paragrafın bütününden çıkan temel yargıdır.");
+})();
+/* ===== Özgün soru bankası · 13. bölüm: ÖSYM tarzı sorular (öncüllü, "söylenemez/değildir", paragraf, bütünlük) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  const H = (id, t) => { let h = 2166136261; for (const ch of id + t) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
+  const LAB = ["Yalnız I", "Yalnız II", "Yalnız III", "I ve II", "I ve III", "II ve III", "I, II ve III"];
+  /* Öncüllü soru: truth = [I, II, III] soru kökünün aradığı ölçüte uyuyor mu */
+  function rom(s, t, d, kok, onc, truth, x, p) {
+    cnt[s] = (cnt[s] || 0) + 1; const id = s + "-13-" + cnt[s];
+    const dog = truth.map((v, i) => v ? i : -1).filter(i => i >= 0).join("");
+    const dogru = { "0": 0, "1": 1, "2": 2, "01": 3, "02": 4, "12": 5, "012": 6 }[dog];
+    let h = H(id, kok), pool = LAB.map((_, i) => i).filter(i => i !== dogru), sec = [dogru];
+    while (sec.length < 5) { h = Math.imul(h ^ (h >>> 13), 2246822519) >>> 0; sec.push(pool.splice(h % pool.length, 1)[0]); }
+    sec.sort((a, b) => a - b);
+    const q = { id, s, t, d, q: kok + "\n" + onc.map((o, i) => ["I", "II", "III"][i] + ". " + o).join("\n"), o: sec.map(i => LAB[i]), a: sec.indexOf(dogru), x, os: 1 };
+    if (p) q.p = p; BANK.push(q);
+  }
+  /* Diğer ÖSYM biçimleri: seçenekler çalışma anında karıştırılır */
+  function os(s, t, d, text, o, a, x, p) {
+    cnt[s] = (cnt[s] || 0) + 1; const id = s + "-13-" + cnt[s];
+    const q = { id, s, t, d, q: text, o, a, x, os: 1 }; if (p) q.p = p; BANK.push(q);
+  }
+
+  /* ---- TYT sözel ---- */
+  rom("tarih", "İlk Türk Devletleri", 3, "İlk Türk devletleriyle ilgili aşağıdakilerden hangileri doğrudur?", ["Orhun Yazıtları Köktürk alfabesiyle yazılmıştır.", "Uygurlar yerleşik hayata geçerek tarımla uğraşmıştır.", "Hunlar İslamiyet'i kabul etmiştir."], [1, 1, 0], "Orhun Yazıtları Köktürk alfabesiyle yazılmıştır ve Uygurlar yerleşik hayata geçmiştir. Hunlar ise İslamiyet'ten çok önce yaşamıştır; İslamiyet'i ilk kabul eden Türk devleti Karahanlılar'dır.");
+  rom("tarih", "Osmanlı Kuruluş ve Yükselme", 3, "Aşağıdakilerden hangileri Fatih Sultan Mehmet döneminde gerçekleşmiştir?", ["İstanbul'un fethi", "Mısır'ın fethi", "Trabzon Rum İmparatorluğu'na son verilmesi"], [1, 0, 1], "İstanbul 1453'te, Trabzon Rum İmparatorluğu 1461'de fethedildi. Mısır, Yavuz Sultan Selim döneminde (1517) alınmıştır.");
+  rom("tarih", "Kurtuluş Savaşı", 3, "Aşağıdaki gelişmelerden hangileri TBMM'nin açılışından (23 Nisan 1920) önce gerçekleşmiştir?", ["Amasya Genelgesi'nin yayımlanması", "Erzurum Kongresi'nin toplanması", "Sakarya Meydan Muharebesi'nin kazanılması"], [1, 1, 0], "Amasya Genelgesi ve Erzurum Kongresi 1919'da yapıldı. Sakarya Meydan Muharebesi ise 1921'de, TBMM açıldıktan sonra kazanıldı.");
+  rom("tarih", "Atatürk İlkeleri ve İnkılapları", 3, "Aşağıdaki inkılaplardan hangileri laiklik ilkesi doğrultusunda yapılmıştır?", ["Halifeliğin kaldırılması", "Medeni Kanun'un kabul edilmesi", "Soyadı Kanunu'nun çıkarılması"], [1, 1, 0], "Halifeliğin kaldırılması ve Medeni Kanun, din ile devlet işlerini ayıran adımlardır. Soyadı Kanunu toplumsal bir düzenlemedir; laiklikle doğrudan ilgili değildir.");
+  os("tarih", "Antlaşmalar", 3, "Lozan Barış Antlaşması ile ilgili aşağıdakilerden hangisi söylenemez?", ["Kapitülasyonlar kaldırılmıştır.", "Meriç Irmağı, Türkiye ile Yunanistan arasında sınır olmuştur.", "Osmanlı borçlarının paylaşımı konusunda düzenleme yapılmıştır.", "Türkiye'nin siyasi bağımsızlığı uluslararası alanda tanınmıştır.", "Boğazlar üzerindeki Türk egemenliği tam olarak sağlanmıştır."], 4, "Lozan'da Boğazlar silahsızlandırılmış ve uluslararası bir komisyonun denetimine bırakılmıştır. Türkiye'nin Boğazlar üzerindeki tam egemenliği 1936 Montrö Sözleşmesi ile sağlanmıştır.");
+  rom("cografya", "Dünya'nın Hareketleri", 2, "Dünya'nın günlük (kendi ekseni etrafındaki) hareketinin sonuçları ile ilgili aşağıdakilerden hangileri doğrudur?", ["Gece ile gündüz oluşur.", "Mevsimler oluşur.", "Yerel saat farkları oluşur."], [1, 0, 1], "Gece-gündüz oluşumu ve yerel saat farkları günlük harekete bağlıdır. Mevsimlerin oluşması, eksen eğikliğiyle birlikte yıllık hareketin sonucudur.");
+  rom("cografya", "Türkiye'nin İklimi", 2, "Karadeniz iklimi ile ilgili aşağıdakilerden hangileri doğrudur?", ["Her mevsim yağışlıdır.", "Yazlar sıcak ve kurak geçer.", "Doğal bitki örtüsü ormandır."], [1, 0, 1], "Karadeniz kıyılarında yağış her mevsim görülür ve nemli iklim ormanları besler. Yazların sıcak ve kurak geçmesi Akdeniz iklimine özgüdür.");
+  rom("cografya", "Yerin Şekillenmesi", 3, "Aşağıdakilerden hangisi ya da hangileri iç kuvvetlerin (endojen) etkisiyle gerçekleşir?", ["Volkanizma", "Rüzgârın aşındırması", "Buzulların biriktirmesi"], [1, 0, 0], "Volkanizma yerin içindeki kuvvetlerin etkisiyle oluşur. Rüzgâr ve buzul dış kuvvettir.");
+  rom("cografya", "Nüfus", 2, "Nüfusla ilgili aşağıdaki bilgilerden hangileri doğrudur?", ["Doğum hızı ölüm hızından yüksekse doğal nüfus artışı pozitiftir.", "Göç, bir bölgenin nüfusunu etkilemez.", "Nüfus yoğunluğu, nüfusun alana bölünmesiyle bulunur."], [1, 0, 1], "Doğal artış = doğum hızı − ölüm hızıdır. Göç nüfusu doğrudan değiştirir; nüfus yoğunluğu da nüfus / alan işlemiyle bulunur.");
+  os("cografya", "İklim ve bitki örtüsü", 2, "Akdeniz iklimi ile ilgili aşağıdakilerden hangisi yanlıştır?", ["Kışlar ılık ve yağışlıdır.", "Yazlar sıcak ve kurak geçer.", "Doğal bitki örtüsü makidir.", "Zeytin ve narenciye tarımına uygundur.", "Yağışların büyük bölümü yaz mevsiminde düşer."], 4, "Akdeniz ikliminde yağış kışın düşer, yaz kurak geçer. Bu nedenle 'yağışın çoğu yaz mevsiminde düşer' ifadesi yanlıştır.");
+  rom("biyoloji", "Hücre", 2, "Aşağıdaki yapılardan hangileri hem bitki hem de hayvan hücresinde bulunur?", ["Hücre duvarı", "Mitokondri", "Golgi aygıtı"], [0, 1, 1], "Mitokondri ve Golgi her ökaryot hücrede bulunur. Hücre duvarı hayvan hücresinde yoktur.");
+  rom("biyoloji", "Kalıtım", 3, "Mendel'in çalışmalarıyla ilgili aşağıdakilerden hangileri doğrudur?", ["Deneylerini bezelye bitkisi üzerinde yapmıştır.", "Baskın özellik, heterozigot bireyde kendini gösterir.", "Kromozom ve gen kavramlarını tanımlamıştır."], [1, 1, 0], "Mendel bezelye ile çalışmış, baskın karakterin melezde ortaya çıktığını göstermiştir. Gen ve kromozom kavramları ondan sonra geliştirilmiştir.");
+  rom("biyoloji", "Ekosistem", 2, "Bir ekosistemle ilgili aşağıdakilerden hangileri doğrudur?", ["Üreticiler fotosentez veya kemosentezle besin yapar.", "Ayrıştırıcılar enerji akışında yer almaz.", "Besin piramidinde enerji, üst basamaklara doğru azalır."], [1, 0, 1], "Üreticiler besin yapar ve her basamakta enerjinin büyük kısmı kaybolduğundan enerji azalır. Ayrıştırıcılar da ölü organik maddeyi parçalayarak madde döngüsüne katılır.");
+  rom("fizik", "Elektrik", 3, "Paralel bağlı dirençlerle ilgili aşağıdakilerden hangileri doğrudur?", ["Her koldan geçen akım aynıdır.", "Her direncin uçları arasındaki potansiyel farkı aynıdır.", "Eş değer direnç, en küçük dirençten küçüktür."], [0, 1, 1], "Paralel kolların uçları aynı noktalara bağlı olduğundan potansiyel farkı aynıdır. Eş değer direnç en küçük dirençten de küçük olur. Kollardaki akım dirençlere bağlı olarak değişir.");
+  rom("fizik", "Kuvvet ve Hareket", 2, "Sürtünmesiz ortamda serbest bırakılan bir cisimle ilgili aşağıdakilerden hangileri doğrudur?", ["Hızı zamanla artar.", "İvmesi sabittir.", "Kütlesi büyüdükçe ivmesi artar."], [1, 1, 0], "Serbest düşmede ivme g sabittir ve hız düzgün biçimde artar. İvme, cismin kütlesine bağlı değildir.");
+  rom("fizik", "Isı ve sıcaklık", 3, "Isı ve sıcaklıkla ilgili aşağıdaki ifadelerden hangisi ya da hangileri yanlıştır?", ["Isı, sıcaklık farkından dolayı aktarılan enerjidir.", "Isı ile sıcaklık aynı kavramdır.", "Hâl değişimi sırasında sıcaklık sabit kalır."], [0, 1, 0], "Isı enerji aktarımıdır, sıcaklık ise ortalama kinetik enerjinin ölçüsüdür; aynı kavram değildirler. Saf maddelerde hâl değişimi sırasında sıcaklık sabit kalır.");
+  rom("kimya", "Periyodik sistem", 3, "Periyodik sistemde aynı grupta yukarıdan aşağıya inildikçe aşağıdakilerden hangileri artar?", ["Atom yarıçapı", "Değerlik elektron sayısı", "Katman sayısı"], [1, 0, 1], "Aynı grupta değerlik elektron sayısı sabittir; katman sayısı ve atom yarıçapı artar.");
+  rom("kimya", "Asitler ve bazlar", 2, "Asit ve bazlarla ilgili aşağıdakilerden hangileri doğrudur?", ["pH değeri 7'den küçük olan çözeltiler asidiktir.", "Bazlar kırmızı turnusol kâğıdını maviye çevirir.", "Asitler sulu çözeltide OH⁻ iyonu verir."], [1, 1, 0], "Asidik çözeltilerde pH < 7'dir ve bazlar kırmızı turnusolu maviye çevirir. Asitler sulu çözeltide H⁺ iyonu verir.");
+  rom("kimya", "Karışımlar", 2, "Aşağıdakilerden hangileri homojen karışımdır?", ["Tuzlu su", "Hava", "Çamurlu su"], [1, 1, 0], "Tuzlu su ve hava her yerinde aynı özelliği gösterir. Çamurlu su ise heterojen bir karışımdır.");
+  rom("mat", "Önermeler", 3, "p: \"2 çift sayıdır.\"  q: \"3 çift sayıdır.\"\nBuna göre aşağıdakilerden hangileri doğrudur?", ["p ∧ q doğrudur.", "p ∨ q doğrudur.", "p → q doğrudur."], [0, 1, 0], "p doğru (1), q yanlış (0) olduğundan p ∧ q = 0, p ∨ q = 1 ve p → q = 0 olur.");
+  rom("mat", "Sayılar", 2, "Sayılarla ilgili aşağıdakilerden hangileri doğrudur?", ["İki tek sayının toplamı çifttir.", "İki asal sayının toplamı daima çifttir.", "Çift sayının karesi çifttir."], [1, 0, 1], "Tek + tek = çift ve çift² = çifttir. 2 + 3 = 5 olduğundan iki asalın toplamı daima çift değildir.");
+  rom("mat", "Kümeler", 2, "A = {1, 2, 3} ve B = {3, 4} kümeleri için aşağıdakilerden hangileri doğrudur?", ["A ∩ B = {3}", "s(A ∪ B) = 4", "s(A − B) = 3"], [1, 1, 0], "A ∩ B = {3} ve A ∪ B = {1, 2, 3, 4} olduğundan s(A ∪ B) = 4'tür. A − B = {1, 2} olduğundan s(A − B) = 2'dir.");
+  rom("mat", "Önermeler", 2, "Aşağıdakilerden hangileri önermedir?", ["5 bir asal sayıdır.", "Kapıyı kapat.", "Ankara, Türkiye'nin başkentidir."], [1, 0, 1], "Önerme, doğru ya da yanlış hükmü verilebilen ifadedir. Emir cümlesi önerme değildir.");
+  os("mat", "Problemler", 2, "Bir sayının %20'si 30'dur. Bu sayının yarısı kaçtır?", ["50", "60", "75", "90", "150"], 2, "Sayı 30 ÷ 0,2 = 150'dir. Yarısı 75'tir.");
+  os("mat", "Problemler", 2, "Ali'nin yaşı Veli'nin yaşının 2 katıdır. 5 yıl sonra ikisinin yaşları toplamı 40 olacağına göre Ali'nin şimdiki yaşı kaçtır?", ["10", "15", "20", "25", "30"], 2, "Veli V, Ali 2V yaşındadır. (2V + 5) + (V + 5) = 40 ise 3V = 30 ve V = 10'dur. Ali 20 yaşındadır.");
+  os("mat", "Problemler", 2, "Bir işi A tek başına 12 günde, B tek başına 6 günde bitirmektedir. İkisi birlikte çalışırsa işi kaç günde bitirir?", ["3", "4", "5", "6", "9"], 1, "Bir günde yapılan iş 1/12 + 1/6 = 3/12 = 1/4'tür. İş 4 günde biter.");
+  os("mat", "Problemler", 3, "5 sayının aritmetik ortalaması 12'dir. Bu sayılara bir sayı daha eklenince ortalama 13 oluyor. Eklenen sayı kaçtır?", ["13", "15", "18", "20", "24"], 2, "İlk toplam 5 · 12 = 60'tır. Yeni toplam 6 · 13 = 78 olduğundan eklenen sayı 78 − 60 = 18'dir.");
+  os("mat", "Problemler", 3, "Bir araç A şehrinden B şehrine 60 km/sa hızla, aynı yoldan geri dönüşte 40 km/sa hızla gidiyor. Yol 120 km olduğuna göre aracın tüm yolculuktaki ortalama hızı kaç km/sa'tir?", ["45", "48", "50", "52", "55"], 1, "Gidiş 120 / 60 = 2 saat, dönüş 120 / 40 = 3 saattir. Toplam yol 240 km, süre 5 saat olduğundan ortalama hız 240 / 5 = 48 km/sa'tir.");
+  os("mat", "Yüzde Problemleri", 3, "Bir ürünün fiyatına önce %20 zam, sonra yeni fiyata %20 indirim yapılıyor. Son fiyat ilk fiyata göre nasıl değişmiştir?", ["Değişmemiştir.", "%4 artmıştır.", "%4 azalmıştır.", "%2 azalmıştır.", "%2 artmıştır."], 2, "Son fiyat = 1,2 · 0,8 = 0,96 katıdır. Fiyat %4 azalmıştır.");
+  rom("felsefe", "Bilgi Felsefesi", 2, "Bilgi felsefesiyle ilgili aşağıdakilerden hangileri doğrudur?", ["Rasyonalizm, bilginin kaynağını akıl olarak görür.", "Empirizm, doğuştan gelen bilgileri kabul eder.", "Septisizm, kesin bilginin mümkün olmadığını savunur."], [1, 0, 1], "Rasyonalizm aklı, septisizm kuşkuyu temel alır. Empirizm doğuştan bilgiyi reddedip deneyi esas alır.");
+  rom("felsefe", "Felsefenin Alanları", 1, "Aşağıdakilerden hangileri felsefenin alt alanlarından biridir?", ["Ahlak felsefesi", "Siyaset felsefesi", "Sanat felsefesi"], [1, 1, 1], "Ahlak, siyaset ve sanat felsefesinin hepsi felsefenin alt alanlarıdır.");
+  rom("din", "Kur'an-ı Kerim", 3, "Kur'an-ı Kerim ile ilgili aşağıdakilerden hangileri doğrudur?", ["114 sureden oluşur.", "İlk inen sure Fâtiha'dır.", "Mushaf hâlinde ilk toplama Hz. Ebû Bekir döneminde yapılmıştır."], [1, 0, 1], "Kur'an 114 sureden oluşur ve ilk toplama Hz. Ebû Bekir döneminde yapılmıştır. İlk inen ayetler Alak suresinin başındadır.");
+  rom("psikoloji", "Öğrenme", 3, "Öğrenme psikolojisi ile ilgili aşağıdakilerden hangileri doğrudur?", ["Klasik koşullanmada nötr uyaran, koşullu uyarana dönüşür.", "Edimsel koşullanma kuramını Skinner geliştirmiştir.", "Klasik koşullanmayı Skinner bulmuştur."], [1, 1, 0], "Klasik koşullanmayı Pavlov, edimsel koşullanmayı Skinner geliştirmiştir.");
+  rom("sosyoloji", "Toplumsal Kurumlar", 1, "Aşağıdakilerden hangileri toplumsal kurum sayılır?", ["Aile", "Eğitim", "Ekonomi"], [1, 1, 1], "Aile, eğitim ve ekonomi toplumun temel ihtiyaçlarını karşılayan toplumsal kurumlardır.");
+  /* ---- TYT Türkçe ---- */
+  rom("turkce", "Fiilimsiler", 3, "Aşağıdaki cümlelerin hangilerinde fiilimsi vardır?", ["Koşarak okula gitti.", "Hava çok soğuktu.", "Gelen misafirleri karşıladı."], [1, 0, 1], "'Koşarak' zarf-fiil, 'gelen' sıfat-fiildir. İkinci cümlede fiilimsi yoktur.");
+  rom("turkce", "Yazım Kuralları", 2, "Aşağıdaki cümlelerin hangisinde ya da hangilerinde yazım yanlışı vardır?", ["Hiçbirşey söylemedi.", "Hiçbir şey söylemedi.", "Her gün koşuya çıkar."], [1, 0, 0], "'Hiçbir şey' ayrı yazılır. Birinci cümledeki 'hiçbirşey' yanlıştır.");
+  rom("turkce", "Paragraf", 2, "Bu parçadan aşağıdakilerden hangilerine ulaşılabilir?", ["Okumak, düşünme becerisini geliştirir.", "Okuyan herkes başarılı olur.", "Düzenli okumak söz varlığını artırır."], [1, 0, 1], "Parçada okumanın düşünme becerisine ve söz varlığına katkısı anlatılır. 'Herkes başarılı olur' ifadesi parçada yoktur; aşırı bir genellemedir.", "Okumak, yalnızca bilgi edinmek değil, aynı zamanda düşünme becerisi kazanmaktır. Düzenli okuyan bir kişi hem söz varlığını zenginleştirir hem de olaylara farklı açılardan bakmayı öğrenir.");
+  os("turkce", "Paragraf", 3, "Bu parçanın ana düşüncesi aşağıdakilerden hangisidir?", ["Bilimsel bilginin değişebilmesi bilimin güvenilirliğini azaltmaz, onun güçlü yanıdır.", "Bilimsel bilgiler hiçbir zaman doğru değildir.", "Deney ve gözlem, bilimde işe yaramaz.", "Bilim insanları birbirinden farklı sonuçlara ulaşmaktan kaçınmalıdır.", "Değişen bilgiler yerine hep eski bilgiler korunmalıdır."], 0, "Parçada değişkenliğin bir zayıflık değil, bilimin kendini düzeltebilme gücü olduğu vurgulanır.", "Bilimsel bilgi, deney ve gözlemle sınanabildiği için değişebilir. Bu değişkenlik, bilimin zayıflığı değil, kendini düzeltebilme gücünün göstergesidir.");
+  os("turkce", "Paragraf", 3, "Numaralanmış cümlelerle oluşturulan bu parçada anlam bütünlüğünü bozan cümle hangisidir?", ["I", "II", "III", "IV", "V"], 2, "Parça, denizin sıcaklığa etkisini anlatır. III. cümle ışığın kırılmasından söz ettiği için konudan sapar.", "(I) Denizler, ısıyı karalara göre daha yavaş alır ve yavaş verir. (II) Bu nedenle kıyı kesimlerde sıcaklık farkları daha azdır. (III) Fizikte ışığın kırılması, farklı ortamlardaki hız farkından kaynaklanır. (IV) İç kesimlerde ise gece ile gündüz arasındaki sıcaklık farkı daha belirgindir. (V) Böylece denizden uzaklık, iklimin önemli bir belirleyicisi olur.");
+  /* ---- AYT ---- */
+  rom("amat", "Türev", 3, "f(x) = x³ − 3x + 2 fonksiyonu için aşağıdakilerden hangileri doğrudur?", ["f'(1) = 0", "f'(0) = −3", "x = −1'de yerel minimum vardır."], [1, 1, 0], "f'(x) = 3x² − 3 olduğundan f'(1) = 0 ve f'(0) = −3'tür. f''(−1) = −6 < 0 olduğundan x = −1'de yerel maksimum vardır.");
+  rom("afizik", "Momentum", 3, "Çarpışmalarla ilgili aşağıdakilerden hangileri doğrudur?", ["Esnek çarpışmada kinetik enerji korunur.", "Esnek olmayan çarpışmada momentum korunmaz.", "Yalıtılmış sistemde toplam momentum sabittir."], [1, 0, 1], "Esnek çarpışmada kinetik enerji, yalıtılmış sistemde ise her çarpışmada momentum korunur. Esnek olmayan çarpışmada korunmayan kinetik enerjidir.");
+  rom("akimya", "Kimyasal denge", 3, "Dengedeki bir tepkimeye katalizör eklendiğinde aşağıdakilerden hangileri doğrudur?", ["Denge sabiti değişmez.", "Denge ürünler yönüne kayar.", "Dengeye ulaşma süresi kısalır."], [1, 0, 1], "Katalizör hızı artırır, denge konumunu ve denge sabitini değiştirmez.");
+  rom("abiyoloji", "Protein sentezi", 3, "Ökaryot hücrede protein sentezi ile ilgili aşağıdakilerden hangileri doğrudur?", ["Transkripsiyon çekirdekte gerçekleşir.", "Translasyon ribozomda gerçekleşir.", "mRNA, amino asitleri ribozoma taşır."], [1, 1, 0], "mRNA DNA'dan kopyalanır (çekirdekte); amino asitleri ribozoma taşıyan molekül tRNA'dır.");
+  rom("tarih2", "Çok partili hayat", 3, "Çok partili hayata geçiş süreciyle ilgili aşağıdakilerden hangileri doğrudur?", ["Demokrat Parti 1946'da kurulmuştur.", "1950 seçimlerini CHP kazanmıştır.", "Serbest Cumhuriyet Fırkası 1930'da kurulmuştur."], [1, 0, 1], "Demokrat Parti 1946'da, Serbest Cumhuriyet Fırkası 1930'da kuruldu. 1950 seçimlerini Demokrat Parti kazandı.");
+  rom("cografya2", "Türkiye'de tarım", 2, "Türkiye'de tarımla ilgili aşağıdakilerden hangisi ya da hangileri doğrudur?", ["Çay tarımı Doğu Karadeniz'de yoğundur.", "Zeytin tarımı en çok İç Anadolu'da yapılır.", "Antep fıstığı Karadeniz Bölgesi'nde yetiştirilir."], [1, 0, 0], "Çay Doğu Karadeniz'de yetişir. Zeytin Ege ve Akdeniz'de, Antep fıstığı Güneydoğu Anadolu'da yoğundur.");
+  rom("edebiyat", "Servet-i Fünun", 3, "Servet-i Fünun edebiyatı ile ilgili aşağıdakilerden hangileri doğrudur?", ["'Sanat sanat içindir' anlayışı benimsenmiştir.", "Halit Ziya Uşaklıgil bu topluluğun önemli romancısıdır.", "Halk diline ve sade Türkçeye öncelik verilmiştir."], [1, 1, 0], "Servet-i Fünun sanatçıları sanat için sanat anlayışını benimsemiş, ağır ve süslü bir dil kullanmışlardır.");
+  rom("edebiyat", "Halk Edebiyatı", 2, "Aşağıdakilerden hangileri halk edebiyatı nazım şeklidir?", ["Koşma", "Gazel", "Mani"], [1, 0, 1], "Koşma ve mani halk şiiri biçimleridir. Gazel Divan edebiyatına aittir.");
+  rom("edebiyat", "Tanzimat Dönemi", 3, "Aşağıdaki eserlerden hangileri Tanzimat edebiyatı dönemine aittir?", ["Vatan yahut Silistre", "Araba Sevdası", "Mai ve Siyah"], [1, 1, 0], "Vatan yahut Silistre (Namık Kemal) ve Araba Sevdası (Recaizade Mahmut Ekrem) Tanzimat dönemindedir. Mai ve Siyah Servet-i Fünun'a aittir.");
+  rom("mantik", "Akıl Yürütme", 2, "Aşağıdakilerden hangileri önermedir?", ["Ankara Türkiye'nin başkentidir.", "Yarın hava nasıl olacak?", "8, 3'ten büyüktür."], [1, 0, 1], "Soru cümlesi doğru ya da yanlış hükmü taşımadığı için önerme değildir.");
+  /* ---- YDT ---- */
+  os("ingilizce", "Conjunctions", 2, "She was so tired ____ she fell asleep during the lecture.", ["that", "which", "than", "unless", "although"], 0, "'so + sıfat + that' kalıbı sonuç bildirir: 'O kadar yorgundu ki ...'.");
+  os("ingilizce", "Conditionals", 2, "If I ____ you, I would accept the offer.", ["am", "was being", "were", "will be", "had been"], 2, "Gerçek dışı şimdiki durum için 'If + were ..., would + fiil' kullanılır.");
+  os("ingilizce", "Reading", 3, "According to the passage, what is the main function of the waggle dance?", ["To tell other bees where food is located", "To scare away predators", "To choose a new queen", "To warm the hive in winter", "To attract bees from other hives"], 0, "Parçada bal arılarının dansla besin kaynağının yönünü ve uzaklığını bildirdiği anlatılıyor.", "Honeybees perform a movement called the waggle dance when they return to the hive. The angle of the dance shows the direction of the food, and the length of the dance shows how far away it is.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -6983,8 +7063,8 @@ const NAVG = [
   ["Hesap", [["ayarlar", "Ayarlar", "gear"]]]
 ];
 /* alt sayfalar hangi ana menüye ait */
-const NAVACT = { koc: "gelisim", banka: "studyo", paragraf: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
-const SORU_TABS = [["studyo", "Konular"], ["banka", "Soru ara"], ["paragraf", "Paragraf"], ["uret", "AI ile üret"]];
+const NAVACT = { koc: "gelisim", banka: "studyo", paragraf: "studyo", osym: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
+const SORU_TABS = [["studyo", "Konular"], ["banka", "Soru ara"], ["osym", "ÖSYM tarzı"], ["paragraf", "Paragraf"], ["uret", "AI ile üret"]];
 const TEKRAR_TABS = [["yanlislar", "Yanlışlarım"], ["kartlar", "Kartlar"], ["kisa", "Kısa dersler"]];
 const subTabs = (tabs, cur) => `<nav class="subtabs" aria-label="Bölüm">${tabs.map(([k, l]) => `<a href="#${k}" class="${k === cur ? "on" : ""}"${k === cur ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav>`;
 function navHTML(r) {
@@ -10048,6 +10128,65 @@ Object.assign(OZ_ACT, {
   kocYeniOrnek() { const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t); KOC.ex = kocOrnekler(s, t, a ? a.seviye : 2); render(); },
   kocTest(d) { const b = kocSet(d.s, d.t, 10); startRun({ kind: "practice", title: `Sana özel · ${d.t}`, mode: "study", qs: b.qs }); }
 });
+/* ===== ÖSYM tarzı sorular: öncüllü, "söylenemez / değildir", paragraf ve zor kalıp soruları ===== */
+UI.osym = { e: "TYT", s: "", n: 10, mode: "study" };
+const OSYM_DK = { TYT: 1.4, AYT: 2.2, YDT: 1.5 }; /* soru başına önerilen dakika (resmî oturumlara yakın) */
+const osymDersler = e => Object.keys(SUBJ).filter(k => SUBJ[k].e === e);
+const osymKalip = s => GENS.filter(g => g.subs.includes(s) && (g.d >= 3 || /^paragraf-/.test(g.id) || /^zor-/.test(g.id)));
+const osymElle = s => allQ().filter(q => q.s === s && q.os && !S.reports[q.id]);
+function osymSet(e, s, n) {
+  const dersler = s && SUBJ[s] ? [s] : osymDersler(e);
+  if (!dersler.length) return [];
+  const used = new Set(), out = [];
+  /* ders başına eşit pay; paylar artarsa kalan sorular sırayla dağıtılır */
+  const pay = {}; for (let i = 0; i < n; i++) { const k = dersler[i % dersler.length]; pay[k] = (pay[k] || 0) + 1; }
+  for (const k of dersler) {
+    const hedef = pay[k] || 0, al = [];
+    const el = shuffle(osymElle(k)), taze = el.filter(q => !S.ans[q.id]), eski = el.filter(q => S.ans[q.id]).sort((a, b) => (S.ans[a.id][3] || 0) - (S.ans[b.id][3] || 0));
+    for (const q of taze.concat(eski)) { if (al.length >= Math.ceil(hedef * 0.6)) break; al.push(q); }
+    const kal = osymKalip(k); let guard = 0;
+    while (al.length < hedef && kal.length && guard++ < hedef * 10) { const q = genQ(pick(kal), k, used); if (q) { delete q.stale; al.push(q); } }
+    for (const q of taze.concat(eski)) { if (al.length >= hedef) break; if (!al.includes(q)) al.push(q); }
+    /* ÖSYM tarzı soru azsa aynı dersin orta/zor sorularıyla tamamla (çözülmemişler önce) */
+    if (al.length < hedef) { const yd = shuffle(allQ().filter(q => q.s === k && q.d >= 2 && !S.reports[q.id] && !al.includes(q))).sort((a, b) => (S.ans[a.id] ? 1 : 0) - (S.ans[b.id] ? 1 : 0) || b.d - a.d); for (const q of yd) { if (al.length >= hedef) break; al.push(q); } }
+    out.push(...al);
+  }
+  /* aynı dersten sorular peş peşe gelmesin: dersleri karıştır, sınav akışı gibi olsun */
+  const gr = {}; out.forEach(q => (gr[q.s] = gr[q.s] || []).push(q)); const res = []; let kaldi = true;
+  while (kaldi) { kaldi = false; for (const k of Object.keys(gr)) if (gr[k].length) { res.push(gr[k].shift()); kaldi = true; } }
+  return res.slice(0, n);
+}
+function vOsym() {
+  const O = UI.osym, ders = osymDersler(O.e);
+  if (O.s && !ders.includes(O.s)) O.s = "";
+  const elle = ders.reduce((a, k) => a + osymElle(k).length, 0), kalip = ders.reduce((a, k) => a + osymKalip(k).length, 0);
+  const dk = Math.round(O.n * OSYM_DK[O.e]);
+  return `<div class="view">${resumeBanner()}
+  <div class="vhead"><span class="eyebrow">Sınav formatında</span><h1>ÖSYM tarzı sorular</h1><p>Sınavdaki gibi öncüllü (I, II, III), “söylenemez / değildir”, paragraf ve çok adımlı zor sorular. Seçtiğin sınav ve dersten sırayla set hazırlanır.</p></div>
+  ${subTabs(SORU_TABS, "osym")}
+  <div class="card stack">
+    <div><h3 style="margin-bottom:8px">Sınav</h3><div class="seg" role="group" aria-label="Sınav">${["TYT", "AYT", "YDT"].map(e => `<button type="button" data-a="osymE" data-k="${e}" class="${e === O.e ? "on" : ""}">${e}</button>`).join("")}</div></div>
+    <div class="fields">
+      <label class="f">Ders<select class="in" data-c="osymS"><option value="">Tüm ${O.e} dersleri (karışık)</option>${ders.map(k => `<option value="${k}"${k === O.s ? " selected" : ""}>${esc(SUBJ[k].n)}</option>`).join("")}</select></label>
+      <label class="f">Soru sayısı<select class="in" data-c="osymN">${[10, 20, 40].map(n => `<option${n === O.n ? " selected" : ""}>${n}</option>`).join("")}</select></label>
+    </div>
+    <div><h3 style="margin-bottom:8px">Çalışma biçimi</h3><div class="seg">${[["study", "Çözümlü çalışma"], ["exam", "Sınav modu · " + dk + " dk"]].map(([k, l]) => `<button type="button" data-a="osymM" data-k="${k}" class="${O.mode === k ? "on" : ""}">${l}</button>`).join("")}</div>
+      <p class="small muted" style="margin-top:8px">${O.mode === "exam" ? "Süre dolunca deneme otomatik değerlendirilir; cevaplar bitişte açılır." : "Her sorudan sonra doğru cevap ve çözüm hemen gösterilir."}</p></div>
+    <button class="btn pri wide" data-a="osymBasla"${ders.length ? "" : " disabled"}>${O.n} soruluk ÖSYM tarzı seti başlat</button>
+    <p class="xs muted">${fmtN(elle)} elle yazılmış ÖSYM tarzı soru + ${fmtN(kalip)} zor soru kalıbı (sayıları her seferinde değişir). Kalıp soruları koddan doğrulanır; elle yazılanlar için öğretmen onayı önerilir.</p>
+  </div></div>`;
+}
+Object.assign(OZ_ACT, {
+  osymE(d) { UI.osym.e = d.k; UI.osym.s = ""; render(); },
+  osymM(d) { UI.osym.mode = d.k; render(); },
+  osymBasla() {
+    const O = UI.osym, qs = osymSet(O.e, O.s, O.n);
+    if (!qs.length) { toast("Bu seçimle ÖSYM tarzı soru bulunamadı."); return; }
+    const exam = O.mode === "exam", ad = O.s ? SUBJ[O.s].n : O.e;
+    startRun({ kind: "practice", type: null, title: `ÖSYM tarzı · ${ad}`, mode: O.mode, qs, dur: exam ? Math.round(qs.length * OSYM_DK[O.e]) : 0 });
+  }
+});
+Object.assign(OZ_CHG, { osymS(el) { UI.osym.s = el.value; render(); }, osymN(el) { UI.osym.n = +el.value; render(); } });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
@@ -10246,11 +10385,11 @@ function siteFoot() {
 }
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
-const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
+const ROUTES = { bugun: vHome, ogretmen: vTutor, deneme: vExam, banka: vBank, studyo: vStudio, paragraf: vPara, osym: vOsym, yanlislar: vMistakes, kartlar: vCards, plan: vPlan, gelisim: vProgress, ayarlar: vSettings, sonuc: vResult };
 Object.assign(ROUTES, { sss: vSSS, hakkimizda: vHakkimizda, premium: vPremium, yasal: vLegalIndex, uret: vUret, kisa: vKisa, hesap: vHesap, yonetim: vYonetim, lig: vLig, sinif: vSinif, canli: vCanli, koc: vKoc });
 LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
 function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
-const SAYFA_BASLIK = { koc: "Sana özel", bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
+const SAYFA_BASLIK = { koc: "Sana özel", bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", osym: "ÖSYM tarzı", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
 function sayfaBasligi(r) { try { const t = SAYFA_BASLIK[r] || (LEGAL[r] && LEGAL[r].t) || ""; document.title = t && r !== "bugun" ? t + " · AKE Akademi" : "AKE Akademi · YKS 2027"; } catch (e) { } }
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;

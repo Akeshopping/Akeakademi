@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=e64030cdf9">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e64030cdf9">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e64030cdf9">
+<link rel="manifest" href="/manifest.webmanifest?v=7c046cd5c1">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7c046cd5c1">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7c046cd5c1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=e64030cdf9">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=7c046cd5c1">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2363,7 +2363,7 @@ const BANK = [];
     0, "Atasözü, küçük birikimlerin zamanla büyük sonuç verdiğini anlatır. Düz anlamı değil, mecaz anlamı sorulmuştur.");
   q("turkce", "Tamlamalar", 2, "Aşağıdakilerden hangisi isim tamlamasıdır?",
     ["Sarı çiçek", "Okuyan çocuk", "Kitabın kapağı", "Çok güzel", "Ali geldi"], 2, "İsim tamlamasında tamlayan (-ın) ve tamlanan (-ı) eki vardır: kitabın kapağı. “Sarı çiçek” sıfat tamlamasıdır.");
-  q("turkce", "Paragraf", 3, "(I) İyi bir dinleyici, konuşmacının sözlerini kesmeden sonuna kadar dinler. (II) Karşısındakinin duygu ve düşüncelerini anlamaya çalışır. (III) Anlamadığı yerde nazikçe soru sorar. (IV) Dinlemek, yalnızca susmak değil, anlamak için çaba göstermektir.\nBu parçanın ana düşüncesi aşağıdakilerden hangisidir?",
+  q("turkce", "Paragraf", 3, "İyi bir dinleyici, konuşmacının sözlerini kesmeden sonuna kadar dinler. Karşısındakinin duygu ve düşüncelerini anlamaya çalışır. Anlamadığı yerde nazikçe soru sorar. Dinlemek, yalnızca susmak değil, anlamak için çaba göstermektir.\nBu parçanın ana düşüncesi aşağıdakilerden hangisidir?",
     ["Konuşmacılar dinleyicilere saygı göstermelidir.", "Soru sormak dinlemenin en önemli parçasıdır.", "Etkili dinleme, anlamaya yönelik bilinçli bir çabadır.", "Her konuşma kesintisiz dinlenmelidir.", "Susmak her zaman en doğru davranıştır."],
     2, "Parça, iyi dinlemenin özelliklerini sayar ve IV. cümlede ‘dinlemek anlamak için çabadır’ diyerek sonucu söyler.");
   q("turkce", "Paragraf", 3, "Aşağıdaki cümlelerden hangisi paragrafta ‘yardımcı düşünce’ olmaya daha uygundur?",
@@ -2562,6 +2562,56 @@ const BANK = [];
   q("sosyoloji","Sosyal Değişme",3,"Toplumsal değişmenin sonuçlarından biri olan ‘kültürel gecikme’ kavramını ortaya atan sosyolog kimdir?",["William Ogburn", "Auguste Comte", "Emile Durkheim", "Max Weber", "Karl Marx"],0,"William Ogburn, maddi kültürün manevi kültürden hızlı değişmesini kültürel gecikme olarak adlandırdı.");
   q("mantik","Önermeler",2,"‘Eğer yağmur yağarsa, yer ıslanır.’ önermesi hangi tür birleşik önermedir?",["Koşullu", "Ayrık", "Birleşik", "Olumsuz", "Karşıt"],0,"Eğer ... ise ... kalıbı koşullu önermedir.");
   q("mantik","Önermeler",3,"‘Her insan ölümlüdür’ önermesinin değili aşağıdakilerden hangisidir?",["Bazı insanlar ölümlü değildir", "Hiçbir insan ölümlü değildir", "Bazı insanlar ölümlüdür", "Her insan ölümsüzdür", "Hiçbir insan ölümsüz değildir"],0,"Tümel olumlunun değili özel olumsuzdur: Bazı insanlar ölümlü değildir.");
+})();
+/* ===== Özgün soru bankası · 11. bölüm: az sorulu sözel konular (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    const id = s + "-11-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
+  }
+
+
+  q("tarih","Osmanlı Tarihi",2,"Osmanlı Devleti'nde ilk kez ‘Sultan’ unvanını kullanan hükümdar kimdir?",["I. Murat", "Osman Bey", "Orhan Bey", "Yıldırım Bayezid", "II. Mehmet"],0,"I. Murat ilk kez ‘Sultan’ unvanını kullanan Osmanlı hükümdarıdır; Yıldırım Bayezid ise Anadolu'da siyasi birliği güçlendirmiştir.");
+  q("tarih","Osmanlı Tarihi",2,"Osmanlı'da Lale Devri hangi padişah döneminde yaşanmıştır?",["III. Ahmet", "I. Mahmut", "III. Mustafa", "II. Mustafa", "III. Selim"],0,"Lale Devri (1718–1730) III. Ahmet dönemindedir; Nevşehirli Damat İbrahim Paşa sadrazamdır.");
+  q("tarih","Osmanlı Tarihi",3,"Osmanlı'da yeniçeri ocağı hangi padişah döneminde kaldırılmıştır?",["II. Mahmut", "III. Selim", "Abdülmecid", "Abdülaziz", "II. Abdülhamit"],0,"Yeniçeri Ocağı 1826'da II. Mahmut tarafından kaldırıldı (Vaka-i Hayriye).");
+  q("tarih","Osmanlı Tarihi",3,"Islahat Fermanı hangi padişah döneminde ilan edilmiştir?",["Abdülmecid", "Abdülaziz", "II. Mahmut", "II. Abdülhamit", "V. Murat"],0,"Tanzimat Fermanı (1839) ve Islahat Fermanı (1856) Abdülmecid döneminde ilan edilmiştir.");
+  q("tarih","Osmanlı Tarihi",2,"İlk Osmanlı anayasası olan Kanun-i Esasi hangi yıl ilan edilmiştir?",["1876", "1856", "1839", "1908", "1920"],0,"Kanun-i Esasi 1876'da II. Abdülhamit döneminde ilan edildi (I. Meşrutiyet).");
+  q("tarih","Kurtuluş Savaşı",2,"Mustafa Kemal'in Samsun'a çıktığı tarih aşağıdakilerden hangisidir?",["19 Mayıs 1919", "23 Nisan 1920", "30 Ağustos 1922", "29 Ekim 1923", "9 Eylül 1922"],0,"Mustafa Kemal 19 Mayıs 1919'da Samsun'a çıkarak millî mücadeleyi başlatmıştır.");
+  q("tarih","Kurtuluş Savaşı",3,"Amasya Genelgesi'nin en önemli özelliği aşağıdakilerden hangisidir?",["Millî mücadelenin gerekçesi ve amacının ilk kez ilan edilmesi", "TBMM'nin açılması", "Misak-ı Millî'nin kabulü", "Saltanatın kaldırılması", "Cumhuriyetin ilanı"],0,"1919 Amasya Genelgesi'nde ‘Milletin istiklalini yine milletin azim ve kararı kurtaracaktır’ denir.");
+  q("tarih","Atatürk İlkeleri",2,"Atatürk ilkelerinden ‘laiklik’ aşağıdakilerden hangisiyle doğrudan ilgilidir?",["Din ve devlet işlerinin ayrılması", "Millî egemenlik", "Devletçilik", "Halkçılık", "İnkılapçılık"],0,"Laiklik, din ve devlet işlerinin ayrılmasıdır; halifeliğin kaldırılması ve Tevhid-i Tedrisat bu ilkeye uygundur.");
+  q("tarih","Atatürk İlkeleri",3,"Aşağıdakilerden hangisi Atatürk dönemi eğitim alanındaki gelişmelerden biri DEĞİLDİR?",["Medeni Kanun'un kabulü", "Tevhid-i Tedrisat Kanunu", "Harf İnkılabı", "Millet Mektepleri", "Köy Enstitüleri"],0,"Medeni Kanun (1926) hukuk alanındadır; diğerleri eğitim ve kültür alanındadır.");
+  q("cografya","Türkiye'nin Bölgeleri",2,"Türkiye'nin en kalabalık nüfuslu coğrafi bölgesi hangisidir?",["Marmara", "Ege", "İç Anadolu", "Karadeniz", "Akdeniz"],0,"Marmara Bölgesi, İstanbul'un etkisiyle en kalabalık nüfuslu bölgedir.");
+  q("cografya","Türkiye'nin Bölgeleri",2,"Türkiye'de ‘çay’ yetiştirilen bölge aşağıdakilerden hangisidir?",["Doğu Karadeniz", "Çukurova", "Konya Ovası", "Güneydoğu Anadolu", "Trakya"],0,"Çay, bol yağış alan ve nemli olan Doğu Karadeniz'de yetiştirilir.");
+  q("cografya","Türkiye'nin Bölgeleri",3,"Türkiye'de ‘pamuk’ ekimi en çok hangi bölgede yapılır?",["Güneydoğu Anadolu ve Ege", "Doğu Karadeniz", "İç Anadolu", "Trakya", "Doğu Anadolu"],0,"Pamuk sıcak ve sulanabilir alanlarda yetişir: Çukurova, Ege ve Güneydoğu Anadolu.");
+  q("cografya","Yükselti ve Sıcaklık",3,"Yükseltiye bağlı olarak sıcaklık ortalama her 100 metrede kaç °C azalır?",["0,5 °C", "0,1 °C", "1 °C", "2 °C", "5 °C"],0,"Ortalama yükseklik arttıkça her 100 metrede sıcaklık yaklaşık 0,5 °C düşer.");
+  q("cografya","Yer şekilleri",2,"Aşağıdakilerden hangisi rüzgârın aşındırma ve biriktirme ile oluşturduğu şekillerden biridir?",["Kum tepesi (kumul)", "Delta", "Dev kazanı", "Çentik", "Peribacası"],0,"Kumullar rüzgârın biriktirdiği kumlardan oluşur.");
+  q("felsefe","Felsefi Akımlar",3,"Bilginin kaynağının akıl olduğunu savunan felsefi akım hangisidir?",["Rasyonalizm", "Empirizm", "Pozitivizm", "Sofizm", "Septisizm"],0,"Rasyonalizm bilginin kaynağını akıl olarak görür; empirizm deneyi esas alır.");
+  q("felsefe","Felsefi Akımlar",3,"‘Bilgi deneyimle elde edilir’ görüşünü savunan akım hangisidir?",["Empirizm", "Rasyonalizm", "İdealizm", "Kritisizm", "Entüisyonizm"],0,"Empirizm, bilginin kaynağını deney ve gözlem olarak görür.");
+  q("felsefe","Etik",2,"‘Eylemin sonucuna bakılarak iyi ve kötünün belirlendiği’ ahlak anlayışı hangisidir?",["Faydacılık", "Ödev ahlakı", "Erdem ahlakı", "Sofizm", "Kritisizm"],0,"Faydacılık (utilitarizm) eylemin yarattığı yarar ve mutluluğa bakar.");
+  q("felsefe","Felsefenin Alanları",3,"Güzellik ve sanat üzerine düşünen felsefe alanı hangisidir?",["Estetik", "Etik", "Ontoloji", "Epistemoloji", "Mantık"],0,"Estetik, güzelin ve sanatın ne olduğunu inceler.");
+  q("din","Temel Kavramlar",2,"İslam'ın beş şartından biri olan ‘zekât’ aşağıdakilerden hangisini ifade eder?",["Belli bir malın yoksullara verilmesi", "Ramazanda oruç tutmak", "Kâbe'yi ziyaret etmek", "Günde beş vakit namaz kılmak", "Kelime-i şehadet getirmek"],0,"Zekât, nisap miktarı mala sahip olanın yoksullara belli bir pay vermesidir.");
+  q("din","İslam Düşüncesi",3,"İtikadi mezhepler içinde ‘Maturidilik’ hangi alimin adıyla anılır?",["Ebu Mansur el-Maturidi", "İmam Eşari", "İmam Gazali", "İbn Sina", "Farabi"],0,"Maturidilik, Ebu Mansur el-Maturidi'nin görüşleri üzerine kurulmuş itikadi mezheptir.");
+  q("din","İslam Düşüncesi",3,"Mezhepler içinde ‘Hanefilik’ mezhebinin imamı kimdir?",["İmam-ı Azam Ebu Hanife", "İmam Malik", "İmam Şafii", "Ahmed b. Hanbel", "İmam Maturidi"],0,"Hanefi mezhebi İmam-ı Azam Ebu Hanife'ye dayanır.");
+  q("edebiyat","Eser Türleri",2,"Aşağıdakilerden hangisi bir hikâye (öykü) yazarı olarak bilinir?",["Sait Faik Abasıyanık", "Nazım Hikmet", "Ahmet Hamdi Tanpınar", "Yahya Kemal", "Orhan Veli"],0,"Sait Faik Abasıyanık Türk öykücülüğünün öncülerindendir.");
+  q("edebiyat","Nazım Şekilleri",2,"Gazelin ilk beytine ne ad verilir?",["Matla", "Makta", "Mahlas", "Beyit", "Redif"],0,"Gazelin ilk beyti matla, son beyti ise mahlasın bulunduğu makta'dır.");
+  q("edebiyat","Şairler",2,"‘Han Duvarları’ şiiri kime aittir?",["Faruk Nafiz Çamlıbel", "Ziya Gökalp", "Ahmet Hamdi Tanpınar", "Orhan Veli", "Behçet Necatigil"],0,"Han Duvarları, Faruk Nafiz Çamlıbel'e aittir.");
+  q("edebiyat","Şairler",3,"‘Dokuzuncu Hariciye Koğuşu’ romanının yazarı kimdir?",["Peyami Safa", "Halide Edip", "Kemal Tahir", "Sabahattin Ali", "Orhan Pamuk"],0,"Dokuzuncu Hariciye Koğuşu (1930), Peyami Safa'ya aittir.");
+  q("edebiyat","Eser-Yazar",3,"‘Kürk Mantolu Madonna’ romanı kime aittir?",["Sabahattin Ali", "Halide Edip", "Reşat Nuri", "Yaşar Kemal", "Orhan Kemal"],0,"Kürk Mantolu Madonna (1943), Sabahattin Ali'ye aittir.");
+  q("turkce","Deyimler",2,"‘Kulak vermek’ deyimi aşağıdakilerden hangisini ifade eder?",["Dikkatle dinlemek", "Küsmek", "Öğüt vermek", "Duymamazlıktan gelmek", "Şikâyet etmek"],0,"Kulak vermek, dikkatle dinlemek anlamındadır.");
+  q("turkce","Atasözleri",2,"‘Damlaya damlaya göl olur’ atasözü aşağıdakilerden hangisini anlatır?",["Küçük birikimlerin zamanla büyüdüğünü", "Çok su içmenin yararını", "Yağmurun faydasını", "Göllerin önemini", "Tasarruf yapmamayı"],0,"Küçük şeylerin birikerek büyük sonuç doğuracağını anlatır.");
+  q("turkce","Atasözleri",3,"‘Ak akçe kara gün içindir’ atasözüyle ilgili aşağıdakilerden hangisi doğrudur?",["Gün gelip ihtiyaç olabileceği için tasarruf edilmelidir", "Para ak ise kötüdür", "Kara günlerde borç alınmaz", "Gümüş değerli bir madendir", "Kazanç hep karaya çıkar"],0,"Beklenmedik zor durumlar için para biriktirmek gerektiğini anlatır.");
+  q("psikoloji","Öğrenme",3,"Davranışın sonucunda ödül ya da ceza almasına bağlı olarak öğrenilmesini savunan kuramcı kimdir?",["B. F. Skinner", "Pavlov", "Freud", "Piaget", "Maslow"],0,"Skinner, edimsel şartlanma kuramının temsilcisidir.");
+  q("psikoloji","Gelişim",3,"Piaget'nin bilişsel gelişim dönemlerinden ‘soyut işlemler dönemi’ yaklaşık hangi yaşta başlar?",["11-12", "0-2", "2-7", "7-11", "16 sonrası"],0,"Soyut işlemler dönemi yaklaşık 11-12 yaşında başlar.");
+  q("sosyoloji","Toplumsal Yapı",3,"Aşağıdakilerden hangisi toplumsal tabakalaşma ölçütlerinden biri değildir?",["Burç", "Gelir", "Meslek", "Eğitim", "Servet"],0,"Burç, tabakalaşma ölçütü değildir; gelir, meslek, eğitim ve servet ölçütlerdir.");
+  q("sosyoloji","Kültür",2,"Aynı toplumdaki farklı grupların kendine özgü kültürel özelliklerine ne denir?",["Alt kültür", "Karşı kültür", "Kitle kültürü", "Popüler kültür", "Maddi kültür"],0,"Bir toplumdaki belli bir grubun ana kültürden farklı özelliklerine alt kültür denir.");
+  q("mantik","Önermeler",3,"p doğru, q yanlış olduğunda ‘p ∧ q’ önermesinin doğruluk değeri nedir?",["Yanlış", "Doğru", "Belirsiz", "Hem doğru hem yanlış", "Hesaplanamaz"],0,"Ve bağlacı yalnızca iki önerme de doğruysa doğrudur; p ∧ q yanlıştır.");
+  q("mantik","Kavramlar",3,"‘Kuş’ ve ‘serçe’ kavramları arasındaki ilişki aşağıdakilerden hangisidir?",["Kapsam (tür-cins) ilişkisi", "Ayrık ilişkisi", "Çelişik ilişkisi", "Karşıt ilişkisi", "Eş anlamlılık"],0,"Serçe, kuşun bir türüdür; kuş kavramı serçeyi kapsar.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -8394,7 +8444,7 @@ Object.assign(OZ_ACT, {
     try {
       const r = await fetch("/api/yonetim/soru-uret", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ s: d.s, t: d.t, sn: SUBJ[d.s].n, e: SUBJ[d.s].e, d: 2, n: 5, ornek }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok) toast(`${j.gecen}/${j.uretilen} soru kontrolü geçti ve onayına düştü.`); else SORU.err = j.message || "Soru üretilemedi.";
+      if (r.ok) toast(`${j.gecen}/${j.uretilen} soru üretildi ve onayına düştü.`); else SORU.err = j.message || "Soru üretilemedi.";
     } catch (e) { SORU.err = "Bağlantı kurulamadı."; }
     delete SORU.busy[k]; await soruYukle();
   },

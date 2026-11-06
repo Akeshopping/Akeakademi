@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=40f5c0273a">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=40f5c0273a">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=40f5c0273a">
+<link rel="manifest" href="/manifest.webmanifest?v=286c457d25">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=286c457d25">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=286c457d25">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=40f5c0273a">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=286c457d25">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2248,6 +2248,79 @@ const BANK = [];
     "[A] iki katına çıkınca hız 2² = 4 katına çıkar.");
   q("akimya", "Atom ve periyodik sistem", 2, "Bir elementin %20'si 10 kütle numaralı, %80'i 11 kütle numaralı izotoptur. Elementin ortalama atom kütlesi kaçtır?", ["10,2", "10,5", "10,8", "11", "11,2"], 2,
     "Ortalama atom kütlesi = 0,20 · 10 + 0,80 · 11 = 2 + 8,8 = 10,8 olur.");
+})();
+/* ===== Özgün soru bankası · 7. bölüm: zor ve orta düzey kavram soruları (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    BANK.push({ id: s + "-7-" + cnt[s], s, t, d, q: text, o, a, x });
+  }
+  q("tarih", "Osmanlı Devleti", 3, "Osmanlı Devleti'nde Karlofça Antlaşması (1699) ile ilgili aşağıdakilerden hangisi söylenemez?",
+    ["Osmanlı ilk kez büyük çapta toprak kaybetmiştir.", "Macaristan ve Transilvanya Avusturya'ya bırakılmıştır.", "Antlaşma ile Osmanlı Devleti Rusya ile Azak Kalesi için iki yıllık ateşkes yapmıştır.", "Antlaşmayla Fransa'ya kapitülasyonlar verilmiştir.", "Mora Yarımadası Venedik'e bırakılmıştır."],
+    3, "Fransa'ya kapitülasyonlar 1569'da (Kanuni döneminde) verilmiştir; Karlofça ile ilgisi yoktur. Diğer seçenekler Karlofça'nın hükümleridir.");
+  q("tarih", "Kurtuluş Savaşı", 3, "Aşağıdaki gelişmelerden hangisi Mudanya Ateşkesi'nin (1922) doğrudan sonucudur?",
+    ["Doğu Trakya'nın Türklere bırakılması ve İstanbul'un TBMM yönetimine geçeceğinin kabul edilmesi", "Sakarya Meydan Muharebesi'nin kazanılması", "Lozan'da boğazlar rejiminin kesinleşmesi", "Saltanatın kaldırılması kararının alınması", "Kars Antlaşması'nın imzalanması"],
+    0, "Mudanya Ateşkesi ile Yunanistan Doğu Trakya'yı boşaltmayı, İtilaf Devletleri de İstanbul ve Boğazlar'ın TBMM'ye bırakılmasını kabul etmiştir. Saltanat ise 1 Kasım 1922'de kaldırılmıştır; seçenekte ‘doğrudan sonuç’ değildir.");
+  q("tarih", "İnkılap Tarihi", 3, "Aşağıdaki inkılaplardan hangisi laiklik ilkesiyle doğrudan ilgili DEĞİLDİR?",
+    ["Tevhid-i Tedrisat Kanunu'nun çıkarılması", "Medeni Kanun'un kabul edilmesi", "Tekke ve zaviyelerin kapatılması", "Soyadı Kanunu'nun kabul edilmesi", "Halifeliğin kaldırılması"],
+    3, "Soyadı Kanunu (1934) toplumsal bir düzenlemedir; diğerleri din ile devlet işlerinin ayrılmasına yönelik adımlardır.");
+  q("tarih", "İlk Türk Devletleri", 2, "Orhun Yazıtları ile ilgili aşağıdakilerden hangisi doğrudur?",
+    ["Göktürk Devleti'nin yazılı belgesidir ve Köktürk alfabesiyle yazılmıştır.", "Uygur Devleti'nin kuruluşunu anlatır.", "Arap alfabesiyle yazılmıştır.", "Dede Korkut hikâyelerini içerir.", "Karahanlılar döneminde yazılmıştır."],
+    0, "Orhun Yazıtları (Bilge Kağan, Kül Tigin, Tonyukuk) Göktürk dönemine aittir ve Köktürk alfabesiyle yazılmıştır.");
+  q("tarih", "Osmanlı Devleti", 3, "Tanzimat Fermanı'nın aşağıdaki hedeflerden hangisini taşıdığı söylenemez?",
+    ["Can, mal ve namus güvenliğinin sağlanması", "Vergilerin adil biçimde toplanması", "Askerlik süresinin düzenlenmesi", "Anayasa ile meclisin kurulması", "Rüşvetin önlenmesi ve yargılamada eşitlik"],
+    3, "Meclis ve anayasa (Kanun-i Esasi, 1876) Meşrutiyet'in konusudur; Tanzimat Fermanı (1839) padişahın yetkilerini yazılı bir anayasa ile sınırlamamıştır.");
+  q("cografya", "Türkiye'nin İklimi", 3, "Karadeniz Bölgesi'nde yıl boyunca her mevsim yağış alınmasının asıl nedeni aşağıdakilerden hangisidir?",
+    ["Dağların kıyıya paralel uzanarak nemli rüzgârları yükseltmesi ve yağış kuşağında yer alması", "Bölgenin güneye bakması", "Yüksek basınç kuşağında bulunması", "Çöl iklimine komşu olması", "Karasal iklim etkisinde kalması"],
+    0, "Karadeniz'in nemli hava kütleleri, kıyıya paralel dağlarda yükselerek yamaç yağışı bırakır; bu yüzden yağış her mevsim görülür.");
+  q("cografya", "Harita Bilgisi", 3, "Ölçeği 1/500.000 olan bir haritada 6 cm olan uzunluk gerçekte kaç km'dir?",
+    ["15", "30", "3", "60", "300"], 1, "6 × 500.000 = 3.000.000 cm = 30 km.");
+  q("cografya", "Harita Bilgisi", 3, "Aynı iki nokta arasındaki gerçek uzaklık 1/1.000.000 ölçekli haritada 4 cm ise 1/2.000.000 ölçekli haritada kaç cm gösterilir?",
+    ["8", "4", "2", "1", "16"], 2, "Gerçek uzaklık 40 km. 1/2.000.000'lik haritada 4.000.000 cm ÷ 2.000.000 = 2 cm.");
+  q("cografya", "Yerin Şekillenmesi", 3, "Aşağıdakilerden hangisi iç kuvvetlerin (endojen) oluşturduğu bir yer şeklidir?",
+    ["Delta ovası", "Volkanik koni", "Kanyon", "Obruk", "Peribacası"], 1, "Volkanik koni, magmanın yüzeye çıkmasıyla (iç kuvvet) oluşur; diğerleri akarsu, çözünme ve aşınma gibi dış kuvvetlerin ürünüdür.");
+  q("cografya", "Nüfus", 2, "Bir ülkenin nüfus piramidinin tabanı geniş, tepesi dar ise aşağıdakilerden hangisi söylenebilir?",
+    ["Genç nüfus oranı yüksektir.", "Yaşlı nüfus oranı yüksektir.", "Nüfus azalmaktadır.", "Ortalama yaşam süresi çok uzundur.", "Doğum oranı çok düşüktür."],
+    0, "Geniş taban doğum oranının ve genç nüfusun yüksek olduğunu gösterir.");
+  q("edebiyat", "Edebi Sanatlar", 3, "“Gözlerin gecenin ışığı, yüzün ayın ta kendisi” dizesinde aşağıdaki sanatlardan hangisi vardır?",
+    ["Teşbih (benzetme)", "Hüsn-i talil", "Tezat", "Kinaye", "Mecaz-ı mürsel"],
+    0, "“Yüzün ayın ta kendisi” benzetmedir (teşbih); benzetilen ve benzeyen birlikte kullanılmıştır.");
+  q("edebiyat", "Divan Edebiyatı", 3, "Aşağıdakilerden hangisi Divan edebiyatının nazım şekillerinden biri DEĞİLDİR?",
+    ["Gazel", "Kaside", "Mesnevi", "Rubai", "Koşma"], 4, "Koşma, halk edebiyatı nazım şeklidir.");
+  q("edebiyat", "Cumhuriyet Dönemi", 3, "“Kuyucaklı Yusuf” romanının yazarı kimdir?",
+    ["Sabahattin Ali", "Yakup Kadri Karaosmanoğlu", "Reşat Nuri Güntekin", "Halide Edib Adıvar", "Refik Halit Karay"], 0, "Kuyucaklı Yusuf, Sabahattin Ali'nin romanıdır.");
+  q("edebiyat", "Tanzimat Dönemi", 3, "Aşağıdakilerden hangisi Tanzimat edebiyatında ilk Türk tiyatro eserlerinden biridir?",
+    ["Şair Evlenmesi (Şinasi)", "Eski Hastalık (Hamit)", "Sergüzeşt (Samipaşazade)", "Araba Sevdası (Ekrem)", "Aşk-ı Memnu (Halit Ziya)"],
+    0, "Şinasi'nin Şair Evlenmesi (1860) ilk Türk tiyatro eseri sayılır; Aşk-ı Memnu roman, Sergüzeşt ve Araba Sevdası ise romandır.");
+  q("turkce", "Dil Bilgisi", 3, "Aşağıdaki cümlelerin hangisinde ‘-ki’ eki yazımı bakımından diğerlerinden farklıdır?",
+    ["Sen de gel, bende ki kitap sende kalsın.", "Evdeki hesap çarşıya uymaz.", "Bahçedeki çiçekler açmış.", "Dünkü toplantı çok uzundu.", "Sınıftaki öğrenciler çalışıyor."],
+    0, "“bende ki” ayrı yazılamaz; ek bitişik yazılmalıydı (“bendeki”). Diğer cümlelerde -ki ek olarak doğru yazılmıştır.");
+  q("turkce", "Anlatım Bozuklukları", 3, "Aşağıdaki cümlelerden hangisinde anlatım bozukluğu vardır?",
+    ["Yarın akşam toplantıya gelecek misiniz?", "Kitabı okudu ve yazara hayran kaldı.", "Bu konuyu daha önce hiç duymamıştım ve yeni öğrendim.", "Havanın soğuk olmasına rağmen yürüyüşe çıktık.", "Gençler sokakta futbol oynuyordu."],
+    2, "“daha önce hiç duymamıştım” ile “yeni öğrendim” anlam bakımından birlikte kullanılmış, gereksiz tekrar yapılmıştır.");
+  q("felsefe", "Bilgi Felsefesi", 3, "“Doğru bilgiye ancak akıl yoluyla ulaşılır.” görüşünü savunan felsefe akımı aşağıdakilerden hangisidir?",
+    ["Rasyonalizm", "Empirizm", "Septisizm", "Pragmatizm", "Pozitivizm"], 0, "Bilginin kaynağını akıl olarak gören görüş rasyonalizmdir (Descartes, Spinoza, Leibniz).");
+  q("felsefe", "Bilgi Felsefesi", 3, "‘Her bilgi duyum ile başlar; zihin doğuştan boş bir levhadır (tabula rasa).’ görüşü kime aittir?",
+    ["John Locke", "Descartes", "Platon", "Kant", "Parmenides"], 0, "Tabula rasa görüşü empirist John Locke'a aittir.");
+  q("felsefe", "Ahlak Felsefesi", 3, "Kant'ın ahlak anlayışında bir eylemin ahlaki değerini belirleyen şey aşağıdakilerden hangisidir?",
+    ["Eylemin sonucunda sağlanan fayda", "Eylemin ödev duygusuyla ve evrenselleştirilebilir bir ilkeyle yapılması", "Toplumun onayı", "Kişinin duyguları", "Eylemin dinî kurallara uygunluğu"],
+    1, "Kant'a göre ahlaki eylem, sonuca bakmaksızın ödev bilinciyle ve evrensel yasa olabilecek bir ilkeyle yapılan eylemdir.");
+  q("din", "İslam ve İbadet", 2, "Aşağıdakilerden hangisi İslam'ın şartlarından biri değildir?",
+    ["Hac", "Zekât", "Cihad", "Oruç", "Namaz"], 2, "İslam'ın beş şartı: kelime-i şehadet, namaz, oruç, zekât ve hac. Cihad bunlardan değildir.");
+  q("biyoloji", "Hücre", 3, "Aşağıdaki organellerden hangisi çift zarlı olup kendi DNA'sına sahiptir?",
+    ["Ribozom", "Mitokondri", "Lizozom", "Golgi aygıtı", "Endoplazmik retikulum"], 1, "Mitokondri ve kloroplast çift zarlıdır ve kendi DNA'larını taşır.");
+  q("biyoloji", "Hücre Bölünmesi", 3, "2n = 12 kromozomlu bir hücre mayoz I'in sonunda oluşan her hücrede kaç kromozom bulunur?",
+    ["24", "12", "6", "3", "18"], 2, "Mayoz I sonunda kromozom sayısı yarıya iner: n = 6 (her biri hâlâ çift kromatidli).");
+  q("biyoloji", "Enzimler", 3, "Enzimlerle ilgili aşağıdakilerden hangisi yanlıştır?",
+    ["Tepkime hızını artırırlar.", "Tepkime sonunda değişmeden kalırlar.", "Aktivasyon enerjisini düşürürler.", "Sıcaklık çok yükselince denatüre olabilirler.", "Her enzim tüm substratlara etki eder."],
+    4, "Enzimler substrata özgüdür; her enzim yalnızca belirli bir madde veya madde grubuna etki eder.");
+  q("biyoloji", "Ekoloji", 3, "Besin zincirinde enerji aktarımı ile ilgili aşağıdakilerden hangisi doğrudur?",
+    ["Enerji her basamakta artar.", "Enerjinin yaklaşık %10'u bir üst basamağa aktarılır.", "Üreticilerde enerji en azdır.", "Ayrıştırıcılar enerji akışının dışındadır.", "Enerji döngüsel olarak geri kazanılır."],
+    1, "Enerji akışı tek yönlüdür ve her basamakta yaklaşık %10 bir üst basamağa aktarılır (on kuralı).");
+  q("biyoloji", "Solunum", 3, "Aerobik hücresel solunumda glikozun tam yıkımı sonucunda aşağıdakilerden hangisi oluşur?",
+    ["Etil alkol ve CO₂", "Laktik asit", "CO₂, H₂O ve ATP", "Yalnızca O₂", "Piruvat ve NADH"], 2, "Oksijenli solunumda glikoz CO₂ ve H₂O'ya kadar yıkılır; enerji ATP olarak elde edilir.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -4520,6 +4593,180 @@ EPAS.push(
     main: ["Playing a musical instrument helps children develop several skills.", "Children should not learn instruments before they are ten.", "Only talented children can learn to play the piano.", "Music lessons make children worse at mathematics.", "Most instruments were invented in Italy."],
     det: ["According to the passage, practising an instrument regularly teaches children ----.", "patience and discipline", "how to invent new instruments", "to avoid mathematics", "to play without reading music", "to make quick progress without effort"] }
 );
+/* ===== Yeni nesil zor/orta kalıplar: her biri cevabı iki bağımsız yoldan hesaplar ===== */
+const chk6 = (a, b) => { if (Math.abs(a - b) > 1e-9) throw new Error("gen6 tutarsiz"); return a; };
+G("modson", ["mat"], "Üslü sayılar", 3, () => {
+  const a = pick([2, 3, 7, 8, 9]), n = rnd(40, 400);
+  let c = 1; for (let i = 0; i < n; i++) c = (c * a) % 10;
+  const cyc = []; let v = a % 10; do { cyc.push(v); v = (v * a) % 10; } while (v !== a % 10);
+  const per = cyc.length, c2 = cyc[(n - 1) % per]; chk6(c, c2);
+  return { q: `${a}^{${n}} sayısının birler basamağı kaçtır?`, ...numChoices(c, [(c + 1) % 10, (c + 2) % 10, (c + 3) % 10, (c + 7) % 10, 1, 9], { neg: false, step: 1 }),
+    x: `${a} sayısının kuvvetlerinin birler basamağı ${per} adımda tekrar eder. ${n} ÷ ${per} işleminde kalan ${n % per} olduğundan örüntüdeki ${((n - 1) % per) + 1}. terim alınır: ${c}.` };
+});
+G("yanyana", ["mat"], "Permütasyon", 3, () => {
+  const n = rnd(5, 8), c = fact(n) - 2 * fact(n - 1);
+  let m = 0; const f = (k, arr) => 0; // bağımsız: toplam − yan yana
+  const c2 = (n - 2) * fact(n - 1); chk6(c, c2);
+  return { q: `${n} kişi bir sırada yan yana oturacaktır. Ali ile Veli'nin yan yana oturmadığı kaç farklı oturma düzeni vardır?`,
+    ...numChoices(c, [fact(n), 2 * fact(n - 1), fact(n - 1), fact(n) - fact(n - 1), (n - 1) * fact(n - 1)]),
+    x: `Tüm durum ${n}! = ${fact(n)}. Ali–Veli yan yana ise onları tek kişi sayıp kendi aralarında 2! ile çarparız: 2·${n - 1}! = ${2 * fact(n - 1)}. İstenen = ${fact(n)} − ${2 * fact(n - 1)} = ${c}.` };
+});
+G("dogrusal-ucgen", ["mat", "geo"], "Kombinasyon", 3, () => {
+  const n = rnd(8, 12), p = rnd(3, 5), c = comb(n, 3) - comb(p, 3);
+  let t = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) for (let k = j + 1; k < n; k++) if (!(i < p && j < p && k < p)) t++; chk6(c, t);
+  return { q: `Bir düzlemde ${n} nokta vardır. Bunlardan ${p} tanesi bir doğru üzerinde olup başka üç nokta doğrusal değildir. Köşeleri bu noktalardan seçilen kaç farklı üçgen çizilebilir?`,
+    ...numChoices(c, [comb(n, 3), comb(n, 3) - p, comb(n, 3) - comb(p, 2), comb(n - p, 3), c + comb(p, 2)]),
+    x: `Üç noktadan üçgen oluşması için noktalar doğrusal olmamalıdır. Tüm seçimler C(${n},3) = ${comb(n, 3)}; ${p} doğrusal noktadan seçilenler C(${p},3) = ${comb(p, 3)} üçgen vermez. ${comb(n, 3)} − ${comb(p, 3)} = ${c}.` };
+});
+G("ayni-renk", ["mat"], "Olasılık", 2, () => {
+  const r = rnd(3, 8), b = rnd(3, 8), N = r + b;
+  const pn = comb(r, 2) + comb(b, 2), pd = comb(N, 2);
+  const p2 = (r / N) * ((r - 1) / (N - 1)) + (b / N) * ((b - 1) / (N - 1)); chk6(pn / pd, p2);
+  const c = frac(pn, pd);
+  return { q: `Bir torbada ${r} kırmızı ve ${b} mavi bilye vardır. Torbadan rastgele ve geri koymadan 2 bilye çekiliyor. Çekilen bilyelerin aynı renkte olma olasılığı kaçtır?`,
+    ...strChoices(c, [frac(r * b, pd), frac(pn, N * N), frac(2 * r * b, pd), frac(comb(r, 2), pd), frac(pd - pn + 1, pd), frac(r * r + b * b, N * N)].filter(s => s !== c)),
+    x: `Aynı renk: iki kırmızı C(${r},2) = ${comb(r, 2)} veya iki mavi C(${b},2) = ${comb(b, 2)}. Tüm durum C(${N},2) = ${pd}. Olasılık = ${pn}/${pd} = ${c}.` };
+});
+G("kok-kup", ["mat", "amat"], "İkinci dereceden denklemler", 3, () => {
+  let r1 = rnd(-5, 6), r2 = rnd(-5, 6); if (r1 === r2) r2++;
+  const S = r1 + r2, P = r1 * r2, c = S * S * S - 3 * S * P; chk6(c, r1 ** 3 + r2 ** 3);
+  const b = -S;
+  return { q: `x² ${b < 0 ? "−" : "+"} ${Math.abs(b)}x ${P < 0 ? "−" : "+"} ${Math.abs(P)} = 0 denkleminin kökleri x₁ ve x₂ olduğuna göre x₁³ + x₂³ ifadesinin değeri kaçtır?`.replace("+ 0x", "").replace("x² + 0x", "x²"),
+    ...numChoices(c, [S ** 3, S * S - 2 * P, S ** 3 - 3 * P, S ** 3 + 3 * S * P, -c, P ** 3], { neg: true }),
+    x: `Kökler toplamı ${S}, çarpımı ${P}. x₁³ + x₂³ = (x₁+x₂)³ − 3x₁x₂(x₁+x₂) = ${S ** 3} − 3·${P}·${S} = ${c}.` };
+});
+G("dizi-toplam", ["mat", "amat"], "Diziler", 3, () => {
+  const a1 = rnd(-6, 12), d = rnd(2, 6), m = rnd(3, 6), n = m + rnd(4, 7), k = rnd(10, 20);
+  const am = a1 + (m - 1) * d, an = a1 + (n - 1) * d;
+  const dd = (an - am) / (n - m); chk6(dd, d);
+  const c = k * (2 * a1 + (k - 1) * d) / 2; let t = 0; for (let i = 0; i < k; i++) t += a1 + i * d; chk6(c, t);
+  return { q: `Bir aritmetik dizide a_{${m}} = ${am} ve a_{${n}} = ${an} olduğuna göre ilk ${k} teriminin toplamı kaçtır?`,
+    ...numChoices(c, [k * (a1 + k * d), c + d * k, c - a1, k * am, c + k, (k + 1) * (2 * a1 + k * d) / 2], { neg: true }),
+    x: `Ortak fark = (${an} − ${am}) ÷ (${n} − ${m}) = ${d}. a₁ = ${am} − ${m - 1}·${d} = ${a1}. S_{${k}} = ${k}·(2·${a1} + ${k - 1}·${d}) ÷ 2 = ${c}.` };
+});
+G("geo-seri", ["mat"], "Diziler", 3, () => {
+  const a = rnd(1, 5), r = pick([2, 3]), n = rnd(5, 8);
+  const c = a * (r ** n - 1) / (r - 1); let t = 0; for (let i = 0; i < n; i++) t += a * r ** i; chk6(c, t);
+  return { q: `İlk terimi ${a}, ortak çarpanı ${r} olan geometrik dizinin ilk ${n} teriminin toplamı kaçtır?`,
+    ...numChoices(c, [a * r ** n, a * (r ** n + 1) / (r + 1), c + a, c - a * r ** (n - 1), a * (r ** (n + 1) - 1) / (r - 1)]),
+    x: `S_n = a·(r^n − 1)/(r − 1) = ${a}·(${r ** n} − 1)/${r - 1} = ${c}.` };
+});
+G("log-zincir", ["mat", "amat"], "Logaritma", 3, () => {
+  const t = pick([2, 3, 5]), m = rnd(2, 4), n = rnd(2, 5), k = rnd(2, 4);
+  const A = t ** m, B = t ** n, C = t ** (n * k);
+  const c = k * n / m * m / n * 1; // log_A B · log_B C = log_A C = n k / m
+  if (n * k === m || n === m || k === m) return G6redo();
+  const val = (n * k) / m;
+  chk6(Math.log(B) / Math.log(A) * Math.log(C) / Math.log(B), val);
+  const s = frac(n * k, m);
+  return { q: `log_{${A}} ${B} · log_{${B}} ${C} işleminin sonucu kaçtır?`,
+    ...strChoices(s, [frac(n, m), frac(k, m), frac(m, n * k), frac(n * k, 1), frac(n + k, m), frac(m * k, n), frac(n * k + 1, m), frac(n * k, m + 1), frac(n * k - 1, m)].filter(v => v !== s)),
+    x: `Tabanlar zincirlenir: log_{${A}} ${B} · log_{${B}} ${C} = log_{${A}} ${C}. ${A} = ${t}^${m}, ${C} = ${t}^${n * k} olduğundan sonuç ${n * k}/${m} = ${s}.` };
+});
+G("is-birlikte", ["mat"], "Problemler", 3, () => {
+  const a = pick([6, 8, 10, 12]), b = pick([12, 15, 20, 24, 30]), t = rnd(2, 4);
+  if (a >= b) return G6redo();
+  const kalan = 1 - t * (1 / a + 1 / b); if (kalan <= 0) return G6redo();
+  const c = kalan * a; if (Math.abs(c * 100 - Math.round(c * 100)) > 1e-9) return G6redo();
+  const s = nf(c);
+  return { q: `Bir işi A tek başına ${a} günde, B tek başına ${b} günde bitirebilmektedir. İkisi birlikte ${t} gün çalıştıktan sonra B işi bırakıyor. Kalan işi A tek başına kaç günde bitirir?`,
+    ...numChoices(c, [a - t, t, b - t, (a * b) / (a + b), c + 1, c * 2], { step: 1 }),
+    x: `Birlikte ${t} günde yapılan iş ${t}·(1/${a} + 1/${b}) = ${frac(Math.round(t * (a + b) * 1000), Math.round(a * b * 1000))}. Kalan iş ${nf(kalan)}; A günlük 1/${a} yaptığından ${nf(kalan)}·${a} = ${s} gün.` };
+});
+function G6redo() { return null; }
+G("iccember", ["geo"], "Üçgenler", 3, () => {
+  const [p, q, r] = pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [20, 21, 29]]), k = rnd(1, 2);
+  const a = p * k, b = q * k, h = r * k, c = (a + b - h) / 2;
+  chk6(c, (a * b / 2) / ((a + b + h) / 2));
+  return { q: `Dik kenar uzunlukları ${a} cm ve ${b} cm olan dik üçgenin iç teğet çemberinin yarıçapı kaç cm'dir?`,
+    ...numChoices(c, [(a + b + h) / 4, a * b / (a + b), h / 2, (a + b - h), (a + b + h) / 6], { step: 1 }),
+    x: `Hipotenüs ${h} cm. Alan = ${a}·${b}/2 = ${a * b / 2}, çevre yarısı u = ${(a + b + h) / 2}. r = Alan ÷ u = ${c} cm (dik üçgende r = (a + b − c)/2 de aynı sonucu verir).` };
+});
+G("kuvvet-cember", ["geo"], "Çember ve daire", 3, () => {
+  const pa = rnd(2, 6), ab = rnd(3, 9), pb = pa + ab, pt2 = pa * pb;
+  const c = pb - pa; chk6(c, ab);
+  const T = Math.round(Math.sqrt(pt2)); if (T * T === pt2) return G6redo();
+  return { q: `Bir P noktasından çizilen kesen çemberi A ve B noktalarında kesmektedir (A, P'ye yakın). |PA| = ${pa} cm ve |PT|² = ${pt2} cm² (T, P'den çizilen teğetin değme noktası) olduğuna göre |AB| kaç cm'dir?`,
+    ...numChoices(ab, [pt2 / pa + pa, pt2 / pa, pa * 2, pb + pa, Math.abs(pa - ab)], { step: 1 }),
+    x: `Kuvvet teoremine göre |PT|² = |PA|·|PB| ⇒ ${pt2} = ${pa}·|PB| ⇒ |PB| = ${pb}. |AB| = ${pb} − ${pa} = ${ab} cm.` };
+});
+G("ucgen-alan-kordinat", ["geo", "mat"], "Analitik geometri", 3, () => {
+  const x1 = rnd(-4, 2), y1 = rnd(-4, 2), x2 = x1 + rnd(2, 7), y2 = y1 + rnd(-3, 3), x3 = x1 + rnd(-2, 5), y3 = y1 + rnd(3, 8);
+  const D = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1); if (D === 0) return G6redo();
+  const A = Math.abs(D) / 2;
+  const sh = Math.abs(x1 * y2 + x2 * y3 + x3 * y1 - y1 * x2 - y2 * x3 - y3 * x1) / 2; chk6(A, sh);
+  const P = (x, y) => `(${x < 0 ? "−" + (-x) : x}, ${y < 0 ? "−" + (-y) : y})`;
+  return { q: `Analitik düzlemde A${P(x1, y1)}, B${P(x2, y2)} ve C${P(x3, y3)} noktaları veriliyor. ABC üçgeninin alanı kaç birimkaredir?`,
+    ...numChoices(A, [Math.abs(D), A + 1, A * 2 + 1, A - 1, A + 2, Math.abs(D) + 1], { step: 0.5 }),
+    x: `Alan = ½·|x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)| = ½·|${x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)}| = ${nf(A)} birimkare.` };
+});
+G("yatay-atis", ["fizik"], "Hareket", 3, () => {
+  const h = pick([5, 20, 45, 80, 125]), v = pick([10, 15, 20, 30, 40]);
+  const t = Math.sqrt(2 * h / 10), c = v * t; chk6(c, v * Math.sqrt(h / 5));
+  return { q: `${h} m yükseklikten yatay doğrultuda ${v} m/s hızla atılan cisim, yatayda kaç metre uzağa düşer? (g = 10 m/s², sürtünmeler önemsizdir.)`,
+    ...numChoices(c, [v * h / 10, v * h / 5, v * t * 2, v * t / 2, h + v, c + v], { step: 5 }),
+    x: `Düşey: h = ½gt² ⇒ ${h} = 5t² ⇒ t = ${nf(t)} s. Yatay hız sabit: x = v·t = ${v}·${nf(t)} = ${nf(c)} m.` };
+});
+G("egik-duzlem", ["fizik"], "Kuvvet ve hareket", 3, () => {
+  const [sn, cs, ang] = pick([[0.6, 0.8, 37], [0.8, 0.6, 53]]), mu = pick([0.1, 0.25, 0.5]);
+  const a = 10 * sn - mu * 10 * cs; if (a <= 0) return G6redo();
+  const m = rnd(2, 6);
+  const F = m * a; chk6(F, m * (10 * sn) - mu * m * 10 * cs);
+  return { q: `${ang}° eğimli sürtünmeli bir eğik düzlemde bırakılan ${m} kg kütleli cismin kinetik sürtünme katsayısı ${nf(mu)}'dir. Cismin ivmesi kaç m/s² olur? (g = 10 m/s², sin37° = 0,6; cos37° = 0,8)`,
+    ...numChoices(a, [10 * sn, 10 * sn + mu * 10 * cs, 10 * cs - mu * 10 * sn, 10 * sn - mu * 10, 10 * sn - mu * 10 * sn], { step: 0.5 }),
+    x: `Eğim yönünde: m·a = m·g·sinθ − μ·m·g·cosθ ⇒ a = ${nf(10 * sn)} − ${nf(mu)}·${nf(10 * cs)} = ${nf(a)} m/s² (kütle sadeleşir).` };
+});
+G("devre-es", ["fizik"], "Elektrik", 3, () => {
+  const R1 = pick([2, 3, 4, 6]), R2 = pick([3, 6, 12]), R3 = pick([2, 4, 6]), V = pick([12, 24, 36, 48]);
+  const Rp = R1 * R2 / (R1 + R2), Rt = Rp + R3, I = V / Rt;
+  if (!Number.isFinite(I) || Math.abs(I * 100 - Math.round(I * 100)) > 1e-9) return G6redo();
+  const Vp = V * Rp / Rt, I2 = Vp / R1 + Vp / R2; chk6(I, I2);
+  return { q: `R₁ = ${R1} Ω ve R₂ = ${R2} Ω değerli dirençler birbirine paralel bağlanmış, bu grup R₃ = ${R3} Ω değerli direnç ile seri bağlıdır. Devre ${V} V'luk üretece bağlandığında üretecin çektiği akım kaç amperdir?`,
+    ...numChoices(I, [V / (R1 + R2 + R3), V / R3, V / (Rp), V / (R1 + R2), I * 2, I + 1], { step: 0.5 }),
+    x: `Paralel kol: ${R1}·${R2}/(${R1}+${R2}) = ${nf(Rp)} Ω. Toplam direnç = ${nf(Rp)} + ${R3} = ${nf(Rt)} Ω. I = V/R = ${V}/${nf(Rt)} = ${nf(I)} A.` };
+});
+G("mol-hacim", ["kimya"], "Mol kavramı", 2, () => {
+  const [ad, M] = pick([["CH₄", 16], ["CO₂", 44], ["O₂", 32], ["N₂", 28], ["SO₂", 64]]), n = pick([0.25, 0.5, 1, 2, 3]);
+  const g = M * n, V = 22.4 * n; chk6(V, g / M * 22.4);
+  return { q: `Normal koşullarda ${nf(g)} gram ${ad} gazı kaç litre hacim kaplar? (Mol kütleleri: H = 1, C = 12, N = 14, O = 16, S = 32; NK'da 1 mol gaz 22,4 L)`,
+    ...numChoices(V, [g, g / 22.4, M * 22.4 / n, V * 2, V / 2, 22.4], { step: 2.8 }),
+    x: `n = m/M = ${nf(g)}/${M} = ${nf(n)} mol. V = n·22,4 = ${nf(n)}·22,4 = ${nf(V)} L.` };
+});
+G("derisim-karisim", ["kimya"], "Çözeltiler", 3, () => {
+  const M1 = rnd(1, 6), V1 = rnd(1, 4) * 100, M2 = rnd(1, 6), V2 = rnd(1, 4) * 100;
+  const M = (M1 * V1 + M2 * V2) / (V1 + V2);
+  if (Math.abs(M * 100 - Math.round(M * 100)) > 1e-9 || M1 === M2) return G6redo();
+  return { q: `${M1} M ${V1} mL NaCl çözeltisi ile ${M2} M ${V2} mL NaCl çözeltisi karıştırılıyor. Karışımın molar derişimi kaç M olur? (Hacimler toplanabilir.)`,
+    ...numChoices(M, [(M1 + M2) / 2, M1 + M2, M1 * V1 / V2 + M2, (M1 * V2 + M2 * V1) / (V1 + V2), M + 0.5], { step: 0.25 }),
+    x: `Toplam mol = (${M1}·${V1} + ${M2}·${V2})/1000 = ${nf((M1 * V1 + M2 * V2) / 1000)} mol. Toplam hacim ${(V1 + V2) / 1000} L. M = ${nf((M1 * V1 + M2 * V2) / 1000)}/${(V1 + V2) / 1000} = ${nf(M)} M.` };
+});
+G("seyreltme-ph", ["kimya"], "Asitler ve bazlar", 3, () => {
+  const k = rnd(1, 3), f = pick([10, 100, 1000]), m = Math.log10(f), pH = k + m;
+  chk6(-Math.log10(Math.pow(10, -k) / f), pH);
+  return { q: `pH değeri ${k} olan kuvvetli asit çözeltisinin hacmi saf su eklenerek ${f} katına çıkarılıyor. Son çözeltinin pH değeri kaçtır? (Su ile oluşan H⁺ ihmal edilecektir.)`,
+    ...numChoices(pH, [k * m, k - m, k + 1, k * f, pH + 1, 7], { step: 1 }),
+    x: `Hacim ${f} katına çıkınca [H⁺] ${f} kat azalır. [H⁺] = 10^−${k}/${f} = 10^−${pH}. pH = ${pH}.` };
+});
+G("dihibrit", ["biyoloji"], "Kalıtım", 3, () => {
+  const kind = pick([["iki baskın fenotip", 9], ["A baskın, B çekinik fenotip", 3], ["iki çekinik fenotip", 1]]);
+  const A = ["AA", "Aa", "Aa", "aa"], cnt = { 9: 0, 3: 0, 1: 0 };
+  let n9 = 0, n3 = 0, n1 = 0; for (const x of A) for (const y of A) { const da = x !== "aa", db = y !== "aa"; if (da && db) n9++; else if (da && !db) n3++; else if (!da && !db) n1++; }
+  const exp = { 9: n9, 3: n3, 1: n1 }[kind[1]]; chk6(exp, kind[1]);
+  const c = frac(exp, 16);
+  return { q: `AaBb × AaBb çaprazlamasında (genler bağımsız dağılır, A ve B tam baskındır) oluşacak bireylerin ${kind[0]}ne sahip olma olasılığı kaçtır?`.replace("ne sahip", "ne sahip"),
+    ...strChoices(c, [frac(1, 4), frac(3, 8), frac(9, 16), frac(3, 16), frac(1, 16), frac(1, 8), frac(1, 2)].filter(s => s !== c)),
+    x: `Dihibrit çaprazlamada fenotip oranı 9 : 3 : 3 : 1'dir (toplam 16). İstenen sınıf için olasılık ${c}.` };
+});
+G("dna-bag", ["biyoloji"], "Nükleik asitler", 3, () => {
+  const N = pick([200, 300, 400, 600, 800]), pa = pick([20, 25, 30]);
+  const A = N * pa / 100 / 2, Gn = (N - 2 * (2 * A)) / 2 * 1;
+  const aT = A * 2, gc = N - aT; if (aT !== N * pa / 100 * 1 && false) return G6redo();
+  const A2 = N * pa / 100, G2 = (N - 2 * A2) / 2; if (G2 <= 0) return G6redo();
+  const H = 2 * A2 + 3 * G2; chk6(H, 2 * A2 + 3 * (N / 2 - A2));
+  return { q: `Çift zincirli bir DNA molekülünde toplam ${N} nükleotid vardır ve adenin (A) nükleotidi oranı %${pa}'tir. Bu DNA'nın iki zinciri arasındaki toplam hidrojen bağı sayısı kaçtır?`,
+    ...numChoices(H, [2 * A2 + 2 * G2, 3 * A2 + 2 * G2, 2 * (A2 + G2), H + N / 10, N * 2, H - N / 10], { step: 20 }),
+    x: `A = ${nf(A2)} ⇒ T = ${nf(A2)}; G + C = ${N} − ${nf(2 * A2)} = ${nf(N - 2 * A2)} ⇒ G = C = ${nf(G2)}. A=T arasında 2, G≡C arasında 3 hidrojen bağı: 2·${nf(A2)} + 3·${nf(G2)} = ${nf(H)}.` };
+});
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */
 const r1 = x => Math.round(x * 10) / 10;

@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=34c6be3b49">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=34c6be3b49">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=34c6be3b49">
+<link rel="manifest" href="/manifest.webmanifest?v=e64030cdf9">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e64030cdf9">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e64030cdf9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=34c6be3b49">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=e64030cdf9">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -8274,7 +8274,7 @@ const HESAP_SUB = {
 };
 
 /* ===== Yönetim (yalnızca yönetici hesabı, akeakademi.com) ===== */
-const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay" };
+const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay", deposta: "" };
 async function yonYukle() {
   YON.busy = "yukle"; render();
   try { fetch("/api/yonetim/bildirim", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.bil = j; render(); } }).catch(() => { }); } catch (e) { }
@@ -8315,8 +8315,9 @@ function vYonetim() {
       <p class="small muted">Kurulduğunda Shopier'de ödeme alınan her pakette kod kendiliğinden üretilir, alıcıya e-postayla gider; alıcı aynı e-postayla giriş yaptığında paket hesabına tanımlanır.</p>
       <div class="row"><button class="btn pri" data-a="yonKur"${!V.pat || YON.busy ? " disabled" : ""}>${YON.busy === "kur" ? "Kuruluyor…" : V.webhook ? "Yeniden kur" : "Otomatik satışı kur"}</button></div>
       <div class="row" style="border-top:1px solid var(--line2);padding-top:12px"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Atılım · 1 ay"], ["orta-yil", "Atılım · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
-        <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Deneme siparişi gönder"}</button></div>
-      <p class="xs muted">Deneme siparişi para çekmez; seçtiğin paket için gerçek bir kod üretip senin e-postana gönderir ve hesabına tanımlar.</p>
+        <input class="in" data-c="yonEposta" type="email" placeholder="Arkadaşının e-postası (boşsa sana gider)" value="${esc(YON.deposta)}" style="flex:1;min-width:200px">
+        <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Kod gönder"}</button></div>
+      <p class="xs muted">Para çekmez. Seçtiğin paket için gerçek kod üretip yazdığın e-postaya gönderir (boşsa sana). O e-postayla giriş yapan kişinin hesabına paket tanımlanır.</p>
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
     ${maliyetKarti()}${bildirimYonKarti()}
     <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
@@ -8333,10 +8334,10 @@ async function yonIstek(path, body) {
 Object.assign(OZ_ACT, {
   yonYenile() { YON.veri = null; YON.err = ""; yonYukle(); },
   async yonKur() { YON.busy = "kur"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("shopier-kur").catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok) { YON.msg = "Otomatik satış kuruldu. Bildirim adresi: " + j.url; await yonYukle(); } else { YON.err = j.message || "Kurulamadı."; render(); } },
-  async yonDeneme() { YON.busy = "deneme"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("deneme-siparis", { paket: YON.dpaket }).catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok && j.kodlar) { YON.msg = `Deneme kodu üretildi ve ${HESAP.user.eposta} adresine gönderildi: ${j.kodlar[0].kod}`; try { const b = await hesapIstek("ben"); if (b.r.ok) hesapUygula(b.j); } catch (e) { } await yonYukle(); } else { YON.err = j.message || "Deneme siparişi oluşturulamadı."; render(); } },
+  async yonDeneme() { YON.busy = "deneme"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("deneme-siparis", { paket: YON.dpaket, eposta: YON.deposta }).catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok && j.kodlar) { YON.msg = `Deneme kodu üretildi ve ${YON.deposta || HESAP.user.eposta} adresine gönderildi: ${j.kodlar[0].kod}`; try { const b = await hesapIstek("ben"); if (b.r.ok) hesapUygula(b.j); } catch (e) { } await yonYukle(); } else { YON.err = j.message || "Deneme siparişi oluşturulamadı."; render(); } },
   async yonTekrar(d) { const { r } = await yonIstek("tekrar-gonder", { id: d.id }).catch(() => ({ r: { ok: false } })); toast(r.ok ? "Kod e-postası yeniden gönderildi." : "Gönderilemedi."); if (r.ok) yonYukle(); }
 });
-Object.assign(OZ_CHG, { yonPaket(el) { YON.dpaket = el.value; } });
+Object.assign(OZ_CHG, { yonPaket(el) { YON.dpaket = el.value; }, yonEposta(el) { YON.deposta = el.value.trim(); } });
 
 /* ===== Onaylı ek sorular: sunucudan al (web) ===== */
 const ekGecerli = q => q && typeof q.id === "string" && SUBJ[q.s] && typeof q.t === "string" && typeof q.q === "string" && Array.isArray(q.o) && q.o.length === 5 && Number.isInteger(q.a) && q.a >= 0 && q.a <= 4;

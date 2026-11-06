@@ -102,7 +102,7 @@ export async function onRequest({ request, env, params }) {
     let b = {}; try { b = await request.json(); } catch (e) { }
     const paket = PAKETLER[b.paket] ? b.paket : "orta-ay";
     const urun = { "orta-ay": "52547800", "orta-yil": "52547904", "premium-ay": "52547968", "premium-yil": "52547986" }[paket];
-    const o = { id: "deneme-" + Date.now(), paymentStatus: "paid", billingInfo: { email: u.eposta, firstName: "Deneme" }, lineItems: [{ productId: urun, title: "AKE Akademi deneme", quantity: 1 }], totals: { total: "0" } };
+    const o = { id: "deneme-" + Date.now(), paymentStatus: "paid", billingInfo: { email: (typeof b.eposta === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.eposta.trim()) ? b.eposta.trim().toLowerCase() : u.eposta), firstName: "Deneme" }, lineItems: [{ productId: urun, title: "AKE Akademi deneme", quantity: 1 }], totals: { total: "0" } };
     const r = await siparisIsle(env, o, true);
     return json(200, r);
   }

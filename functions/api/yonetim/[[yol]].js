@@ -29,8 +29,18 @@ Kurallar:
 ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı tarzda yeni soru yaz):\n" + ornek.map(o => "- " + String(o).slice(0, 400)).join("\n") + "\n" : ""}Yalnızca JSON dizisi döndür:
 [{"p":"","q":"Soru metni","o":["…","…","…","…","…"],"a":2,"x":"Açıklama"}]
 "a", doğru seçeneğin 0-4 arası sırasıdır.`;
-  let arr = jsonAyikla(await claude(env, { model: env.AKE_MODEL_HIZLI || "claude-haiku-5-5", prompt, effort: "high", max_tokens: 16000 }));
-  if (!Array.isArray(arr)) return { hata: "uretim" };
+  const ham = await claude(env, { model: env.AKE_MODEL_HIZLI || "claude-haiku-5-5", prompt, effort: "medium", max_tokens: 12000 });
+  let arr = jsonAyikla(ham);
+  /* Yanıt yarıda kesildiyse ya da bozuksa: dizideki tamamlanmış soruları tek tek kurtar (boşa token harcanmasın) */
+  if (!Array.isArray(arr)) {
+    arr = []; const t = String(ham || "").replace(/```(?:json)?/gi, ""); let der = 0, bas = -1, str = false, kc = false;
+    for (let i = 0; i < t.length; i++) {
+      const c = t[i];
+      if (str) { if (kc) kc = false; else if (c === "\\") kc = true; else if (c === '"') str = false; continue; }
+      if (c === '"') str = true; else if (c === "{") { if (!der) bas = i; der++; } else if (c === "}" && der) { der--; if (!der && bas >= 0) { try { arr.push(JSON.parse(t.slice(bas, i + 1))); } catch (e) { } bas = -1; } }
+    }
+  }
+  if (!arr.length) return { hata: "uretim" };
   arr = arr.map(o => o && Object.assign({}, o, { a: Number(o.a) })).filter(o => o && typeof o.q === "string" && o.q.trim() && Array.isArray(o.o) && o.o.length === 5 && o.o.every(x => typeof x === "string" && x.trim()) && new Set(o.o.map(x => x.trim())).size === 5 && Number.isInteger(o.a) && o.a >= 0 && o.a <= 4).slice(0, n);
   /* numaralı ifade (I, II, III) varsa seçenekler de numaralara göre olmalı; yoksa soruyu ele */
   const nmr = o => (((o.p || "") + "\n" + o.q).match(/(^|\n)\s*(I{1,3}|IV|V)[.)]\s|\((I{1,3}|IV|V)\)/g) || []).length >= 2, rmz = o => o.o.filter(x => /^(yalnız\s+)?(I{1,3}|IV|V)(\s|,|$)/i.test(String(x).trim())).length;

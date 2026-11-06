@@ -5,6 +5,8 @@
 //   POST tekrar-gonder {id}  Bir siparişin kod e-postasını yeniden gönderir
 //   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, onaya koyar
 //   GET  sorular          onay bekleyen sorular ve sayılar
+//   GET  aboneler         paketi süren aboneler
+//   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez)
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
 import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
@@ -63,6 +65,17 @@ export async function onRequest({ request, env, params }) {
     const tok = await ayarOku(env, "shopier_webhook_token"), wid = await ayarOku(env, "shopier_webhook_id");
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
     return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], sayilar: say || {} });
+  }
+  if (ad === "aboneler" && m === "GET") {
+    const bugun = new Date().toISOString().slice(0, 10);
+    const { results } = await env.DB.prepare("SELECT k.id AS kid, k.eposta AS eposta, k.ad AS ad, c.plan AS plan, c.bitis AS bitis FROM kod c JOIN kullanici k ON k.id = c.kid WHERE c.kid IS NOT NULL AND c.kid != 'silindi' AND (c.bitis IS NULL OR c.bitis >= ?) ORDER BY c.bitis ASC LIMIT 300").bind(bugun).all();
+    return json(200, { aboneler: results || [] });
+  }
+  if (ad === "abone-iptal" && m === "POST") {
+    let b = {}; try { b = await request.json(); } catch (e) { }
+    const kid = String(b.kid || ""); if (!kid || kid === "silindi") return fail(400, "kid");
+    await env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(kid).run();
+    return json(200, { ok: true });
   }
   if (ad === "bildirim" && m === "GET") {
     await env.DB.prepare("CREATE TABLE IF NOT EXISTS push (endpoint TEXT PRIMARY KEY, kid TEXT, p256dh TEXT, auth TEXT, slots TEXT, tarih INTEGER)").run();

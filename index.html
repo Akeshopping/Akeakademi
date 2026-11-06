@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=6191143794">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=6191143794">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=6191143794">
+<link rel="manifest" href="/manifest.webmanifest?v=e371288063">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e371288063">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e371288063">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=6191143794">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=e371288063">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -8731,6 +8731,7 @@ function vYonetim() {
         <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Kod gönder"}</button></div>
       <p class="xs muted">Para çekmez. Seçtiğin paket için gerçek kod üretip yazdığın e-postaya gönderir (boşsa sana). O e-postayla giriş yapan kişinin hesabına paket tanımlanır.</p>
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
+    ${aboneKarti()}
     ${maliyetKarti()}${bildirimYonKarti()}
     <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
@@ -8739,11 +8740,43 @@ function vYonetim() {
     ${canliYonetim()}${hataYonetim()}
   </div>`;
 }
+
+/* ---------- aboneler: liste + çift onaylı iptal ---------- */
+function aboneKarti() {
+  if (!YON.abone && !YON.aboneBusy) aboneYukle();
+  const L = YON.abone;
+  const pk = p => ({ premium: "Premium", orta: "Atılım" })[p] || p || "Paket";
+  const tr = b => b ? new Date(b + "T00:00:00").toLocaleDateString("tr-TR") : "süresiz";
+  return `<div class="card"><div class="card-h"><h2>Aboneler</h2><button class="btn sm ghost" data-a="yonAboneYenile">Yenile</button></div>
+    ${!L ? `<div class="empty">Yükleniyor…</div>` : L.length ? `<div class="list">${L.map(a => `<div class="li mli"><div class="grow"><div class="t">${esc(a.ad || a.eposta || "Abone")}</div><div class="s">${esc(a.eposta || "")} · ${pk(a.plan)} · ${tr(a.bitis)} tarihine kadar</div></div><div class="li-act"><button class="btn sm" data-a="yonAboneIptal" data-k="${esc(a.kid)}">İptal et</button></div></div>`).join("")}</div>`
+      : `<div class="empty">Şu an paketi süren abone yok.</div>`}
+    <p class="xs muted">İptal edilen abonenin paketi kapanır; hesabı ve çalışma verileri silinmez.</p></div>`;
+}
+async function aboneYukle() {
+  YON.aboneBusy = true;
+  try { const r = await fetch("/api/yonetim/aboneler", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); YON.abone = r.ok ? (j.aboneler || []) : []; } catch (e) { YON.abone = []; }
+  YON.aboneBusy = false; render();
+}
 async function yonIstek(path, body) {
   const r = await fetch("/api/yonetim/" + path, { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(body || {}) });
   let j = {}; try { j = await r.json(); } catch (e) { } return { r, j };
 }
 Object.assign(OZ_ACT, {
+  yonAboneYenile() { YON.abone = null; aboneYukle(); },
+  yonAboneIptal(d) {
+    const a = (YON.abone || []).find(x => x.kid === d.k); if (!a) return; YON.iptalKid = a.kid;
+    const ad = esc(a.ad || a.eposta || "bu abone");
+    openModal("Aboneliği iptal et", `<p><b>${ad}</b> adlı abonenin aboneliğini iptal etmek istediğinize emin misiniz?</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Evet, devam et", a: "yonAboneIptal2", k: "pri" }]);
+  },
+  yonAboneIptal2() {
+    const a = (YON.abone || []).find(x => x.kid === YON.iptalKid); if (!a) { UI.modal = null; render(); return; }
+    openModal("Son kez soruyorum", `<p><b>${esc(a.ad || a.eposta || "Abone")}</b> kullanıcısının paketi hemen kapanacak ve AI özellikleri kullanılamayacak. Bu işlem geri alınamaz. Gerçekten iptal edilsin mi?</p>`, [{ l: "Hayır, vazgeç", a: "modalClose" }, { l: "Evet, iptal et", a: "yonAboneIptalGo", k: "pri" }]);
+  },
+  async yonAboneIptalGo() {
+    const kid = YON.iptalKid; UI.modal = null; render(); if (!kid) return;
+    const { r } = await yonIstek("abone-iptal", { kid }).catch(() => ({ r: { ok: false } }));
+    toast(r.ok ? "Abonelik iptal edildi." : "İptal edilemedi, tekrar dene."); YON.iptalKid = ""; YON.abone = null; aboneYukle();
+  },
   yonYenile() { YON.veri = null; YON.err = ""; yonYukle(); },
   async yonKur() { YON.busy = "kur"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("shopier-kur").catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok) { YON.msg = "Otomatik satış kuruldu. Bildirim adresi: " + j.url; await yonYukle(); } else { YON.err = j.message || "Kurulamadı."; render(); } },
   async yonDeneme() { YON.busy = "deneme"; YON.err = ""; YON.msg = ""; render(); const { r, j } = await yonIstek("deneme-siparis", { paket: YON.dpaket, eposta: YON.deposta }).catch(() => ({ r: { ok: false }, j: {} })); YON.busy = ""; if (r.ok && j.kodlar) { YON.msg = `Deneme kodu üretildi ve ${YON.deposta || HESAP.user.eposta} adresine gönderildi: ${j.kodlar[0].kod}`; try { const b = await hesapIstek("ben"); if (b.r.ok) hesapUygula(b.j); } catch (e) { } await yonYukle(); } else { YON.err = j.message || "Deneme siparişi oluşturulamadı."; render(); } },
@@ -9164,7 +9197,7 @@ async function sinifDetayYukle(id) {
 /* ---------- yönetim: canlı deneme planla ---------- */
 function canliYonetim() {
   sosTaze("canli", 60000); pazarOto();
-  const Y = UI.cy || (UI.cy = { tur: defaultExam(), boy: "full" }), { adet, dk } = cyHesap(Y);
+  const Y = UI.cy || (UI.cy = { tur: "TYT", boy: "full" }), { adet, dk } = cyHesap(Y);
   const C = SOS.canli && SOS.canli.denemeler || [];
   return pazarYonetim() + `<div class="card stack"><h2>Canlı deneme planla</h2>
     <p class="small muted">Sorular şimdi bankadan ve soru kalıplarından seçilir, sunucuya kaydedilir. Başlangıç saatinde herkes aynı soruları çözer; cevap anahtarı deneme bitene kadar kimseye gönderilmez.</p>
@@ -9230,8 +9263,8 @@ const SOS_ACT = {
   async sinifSilGo() { const d = UI.sosSec || {}; UI.modal = null; render(); const { r } = await sosIstek("sinif/" + d.id + "/sil", {}).catch(() => ({ r: {} })); toast(r.ok ? "Sınıf kapatıldı." : "Kapatılamadı."); delete SOS.sinifAc[d.id]; sosYukle("sinif", true); }
 };
 const SOS_CHG = {
-  cyTur(el) { UI.cy = Object.assign(UI.cy || {}, { tur: el.value }); cyBoya(); },
-  cyBoy(el) { UI.cy = Object.assign(UI.cy || {}, { boy: el.value }); cyBoya(); }
+  cyTur(el) { UI.cy = Object.assign(UI.cy || { boy: "full" }, { tur: el.value }); cyBoya(); },
+  cyBoy(el) { UI.cy = Object.assign(UI.cy || { tur: "TYT" }, { boy: el.value }); cyBoya(); }
 };
 /* Gönderilen form değerleri hata olursa kaybolmasın diye saklanır, başarıda silinir */
 const sf = (form, alan, yedek) => { const v = UI.sf && UI.sf[form] && UI.sf[form][alan]; return v != null ? v : (yedek || ""); };

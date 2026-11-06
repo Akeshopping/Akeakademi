@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=786f2a923e">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=786f2a923e">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=786f2a923e">
+<link rel="manifest" href="/manifest.webmanifest?v=f3337beeb0">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f3337beeb0">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=f3337beeb0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=786f2a923e">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=f3337beeb0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5945,6 +5945,72 @@ const PHR = [["give up", "stop trying"], ["look after", "take care of"], ["turn 
 G("en-phrasal", ["ingilizce"], "Phrasal Verbs", 3, () => {
   const it = pick(PHR), yan = KOKUS(PHR.filter(p => p[0] !== it[0]).map(p => p[1]), 4);
   return { q: `What does the phrasal verb “${it[0]}” mean?`, ...strChoices(it[1], yan), x: `“${it[0]}” = ${it[1]}.` };
+});
+/* ===== 8. tur: zor seviye matematik / fizik (iki yoldan doğrulanır) ===== */
+const chk13 = (a, b, id) => { if (Math.abs(a - b) > 1e-9) throw new Error("gen13 " + id + " " + a + " " + b); };
+const gcd13 = (a, b) => b ? gcd13(b, a % b) : Math.abs(a);
+const C13 = (n, k) => { if (k < 0 || k > n) return 0; let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); };
+const kes13 = (p, q) => { const g = gcd13(p, q); return (p / g) + "/" + (q / g); };
+G("zor-olasilik-ayni", ["mat"], "Olasılık", 3, () => {
+  const a = rnd(3, 7), b = rnd(3, 7), n = a + b, pay = C13(a, 2) + C13(b, 2), payda = C13(n, 2);
+  /* ikinci yol: ardışık çekiliş olasılığı */
+  chk13(pay / payda, (a / n) * ((a - 1) / (n - 1)) + (b / n) * ((b - 1) / (n - 1)), "ayni");
+  const dog = kes13(pay, payda), yan = [kes13(a * b, payda), kes13(a * b, n * (n - 1)), kes13(pay + 1, payda), kes13(a * a + b * b, n * n), kes13(C13(a, 2), payda)].filter(x => x !== dog);
+  if (new Set(yan).size < 4) return null;
+  return { q: `Bir torbada ${a} kırmızı ve ${b} mavi top vardır. Torbadan geri koymadan art arda 2 top çekiliyor. Çekilen iki topun aynı renkte olma olasılığı kaçtır?`, ...strChoices(dog, KOKUS([...new Set(yan)], 4)), x: `Aynı renk: C(${a},2)+C(${b},2) = ${pay}. Tüm durumlar C(${n},2) = ${payda}. Olasılık = ${pay}/${payda} = ${dog}.` };
+});
+G("zor-kombinasyon-sart", ["mat"], "Permütasyon ve Kombinasyon", 3, () => {
+  const n = rnd(7, 11), k = rnd(3, 5), dog = C13(n - 2, k - 2);
+  chk13(dog, C13(n, k) - C13(n - 2, k) - 2 * C13(n - 2, k - 1), "komb-sart");
+  /* ikinci yol: A ve B'nin ikisinin de seçildiği kümeler = toplam − (A yok) − (B yok) + (ikisi de yok) */
+  chk13(dog, C13(n, k) - 2 * C13(n - 1, k) + C13(n - 2, k), "komb-sart2");
+  return { q: `${n} kişilik bir gruptan ${k} kişilik bir ekip seçilecektir. Grupta bulunan Ali ile Veli'nin ikisinin de ekipte bulunması koşuluyla kaç farklı ekip seçilebilir?`, ...numChoices(dog, [C13(n, k), C13(n - 2, k), C13(n - 1, k - 1), C13(n - 2, k - 1), C13(n, k - 2)]), x: `İkisi sabit seçilir; kalan ${k - 2} kişi ${n - 2} kişiden seçilir: C(${n - 2},${k - 2}) = ${dog}.` };
+});
+G("zor-parabol-tepe", ["mat"], "Parabol", 3, () => {
+  const a = pick([1, 2, 3, -1, -2]), h = rnd(-4, 4), k = rnd(-9, 9), b = -2 * a * h, c = a * h * h + k;
+  const f = x => a * x * x + b * x + c; chk13(f(h), k, "parabol");
+  const poly = `${a === 1 ? "" : a === -1 ? "−" : a}x²${b ? (b > 0 ? " + " : " − ") + (Math.abs(b) === 1 ? "" : Math.abs(b)) + "x" : ""}${c ? (c > 0 ? " + " : " − ") + Math.abs(c) : ""}`;
+  const soru = pick(["tepe noktasının ordinatı", "tepe noktasının apsisi"]), dog = soru.includes("ordinat") ? k : h;
+  return { q: `f(x) = ${poly} parabolünün ${soru} kaçtır?`, ...numChoices(dog, [k, h, -h, -k, c, b / 2], { neg: true }), x: `Tepe noktası T(−b/2a, f(−b/2a)) = (${h}, ${k}). ${soru.includes("ordinat") ? "Ordinat" : "Apsis"} = ${dog}.` };
+});
+G("zor-log-iliski", ["mat"], "Logaritma", 3, () => {
+  const t = pick([2, 3, 5]), m = rnd(2, 6), n = rnd(2, 6), p = rnd(2, 4), q = rnd(1, 3), dog = p * m - q * n;
+  chk13(dog, Math.round((p * Math.log2(Math.pow(2, m)) - q * Math.log2(Math.pow(2, n)))), "log");
+  return { q: `log_${t} x = ${m} ve log_${t} y = ${n} olduğuna göre log_${t}(x^${p} / y^${q}) ifadesinin değeri kaçtır?`, ...numChoices(dog, [p * m + q * n, p * n - q * m, m - n, p * m * q * n, m + n], { neg: true }), x: `log(x^${p}/y^${q}) = ${p}·log x − ${q}·log y = ${p}·${m} − ${q}·${n} = ${dog}.` };
+});
+const TRI = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [20, 21, 29]];
+G("zor-trigonometri-oran", ["mat"], "Trigonometri", 3, () => {
+  const [a, b, c] = pick(TRI), tur = rnd(0, 2);
+  const A = Math.atan2(a, b), sn = Math.sin(A), cs = Math.cos(A);
+  let dog, txt, ifade;
+  if (tur === 0) { dog = kes13(c * c, a * b); ifade = "tan A + cot A"; chk13(sn / cs + cs / sn, c * c / (a * b), "tri1"); txt = `tan A + cot A = (a²+b²)/(ab) = ${c * c}/${a * b}`; }
+  else if (tur === 1) { dog = kes13(a * a - b * b, c * c); ifade = "sin²A − cos²A"; chk13(sn * sn - cs * cs, (a * a - b * b) / (c * c), "tri2"); txt = `sin²A − cos²A = (${a * a} − ${b * b})/${c * c}`; }
+  else { dog = kes13(2 * a * b, c * c); ifade = "sin 2A"; chk13(Math.sin(2 * A), 2 * a * b / (c * c), "tri3"); txt = `sin 2A = 2·sinA·cosA = 2·${a}·${b}/${c * c}`; }
+  const yan = [kes13(a * b, c * c), kes13(a, b), kes13(b, a), kes13(a + b, c), kes13(c, a + b), kes13(c * c, a + b), kes13(a * a + b * b, a * b + 1)].filter(x => x !== dog);
+  return { q: `Dik üçgen ABC'de A açısı dar açıdır, A'nın karşısındaki kenar ${a}, komşu dik kenar ${b} ve hipotenüs ${c} birimdir. ${ifade} ifadesinin değeri kaçtır?`, ...strChoices(dog, KOKUS([...new Set(yan)], 4)), x: `${txt} = ${dog}.` };
+});
+G("zor-ardisik-toplam", ["mat"], "Sayılar", 3, () => {
+  const n = pick([5, 7, 9]), orta = rnd(6, 30), S = n * orta, kucuk = orta - (n - 1) / 2;
+  chk13(S, Array.from({ length: n }, (_, i) => kucuk + i).reduce((x, y) => x + y, 0), "ardisik");
+  return { q: `Toplamı ${S} olan ${n} ardışık tam sayının en küçüğü kaçtır?`, ...numChoices(kucuk, [orta, orta - 1, kucuk + 1, orta - (n + 1) / 2, S / n - n], { neg: true }), x: `Ardışık sayıların ortası toplam/adet = ${S}/${n} = ${orta}. En küçük = ${orta} − ${(n - 1) / 2} = ${kucuk}.` };
+});
+G("zor-momentum-carpisma", ["fizik"], "İş, Enerji, Momentum", 3, () => {
+  const m1 = rnd(1, 5), m2 = rnd(1, 5), v1 = rnd(2, 10), v2 = pick([0, 0, -2, -3, 2]), M = m1 + m2, P = m1 * v1 + m2 * v2;
+  if (P % M !== 0) return null;
+  const v = P / M, kayip = 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2 - 0.5 * M * v * v;
+  chk13(kayip, 0.5 * (m1 * m2 / M) * (v1 - v2) * (v1 - v2), "mom");
+  const tur = rnd(0, 1);
+  return tur === 0
+    ? { q: `Kütlesi ${m1} kg olan cisim ${v1} m/s hızla ilerleyip ${m2} kg kütleli ve ${v2 === 0 ? "durmakta olan" : (Math.abs(v2) + " m/s hızla " + (v2 > 0 ? "aynı yönde" : "ters yönde") + " hareket eden")} cisme çarpıp yapışıyor. Çarpışmadan hemen sonra ortak hız kaç m/s olur?`, ...numChoices(v, [v1, (v1 + v2) / 2, m1 * v1 / m2, P / m1, v1 - v], { neg: true }), x: `Momentum korunur: ${m1}·${v1} + ${m2}·(${v2}) = ${M}·v → v = ${P}/${M} = ${v} m/s.` }
+    : { q: `Kütlesi ${m1} kg olan cisim ${v1} m/s hızla ilerleyip ${m2} kg kütleli ve ${v2 === 0 ? "durmakta olan" : (Math.abs(v2) + " m/s hızla " + (v2 > 0 ? "aynı yönde" : "ters yönde") + " hareket eden")} cisme çarpıp yapışıyor. Çarpışmada kaç joule enerji kaybolur?`, ...numChoices(kayip, [0.5 * m1 * v1 * v1, kayip * 2, kayip / 2, 0.5 * M * v * v, m1 * v1]), x: `Ortak hız ${v} m/s. Kayıp = (1/2)m₁v₁² + (1/2)m₂v₂² − (1/2)(m₁+m₂)v² = ${kayip} J.` };
+});
+G("zor-yay-sarkac", ["fizik"], "Basit Harmonik Hareket", 3, () => {
+  const k = pick([100, 200, 400, 800]), m = pick([1, 2, 4, 0.25, 0.5, 0.0625].filter(x => x)), omega = Math.sqrt(k / m);
+  if (!Number.isInteger(omega)) return null;
+  const T = 2 * Math.PI / omega, kat = (Math.round(T / Math.PI * 1000) / 1000);
+  const dogM = `${kes13(Math.round(2 * 1000), Math.round(omega * 1000))}π`;
+  const dog = (2 / omega) + "π", yan = [(1 / omega) + "π", (2 * omega) + "π", (omega / 2) + "π", (4 / omega) + "π", (2 / omega / 2) + "π"].filter(x => x !== dog);
+  return { q: `Yay sabiti ${k} N/m olan yaya bağlı ${m} kg kütleli cisim basit harmonik hareket yapıyor. Hareketin periyodu kaç saniyedir? (π sayısı cinsinden)`, ...strChoices(dog, KOKUS([...new Set(yan)], 4)), x: `T = 2π√(m/k) = 2π√(${m}/${k}) = 2π/${omega} = ${dog} s.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

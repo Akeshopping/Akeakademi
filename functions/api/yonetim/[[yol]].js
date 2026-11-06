@@ -6,7 +6,7 @@
 //   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, güçlü modelle kontrol eder, onaya koyar
 //   GET  sorular          onay bekleyen sorular ve sayılar
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
-import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele } from "../../../lib/ortak.js";
+import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
 /* AI soru üretimi: hızlı model yazar, güçlü model cevabı görmeden çözer; tutanlar onaya düşer */
@@ -69,6 +69,17 @@ export async function onRequest({ request, env, params }) {
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
     return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], sayilar: say || {} });
   }
+  if (ad === "maliyet" && m === "GET") {
+    /* Dolar fiyatları (milyon token başına) env ile değiştirilebilir; akışsız çağrılarda gerçek token, diğerlerinde de akıştan okunan token kullanılır */
+    const fy = { hizli: [+env.AKE_FIYAT_HIZLI_GIRIS || 1, +env.AKE_FIYAT_HIZLI_CIKIS || 5], guclu: [+env.AKE_FIYAT_GUCLU_GIRIS || 3, +env.AKE_FIYAT_GUCLU_CIKIS || 15] };
+    const ay = gunTR().slice(0, 7);
+    let rows = []; try { rows = (await env.DB.prepare("SELECT gun, kaynak, model, adet, giris, cikis FROM gider WHERE gun >= ? ORDER BY gun DESC").bind(ay + "-01").all()).results || []; } catch (e) { }
+    const tipf = m => /guclu|sonnet|opus/i.test(m) ? fy.guclu : fy.hizli;
+    const usd = r => r.kaynak === "soru-uret" ? 0 : (r.giris * tipf(r.model)[0] + r.cikis * tipf(r.model)[1]) / 1e6;
+    const bugun = gunTR(); let ayUsd = 0, bugunUsd = 0, ayCagri = 0, bugunCagri = 0; const kaynak = {};
+    rows.forEach(r => { const u = usd(r); ayUsd += u; if (r.gun === bugun) bugunUsd += u; if (r.kaynak !== "soru-uret") { ayCagri += r.adet; if (r.gun === bugun) bugunCagri += r.adet; } kaynak[r.kaynak] = (kaynak[r.kaynak] || 0) + u; });
+    return json(200, { ay, ayUsd, bugunUsd, ayCagri, bugunCagri, kaynak, soruUretBugun: rows.filter(r => r.gun === bugun && r.kaynak === "soru-uret").reduce((s, r) => s + r.adet, 0), soruUretLimit: +env.AKE_SORU_GUNLUK || 20, butceUsd: +env.AKE_AYLIK_BUTCE_USD || 0 });
+  }
   if (ad === "shopier-kur" && m === "POST") {
     if (!env.SHOPIER_PAT) return fail(400, "pat_yok", "Cloudflare'e SHOPIER_PAT eklenmemiş.");
     const url = origin.replace("://www.", "://") + "/api/shopier";
@@ -95,6 +106,9 @@ export async function onRequest({ request, env, params }) {
     await soruSema(env);
     let b = {}; try { b = await request.json(); } catch (e) { }
     if (!b.s || !b.t) return fail(400, "eksik");
+    const glim = +env.AKE_SORU_GUNLUK || 20;
+    if (await giderBugun(env, "soru-uret") >= glim) return fail(429, "gunluk_limit", `Günlük AI soru üretme sınırına (${glim}) ulaşıldı. Yarın tekrar dene.`);
+    await giderYaz(env, "soru-uret", "cagri", 0, 0);
     const r = await soruUret(env, b);
     return r.hata ? fail(502, r.hata, "AI soru üretemedi, tekrar dene.") : json(200, r);
   }

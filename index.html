@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=474fdce2ff">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=474fdce2ff">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=474fdce2ff">
+<link rel="manifest" href="/manifest.webmanifest?v=649453322a">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=649453322a">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=649453322a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=474fdce2ff">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=649453322a">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5213,6 +5213,132 @@ G("elektron-dizilim", ["kimya", "akimya"], "Atomun yapısı", 3, () => {
     ...numChoices(un, [un + 1, un + 2, Math.max(un - 1, 0), 0, 6, 4], { step: 1 }),
     x: `Dizilim: ${cfs}. Hund kuralına göre orbitaller önce birer elektronla dolar; son alt katmandaki yalnız elektron sayısı ${un} olur.` };
 });
+/* ===== 4. tur: biyoloji zor/orta kalıpları (olasılıkları sayarak ve formülle iki yoldan doğrular) ===== */
+const chk9 = (a, b, tol) => { if (Math.abs(a - b) > (tol || 1e-9)) throw new Error("gen9 tutarsiz"); return a; };
+const FR9 = [frac(1, 2), frac(1, 4), frac(3, 4), frac(1, 8), frac(3, 8), frac(1, 16), frac(3, 16), frac(9, 16), frac(1, 3), frac(2, 3), frac(5, 8), frac(1, 1), "0"];
+const dis9 = (c, ek) => FR9.concat(ek || []).filter(v => v !== c);
+G("mendel-binom", ["biyoloji", "abiyoloji"], "Kalıtım", 3, () => {
+  const n = rnd(3, 5), k = rnd(1, n - 1), top = comb(n, k) * 3 ** k, alt = 4 ** n;
+  let s = 0; for (let m = 0; m < 1 << n; m++) { let c = 0; for (let i = 0; i < n; i++) if (m >> i & 1) c++; if (c === k) s++; } chk9(s * 3 ** k * 1 ** (n - k), top);
+  const c = frac(top, alt);
+  return { q: `Aa × Aa çaprazlamasından doğacak ${n} çocuktan tam olarak ${k} tanesinin baskın fenotipli (A_), diğerlerinin çekinik fenotipli (aa) olma olasılığı kaçtır? (Tam baskınlık)`,
+    ...strChoices(c, [frac(3 ** k, 4 ** k), frac(comb(n, k), 4 ** n), frac(comb(n, k) * 3 ** (n - k), alt), frac(3 ** n, alt), frac(k * 3, 4 * n)].filter(v => v !== c)),
+    x: `Bir çocuğun baskın olma olasılığı 3/4, çekinik olma olasılığı 1/4. ${n} çocuktan ${k}'ının baskın olması: C(${n},${k})·(3/4)^${k}·(1/4)^${n - k} = ${top}/${alt} = ${c}.` };
+});
+G("kan-grubu", ["biyoloji", "abiyoloji"], "Kalıtım", 3, () => {
+  const G = { A: [["A", "A"], ["A", "O"]], B: [["B", "B"], ["B", "O"]], AB: [["A", "B"]], O: [["O", "O"]] };
+  const pars = [["Aa", "A", "O"], ["A", "AB"], ["AB", "B"], ["A", "B"], ["B", "O"], ["AB", "O"]]; const [ga, gb] = pick([[["A", "O"], ["B", "O"]], [["A", "O"], ["A", "B"]], [["B", "O"], ["A", "B"]], [["A", "O"], ["O", "O"]], [["B", "O"], ["O", "O"]], [["A", "B"], ["A", "B"]], [["A", "A"], ["B", "O"]]]);
+  const fen = x => x.includes("A") && x.includes("B") ? "AB" : x.includes("A") ? "A" : x.includes("B") ? "B" : "O";
+  const ad = g => g[0] === g[1] ? g[0] + g[0] : g.join("");
+  const hedef = pick(["A", "B", "AB", "O"]); let n = 0; for (const a of ga) for (const b of gb) if (fen([a, b]) === hedef) n++;
+  const p1 = ga.filter(x => true).length; chk9(n / 4, [0, 1, 2, 3].filter(i => fen([ga[i >> 1], gb[i & 1]]) === hedef).length / 4);
+  const c = frac(n, 4);
+  const gs = g => ({ AA: "AA", AO: "AO", BB: "BB", BO: "BO", AB: "AB", OO: "OO" })[g.slice().sort().join("")];
+  return { q: `Genotipi ${gs(ga)} olan anne ile genotipi ${gs(gb)} olan babanın çocuğunun kan grubunun ${hedef} olma olasılığı kaçtır? (A ve B alelleri O'ya baskın, kendi aralarında eş baskındır.)`,
+    ...strChoices(c, dis9(c)),
+    x: `Anne gametleri: ${ga.join(", ")}; baba gametleri: ${gb.join(", ")}. 4 olası çocuk genotipinden ${n} tanesi ${hedef} grubudur: ${c}.` };
+});
+G("dna-n15", ["abiyoloji", "biyoloji"], "Nükleik asitler", 3, () => {
+  const g = rnd(2, 5), top = 2 ** g, agir = 2, hafif = top - 2, mixed = 2;
+  let dnas = [["N15", "N14"]]; /* her molekül [eski zincir, yeni zincir] */ let list = [["a", "a"]];
+  let n15 = 1; // N15 zincir sayısı toplam 2 (hiç artmaz) : başlangıçta iki N15 zincir
+  const tot = top, sadeceN14 = tot - 2; chk9(sadeceN14 / tot, 1 - 2 / (2 ** g));
+  const c = frac(sadeceN14, tot);
+  return { q: `Her iki zinciri ¹⁵N içeren bir DNA molekülü, ¹⁴N içeren ortamda yarı korunumlu olarak ${g} kez eşlenmeye bırakılıyor. Oluşan DNA moleküllerinin kaçta kaçı yalnızca ¹⁴N içerir?`,
+    ...strChoices(c, [frac(1, tot), frac(2, tot), frac(1, 2), frac(tot - 1, tot), frac(1, tot / 2 || 1), frac(tot - 4, tot), frac(3, 4), frac(1, 4), frac(7, 8), frac(3, 8)].filter(v => v !== c)),
+    x: `${g} eşlemede ${tot} DNA oluşur. Başlangıçtaki iki ¹⁵N'li zincir ayrı moleküllerde kalır ⇒ yalnızca 2 molekül (¹⁵N–¹⁴N) melezdir. Geri kalan ${tot} − 2 = ${tot - 2} molekül yalnız ¹⁴N içerir: ${tot - 2}/${tot} = ${c}.` };
+});
+G("mayoz-gamet", ["biyoloji", "abiyoloji"], "Hücre bölünmesi", 2, () => {
+  const n = rnd(3, 6), c = 2 ** n; let s = 1; for (let i = 0; i < n; i++) s *= 2; chk9(c, s);
+  return { q: `2n = ${2 * n} kromozomlu bir canlıda, krossing-over olmadığı varsayılırsa mayoz bölünme sonucunda genetik olarak birbirinden farklı en fazla kaç çeşit gamet oluşabilir?`,
+    ...numChoices(c, [2 * n, n * n, 2 ** (n - 1), 2 ** (n + 1), n, 4 ** n], { step: 4 }),
+    x: `Haploit kromozom sayısı n = ${n}. Homolog çiftler bağımsız ayrıldığından çeşit sayısı 2^n = 2^${n} = ${c}.` };
+});
+G("hardy-weinberg", ["abiyoloji"], "Evrim", 3, () => {
+  const q = pick([0.1, 0.2, 0.3, 0.4, 0.5]), N = pick([200, 500, 1000, 2000]), p = 1 - q, het = 2 * p * q * N; if (!ok3(het)) return null;
+  chk9(het, 2 * (1 - q) * q * N); const aa = q * q * N;
+  return { q: `Hardy–Weinberg dengesindeki ${N} bireylik bir popülasyonda çekinik alelin (a) frekansı ${nf(q)}'dir. Bu popülasyonda heterozigot (Aa) birey sayısı kaçtır?`,
+    ...numChoices(het, [aa, p * p * N, 2 * q * N, p * q * N, het + N / 10, N * q], { step: N / 20 }),
+    x: `p = 1 − ${nf(q)} = ${nf(p)}. Heterozigot frekansı 2pq = 2·${nf(p)}·${nf(q)} = ${nf(2 * p * q)}. Birey sayısı = ${nf(2 * p * q)}·${N} = ${nf(het)}.` };
+});
+G("protein-kodon", ["abiyoloji", "biyoloji"], "Protein sentezi", 3, () => {
+  const aa = rnd(50, 300), kod = aa + 1, mrna = kod * 3, dna = mrna * 2; chk9(dna / 6 - 1, aa);
+  return { q: `Bir gendeki kodlayıcı bölge çift zincirli DNA'da toplam ${dna} nükleotit içermektedir (başlangıç ve bitiş kodonları dahil, intron yok). Bu genden sentezlenen proteinde kaç amino asit bulunur? (Bitiş kodonu amino asit kodlamaz.)`,
+    ...numChoices(aa, [kod, mrna, dna / 3, dna / 6, aa - 1, aa + 2], { step: 1 }),
+    x: `Çift zincirin yarısı mRNA'ya karşılık gelir: ${dna}/2 = ${mrna} nükleotit. Üçlü kodon sayısı ${mrna}/3 = ${kod}. Bitiş kodonu amino asit kodlamadığından amino asit sayısı ${kod} − 1 = ${aa}.` };
+});
+G("fermantasyon", ["biyoloji", "abiyoloji"], "Hücresel solunum", 2, () => {
+  const n = rnd(2, 12), tip = pick([["alkol fermantasyonu", "CO₂", 2], ["oksijenli solunum", "CO₂", 6], ["oksijenli solunum", "O₂", 6], ["oksijenli solunum", "H₂O", 6]]);
+  const c = tip[2] * n;
+  return { q: `${n} mol glikoz ${tip[0]} ile tamamen yıkıldığında toplam kaç mol ${tip[1]} ${tip[0] === "alkol fermantasyonu" ? "açığa çıkar" : tip[1] === "O₂" ? "harcanır" : "oluşur"}?`,
+    ...numChoices(c, [n, 2 * n, 3 * n, 6 * n, 12 * n, c + n, c - n].filter(v => v !== c), { step: n }),
+    x: `Glikoz başına ${tip[2]} mol ${tip[1]} ${tip[0] === "alkol fermantasyonu" ? "(C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂)" : "(C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O)"}. ${n}·${tip[2]} = ${c} mol.` };
+});
+G("enerji-piramidi", ["biyoloji", "abiyoloji"], "Ekoloji", 2, () => {
+  const E = pick([10000, 20000, 50000, 100000, 500000]), k = rnd(2, 4), v = E * 0.1 ** (k - 1); let t = E; for (let i = 1; i < k; i++) t *= 0.1; chk9(v, t, 1e-6);
+  const ad = ["", "üretici", "1. derece tüketici", "2. derece tüketici", "3. derece tüketici"][k];
+  return { q: `Bir besin zincirinde üreticilerin depoladığı enerji ${nf(E)} kJ'dir. Her basamakta enerjinin %10'u bir üst basamağa aktarıldığına göre ${ad}de depolanan enerji kaç kJ'dir?`.replace("üreticide", "üreticide"),
+    ...numChoices(Math.round(v), [Math.round(E * 0.1 ** k), Math.round(E * 0.1 ** (k - 2)), Math.round(E / k), Math.round(E * 0.9 ** (k - 1)), Math.round(v * 2)], { step: Math.max(1, Math.round(v / 2)) }),
+    x: `Her basamakta enerji 10'da 1'ine düşer. ${k - 1} basamak sonra ${nf(E)}·(1/10)^${k - 1} = ${nf(v)} kJ.` };
+});
+G("bakteri-bolunme", ["biyoloji"], "Canlıların sınıflandırılması", 2, () => {
+  const g = pick([15, 20, 30]), n = rnd(3, 8), t = g * n, N0 = pick([1, 2, 5, 10]), N = N0 * 2 ** n; chk9(N, N0 * Math.pow(2, t / g));
+  return { q: `Uygun koşullarda her ${g} dakikada bir ikiye bölünen bakterilerden başlangıçta ${N0} tane vardır. ${t} dakika sonra bakteri sayısı kaç olur? (Hiçbiri ölmemektedir.)`,
+    ...numChoices(N, [N0 * n * 2, N0 * n, N0 * 2 ** (n - 1), N0 * 2 ** (n + 1), N0 * t / g * g, N0 * n * n], { step: N0 }),
+    x: `${t}/${g} = ${n} bölünme olur. Sayı her bölünmede 2 katına çıkar: ${N0}·2^${n} = ${N}.` };
+});
+G("soyagaci", ["biyoloji", "abiyoloji"], "Kalıtım", 3, () => {
+  /* Otozomal çekinik: anne ve baba taşıyıcı (Aa × Aa); cinsiyet bağımsız (1/2) */
+  const soru = pick([["kız çocuğunun hasta olma", [["k", "aa"]]], ["çocuğunun erkek ve sağlıklı olma", [["e", "AA"], ["e", "Aa"]]], ["çocuğunun taşıyıcı olma", [["k", "Aa"], ["e", "Aa"]]], ["kız ve hasta bir çocuğa sahip olma", [["k", "aa"]]]]);
+  const gt = [["AA", 1], ["Aa", 2], ["aa", 1]]; let n = 0, d = 0;
+  for (const cs of ["k", "e"]) for (const [g, w] of gt) { d += w; }
+  d /= 1; let pay = 0; for (const [cs, g] of soru[1]) pay += gt.find(x => x[0] === g)[1];
+  const olas = pay / 8; const c = frac(pay, 8);
+  const alt = soru[0].startsWith("kız çocuğunun") ? frac(1, 4) : null; let c2 = c; if (alt) { c2 = frac(1, 4); /* kız çocuğu verildi: koşullu */ }
+  const kosullu = soru[0].startsWith("kız çocuğunun"); const ans = kosullu ? frac(1, 4) : c;
+  chk9(kosullu ? 1 / 4 : olas, kosullu ? (1 / 2 * 1 / 4) / (1 / 2) : pay / 8);
+  return { q: `Otozomal çekinik bir hastalık için taşıyıcı (Aa) olan anne ve babanın bir çocuğunun ${soru[0] === "kız çocuğunun hasta olma" ? "kız olduğu bilindiğine göre hasta (aa) olma" : soru[0] === "kız ve hasta bir çocuğa sahip olma" ? "kız ve hasta (aa) olma" : soru[0].replace("çocuğunun ", "").replace(" olma", " olma")} olasılığı kaçtır?`.replace("erkek ve sağlıklı olma olma", "erkek ve sağlıklı olma"),
+    ...strChoices(ans, dis9(ans)),
+    x: `Aa × Aa ⇒ AA : Aa : aa = 1 : 2 : 1 ve cinsiyet olasılığı 1/2 bağımsızdır. ${kosullu ? "Cinsiyet bilindiği için hasta olma olasılığı yalnızca aa'ya bağlıdır: 1/4." : "İstenen durumların olasılıkları çarpılıp toplanır: " + ans + "."}` };
+});
+G("renk-korlugu", ["biyoloji", "abiyoloji"], "Kalıtım", 3, () => {
+  /* X'e bağlı çekinik (renk körlüğü): X^D X^d (anne taşıyıcı) × X^D Y (baba sağlıklı) */
+  const tur = pick([["XDXd", "XDY", "erkek çocuğunun renk körü olma"], ["XDXd", "XDY", "çocuğunun renk körü olma"], ["XDXd", "XdY", "kız çocuğunun renk körü olma"], ["XDXd", "XdY", "çocuğunun renk körü olma"], ["XDXD", "XdY", "kız çocuğunun taşıyıcı olma"]]);
+  const al = { XDXd: ["XD", "Xd"], XDXD: ["XD", "XD"], XDY: ["XD", "Y"], XdY: ["Xd", "Y"] };
+  const kids = []; for (const a of al[tur[0]]) for (const b of al[tur[1]]) kids.push([a, b]);
+  const kiz = kids.filter(k => k[1] !== "Y"), erk = kids.filter(k => k[1] === "Y");
+  const hasta = k => k[1] === "Y" ? k[0] === "Xd" : k[0] === "Xd" && k[1] === "Xd", tas = k => k[1] !== "Y" && (k[0] === "Xd") !== (k[1] === "Xd");
+  let n, d;
+  if (tur[2].startsWith("erkek")) { n = erk.filter(hasta).length; d = erk.length; }
+  else if (tur[2].startsWith("kız çocuğunun renk")) { n = kiz.filter(hasta).length; d = kiz.length; }
+  else if (tur[2].startsWith("kız çocuğunun taşıyıcı")) { n = kiz.filter(tas).length; d = kiz.length; }
+  else { n = kids.filter(hasta).length; d = kids.length; }
+  const c = frac(n, d);
+  return { q: `X kromozomunda taşınan çekinik bir alel (Xᵈ) renk körlüğüne neden olur. Anne ${tur[0].replace("XD", "X^D").replace("Xd", "X^d").replace("X^DX^D", "X^DX^D") === "" ? "" : tur[0].replace(/X([Dd])/g, "X$1").replace(/XD/g, "XᴰD") && ""}genotipi ${tur[0].replace(/X([Dd])/g, (m, a) => "X" + (a === "D" ? "ᴰ" : "ᵈ"))}, baba genotipi ${tur[1].replace(/X([Dd])/g, (m, a) => "X" + (a === "D" ? "ᴰ" : "ᵈ"))} olan çiftin ${tur[2]} olasılığı kaçtır?`,
+    ...strChoices(c, dis9(c)),
+    x: `Çaprazlama kareleri yazılır: anne gametleri ${al[tur[0]].join(", ")}, baba gametleri ${al[tur[1]].join(", ")}. ${tur[2].startsWith("erkek") ? "Erkek çocuklar" : tur[2].includes("kız") ? "Kız çocuklar" : "Tüm çocuklar"} arasında istenen genotip oranı ${c}.` };
+});
+G("kan-uyumu", ["biyoloji", "abiyoloji"], "Dolaşım sistemi", 2, () => {
+  const alici = pick(["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"]);
+  const ab = g => g.replace(/[+−]/, ""), rh = g => g.endsWith("+");
+  const verebilir = (d, a) => { const D = ab(d), A = ab(a); const abo = D === "O" || D === A || A === "AB"; const rhok = !rh(d) || rh(a); return abo && rhok; };
+  const grup = ["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"];
+  const n = grup.filter(d => verebilir(d, alici)).length;
+  const bagimsiz = (ab(alici) === "AB" ? 4 : ab(alici) === "O" ? 1 : 2) * (rh(alici) ? 2 : 1); chk9(n, bagimsiz);
+  return { q: `Kan grubu ${alici} olan bir kişiye, ABO ve Rh uyumu bakımından kan verebilecek kaç farklı kan grubu vardır? (Kendi grubu da sayılacaktır.)`,
+    ...numChoices(n, [1, 2, 3, 4, 6, 8, n + 1].filter(v => v !== n), { step: 1 }),
+    x: `ABO'da ${ab(alici)} alıcıya ${ab(alici) === "AB" ? "A, B, AB, O (4)" : ab(alici) === "O" ? "yalnız O (1)" : ab(alici) + " ve O (2)"} grubu verebilir. Rh ${rh(alici) ? "pozitif alıcıya hem + hem − (2)" : "negatif alıcıya yalnız − (1)"} verilebilir. ${n}.` };
+});
+G("mitoz-kromatit", ["biyoloji"], "Hücre bölünmesi", 2, () => {
+  const n2 = pick([8, 10, 14, 20, 24, 46]), evre = pick([["profaz", 2 * n2], ["metafaz", 2 * n2], ["anafaz", 2 * n2]]);
+  const sor = pick(["kromatit", "kromozom"]);
+  const c = evre[0] === "anafaz" ? (sor === "kromatit" ? 0 : 2 * n2) : (sor === "kromatit" ? 2 * n2 : n2);
+  const c2 = evre[0] === "anafaz" ? (sor === "kromatit" ? 0 : n2 * 2) : (sor === "kromatit" ? n2 * 2 : n2); chk9(c, c2);
+  if (c === 0) return null;
+  return { q: `2n = ${n2} kromozomlu bir hücre mitoz bölünmenin ${evre[0]} evresindeyken hücrede toplam kaç ${sor} bulunur? (Eşlenmeden önceki G₁ hücresi 2n = ${n2}'dir.)`,
+    ...numChoices(c, [n2, 2 * n2, 4 * n2, n2 / 2, c + 2], { step: 2 }),
+    x: evre[0] === "anafaz" ? `Anafazda kardeş kromatitler ayrılır; her biri ayrı kromozom sayılır: ${2 * n2} kromozom.` : `S evresinde DNA eşlendiği için her kromozom 2 kromatitlidir: ${n2} kromozom, ${2 * n2} kromatit.` };
+});
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */
 const r1 = x => Math.round(x * 10) / 10;
@@ -6078,7 +6204,7 @@ function modalHTML() {
 }
 function openModal(title, body, acts) { UI.modal = { title, body, acts: acts || [{ l: "Kapat", a: "modalClose" }] }; render(); }
 let toastT = null;
-function toast(t) { UI.toast = t; render(); clearTimeout(toastT); toastT = setTimeout(() => { UI.toast = null; const el = document.querySelector(".toast"); if (el) el.remove(); }, 3800); }
+function toast(t) { UI.toast = t; try { bildirimSesi(bsesTur(t)); } catch (e) { } render(); clearTimeout(toastT); toastT = setTimeout(() => { UI.toast = null; const el = document.querySelector(".toast"); if (el) el.remove(); }, 3800); }
 const tile = (v, l) => `<div class="tile"><b>${v}</b><span>${l}</span></div>`;
 const subjOpts = (sel, all) => (all ? `<option value="">Tüm dersler</option>` : "") + Object.entries(SUBJ).map(([k, v]) => `<option value="${k}"${sel === k ? " selected" : ""}>${v.n}</option>`).join("");
 const defaultExam = () => ({ SAY: "SAY", EA: "EA", SOZ: "SOZ", DIL: "YDT" })[S.profile.alan] || "TYT";
@@ -7199,6 +7325,7 @@ function erisimKart() {
     <div class="erisim-row"><b>Yazı boyutu</b>${segSec("yazi", ERISIM.yazi, [["n", "Normal"], ["l", "Büyük"], ["xl", "Çok büyük"]])}</div>
     <div class="erisim-row"><b>Yazı tipi</b>${segSec("font", ERISIM.font, [["std", "Standart"], ["okuma", "Okuma dostu"]])}</div>
     <p class="small muted">Otomatik tema, telefonunun ya da bilgisayarının açık/koyu ayarını izler. Okuma dostu yazı tipi, harflerin birbirine karışmaması için tasarlanmıştır.</p>
+    ${bsesSatiri()}
     <div class="erisim-row"><b>Sesli okuma</b>${ses ? `<button type="button" class="btn sm" data-a="sesDene">${icon("ses")} Dene</button>` : `<span class="small muted">Bu tarayıcı sesli okumayı desteklemiyor.</span>`}</div>
     ${ses ? `<p class="small muted">Soru çözerken soru kartındaki hoparlör düğmesi soruyu ve seçenekleri, AI öğretmenin cevaplarındaki "Dinle" düğmesi cevabı sesli okur. Ses, cihazının kendi Türkçe sesiyle çalışır; internet ve ek ücret gerekmez.</p>` : ""}</div>`;
 }
@@ -7741,10 +7868,21 @@ const HESAP_SUB = {
 const YON = { veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay" };
 async function yonYukle() {
   YON.busy = "yukle"; render();
+  try { fetch("/api/yonetim/maliyet", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.mal = j; render(); } }).catch(() => { }); } catch (e) { }
   try { const r = await fetch("/api/yonetim/durum", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) YON.veri = j; else YON.err = j.message || "Yönetim bilgileri alınamadı."; } catch (e) { YON.err = "Bağlantı kurulamadı."; }
   YON.busy = ""; render();
 }
 const SIP_DURUM = { gonderildi: ["ok", "Kod gönderildi"], deneme: ["", "Deneme"], kod_uretildi: ["warn", "Kod üretildi"], eposta_yok: ["bad", "E-posta yok"], eposta_hatasi: ["bad", "E-posta gitmedi"], paket_yok: ["", "Paket dışı ürün"] };
+function maliyetKarti() {
+  const M = YON.mal; if (!M) return "";
+  const tl = +(LS.get("ake.kur") || 0) || 42, d = v => "$" + (v || 0).toFixed(2), t = v => "≈ " + Math.round((v || 0) * tl).toLocaleString("tr-TR") + " TL";
+  const asim = M.butceUsd && M.ayUsd >= M.butceUsd * 0.8;
+  return `<div class="card stack"><h2>Yapay zekâ gideri</h2>
+    <div class="tiles">${tile(d(M.bugunUsd), "bugün")}${tile(d(M.ayUsd), "bu ay")}${tile(M.ayCagri || 0, "bu ay AI çağrısı")}</div>
+    <p class="small muted">Bu ay ${t(M.ayUsd)} (kur ${tl} TL varsayıldı). Sohbet, çözüm ve soru üretimi dahil; gerçek token kullanımından hesaplanır, Anthropic panelindeki rakamla küçük farklar olabilir.</p>
+    <p class="small muted">AI ile soru üretme: bugün ${M.soruUretBugun || 0}/${M.soruUretLimit} (günlük sınır).${M.butceUsd ? ` Aylık bütçe: ${d(M.butceUsd)}.` : ""}</p>
+    ${asim ? `<p class="note">Aylık bütçenin %80'ine ulaşıldı.</p>` : ""}</div>`;
+}
 function vYonetim() {
   if (IN_CLAUDE || !HESAP.user || !HESAP.user.yonetici) return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Bu sayfa yalnızca site yöneticisine açık.</p></div></div>`;
   const V = YON.veri;
@@ -7762,6 +7900,7 @@ function vYonetim() {
         <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Deneme siparişi gönder"}</button></div>
       <p class="xs muted">Deneme siparişi para çekmez; seçtiğin paket için gerçek bir kod üretip senin e-postana gönderir ve hesabına tanımlar.</p>
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
+    ${maliyetKarti()}
     <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
         : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
@@ -8838,6 +8977,47 @@ Object.assign(OZ_ACT, {
     GS_A = o; record(q, o === q.a ? 1 : 0, o); render();
   },
   gsYeni() { gsYeni(); }
+});
+/* ===== AKE bildirim sesi: kısa, okyanus esintili üç notalı çan; tüm cihazlarda tarayıcının kendi ses motoruyla çalışır (dosya indirmez) ===== */
+var BSES = { on: LS.get("ake.bsses") !== "0", ctx: null, son: 0 };
+function bsesCtx() {
+  if (BSES.ctx) return BSES.ctx;
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+  try { BSES.ctx = new AC(); } catch (e) { BSES.ctx = null; }
+  return BSES.ctx;
+}
+/* iPhone/iPad ve Chrome sesi ilk dokunuştan sonra açar */
+["pointerdown", "keydown", "touchend"].forEach(ev => window.addEventListener(ev, function () { const c = bsesCtx(); if (c && c.state === "suspended") c.resume().catch(() => { }); }, { passive: true }));
+const BSES_NOTA = { ok: [659.25, 830.61, 987.77], basari: [659.25, 830.61, 987.77, 1318.51], uyari: [493.88, 392], bilgi: [880, 1174.66] };
+function bildirimSesi(tur, zorla) {
+  if (!BSES.on && !zorla) return;
+  const c = bsesCtx(); if (!c) return;
+  const now = Date.now(); if (!zorla && now - BSES.son < 400) return; BSES.son = now;
+  try {
+    if (c.state === "suspended") c.resume().catch(() => { });
+    const notalar = BSES_NOTA[tur] || BSES_NOTA.ok, t0 = c.currentTime + 0.02;
+    const master = c.createGain(); master.gain.value = 0.16; master.connect(c.destination);
+    const dly = c.createDelay(0.5); dly.delayTime.value = 0.17; const fb = c.createGain(); fb.gain.value = 0.28; const wet = c.createGain(); wet.gain.value = 0.35;
+    dly.connect(fb); fb.connect(dly); dly.connect(wet); wet.connect(master);
+    notalar.forEach((f, i) => {
+      const t = t0 + i * (tur === "uyari" ? 0.14 : 0.085);
+      [[f, "sine", 1], [f * 2, "triangle", 0.18]].forEach(([fr, tip, g]) => {
+        const o = c.createOscillator(), e = c.createGain(); o.type = tip; o.frequency.value = fr;
+        e.gain.setValueAtTime(0.0001, t); e.gain.exponentialRampToValueAtTime(g, t + 0.008); e.gain.exponentialRampToValueAtTime(0.0001, t + (i === notalar.length - 1 ? 0.9 : 0.5));
+        o.connect(e); e.connect(master); e.connect(dly); o.start(t); o.stop(t + 1);
+      });
+    });
+    setTimeout(() => { try { master.disconnect(); dly.disconnect(); } catch (e) { } }, 2500);
+  } catch (e) { }
+}
+const bsesTur = t => /hata|yapılamadı|yapilamadi|başarısız|limit|dolu|olmadı|eksik|geçersiz|sınır/i.test(t || "") ? "uyari" : /rozet|tebrik|tamamlandı|bitti|geçti/i.test(t || "") ? "basari" : "ok";
+function bsesSatiri() {
+  return `<div class="erisim-row"><b>Bildirim sesi</b><div class="seg" role="group"><button type="button" data-a="bsesAc" data-v="1" class="${BSES.on ? "on" : ""}" aria-pressed="${BSES.on}">Açık</button><button type="button" data-a="bsesAc" data-v="0" class="${!BSES.on ? "on" : ""}" aria-pressed="${!BSES.on}">Kapalı</button></div><button type="button" class="btn sm" data-a="bsesDene">${icon("ses")} Dinle</button></div>
+    <p class="small muted">Bildirimler çıkarken AKE'ye özel kısa bir çan sesi çalar. Telefon ve tabletlerde cihazın sessiz tuşu açıksa ses çıkmayabilir.</p>`;
+}
+Object.assign(OZ_ACT, {
+  bsesAc(d) { BSES.on = d.v === "1"; LS.set("ake.bsses", BSES.on ? "1" : "0"); render(); if (BSES.on) bildirimSesi("ok", true); },
+  bsesDene() { bildirimSesi("basari", true); }
 });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");

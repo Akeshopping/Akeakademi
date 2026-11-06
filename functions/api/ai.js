@@ -13,7 +13,7 @@
 // Yanıt akışı Anthropic'ten olduğu gibi (SSE) tarayıcıya aktarılır; ayrıştırmayı tarayıcı yapar.
 // Böylece sunucu neredeyse hiç işlemci kullanmaz (Cloudflare ücretsiz planı için önemli).
 
-import { json, fail, sema, oturum, aktifPaket, kodBagla, kullanimAl, kullanimArtir, limitler, kodCoz } from "../../lib/ortak.js";
+import { json, fail, sema, oturum, aktifPaket, kodBagla, kullanimAl, kullanimArtir, limitler, kodCoz, giderYaz } from "../../lib/ortak.js";
 
 const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const hits = new Map();
@@ -106,7 +106,23 @@ export async function onRequest({ request, env }) {
   if (b.json) {
     const j = await r.json().catch(() => ({}));
     const text = (j.content || []).filter(c => c.type === "text").map(c => c.text).join("");
+    await giderYaz(env, "ai", strong ? "guclu" : "hizli", j.usage && j.usage.input_tokens, j.usage && j.usage.output_tokens);
     return json(200, { text, truncated: j.stop_reason === "max_tokens", plan }, modelHdr);
   }
-  return new Response(r.body, { status: 200, headers: Object.assign({ "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", "x-accel-buffering": "no" }, modelHdr) });
+  /* akış biterken token kullanımını kaydet (içeriğe dokunmadan) */
+  let gi = 0, co = 0, tail = "";
+  const dec = new TextDecoder(), mod = strong ? "guclu" : "hizli";
+  const izle = new TransformStream({
+    transform(chunk, ctl) {
+      ctl.enqueue(chunk);
+      try {
+        tail += dec.decode(chunk, { stream: true });
+        for (const m of tail.matchAll(/"input_tokens":\s*(\d+)/g)) gi = Math.max(gi, +m[1]);
+        for (const m of tail.matchAll(/"output_tokens":\s*(\d+)/g)) co = Math.max(co, +m[1]);
+        tail = tail.slice(-200);
+      } catch (e) { }
+    },
+    async flush() { await giderYaz(env, "ai", mod, gi, co); }
+  });
+  return new Response(r.body.pipeThrough(izle), { status: 200, headers: Object.assign({ "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", "x-accel-buffering": "no" }, modelHdr) });
 }

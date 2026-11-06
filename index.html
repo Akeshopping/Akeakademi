@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=7c046cd5c1">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7c046cd5c1">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7c046cd5c1">
+<link rel="manifest" href="/manifest.webmanifest?v=7ba292292a">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7ba292292a">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7ba292292a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=7c046cd5c1">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=7ba292292a">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5794,6 +5794,105 @@ const EDATLAR = [["I'm interested ___ history.", "in"], ["She is good ___ playin
 G("en-edat", ["ingilizce"], "Prepositions", 2, () => {
   const it = pick(EDATLAR), havuz = ["at", "in", "on", "of", "for", "with", "to", "from", "by", "about"].filter(x => x !== it[1] && !(it[2] || []).includes(x)), yan = KOKUS(havuz, 4), o = shuffle([it[1]].concat(yan));
   return { q: `Choose the correct preposition.\n${it[0]}`, o, a: o.indexOf(it[1]), x: `Doğru ifade: “${it[0].replace("___", it[1])}” Bu bir edat kalıbıdır (ifade ile birlikte öğrenilir).` };
+});
+/* ===== 7. tur: dengeleme (İngilizce zor, mantık, sosyal bilimler kavram-tanım) ===== */
+function esleGen(id, subs, topic, d, pairs, kok, tersMi) {
+  /* pairs: [kavram, tanım]; tersMi=false: tanım verilir kavram sorulur */
+  G(id, subs, topic, d, () => {
+    const it = pick(pairs), yan = KOKUS(pairs.filter(p => p[0] !== it[0]).map(p => p[tersMi ? 1 : 0]), 4);
+    if (yan.length < 4) return null;
+    const dog = it[tersMi ? 1 : 0], soru = it[tersMi ? 0 : 1];
+    return { q: kok.replace("{c}", soru), ...strChoices(dog, yan), x: `${it[0]}: ${it[1]}` };
+  });
+}
+const SOSYO = [
+  ["Norm", "Toplumda bireylerin nasıl davranması gerektiğini belirleyen kurallar"], ["Statü", "Bireyin toplumsal yapıdaki konumu"], ["Rol", "Bir statünün gerektirdiği davranış kalıpları"],
+  ["Sosyalleşme", "Bireyin toplumun değer, norm ve davranışlarını öğrenme süreci"], ["Kültürel gecikme", "Maddi kültürün manevi kültürden daha hızlı değişmesi"], ["Alt kültür", "Bir toplumda belli bir grubun ana kültürden farklı özellikleri"],
+  ["Toplumsal tabakalaşma", "Toplumda bireylerin gelir, meslek, eğitim gibi ölçütlere göre sıralanması"], ["Sosyal kontrol", "Bireylerin davranışlarını toplumsal beklentilere uygun hâle getiren yaptırımlar"], ["Birincil grup", "Aile ve yakın arkadaş çevresi gibi yüz yüze, duygusal ilişkili gruplar"],
+  ["Kitle iletişim", "Mesajların geniş kitlelere aynı anda ulaştırılması"], ["Toplumsal hareketlilik", "Bireylerin toplumsal tabakalar arasında yer değiştirmesi"], ["Göç", "Bireylerin ya da grupların bir yerden başka bir yere yerleşmek için gitmesi"]
+];
+esleGen("sosyo-kavram", ["sosyoloji"], "Temel Kavramlar", 2, SOSYO, "Aşağıdaki açıklama hangi sosyolojik kavramı tanımlar?\n“{c}”");
+const PSIKO = [
+  ["Algı", "Duyu organlarından gelen uyarıcıların anlamlandırılması"], ["Dikkat", "Zihinsel kaynakların belirli bir uyarıcıya yöneltilmesi"], ["Şartlı refleks", "Nötr bir uyarıcının, şartsız uyarıcıyla eşleştirilerek tepki oluşturması"],
+  ["Güdü", "Davranışı başlatan, yönlendiren ve sürdüren içsel güç"], ["Duygu", "Uyarıcıya karşı verilen öznel ve fizyolojik tepki"], ["Bellek", "Bilginin kodlanması, saklanması ve geri çağrılması"],
+  ["Zekâ", "Öğrenme, akıl yürütme ve yeni durumlara uyum sağlama yeteneği"], ["Kişilik", "Bireyi diğerlerinden ayıran, tutarlı davranış ve düşünce örüntüsü"], ["Öğrenme", "Yaşantı sonucu davranışta kalıcı değişiklik olması"],
+  ["Stres", "Zorlayıcı durumlara karşı bedensel ve zihinsel gerginlik tepkisi"], ["Düşünme", "Zihinde sembol ve kavramlarla yapılan işlemler"]
+];
+esleGen("psiko-kavram", ["psikoloji"], "Temel Kavramlar", 2, PSIKO, "Aşağıdaki açıklama hangi psikoloji kavramını tanımlar?\n“{c}”");
+const FELS = [
+  ["Thales", "Evrenin ana maddesinin su olduğunu savunmuştur"], ["Herakleitos", "Evrendeki tek sabit şeyin değişim olduğunu savunmuştur"], ["Parmenides", "Değişimin yanılsama, gerçek varlığın değişmez olduğunu savunmuştur"],
+  ["Demokritos", "Evrenin atomlardan oluştuğunu savunmuştur"], ["Sokrates", "Bilgiye ‘kendini bil’ ve diyalog yöntemiyle ulaşılacağını savunmuştur"], ["Platon", "Gerçek bilginin idealar dünyasında olduğunu savunmuştur"],
+  ["Aristoteles", "Mantığın kurucusudur ve ‘töz’ kavramını geliştirmiştir"], ["Descartes", "‘Düşünüyorum, öyleyse varım’ diyerek bilginin kaynağını akıl görmüştür"], ["Kant", "Hem akıl hem deneyin bilginin kaynağı olduğunu savunmuş (kritisizm)"],
+  ["John Locke", "Zihnin doğuştan boş bir levha (tabula rasa) olduğunu savunmuştur"]
+];
+esleGen("felsefe-filozof", ["felsefe"], "Filozoflar", 3, FELS, "Aşağıdaki açıklama hangi filozofa aittir?\n“{c}”");
+const DINK = [
+  ["Tevhid", "Allah'ın bir ve tek olduğuna inanmak"], ["Nübüvvet", "Peygamberlik kurumu ve peygamberlere inanmak"], ["Ahiret", "Ölümden sonraki sonsuz hayata inanmak"], ["Kader", "Allah'ın ezelî ilmiyle her şeyi bilmesi ve takdir etmesi"],
+  ["Sünnet", "Hz. Muhammed'in söz, davranış ve onayları"], ["Fıkıh", "İslam hukuku ve amelî hükümler bilgisi"], ["Ictihad", "Delillerden hüküm çıkarmak için gösterilen çaba"], ["Vahiy", "Allah'ın peygamberlerine bildirdiği mesaj"],
+  ["Tasavvuf", "İslam'ın manevi ve ahlaki boyutunu yaşama anlayışı"], ["Kelam", "İslam inancını akli delillerle savunan ilim"]
+];
+esleGen("din-kavram", ["din"], "Temel Kavramlar", 2, DINK, "Aşağıdaki açıklama hangi dinî kavramı tanımlar?\n“{c}”");
+/* ---- mantık: bileşik önerme doğruluk değeri (hesaplanır) ---- */
+const MOPS = [["∧", (a, b) => a && b, "ve"], ["∨", (a, b) => a || b, "veya"], ["→", (a, b) => !a || b, "ise"], ["↔", (a, b) => a === b, "ancak ve ancak"]];
+G("mantik-bilesik", ["mantik"], "Önermeler", 3, () => {
+  const p = rnd(0, 1) === 1, q = rnd(0, 1) === 1, r = rnd(0, 1) === 1, o1 = pick(MOPS), o2 = pick(MOPS), np = rnd(0, 1) === 1;
+  const A = np ? !p : p, v = o2[1](o1[1](A, q), r);
+  const metin = `(${np ? "¬p" : "p"} ${o1[0]} q) ${o2[0]} r`, T = x => x ? "Doğru" : "Yanlış";
+  return { q: `p ≡ ${p ? 1 : 0}, q ≡ ${q ? 1 : 0}, r ≡ ${r ? 1 : 0} olduğuna göre ${metin} önermesinin doğruluk değeri nedir?`, ...strChoices(T(v), ["Belirsiz", "Hem doğru hem yanlış", "Hesaplanamaz", "Hiçbiri"].concat(["Duruma göre değişir"])), x: `(${np ? "¬p" : "p"} ${o1[0]} q) = ${o1[1](A, q) ? 1 : 0}; bunun r ile ${o2[0]} işlemi ${v ? 1 : 0} verir.` };
+});
+const KUME_ISIM = [["öğrenci", "çalışkan"], ["kuş", "uçabilen"], ["sporcu", "sağlıklı"], ["yazar", "okur"], ["doktor", "bilgili"], ["hayvan", "memeli"]];
+G("mantik-niceleme", ["mantik"], "Önermeler", 3, () => {
+  const [a, b] = pick(KUME_ISIM), k = rnd(0, 3);
+  const T = [["Her " + a + " " + b + "dir.", "Bazı " + a + "lar " + b + " değildir."], ["Bazı " + a + "lar " + b + "dir.", "Hiçbir " + a + " " + b + " değildir."], ["Hiçbir " + a + " " + b + " değildir.", "Bazı " + a + "lar " + b + "dir."], ["Bazı " + a + "lar " + b + " değildir.", "Her " + a + " " + b + "dir."]][k];
+  const yan = [...new Set([T[0], "Bazı " + a + "lar hem " + b + "dir hem değildir.", "Her " + a + " " + b + "dir.", "Bazı " + a + "lar " + b + "dir.", "Hiçbir " + a + " " + b + " değildir.", "Bazı " + a + "lar " + b + " değildir."])].filter(x => x !== T[1]);
+  return { q: `“${T[0]}” önermesinin değili (olumsuzu) aşağıdakilerden hangisidir?`, ...strChoices(T[1], yan.slice(0, 4)), x: "Tümel olumlunun değili özel olumsuz, tümel olumsuzun değili özel olumludur (ve tersi)." };
+});
+/* ---- İngilizce: koşul, aktarma, ilgi zamiri, kelime türetme, deyimsel fiil ---- */
+const KOSUL = [
+  ["If it ____ tomorrow, we will stay at home.", "rains", ["rain", "would rain", "rained", "had rained"], "Birinci tip koşul: If + present simple, will + V1."],
+  ["If I ____ you, I would accept the offer.", "were", ["am", "will be", "had been", "would be"], "İkinci tip koşul: If + V2 (were), would + V1."],
+  ["If she had studied harder, she ____ the exam.", "would have passed", ["will pass", "would pass", "passed", "had passed"], "Üçüncü tip koşul: If + had + V3, would have + V3."],
+  ["If you heat ice, it ____.", "melts", ["will melted", "would melt", "melted", "has melted"], "Sıfır koşul (genel doğrular): If + present, present."],
+  ["If they ____ earlier, they would have caught the train.", "had left", ["left", "leave", "would leave", "have left"], "Üçüncü tip: If + had + V3."],
+  ["If he ____ more money, he would buy a new car.", "had", ["has", "will have", "would have", "had had"], "İkinci tip: If + V2, would + V1."],
+  ["Unless you ____ hard, you will fail.", "study", ["studied", "will study", "would study", "had studied"], "Unless ile birinci tip koşul: present simple kullanılır."],
+  ["I wish I ____ more time to study.", "had", ["have", "would have", "will have", "had had"], "wish + V2: şimdiki gerçek dışı dilek."]];
+G("en-conditional", ["ingilizce"], "Conditionals", 3, () => { const it = pick(KOSUL); return { q: `Choose the correct option.\n${it[0]}`, ...strChoices(it[1], it[2]), x: it[3] }; });
+const RAPOR = [
+  ["I am tired", "was tired", ["is tired", "are tired", "has been tired", "will be tired"], "Present simple → past simple (am/is → was)."],
+  ["I live in Ankara", "lived in Ankara", ["lives in Ankara", "live in Ankara", "has lived in Ankara", "would live in Ankara"], "Present simple → past simple."],
+  ["I will help you", "would help me", ["will help me", "helps me", "would helped me", "helped you"], "will → would; you → me."],
+  ["I have finished the work", "had finished the work", ["has finished the work", "finished the work now", "finishes the work", "will finish the work"], "Present perfect → past perfect."],
+  ["I am working now", "was working then", ["is working now", "works now", "has worked then", "would work now"], "Present continuous → past continuous; now → then."]];
+G("en-rapor", ["ingilizce"], "Reported Speech", 3, () => {
+  const S = pick(["He", "She"]), it = pick(RAPOR), s = S.toLowerCase();
+  return { q: `Choose the correct reported speech.\n${S} said, “${it[0]}.”`, ...strChoices(s + " " + it[1], it[2].map(y => s + " " + y)), x: it[3] };
+});
+const ILGI = [["The man ____ lives next door is a doctor.", "who", ["which", "whose", "where", "whom"]], ["The book ____ I bought yesterday is great.", "which", ["who", "whose", "where", "whom"]], ["The woman ____ car was stolen called the police.", "whose", ["who", "which", "where", "whom"]],
+  ["This is the town ____ I was born.", "where", ["who", "which", "whose", "whom"]], ["The students ____ passed the exam are happy.", "who", ["which", "whose", "where", "whom"]], ["That is the reason ____ he left.", "why", ["who", "which", "where", "whose"]],
+  ["She is the girl ____ I met at the party.", "whom", ["which", "whose", "where", "why"]], ["The film ____ we watched was boring.", "which", ["who", "whose", "where", "whom"]]];
+G("en-relative", ["ingilizce"], "Relative Clauses", 3, () => {
+  const it = pick(ILGI);
+  return { q: `Choose the correct option.\n${it[0]}`, ...strChoices(it[1], it[2]), x: `Doğru ilgi zamiri “${it[1]}”: ${it[1] === "who" ? "kişiyi niteleyen özne" : it[1] === "whom" ? "kişiyi niteleyen nesne" : it[1] === "which" ? "nesne/şey için" : it[1] === "whose" ? "aitlik bildirir" : it[1] === "where" ? "yer için" : "neden bildirir"}.` };
+});
+const TUR = [["success", "successful", "successfully", "succeed"], ["happy", "happily", "happiness", "unhappy"], ["differ", "different", "difference", "differently"], ["care", "careful", "carefully", "careless"], ["decide", "decision", "decisive", "decidedly"], ["act", "active", "action", "actively"], ["create", "creative", "creation", "creatively"], ["depend", "dependent", "dependence", "independence"]];
+const TURKOK = [
+  ["She is a very ____ student; she always gets high marks. (succeed)", "successful", ["success", "successfully", "succeed", "succeeding"], "Isimden önce sıfat gerekir: successful."],
+  ["He solved the problem ____. (easy)", "easily", ["easy", "ease", "easier", "easiness"], "Fiili niteleyen zarf gerekir: easily."],
+  ["The ____ between the two cities is 300 km. (distant)", "distance", ["distant", "distantly", "distanced", "distancing"], "‘The’ den sonra isim gerekir: distance."],
+  ["Her ____ to the team was great. (contribute)", "contribution", ["contribute", "contributed", "contributing", "contributive"], "Isim gerekir: contribution."],
+  ["It is ____ to cross the road without looking. (danger)", "dangerous", ["danger", "dangerously", "endanger", "dangers"], "Sıfat gerekir: dangerous."],
+  ["He spoke ____ about his plans. (excite)", "excitedly", ["excited", "exciting", "excitement", "excite"], "Zarf gerekir: excitedly."],
+  ["The ____ of the new law surprised everyone. (announce)", "announcement", ["announce", "announced", "announcing", "announcer"], "Isim gerekir: announcement."],
+  ["She felt ____ after the long journey. (exhaust)", "exhausted", ["exhaust", "exhausting", "exhaustion", "exhaustively"], "Duygu durumu: exhausted."]];
+G("en-wordform", ["ingilizce"], "Word Formation", 3, () => {
+  const it = pick(TURKOK);
+  return { q: `Choose the correct form of the word in brackets.\n${it[0]}`, ...strChoices(it[1], it[2]), x: it[3] };
+});
+const PHR = [["give up", "stop trying"], ["look after", "take care of"], ["turn down", "refuse"], ["put off", "postpone"], ["carry on", "continue"], ["come across", "find by chance"], ["break down", "stop working"], ["run out of", "have none left"], ["get over", "recover from"], ["find out", "discover"], ["call off", "cancel"], ["set up", "establish"], ["look up to", "admire"], ["bring up", "raise (a child)"]];
+G("en-phrasal", ["ingilizce"], "Phrasal Verbs", 3, () => {
+  const it = pick(PHR), yan = KOKUS(PHR.filter(p => p[0] !== it[0]).map(p => p[1]), 4);
+  return { q: `What does the phrasal verb “${it[0]}” mean?`, ...strChoices(it[1], yan), x: `“${it[0]}” = ${it[1]}.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

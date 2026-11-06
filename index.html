@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=161d101dd3">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=161d101dd3">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=161d101dd3">
+<link rel="manifest" href="/manifest.webmanifest?v=40f5c0273a">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=40f5c0273a">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=40f5c0273a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=161d101dd3">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=40f5c0273a">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -8098,23 +8098,28 @@ var SSS_SUB = {
 };
 /* ===== Günün sorusu + haftalık hata analizi kartı ===== */
 function gsHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+var GS_CUR = null, GS_A = null;
 function gsSoru() {
-  const al = alanDersleri(), havuz = BANK.filter(q => !q.p && !q.fig && !q.gen && al.includes(q.s) && q.o && q.o.length >= 4 && q.x);
+  if (GS_CUR) return GS_CUR;
+  const al = alanDersleri(), havuz = BANK.filter(q => !q.p && !q.fig && !q.gen && al.includes(q.s) && q.o && q.o.length >= 4 && q.x && !S.reports[q.id]);
   if (!havuz.length) return null;
-  return havuz[gsHash("ake" + dayKey()) % havuz.length];
+  const taze = havuz.filter(q => !S.ans[q.id]);
+  GS_A = null; GS_CUR = pick(taze.length ? taze : havuz);
+  return GS_CUR;
 }
-function gsDurum() { try { const d = JSON.parse(LS.get("ake.gs") || "{}"); return d && d.d === dayKey() ? d : { d: dayKey(), a: null }; } catch (e) { return { d: dayKey(), a: null }; } }
+function gsYeni() { GS_CUR = null; GS_A = null; render(); }
 function kartGunSorusu() {
   const q = gsSoru(); if (!q) return "";
-  const d = gsDurum(), bitti = d.a != null, si = streakInfo();
+  const bitti = GS_A != null, si = streakInfo(), kilit = !bitti && ucretsizMi() && ucretsizHak().kalanSoru < 1;
+  if (kilit) return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Günün sorusu</h2></div><p style="margin:0">Bugünkü ücretsiz soru hakkın doldu. Yarın yenilenir. Sınırsız soru için paketlere bakabilirsin.</p><div class="row"><a class="btn pri" href="#premium">Paketlere bak</a></div></section>`;
   const opts = q.o.map((o, i) => {
     let cls = "";
-    if (bitti) { if (i === q.a) cls = "right"; else if (i === d.a) cls = "wrong"; }
+    if (bitti) { if (i === q.a) cls = "right"; else if (i === GS_A) cls = "wrong"; }
     return `<button class="opt ${cls}" data-a="gsPick" data-o="${i}"${bitti ? " disabled" : ""}><span class="bub">${LET[i]}</span><span class="ot">${fq(o)}</span></button>`;
   }).join("");
   return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Günün sorusu</h2><span class="pill form">${esc(SUBJ[q.s] ? SUBJ[q.s].n : "")}</span></div>
     <div class="qtext">${fq(q.q)}</div><div class="opts" role="group" aria-label="Seçenekler">${opts}</div>
-    ${bitti ? `<div class="expl"><div class="res ${d.a === q.a ? "ok" : "bad"}">${d.a === q.a ? "Doğru!" : "Yanlış. Doğru cevap " + LET[q.a] + "."}</div><p>${fq(q.x)}</p><p class="small muted">Serin: <b>${si.n}</b> gün. Yarın yeni soru gelir.</p></div>` : `<p class="small muted" style="margin:0">Her gün 1 soru. Çözdükçe serin uzar.</p>`}</section>`;
+    ${bitti ? `<div class="expl"><div class="res ${GS_A === q.a ? "ok" : "bad"}">${GS_A === q.a ? "Doğru!" : "Yanlış. Doğru cevap " + LET[q.a] + "."}</div><p>${fq(q.x)}</p><div class="row"><button class="btn sm" data-a="gsYeni">Yeni soru</button><span class="small muted">Serin: <b>${si.n}</b> gün</span></div></div>` : `<p class="small muted" style="margin:0">Sayfayı her açtığında yeni bir soru gelir. Çözdükçe serin uzar.</p>`}</section>`;
 }
 function hataKarti() {
   const now = Date.now(), hafta = 7 * 86400000;
@@ -8134,12 +8139,12 @@ function hataKarti() {
 }
 Object.assign(OZ_ACT, {
   gsPick(d) {
-    const q = gsSoru(), dur = gsDurum(); if (!q || dur.a != null) return;
+    const q = gsSoru(); if (!q || GS_A != null) return;
     const o = +d.o; if (!(o >= 0 && o < q.o.length)) return;
-    LS.set("ake.gs", JSON.stringify({ d: dayKey(), a: o }));
-    record(q, o === q.a ? 1 : 0, o);
-    render();
-  }
+    if (ucretsizMi()) { const h = ucretsizHak(); if (h.kalanSoru < 1) { render(); return; } h.d.n = (h.d.n || 0) + 1; h.kaydet(); }
+    GS_A = o; record(q, o === q.a ? 1 : 0, o); render();
+  },
+  gsYeni() { gsYeni(); }
 });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
@@ -8348,6 +8353,7 @@ function sayfaBasligi(r) { try { const t = SAYFA_BASLIK[r] || (LEGAL[r] && LEGAL
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;
   sayfaBasligi(r);
+  if (r !== "bugun" && !(RUN && UI.inRun)) { GS_CUR = null; GS_A = null; }
   if (adminMode()) APP.innerHTML = vAdminShell();
   else {
   let main;

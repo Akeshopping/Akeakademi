@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=7ba292292a">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7ba292292a">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7ba292292a">
+<link rel="manifest" href="/manifest.webmanifest?v=786f2a923e">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=786f2a923e">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=786f2a923e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=7ba292292a">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=786f2a923e">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2612,6 +2612,58 @@ const BANK = [];
   q("sosyoloji","Kültür",2,"Aynı toplumdaki farklı grupların kendine özgü kültürel özelliklerine ne denir?",["Alt kültür", "Karşı kültür", "Kitle kültürü", "Popüler kültür", "Maddi kültür"],0,"Bir toplumdaki belli bir grubun ana kültürden farklı özelliklerine alt kültür denir.");
   q("mantik","Önermeler",3,"p doğru, q yanlış olduğunda ‘p ∧ q’ önermesinin doğruluk değeri nedir?",["Yanlış", "Doğru", "Belirsiz", "Hem doğru hem yanlış", "Hesaplanamaz"],0,"Ve bağlacı yalnızca iki önerme de doğruysa doğrudur; p ∧ q yanlıştır.");
   q("mantik","Kavramlar",3,"‘Kuş’ ve ‘serçe’ kavramları arasındaki ilişki aşağıdakilerden hangisidir?",["Kapsam (tür-cins) ilişkisi", "Ayrık ilişkisi", "Çelişik ilişkisi", "Karşıt ilişkisi", "Eş anlamlılık"],0,"Serçe, kuşun bir türüdür; kuş kavramı serçeyi kapsar.");
+})();
+/* ===== Özgün soru bankası · 12. bölüm: az sorulu sözel konular (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    const id = s + "-12-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
+  }
+
+
+
+  q("mantik","Önermeler",3,"p → q önermesi aşağıdaki durumların hangisinde yanlıştır?",["p doğru, q yanlış", "p yanlış, q doğru", "p yanlış, q yanlış", "p doğru, q doğru", "p ve q aynı değerde"],0,"Koşullu önerme yalnızca öncül doğru, sonuç yanlış olduğunda yanlıştır.");
+  q("mantik","Önermeler",3,"“p ∨ q” önermesinin yanlış olması için aşağıdakilerden hangisi gerekir?",["p ve q'nun ikisinin de yanlış olması", "p'nin yanlış olması", "q'nun yanlış olması", "p ve q'nun farklı değerde olması", "p ve q'nun ikisinin de doğru olması"],0,"Veya bağlacı yalnızca iki önerme de yanlışsa yanlıştır.");
+  q("mantik","Önermeler",3,"“Eğer çalışırsan başarırsın.” önermesinin karşıt tersi (kontrapozitifi) aşağıdakilerden hangisidir?",["Başarmazsan çalışmamışsındır.", "Başarırsan çalışmışsındır.", "Çalışmazsan başaramazsın.", "Çalışırsan başaramazsın.", "Başarırsan çalışmamışsındır."],0,"p → q'nun kontrapozitifi ¬q → ¬p'dir ve aynı doğruluk değerine sahiptir.");
+  q("mantik","Kavramlar",2,"“Memeli” ve “balık” kavramları arasındaki ilişki aşağıdakilerden hangisidir?",["Ayrık (kesişmeyen)", "Kapsama", "Eş anlamlılık", "Kesişim", "Özdeşlik"],0,"Hiçbir memeli balık olmadığından kavramlar ayrıktır.");
+  q("mantik","Kıyas",3,"“Bütün kuşlar hayvandır. Bütün serçeler kuştur.” öncüllerinden hangisi kesinlikle çıkarılabilir?",["Bütün serçeler hayvandır.", "Bütün hayvanlar kuştur.", "Bazı hayvanlar serçe değildir.", "Bütün kuşlar serçedir.", "Hiçbir serçe hayvan değildir."],0,"Tümel olumlu iki öncülden geçişlilik yoluyla “Bütün serçeler hayvandır.” sonucu çıkar.");
+  q("psikoloji","Duygu ve Güdü",3,"Maslow'un ihtiyaçlar hiyerarşisinde en alttaki ihtiyaç grubu aşağıdakilerden hangisidir?",["Fizyolojik ihtiyaçlar", "Güvenlik ihtiyacı", "Sevgi ve ait olma", "Saygı", "Kendini gerçekleştirme"],0,"Hiyerarşi alttan üste: fizyolojik, güvenlik, ait olma, saygı, kendini gerçekleştirme.");
+  q("psikoloji","Bellek",3,"Bilginin birkaç saniye saklanıp sonra silindiği bellek türü hangisidir?",["Duyusal bellek", "Uzun süreli bellek", "Örtük bellek", "Anlamsal bellek", "Prosedürel bellek"],0,"Duyusal bellek saniyeler içinde silinir; kısa süreli bellek yaklaşık 20-30 saniye sürer.");
+  q("psikoloji","Öğrenme",3,"Bir davranışın, arkasından hoş bir sonuç gelmesi nedeniyle tekrar edilme olasılığının artmasına ne denir?",["Pekiştirme", "Sönme", "Genelleme", "Ayırt etme", "Habituasyon"],0,"Olumlu pekiştirme, davranışın tekrar olasılığını artırır.");
+  q("psikoloji","Gelişim",2,"Erikson'un psikososyal gelişim kuramında ‘güvene karşı güvensizlik’ dönemi hangi yaşta yaşanır?",["Bebeklik (0-1)", "Ergenlik", "Yetişkinlik", "Çocukluk (3-5)", "Yaşlılık"],0,"Güvene karşı güvensizlik, ilk yılda (bebeklik) yaşanan ilk psikososyal dönemdir.");
+  q("psikoloji","Bilişsel Süreçler",3,"Aşağıdakilerden hangisi algıda seçiciliğe örnektir?",["Kalabalık bir ortamda yalnızca adının söylenmesini fark etmek", "Soğuk suyun zamanla sıcak gelmesi", "Bir şarkıyı ezberlemek", "Rüyada uçmak", "Soğuktan titremek"],0,"Çok uyarıcı içinde ilgili olana odaklanmak algıda seçiciliktir (kokteyl parti etkisi).");
+  q("sosyoloji","Toplumsal Yapı",3,"Gelenek ve göreneklerin ağır bastığı, kan bağına dayalı küçük topluluk ilişkileri hangi toplum türünün özelliğidir?",["Geleneksel toplum", "Endüstri toplumu", "Bilgi toplumu", "Kitle toplumu", "Küresel toplum"],0,"Geleneksel toplumda ilişkiler yüz yüze, akrabalık ve gelenek temellidir.");
+  q("sosyoloji","Toplumsal Değişme",3,"Kırsal alandan kente yoğun göçle ilgili aşağıdakilerden hangisi doğrudur?",["Kentleşme ve çarpık yapılaşma artabilir", "Kırsal nüfus artar", "Tarımsal üretim her zaman artar", "Sanayileşme azalır", "Kent nüfusu azalır"],0,"Hızlı göç kentleşmeyi hızlandırır; altyapı ve konut sorunları görülebilir.");
+  q("sosyoloji","Sosyal Kurumlar",2,"Aşağıdakilerden hangisi toplumun temel sosyal kurumlarından biri DEĞİLDİR?",["Moda", "Aile", "Eğitim", "Din", "Ekonomi"],0,"Moda bir kurum değil, toplumsal olgudur; aile, eğitim, din ve ekonomi temel sosyal kurumlardır.");
+  q("din","İslam Düşüncesi",3,"İslam düşüncesinde ‘Mutezile’ mezhebinin temel ilkeleri arasında hangisi vardır?",["Akla büyük önem verme", "Akıl dışı kalma", "Yalnızca sünnete bağlılık", "Tasavvufu reddetme", "Şeriatı kabul etmeme"],0,"Mutezile aklı ön plana çıkaran itikadi bir ekoldür.");
+  q("din","Ahlak ve Değerler",2,"Aşağıdakilerden hangisi İslam ahlakının temel erdemlerinden biridir?",["Adalet", "Kibir", "İsraf", "Gıybet", "Hırs"],0,"Adalet temel bir İslami ahlak değeridir; diğerleri kötü kabul edilen davranışlardır.");
+  q("din","İbadetler",2,"Ramazan ayında tutulan orucun adı nedir?",["Farz", "Vacip", "Sünnet", "Müstehap", "Mubah"],0,"Ramazan orucu farzdır.");
+  q("din","Temel Kavramlar",3,"Hz. Muhammed'e vahyedilen ilk ayet hangisidir?",["İkra (Oku)", "Fatiha", "Bakara", "Yasin", "İhlas"],0,"İlk vahiy Alak suresinin ‘İkra’ ile başlayan ilk beş ayetidir.");
+  q("tarih2","Cumhuriyet Dönemi",3,"Türkiye'nin NATO'ya üye olduğu yıl hangisidir?",["1952", "1945", "1960", "1971", "1980"],0,"Türkiye 1952'de NATO üyesi oldu.");
+  q("tarih2","Cumhuriyet Dönemi",3,"Türkiye'de çok partili hayata geçişi hızlandıran gelişme aşağıdakilerden hangisidir?",["Demokrat Parti'nin kurulması (1946)", "Takrir-i Sükûn Kanunu", "Şeyh Said İsyanı", "Menemen Olayı", "Serbest Cumhuriyet Fırkası'nın kapanması"],0,"1946'da Demokrat Parti kuruldu, 1950'de iktidara geldi.");
+  q("tarih2","Cumhuriyet Dönemi",3,"Hatay'ın Türkiye'ye katıldığı yıl hangisidir?",["1939", "1923", "1936", "1945", "1950"],0,"Hatay Devleti, 1939'da Türkiye'ye katıldı.");
+  q("tarih2","Soğuk Savaş",3,"Soğuk Savaş döneminde Doğu Blokunun askerî örgütü hangisidir?",["Varşova Paktı", "NATO", "SEATO", "CENTO", "AET"],0,"Varşova Paktı (1955), Sovyetler Birliği önderliğindeki askerî ittifaktır.");
+  q("cografya2","Nüfus",3,"Türkiye'de nüfusun ilk iki sırada yoğun olduğu bölgeler aşağıdakilerden hangileridir?",["Marmara ve Ege", "Doğu Anadolu ve Karadeniz", "Akdeniz ve İç Anadolu", "Güneydoğu ve Trakya", "Karadeniz ve Ege"],0,"Marmara en kalabalık, ardından Ege Bölgesi gelir.");
+  q("cografya2","Ekonomik Coğrafya",3,"Türkiye'de ‘fındık’ üretiminin yoğun olduğu bölge hangisidir?",["Karadeniz", "Marmara", "Akdeniz", "İç Anadolu", "Güneydoğu Anadolu"],0,"Fındık Karadeniz'in nemli ve ılıman bölümlerinde yetişir.");
+  q("cografya2","Doğal Afetler",3,"Türkiye'de depremlerin en çok görüldüğü fay hattı hangisidir?",["Kuzey Anadolu Fayı", "Güney Marmara Fayı", "Ege Fayı", "Karasu Fayı", "Toros Fayı"],0,"Kuzey Anadolu Fay Hattı, Türkiye'nin en önemli ve en aktif fay hatlarından biridir.");
+  q("cografya2","İklim",3,"Akdeniz ikliminin görüldüğü bölgelerde yazlar nasıl geçer?",["Sıcak ve kurak", "Soğuk ve yağışlı", "Ilık ve nemli", "Serin ve kurak", "Soğuk ve kurak"],0,"Akdeniz ikliminde yazlar sıcak ve kurak, kışlar ılık ve yağışlıdır.");
+  q("cografya","Türkiye'nin Bölgeleri",3,"Türkiye'nin en yüksek dağı hangisidir?",["Ağrı Dağı", "Erciyes", "Kaçkar", "Uludağ", "Palandöken"],0,"Ağrı Dağı (5137 m), Türkiye'nin en yüksek dağıdır.");
+  q("cografya","Göller",2,"Türkiye'nin en büyük gölü hangisidir?",["Van Gölü", "Tuz Gölü", "Eğirdir Gölü", "Beyşehir Gölü", "İznik Gölü"],0,"Van Gölü, yüzölçümü bakımından Türkiye'nin en büyük gölüdür.");
+  q("cografya","Göller",3,"Türkiye'nin en büyük tatlı su gölü hangisidir?",["Beyşehir Gölü", "Van Gölü", "Tuz Gölü", "İznik Gölü", "Burdur Gölü"],0,"Beyşehir Gölü, Türkiye'nin en büyük doğal tatlı su gölüdür.");
+  q("tarih","İlk Türk Devletleri",2,"Orhun Yazıtları hangi Türk devleti dönemine aittir?",["Göktürkler", "Uygurlar", "Hunlar", "Karahanlılar", "Gazneliler"],0,"Orhun Yazıtları Göktürk dönemine aittir ve Türkçe'nin ilk yazılı belgelerindendir.");
+  q("tarih","İlk Türk Devletleri",3,"Aşağıdakilerden hangisi Karahanlılar'ın Müslüman Türk devleti olmasında etkili olan hükümdardır?",["Satuk Buğra Han", "Alp Arslan", "Mahmud Gazneli", "Tuğrul Bey", "Melikşah"],0,"Satuk Buğra Han İslam'ı kabul eden ilk Karahanlı hükümdarıdır.");
+  q("tarih","Selçuklu",3,"Büyük Selçuklu Devleti'nin kurucusu kimdir?",["Tuğrul Bey", "Alp Arslan", "Melikşah", "Sencer", "Çağrı Bey"],0,"Büyük Selçuklu Devleti'ni Tuğrul Bey kurdu (1040 Dandanakan zaferi).");
+  q("edebiyat","Edebî Akımlar",3,"‘Realizm’ edebiyat akımının temel özelliği aşağıdakilerden hangisidir?",["Gerçekliği olduğu gibi yansıtmak", "Hayal gücüne öncelik vermek", "Duygularla coşmak", "Sanat için sanat", "Bilinç akışı kullanmak"],0,"Realizm, gerçekliği gözleme dayanarak olduğu gibi anlatmayı amaçlar.");
+  q("edebiyat","Edebî Akımlar",3,"‘Sembolizm’ akımı hangi anlayışı benimser?",["Duyguları sembollerle ve imajlarla anlatmak", "Doğayı olduğu gibi anlatmak", "Toplumsal sorunları işlemek", "Akılcılığı savunmak", "Mizah yoluyla eleştirmek"],0,"Sembolizm, anlamı doğrudan değil, semboller ve çağrışımlarla anlatır.");
+  q("edebiyat","Hece Ölçüsü",3,"11'li hece ölçüsüyle yazılmış şiirde genellikle durak nerede olur?",["6. hecede", "5. hecede", "7. hecede", "4. hecede", "8. hecede"],0,"11'li hece ölçüsünde genellikle 6+5 duraklı kalıp kullanılır.");
+  q("edebiyat","Eser Türleri",3,"Aşağıdakilerden hangisi tiyatro türüdür?",["Komedi", "Gazel", "Mesnevi", "Halk hikâyesi", "Mani"],0,"Komedi, tiyatroda güldürü türüdür; diğerleri şiir ve anlatı türleridir.");
+  q("turkce","Paragraf",3,"Bir paragrafta anlatılmak istenen ana duygu ya da düşünceye ne denir?",["Ana düşünce", "Yardımcı düşünce", "Konu", "Başlık", "Özet"],0,"Ana düşünce, paragrafın bütününden çıkan temel yargıdır.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));

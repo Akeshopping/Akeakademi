@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=f3337beeb0">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f3337beeb0">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=f3337beeb0">
+<link rel="manifest" href="/manifest.webmanifest?v=a3591f8b0b">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=a3591f8b0b">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=a3591f8b0b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=f3337beeb0">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=a3591f8b0b">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -6011,6 +6011,51 @@ G("zor-yay-sarkac", ["fizik"], "Basit Harmonik Hareket", 3, () => {
   const dogM = `${kes13(Math.round(2 * 1000), Math.round(omega * 1000))}π`;
   const dog = (2 / omega) + "π", yan = [(1 / omega) + "π", (2 * omega) + "π", (omega / 2) + "π", (4 / omega) + "π", (2 / omega / 2) + "π"].filter(x => x !== dog);
   return { q: `Yay sabiti ${k} N/m olan yaya bağlı ${m} kg kütleli cisim basit harmonik hareket yapıyor. Hareketin periyodu kaç saniyedir? (π sayısı cinsinden)`, ...strChoices(dog, KOKUS([...new Set(yan)], 4)), x: `T = 2π√(m/k) = 2π√(${m}/${k}) = 2π/${omega} = ${dog} s.` };
+});
+/* ===== 9. tur: zor kimya / biyoloji / geometri ===== */
+const chk14 = (a, b, id) => { if (Math.abs(a - b) > 1e-9 * Math.max(1, Math.abs(a))) throw new Error("gen14 " + id + " " + a + " " + b); };
+const BILESIK14 = [["CH₄", 16, 5], ["C₂H₆", 30, 8], ["C₃H₈", 44, 11], ["NH₃", 17, 4], ["H₂O", 18, 3], ["CO₂", 44, 3], ["SO₂", 64, 3], ["C₂H₄", 28, 6]];
+G("zor-mol-atom", ["kimya"], "Mol Kavramı", 3, () => {
+  const [f, M, at] = pick(BILESIK14), k = pick([0.5, 1, 1.5, 2, 3]), m = M * k, mol = m / M, atom = mol * at;
+  chk14(atom, (m * at) / M, "molatom");
+  const tur = rnd(0, 1);
+  return tur === 0
+    ? { q: `${m} gram ${f} gazı kaç mol atom içerir? (Mol kütleleri: H=1, C=12, N=14, O=16, S=32)`, ...numChoices(atom, [mol, m / at, mol * (at - 1), mol * at / 2, mol * (at + 1)]), x: `${m} g ${f} = ${m}/${M} = ${mol} mol. Her molekülde ${at} atom vardır → ${mol} × ${at} = ${atom} mol atom.` }
+    : { q: `${m} gram ${f} gazındaki toplam atom sayısı kaç NA'dır? (Mol kütleleri: H=1, C=12, N=14, O=16, S=32)`, ...numChoices(atom, [mol, mol * at + at, mol * (at - 1), m, atom * 2]), x: `n = ${m}/${M} = ${mol} mol; atom sayısı = ${mol} × ${at} = ${atom} NA.` };
+});
+G("zor-gaz-birlesik", ["kimya"], "Gazlar", 3, () => {
+  const P1 = pick([1, 2, 3, 4]), V1 = pick([2, 4, 6, 8, 10]), T1 = pick([200, 300, 400]), P2 = pick([1, 2, 4, 6]), T2 = pick([300, 400, 600]);
+  const V2 = P1 * V1 * T2 / (P2 * T1); if (!Number.isInteger(V2) || V2 === V1) return null;
+  chk14(P1 * V1 / T1, P2 * V2 / T2, "gaz");
+  return { q: `Sabit miktarda ideal bir gaz ${P1} atm basınç, ${V1} L hacim ve ${T1} K sıcaklıktadır. Basınç ${P2} atm, sıcaklık ${T2} K olduğunda gazın hacmi kaç L olur?`, ...numChoices(V2, [V1 * P2 * T2 / (P1 * T1), P1 * V1 * T1 / (P2 * T2), V1 * T2 / T1, P1 * V1 / P2, V1 * T1 / T2]), x: `P₁V₁/T₁ = P₂V₂/T₂ → V₂ = ${P1}·${V1}·${T2}/(${P2}·${T1}) = ${V2} L.` };
+});
+G("zor-hardy-weinberg", ["biyoloji"], "Popülasyon Genetiği", 3, () => {
+  const qq = pick([0.1, 0.2, 0.3, 0.4, 0.5]), N = pick([100, 200, 500, 1000]), aa = Math.round(qq * qq * N), het = Math.round(2 * qq * (1 - qq) * N);
+  chk14(aa / N, qq * qq, "hw"); chk14(het, 2 * qq * (1 - qq) * N, "hw2");
+  return { q: `Hardy-Weinberg dengesindeki ${N} bireylik bir popülasyonda çekinik (a) alelin frekansı ${qq} olarak verilmiştir. Bu popülasyonda heterozigot (Aa) birey sayısı kaçtır?`, ...numChoices(het, [aa, Math.round(N * (1 - qq) * (1 - qq)), Math.round(N * qq), Math.round(N * (1 - qq)), Math.round(2 * qq * N)]), x: `p = ${(1 - qq).toFixed(1)}, q = ${qq}. Aa = 2pq·N = 2·${(1 - qq).toFixed(1)}·${qq}·${N} = ${het}.` };
+});
+G("zor-dna-baz", ["biyoloji"], "Nükleik Asitler", 3, () => {
+  const N = pick([200, 400, 500, 1000]), A = pick([10, 15, 20, 25, 30, 35]), G2 = 50 - A, aS = N * A / 100, gS = N * G2 / 100, ask = rnd(0, 2);
+  if (!Number.isInteger(aS) || !Number.isInteger(gS)) return null;
+  const H = 2 * aS + 3 * gS;
+  chk14(aS + gS, N / 2, "dna");
+  return ask === 0 ? { q: `Çift zincirli bir DNA molekülünde toplam ${N} nükleotit vardır ve adenin oranı %${A}'dir. Bu DNA'da guanin sayısı kaçtır?`, ...numChoices(gS, [aS, N * G2 / 50, N - aS, G2, N / 2 - gS]), x: `A = T = %${A}; G = C = %${G2}. Guanin = ${N}·${G2}/100 = ${gS}.` }
+    : { q: `Çift zincirli bir DNA molekülünde toplam ${N} nükleotit vardır ve adenin oranı %${A}'dir. Bu DNA'da toplam kaç hidrojen bağı bulunur? (A=T arasında 2, G≡C arasında 3 bağ)`, ...numChoices(H, [2 * aS + 2 * gS, 3 * aS + 2 * gS, aS + gS, 2 * aS + 3 * gS + N / 10, N * 2]), x: `A=T=${aS}, G=C=${gS}. Hidrojen bağı = 2·${aS} + 3·${gS} = ${H}.` };
+});
+const ODIK = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [6, 8, 10], [9, 12, 15], [7, 24, 25]];
+G("zor-ucgen-iccember", ["geo"], "Üçgenler", 3, () => {
+  const [a, b, c] = pick(ODIK), r = (a + b - c) / 2, R = c / 2, s = (a + b + c) / 2;
+  chk14(r, a * b / 2 / s, "iccember");
+  const tur = rnd(0, 1);
+  return tur === 0
+    ? { q: `Dik kenar uzunlukları ${a} cm ve ${b} cm olan dik üçgenin iç teğet çemberinin yarıçapı kaç cm'dir?`, ...numChoices(r, [R, a * b / c, (a + b + c) / 4, a + b - c, s - c + 1]), x: `Hipotenüs = ${c}. r = (a + b − c)/2 = (${a} + ${b} − ${c})/2 = ${r}.` }
+    : { q: `Dik kenar uzunlukları ${a} cm ve ${b} cm olan dik üçgenin çevrel çemberinin yarıçapı ile iç teğet çemberinin yarıçapının toplamı kaç cm'dir?`, ...numChoices(r + R, [R, r, R - r, R * r, c + r]), x: `Hipotenüs = ${c}; R = ${c}/2 = ${R}; r = (${a}+${b}−${c})/2 = ${r}. R + r = ${R + r}.` };
+});
+G("zor-cokgen-ic-aci", ["geo"], "Çokgenler", 3, () => {
+  const n = rnd(6, 12), top = (n - 2) * 180, tek = top / n, kose = n * (n - 3) / 2;
+  const tur = rnd(0, 1);
+  if (tur === 0) { chk14(top / n + 360 / n, 180, "ic-dis"); return { q: `Kenar sayısı ${n} olan bir düzgün çokgenin bir iç açısı kaç derecedir?`, ...numChoices(tek, [360 / n, top / (n + 1), 180 - 360 / (n - 1), top, (n - 1) * 180 / n]), x: `İç açıların toplamı (n−2)·180 = ${top}°. Bir iç açı = ${top}/${n} = ${tek}°.` }; }
+  return { q: `Kenar sayısı ${n} olan bir dışbükey çokgenin köşegen sayısı kaçtır?`, ...numChoices(kose, [n * (n - 1) / 2, n * (n - 3), n * (n - 2) / 2, n, kose + n]), x: `Köşegen sayısı n(n−3)/2 = ${n}·${n - 3}/2 = ${kose}.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

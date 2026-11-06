@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=e371288063">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e371288063">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e371288063">
+<link rel="manifest" href="/manifest.webmanifest?v=a92f85d03d">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=a92f85d03d">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=a92f85d03d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=e371288063">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=a92f85d03d">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -8817,13 +8817,11 @@ function soruKart(q) {
 function soruBolumu() {
   if (!SORU.veri && !SORU.err) { setTimeout(soruYukle, 0); return `<div class="card"><h2>Soru üretimi</h2><div class="empty">Yükleniyor…</div></div>`; }
   const V = SORU.veri || { bekleyen: [], sayi: {} }, eks = eksikKonular();
-  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru üretimi</h2><span class="small muted">${V.sayi.onayli || 0} onaylı · ${V.sayi.bekliyor || 0} bekliyor</span></div>
-    <p class="small muted">Hazır sorusu az olan konular aşağıda. "5 soru üret"e basınca AI soruları yazar, güçlü model cevapları ayrıca çözer; tutmayanlar atılır, kalanlar onayına düşer. Onayladıkların birkaç dakika içinde tüm öğrencilere gider.</p>
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru üretimi</h2><span class="small muted">${V.sayi.onayli || 0} AI sorusu eklendi</span></div>
+    <p class="small muted">Hazır sorusu az olan konular aşağıda. "5 soru üret"e basınca AI soruları yazar; bozuk biçimli olanlar otomatik atılır, kalanlar onay beklemeden birkaç dakika içinde tüm öğrencilere gider. Bu düğme yalnızca yönetici hesabında görünür; günlük en fazla 20 üretim yapılır.</p>
     ${SORU.err ? `<p class="small" style="color:var(--bad)">${esc(SORU.err)}</p>` : ""}
     <select class="in" data-c="soruDers" style="max-width:240px"><option value="">Tüm dersler</option>${Object.keys(SUBJ).map(k => `<option value="${k}"${SORU.s === k ? " selected" : ""}>${esc(SUBJ[k].n)}</option>`).join("")}</select>
-    <div class="list">${eks.length ? eks.map(x => { const k = x.s + "|" + x.t, b = SORU.busy[k]; return `<div class="li"><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(SUBJ[x.s].n)} · ${x.n} hazır soru</div></div><button class="btn sm" data-a="soruUret" data-s="${x.s}" data-t="${esc(x.t)}"${b ? " disabled" : ""}>${b ? "Üretiliyor…" : "5 soru üret"}</button></div>`; }).join("") : `<div class="empty">Bu derste sorusu az olan konu kalmadı.</div>`}</div></div>
-  <div class="card stack"><div class="card-h" style="margin:0"><h2>Onay bekleyenler</h2>${V.bekleyen.length > 1 ? `<button class="btn sm" data-a="soruHepsi">Hepsini onayla</button>` : ""}</div>
-    ${V.bekleyen.length ? V.bekleyen.slice(0, 30).map(soruKart).join("") : `<div class="empty">Onay bekleyen soru yok.</div>`}</div>`;
+    <div class="list">${eks.length ? eks.map(x => { const k = x.s + "|" + x.t, b = SORU.busy[k]; return `<div class="li"><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(SUBJ[x.s].n)} · ${x.n} hazır soru</div></div><button class="btn sm" data-a="soruUret" data-s="${x.s}" data-t="${esc(x.t)}"${b ? " disabled" : ""}>${b ? "Üretiliyor…" : "5 soru üret"}</button></div>`; }).join("") : `<div class="empty">Bu derste sorusu az olan konu kalmadı.</div>`}</div></div>`;
 }
 async function soruKarar(ids, karar) {
   const r = await fetch("/api/yonetim/soru-karar", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: ids, karar }) }).catch(() => null);
@@ -8839,7 +8837,7 @@ Object.assign(OZ_ACT, {
     try {
       const r = await fetch("/api/yonetim/soru-uret", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ s: d.s, t: d.t, sn: SUBJ[d.s].n, e: SUBJ[d.s].e, d: 2, n: 5, ornek }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok) toast(`${j.gecen}/${j.uretilen} soru üretildi ve onayına düştü.`); else SORU.err = j.message || "Soru üretilemedi.";
+      if (r.ok) { toast(`${j.gecen} soru üretildi ve siteye eklendi.`); setTimeout(ekSorularYukle, 1500); } else SORU.err = j.message || "Soru üretilemedi.";
     } catch (e) { SORU.err = "Bağlantı kurulamadı."; }
     delete SORU.busy[k]; await soruYukle();
   },

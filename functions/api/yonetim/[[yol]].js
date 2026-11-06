@@ -50,7 +50,7 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
   for (const o of tut) {
     const q = { id: "ok-" + rastgele(5), s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
     if (typeof o.p === "string" && o.p.trim()) q.p = o.p.trim();
-    await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'bekliyor', ?, 0)").bind(q.id, s, t, d, JSON.stringify(q), Date.now()).run();
+    await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'onayli', ?, ?)").bind(q.id, s, t, d, JSON.stringify(q), Date.now(), Date.now()).run();
   }
   return { uretilen: arr.length, gecen: tut.length };
 }

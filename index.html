@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=b69e98820b">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=b69e98820b">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=b69e98820b">
+<link rel="manifest" href="/manifest.webmanifest?v=54fa94de6b">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=54fa94de6b">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=54fa94de6b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=b69e98820b">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=54fa94de6b">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5596,6 +5596,108 @@ G("kolay-kromozom", ["biyoloji"], "Hücre bölünmesi", 1, () => {
   return { q: `2n = ${n2} kromozomlu bir hücrede ${sor[0]} kaç kromozom bulunur?`,
     ...numChoices(sor[1], [n2 * 2, n2, n2 / 2, n2 / 4, n2 + 2, n2 - 2].filter(v => v !== sor[1]), { step: 2 }),
     x: sor[1] === mito ? `Mitoz bölünmede kromozom sayısı korunur: ${n2}.` : `Mayozda kromozom sayısı yarıya iner: n = ${mayoz}.` };
+});
+/* ===== 6. tur: Türkçe dil bilgisi ve İngilizce kalıpları (etiketli, elle doğrulanmış sözcük/cümle listelerinden) ===== */
+const KOKUS = (a, n) => shuffle(a).slice(0, n);
+function etiketGen(id, subs, topic, d, items, labels, kok, ipucu) {
+  G(id, subs, topic, d, () => {
+    const it = pick(items), dog = it[1], yan = KOKUS(labels.filter(l => l !== dog && !(it[2] || []).includes(l)), 4);
+    if (yan.length < 4) return null;
+    const c = strChoices(dog, yan);
+    return { q: kok.replace("{c}", it[0]), ...c, x: ipucu(it) };
+  });
+}
+function kategoriGen(id, subs, topic, d, cats, kok, ipucu) {
+  G(id, subs, topic, d, () => {
+    const names = Object.keys(cats), hedef = pick(names), dog = pick(cats[hedef]);
+    const diger = names.filter(n => n !== hedef), yan = []; let g = 0;
+    while (yan.length < 4 && g++ < 40) { const w = pick(cats[pick(diger)]); if (!yan.includes(w) && w !== dog) yan.push(w); }
+    if (yan.length < 4) return null;
+    return { q: kok.replace("{k}", hedef), ...strChoices(dog, yan), x: ipucu(hedef, dog) };
+  });
+}
+const SOZ_TUR = ["İsim", "Sıfat", "Zamir", "Zarf", "Edat", "Bağlaç", "Ünlem", "Fiil"];
+etiketGen("tr-sozcuk-turu", ["turkce"], "Sözcük Türleri", 2, [
+  ["**Çocuklar** bahçede oynuyor.", "İsim"], ["Dün **İstanbul**'a gittik.", "İsim"], ["**Kırmızı** araba hızla geçti.", "Sıfat"], ["**Üç** öğrenci geç kaldı.", "Sıfat"],
+  ["**Bu** kitap çok güzel.", "Sıfat"], ["**Bu** çok güzel olmuş.", "Zamir"], ["**Ben** yarın geleceğim.", "Zamir"], ["**Kim** geldi?", "Zamir"],
+  ["**Çok** güzel bir kitap okudum.", "Zarf"], ["**Yarın** bize gelecekler.", "Zarf"], ["Araba **hızla** geçti.", "Zarf"], ["Ali **ile** Veli geldi.", "Edat"],
+  ["Bu hediye **için** teşekkürler.", "Edat"], ["Akşama **kadar** bekledim.", "Edat"], ["Ali **ve** Veli geldi.", "Bağlaç"], ["Çalıştı **ama** başaramadı.", "Bağlaç"],
+  ["Yağmur yağdı **fakat** biz çıktık.", "Bağlaç"], ["**Eyvah**, geç kaldık!", "Ünlem"], ["**Aman**, dikkat et!", "Ünlem"], ["**Hey**, buraya gel!", "Ünlem"],
+  ["Çocuk koşarak **geldi**.", "Fiil"], ["O, yarın **gelecek**.", "Fiil"]
+], SOZ_TUR, "Aşağıdaki cümlede ** ** içindeki sözcüğün türü nedir?\n{c}", it => `Cümledeki yeri ve görevi dikkate alınır: ${it[0].replace(/\*\*/g, "“")}” sözcüğü bu cümlede ${it[1].toLowerCase()} görevindedir.`);
+const FIILIMSI = ["İsim-fiil", "Sıfat-fiil", "Zarf-fiil", "Çekimli fiil", "Sıfat (fiilimsi değil)"];
+etiketGen("tr-fiilimsi-turu", ["turkce"], "Fiilimsiler", 3, [
+  ["**Okumak** insanı geliştirir.", "İsim-fiil"], ["**Yüzmeyi** çok seviyorum.", "İsim-fiil"], ["**Gelişin** beni sevindirdi.", "İsim-fiil"], ["Onun **konuşması** etkileyiciydi.", "İsim-fiil"],
+  ["**Koşan** çocuk düştü.", "Sıfat-fiil"], ["**Gelen** misafirler tanıdıktı.", "Sıfat-fiil"], ["**Yazılacak** mektup hazır.", "Sıfat-fiil"], ["**Okunmuş** kitaplar rafta duruyor.", "Sıfat-fiil"],
+  ["**Gülerek** konuştu.", "Zarf-fiil"], ["Eve **gelince** aradı.", "Zarf-fiil"], ["Ders **çalışırken** uyuyakaldı.", "Zarf-fiil"], ["**Koşa koşa** geldi.", "Zarf-fiil"],
+  ["Çocuk koşarak **geldi**.", "Çekimli fiil"], ["Dün **okudum**.", "Çekimli fiil"]
+], FIILIMSI, "Aşağıdaki cümlede ** ** içindeki sözcük hangi türdedir?\n{c}", it => `${it[1] === "Çekimli fiil" ? "Kip ve kişi eki almış, cümleyi bitiren sözcük çekimli fiildir." : it[1] === "İsim-fiil" ? "-mak, -me, -iş eki almış, isim gibi kullanılan sözcük isim-fiildir." : it[1] === "Sıfat-fiil" ? "İsmi niteleyen -an, -esi, -ecek, -mış gibi ekler sıfat-fiil yapar." : "Eylemi zaman, durum ve tarz bakımından tamamlayan -arak, -ince, -ken, -a gibi ekler zarf-fiil yapar."}`);
+const OGE = ["Özne", "Belirtili nesne", "Belirtisiz nesne", "Dolaylı tümleç", "Zarf tümleci", "Yüklem"];
+etiketGen("tr-oge-turu", ["turkce"], "Cümlenin Ögeleri", 3, [
+  ["**Ali** dün kitabı aldı.", "Özne"], ["Ali dün **kitabı** aldı.", "Belirtili nesne"], ["Ali dün **kitap** aldı.", "Belirtisiz nesne"], ["Ali **bana** bir kitap verdi.", "Dolaylı tümleç"],
+  ["Ali **dün** kitabı aldı.", "Zarf tümleci"], ["Ali kitabı **aldı**.", "Yüklem"], ["Çocuklar **parkta** oynadı.", "Dolaylı tümleç"], ["**Çocuklar** parkta oynadı.", "Özne"],
+  ["Öğretmen **öğrencileri** uyardı.", "Belirtili nesne"], ["Annem **yemek** pişirdi.", "Belirtisiz nesne"], ["Babam **sabah** erkenden çıktı.", "Zarf tümleci"], ["Kardeşim **okula** gitti.", "Dolaylı tümleç"],
+  ["Müdür **bizi** çağırdı.", "Belirtili nesne"], ["Yağmur **şiddetle** yağıyor.", "Zarf tümleci"], ["Kitabı **masaya** bıraktım.", "Dolaylı tümleç"], ["Arkadaşım bana **mektup** yazdı.", "Belirtisiz nesne"], ["**Güneş** doğdu.", "Özne"]
+], OGE, "Aşağıdaki cümlede ** ** içindeki sözcük hangi ögedir?\n{c}", it => `${it[1] === "Yüklem" ? "Cümlede iş, oluş ve durumu bildiren sözcük yüklemdir." : it[1] === "Özne" ? "Yükleme ‘kim?’ ya da ‘ne?’ sorusuyla sorulur." : it[1] === "Belirtili nesne" ? "-i hâl eki almış, ‘neyi, kimi?’ sorusuna cevap veren öğedir." : it[1] === "Belirtisiz nesne" ? "Ek almadan ‘ne?’ sorusuna cevap veren nesnedir." : it[1] === "Dolaylı tümleç" ? "-e, -de, -den hâl eklerini almış ve yükleme dolaylı bağlanan öğedir." : "Yüklemi zaman, durum, nasıl gibi yönlerden tamamlayan, ek almayan sözcük zarf tümlecidir."}`);
+const CTUR = ["Basit cümle", "Birleşik cümle", "Sıralı cümle", "Bağlı cümle", "Girişik birleşik cümle"];
+etiketGen("tr-cumle-yapi", ["turkce"], "Cümle Türleri", 3, [
+  ["Çocuk bahçede oynuyor.", "Basit cümle"], ["Gelirsen birlikte gideriz.", "Birleşik cümle"], ["Koşarak geldi.", "Birleşik cümle"], ["Kitabı okuyup uyudu.", "Birleşik cümle"],
+  ["Okula gitti, derslerine çalıştı.", "Sıralı cümle"], ["Çiçekler açtı, kuşlar öttü.", "Sıralı cümle"], ["Yağmur yağdı ama biz yine de çıktık.", "Bağlı cümle"], ["Gitmek istiyorum ama yorgunum.", "Bağlı cümle"],
+  ["Annem, babamın geleceğini söyledi.", "Birleşik cümle"], ["Ali kitabı masaya bıraktı.", "Basit cümle"]
+], CTUR, "Aşağıdaki cümle yapısına göre hangisidir?\n“{c}”", it => `${it[1] === "Basit cümle" ? "Tek yüklemi vardır ve fiilimsi, yan cümle içermez." : it[1] === "Birleşik cümle" ? "Fiilimsi ya da şart/yan cümle bulunan, tek asıl yargılı cümledir." : it[1] === "Sıralı cümle" ? "Bağımsız yargılı cümleler virgülle sıralanır." : "Cümleler ‘ama, fakat, ve’ gibi bağlaçlarla bağlanmıştır."}`);
+const SESOLAY = ["Ünsüz yumuşaması", "Ünlü düşmesi", "Ünsüz benzeşmesi", "Ünlü daralması", "Ünsüz düşmesi"];
+etiketGen("tr-ses-olayi", ["turkce"], "Ses Olayları", 3, [
+  ["kitap + ı → kitabı", "Ünsüz yumuşaması"], ["renk + e → renge", "Ünsüz yumuşaması"], ["ağaç + a → ağaca", "Ünsüz yumuşaması"],
+  ["ağız + ı → ağzı", "Ünlü düşmesi"], ["burun + u → burnu", "Ünlü düşmesi"], ["oğul + u → oğlu", "Ünlü düşmesi"],
+  ["sokak + da → sokakta", "Ünsüz benzeşmesi"], ["kâğıt + da → kâğıtta", "Ünsüz benzeşmesi"], ["kitap + çı → kitapçı", "Ünsüz benzeşmesi"], ["devlet + de → devlette", "Ünsüz benzeşmesi"],
+  ["başla + yor → başlıyor", "Ünlü daralması"], ["de + yor → diyor", "Ünlü daralması"]
+], SESOLAY, "Aşağıdaki sözcüklerde hangi ses olayı görülür?\n{c}", it => `${it[0]}: ${it[1].toLowerCase()} vardır.`);
+kategoriGen("tr-sozcuk-yapi", ["turkce"], "Sözcükte Yapı", 2, {
+  "basit": ["göz", "kitap", "su", "ev", "kalem", "yol", "dağ", "masa", "güzel", "okul", "deniz", "çiçek"],
+  "türemiş": ["gözlük", "kitaplık", "okuyucu", "güzellik", "evli", "sulu", "yolcu", "dağlık", "hazırlık", "kalemlik", "çiçekçi", "denizci"],
+  "birleşik": ["hanımeli", "akşamüstü", "kuşburnu", "ayçiçeği", "başöğretmen", "bilgisayar", "karabiber", "gökkuşağı", "balayı", "yedieminönü"].filter(x => x !== "yedieminönü")
+}, "Aşağıdaki sözcüklerden hangisi {k} sözcüktür?", (k, w) => `“${w}” ${k} sözcüktür: ${k === "basit" ? "kök durumundadır, ek ya da ikinci sözcük almamıştır" : k === "türemiş" ? "kök + yapım eki ile oluşmuştur" : "iki sözcüğün kaynaşmasıyla oluşmuştur"}.`);
+/* ---- yazım: de/da, ki, mi ayrı-bitişik ---- */
+const YAZIM_DOGRU = ["Ben de geleceğim.", "Sen de bizimle gel.", "O da şarkı söyledi.", "Evde kimse yoktu.", "Kitabı masada unuttum.", "Okulda arkadaşlarımla buluştum.", "Öyle yorgunum ki yürüyemiyorum.", "Benimki daha büyük.", "Sınıftaki öğrenciler çalışıyor.", "Dünkü toplantı çok uzundu.", "Geliyor musun?", "Güzel mi olmuş?", "Hiç yorulmadı mı?", "Bahçedeki çiçekler açtı.", "Sanki hiçbir şey olmamış gibi davrandı."];
+const YAZIM_YANLIS = ["Bende geleceğim.", "Sende bizimle gel.", "Ev de kimse yoktu.", "Kitabı masa da unuttum.", "Okul da arkadaşlarımla buluştum.", "Öyle yorgunumki yürüyemiyorum.", "Benim ki daha büyük.", "Sınıf taki öğrenciler çalışıyor.", "Dün kü toplantı çok uzundu.", "Geliyormusun?", "Güzelmi olmuş?", "Hiç yorulmadımı?", "Bahçe deki çiçekler açtı."];
+G("tr-yazim-yanlis", ["turkce"], "Yazım Kuralları", 2, () => {
+  const w = pick(YAZIM_YANLIS), dogru = KOKUS(YAZIM_DOGRU, 4), o = shuffle(dogru.concat([w]));
+  return { q: "Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?", o, a: o.indexOf(w), x: `“${w}” cümlesinde de/da, ki ya da mi ekinin ayrı-bitişik yazımı yanlıştır. Diğer cümlelerin yazımı doğrudur.` };
+});
+const YAZIM_CIFT = [["yalnız", "yanlız"], ["herkes", "herkez"], ["şoför", "şöför"], ["birçok", "bir çok"], ["hiçbir", "hiç bir"], ["birkaç", "bir kaç"], ["yanlış", "yalnış"], ["ağabey", "ağabay"], ["kırtasiye", "kırtasiyye"], ["tecrübe", "tecrube"], ["pazartesi", "pazar ertesi"], ["bilgisayar", "bilgi sayar"], ["eşofman", "eşorf man"].filter(x => false)].filter(x => x.length === 2);
+G("tr-yazim-sozcuk", ["turkce"], "Yazım Kuralları", 2, () => {
+  const sec = KOKUS(YAZIM_CIFT, 4), dog = sec[0][0], yan = sec.map(x => x[1]);
+  const dogSozler = KOKUS(YAZIM_CIFT.map(x => x[0]).filter(x => x !== dog), 0);
+  const w = pick(YAZIM_CIFT), yanlislar = KOKUS(YAZIM_CIFT.filter(x => x !== w).map(x => x[1]), 4), o = shuffle([w[0]].concat(yanlislar));
+  return { q: "Aşağıdaki sözcüklerden hangisinin yazımı doğrudur?", o, a: o.indexOf(w[0]), x: `Doğru yazım “${w[0]}” biçimindedir. Diğer seçeneklerin doğrusu: ${yanlislar.map(y => YAZIM_CIFT.find(c => c[1] === y)[0]).join(", ")}.` };
+});
+/* ---- İngilizce: fiil biçimi (zaman) ve edat ---- */
+const FIILLER = [["go", "goes", "went", "gone", "going", "to school"], ["eat", "eats", "ate", "eaten", "eating", "breakfast"], ["write", "writes", "wrote", "written", "writing", "a letter"], ["see", "sees", "saw", "seen", "seeing", "a movie"],
+  ["take", "takes", "took", "taken", "taking", "a photo"], ["drink", "drinks", "drank", "drunk", "drinking", "tea"], ["give", "gives", "gave", "given", "giving", "a present"], ["sing", "sings", "sang", "sung", "singing", "a song"],
+  ["speak", "speaks", "spoke", "spoken", "speaking", "English"], ["drive", "drives", "drove", "driven", "driving", "a car"], ["ride", "rides", "rode", "ridden", "riding", "a bike"], ["break", "breaks", "broke", "broken", "breaking", "a window"],
+  ["choose", "chooses", "chose", "chosen", "choosing", "a book"], ["wear", "wears", "wore", "worn", "wearing", "a hat"], ["fly", "flies", "flew", "flown", "flying", "to Ankara"], ["begin", "begins", "began", "begun", "beginning", "the lesson"]];
+const ONAD = [["I", "am", "have", 0], ["You", "are", "have", 0], ["We", "are", "have", 0], ["They", "are", "have", 0], ["He", "is", "has", 1], ["She", "is", "has", 1]];
+G("en-fiil-zaman", ["ingilizce"], "Tenses", 2, () => {
+  const v = pick(FIILLER), s = pick(ONAD), [S, be, hv, th] = s, [b, t3, pa, pp, ing, obj] = v, set = new Set([b, t3, pa, pp, ing]); if (set.size < 5) return null;
+  const kal = pick([
+    [`${S} ____ ${obj} every day.`, th ? t3 : b, `“every day” düzenli bir alışkanlığı gösterir: Simple Present. ${th ? "He/She/It ile fiile -s/-es eklenir." : "I/You/We/They ile fiil yalın kalır."}`],
+    [`${S} ____ ${obj} yesterday.`, pa, "“yesterday” geçmişte bitmiş bir eylemi gösterir: Simple Past, fiilin ikinci hâli kullanılır."],
+    [`${S} ${hv} already ____ ${obj}.`, pp, `“${hv} already” Present Perfect yapısıdır; fiilin üçüncü hâli (V3) gelir.`],
+    [`${S} ${be} ____ ${obj} now.`, ing, `“${be} ... now” Present Continuous yapısıdır; fiile -ing eklenir.`],
+    [`${S} will ____ ${obj} tomorrow.`, b, "“will”dan sonra fiil yalın (V1) kullanılır."],
+    [`${S} didn't ____ ${obj} last week.`, b, "“didn't”tan sonra fiil yalın hâlde kullanılır."],
+    [`While ${S.toLowerCase() === "i" ? "I" : S.toLowerCase()} ${be === "am" ? "was" : be === "is" ? "was" : "were"} ____ ${obj}, the phone rang.`, ing, "“was/were” Past Continuous yapısıdır; fiile -ing eklenir."]
+  ]);
+  const o = shuffle([b, t3, pa, pp, ing]);
+  return { q: `Choose the correct form to complete the sentence.\n${kal[0]}`, o, a: o.indexOf(kal[1]), x: kal[2] };
+});
+const EDATLAR = [["I'm interested ___ history.", "in"], ["She is good ___ playing tennis.", "at", ["in"]], ["He is afraid ___ dogs.", "of"], ["We arrived ___ the airport at noon.", "at"], ["She depends ___ her parents.", "on", ["upon"]],
+  ["I'm looking forward ___ meeting you.", "to"], ["He is married ___ a doctor.", "to"], ["They are proud ___ their son.", "of"], ["The book is different ___ the film.", "from"], ["I'm waiting ___ the bus.", "for"],
+  ["She apologized ___ being late.", "for"], ["He is famous ___ his paintings.", "for"], ["I'll meet you ___ Monday.", "on"], ["The meeting starts ___ 9 o'clock.", "at"], ["She was born ___ 1999.", "in"],
+  ["He is tired ___ working all day.", "of", ["from"]], ["Thank you ___ your help.", "for"], ["I agree ___ you.", "with"], ["We talked ___ the problem.", "about"], ["He is responsible ___ the project.", "for"], ["She is fond ___ chocolate.", "of"], ["I believe ___ you.", "in"]];
+G("en-edat", ["ingilizce"], "Prepositions", 2, () => {
+  const it = pick(EDATLAR), havuz = ["at", "in", "on", "of", "for", "with", "to", "from", "by", "about"].filter(x => x !== it[1] && !(it[2] || []).includes(x)), yan = KOKUS(havuz, 4), o = shuffle([it[1]].concat(yan));
+  return { q: `Choose the correct preposition.\n${it[0]}`, o, a: o.indexOf(it[1]), x: `Doğru ifade: “${it[0].replace("___", it[1])}” Bu bir edat kalıbıdır (ifade ile birlikte öğrenilir).` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=45999a5615">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=45999a5615">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=45999a5615">
+<link rel="manifest" href="/manifest.webmanifest?v=161d101dd3">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=161d101dd3">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=161d101dd3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=45999a5615">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=161d101dd3">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -5417,7 +5417,7 @@ function vHome() {
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
     <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
-  ${veriUyari()}${canliKart(true)}${ligMini()}
+  ${kartGunSorusu()}${veriUyari()}${canliKart(true)}${ligMini()}
   <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
     <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
   <div class="grid2">
@@ -5683,6 +5683,7 @@ function vProgress() {
   const weak = weakTopics(8);
   return `<div class="view">
   <div class="vhead"><span class="eyebrow">Veriye bak, plana dön</span><h1>Gelişimim</h1></div>
+  ${hataKarti()}
   <div class="tiles">${tile(tot.q, "çözülen soru")}${tile("%" + pct(tot.c, tot.q), "doğruluk")}${tile(S.exams.length, "deneme")}${tile(S.exams.length ? nfx(S.exams[S.exams.length - 1].net) : "–", "son net")}</div>
   <div class="card"><div class="card-h"><h2>Deneme netleri</h2><div class="row small">${series.map((s, i) => `<span class="row" style="gap:6px"><i style="width:10px;height:10px;border-radius:50%;background:${["var(--form)", "var(--pencil)", "var(--ok)", "var(--warn)", "var(--bad)"][i % 5]}"></i>${esc(s.n)}</span>`).join("")}</div></div>
     ${series.length ? lineChart(series) : `<div class="empty">İlk denemeni çözdüğünde net grafiğin burada oluşur.</div>`}</div>
@@ -8095,6 +8096,51 @@ var SSS_SUB = {
     GB.busy = false; render();
   }
 };
+/* ===== Günün sorusu + haftalık hata analizi kartı ===== */
+function gsHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function gsSoru() {
+  const al = alanDersleri(), havuz = BANK.filter(q => !q.p && !q.fig && !q.gen && al.includes(q.s) && q.o && q.o.length >= 4 && q.x);
+  if (!havuz.length) return null;
+  return havuz[gsHash("ake" + dayKey()) % havuz.length];
+}
+function gsDurum() { try { const d = JSON.parse(LS.get("ake.gs") || "{}"); return d && d.d === dayKey() ? d : { d: dayKey(), a: null }; } catch (e) { return { d: dayKey(), a: null }; } }
+function kartGunSorusu() {
+  const q = gsSoru(); if (!q) return "";
+  const d = gsDurum(), bitti = d.a != null, si = streakInfo();
+  const opts = q.o.map((o, i) => {
+    let cls = "";
+    if (bitti) { if (i === q.a) cls = "right"; else if (i === d.a) cls = "wrong"; }
+    return `<button class="opt ${cls}" data-a="gsPick" data-o="${i}"${bitti ? " disabled" : ""}><span class="bub">${LET[i]}</span><span class="ot">${fq(o)}</span></button>`;
+  }).join("");
+  return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Günün sorusu</h2><span class="pill form">${esc(SUBJ[q.s] ? SUBJ[q.s].n : "")}</span></div>
+    <div class="qtext">${fq(q.q)}</div><div class="opts" role="group" aria-label="Seçenekler">${opts}</div>
+    ${bitti ? `<div class="expl"><div class="res ${d.a === q.a ? "ok" : "bad"}">${d.a === q.a ? "Doğru!" : "Yanlış. Doğru cevap " + LET[q.a] + "."}</div><p>${fq(q.x)}</p><p class="small muted">Serin: <b>${si.n}</b> gün. Yarın yeni soru gelir.</p></div>` : `<p class="small muted" style="margin:0">Her gün 1 soru. Çözdükçe serin uzar.</p>`}</section>`;
+}
+function hataKarti() {
+  const now = Date.now(), hafta = 7 * 86400000;
+  let q7 = 0, c7 = 0, q14 = 0, c14 = 0;
+  for (let i = 0; i < 14; i++) { const d = new Date(); d.setDate(d.getDate() - i); const k = S.daily[dayKey(d)]; if (!k) continue; if (i < 7) { q7 += k.q; c7 += k.c; } else { q14 += k.q; c14 += k.c; } }
+  const grup = {};
+  Object.values(S.mistakes).forEach(m => { if (!m.q || now - m.ts > hafta) return; const k = m.q.s + "|" + m.q.t; grup[k] = (grup[k] || 0) + 1; });
+  const top = Object.entries(grup).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => { const [s, t] = k.split("|"); return { s, t, n }; }).filter(x => SUBJ[x.s]);
+  if (q7 < 5 && !top.length) return "";
+  const acc = pct(c7, q7), onceki = q14 ? pct(c14, q14) : null, fark = onceki == null ? null : acc - onceki;
+  const acik = openMistakes().length;
+  return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Bu haftanın hata analizi</h2><span class="small muted">son 7 gün</span></div>
+    <p style="margin:0"><b>${q7}</b> soru çözdün, doğruluğun <b>%${acc}</b>${fark == null ? "" : fark === 0 ? ", geçen haftayla aynı" : fark > 0 ? `, geçen haftadan <b>%${fark}</b> yüksek` : `, geçen haftadan <b>%${-fark}</b> düşük`}.</p>
+    ${top.length ? `<div><p class="small muted" style="margin:0 0 6px">En çok yanlış yaptığın konular</p><div class="list">${top.map(x => `<div class="li"><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(SUBJ[x.s].n)} · ${x.n} yanlış</div></div><button class="btn sm" data-a="topicStart" data-s="${x.s}" data-t="${esc(x.t)}">Çalış</button></div>`).join("")}</div></div>
+    <p class="small muted" style="margin:0">Önerim: önce <b>${esc(top[0].t)}</b> konusundan 10 soru çöz, sonra yanlış defterine dön.</p>` : `<p class="small muted" style="margin:0">Bu hafta belirgin bir zayıf konu çıkmadı. Böyle devam.</p>`}
+    ${acik ? `<div class="row"><a class="btn ghost" href="#yanlislar">Yanlış defterim (${acik})</a></div>` : ""}</section>`;
+}
+Object.assign(OZ_ACT, {
+  gsPick(d) {
+    const q = gsSoru(), dur = gsDurum(); if (!q || dur.a != null) return;
+    const o = +d.o; if (!(o >= 0 && o < q.o.length)) return;
+    LS.set("ake.gs", JSON.stringify({ d: dayKey(), a: o }));
+    record(q, o === q.a ? 1 : 0, o);
+    render();
+  }
+});
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",

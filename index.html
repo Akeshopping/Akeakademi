@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=b712972cf8">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=b712972cf8">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=b712972cf8">
+<link rel="manifest" href="/manifest.webmanifest?v=474fdce2ff">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=474fdce2ff">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=474fdce2ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=b712972cf8">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=474fdce2ff">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -4987,6 +4987,231 @@ G("prizma-kosegen", ["geo"], "Katı cisimler", 2, () => {
   return { q: `Boyutları ${a * k} cm, ${b * k} cm ve ${c * k} cm olan dikdörtgenler prizmasının cisim köşegeni kaç cm'dir?`,
     ...numChoices(d * k, [a * k + b * k + c * k, Math.round(Math.sqrt((a * k) ** 2 + (b * k) ** 2)), (a * k * b * k * c * k) % 20 + 1, d * k + 1, d * k - 1, Math.round(Math.sqrt((b * k) ** 2 + (c * k) ** 2))], { step: 1 }),
     x: `Cisim köşegeni √(a² + b² + c²) = √(${(a * k) ** 2} + ${(b * k) ** 2} + ${(c * k) ** 2}) = √${(d * k) ** 2} = ${d * k} cm.` };
+});
+/* ===== 3. tur: fizik ve kimya zor/orta kalıpları (cevaplar iki bağımsız yoldan doğrulanır) ===== */
+const chk8 = (a, b, tol) => { if (Math.abs(a - b) > (tol || 1e-9)) throw new Error("gen8 tutarsiz"); return a; };
+const ok3 = v => Math.abs(v * 1000 - Math.round(v * 1000)) < 1e-6;
+G("cukur-ayna", ["afizik", "fizik"], "Optik", 3, () => {
+  const f = pick([6, 8, 10, 12, 15]), p = f * pick([2, 3, 1.5]), q = p * f / (p - f);
+  chk8(1 / f, 1 / p + 1 / q); if (!Number.isInteger(q) || !Number.isInteger(p)) return null;
+  const m = q / p, h = rnd(2, 6);
+  return { q: `Odak uzaklığı ${f} cm olan çukur aynanın ${p} cm önüne ${h} cm boyunda bir cisim konuluyor. Oluşan görüntü aynadan kaç cm uzaktadır?`,
+    ...numChoices(q, [p - f, f, p + f, p * f, f * 2, q + 3], { step: 1 }),
+    x: `1/f = 1/p + 1/q ⇒ 1/${f} = 1/${p} + 1/q ⇒ 1/q = ${nf(1 / f - 1 / p)} ⇒ q = ${q} cm (gerçek görüntü, ayna önünde; büyütme ${nf(m)}).` };
+});
+G("mercek-buyutme", ["afizik", "fizik"], "Optik", 3, () => {
+  const f = pick([5, 10, 12, 15, 20]), k = pick([2, 3, 4]), p = f * (k + 1) / k; if (!Number.isInteger(p)) return null;
+  const q = p * f / (p - f); chk8(q / p, k);
+  return { q: `Odak uzaklığı ${f} cm olan ince kenarlı mercekle, cisimden ${k} kat büyük gerçek görüntü elde etmek için cisim merceğin kaç cm önüne konulmalıdır?`,
+    ...numChoices(p, [f * k, f * 2, f * (k - 1) / k, f * (k + 2), f + k, p + 5], { step: 1 }),
+    x: `Büyütme q/p = ${k} ⇒ q = ${k}p. 1/f = 1/p + 1/(${k}p) = (${k} + 1)/(${k}p) ⇒ p = f(${k} + 1)/${k} = ${p} cm.` };
+});
+G("dalga-derinlik", ["afizik", "fizik"], "Dalgalar", 2, () => {
+  const f = rnd(2, 8), l1 = rnd(2, 6) * 2, l2 = l1 / 2, v1 = f * l1, v2 = f * l2; chk8(v2 / v1, l2 / l1);
+  return { q: `Bir dalga leğeninde derin bölgede dalga boyu ${l1} cm, frekans ${f} Hz'dir. Dalgalar sığ bölgeye geçince dalga boyu ${l2} cm oluyor. Sığ bölgedeki dalganın hızı kaç cm/s'dir?`,
+    ...numChoices(v2, [v1, f * l1 / 2 * 2, v1 * 2, f + l2, v2 * 2, l2 * 2], { step: f }),
+    x: `Geçişte frekans değişmez (f = ${f} Hz). v = λ·f = ${l2}·${f} = ${v2} cm/s (derin bölgedeki hız ${v1} cm/s idi).` };
+});
+G("surt-is", ["fizik"], "İş, güç ve enerji", 3, () => {
+  const m = pick([2, 4, 5, 10]), mu = pick([0.1, 0.2, 0.25, 0.5]), F = rnd(3, 9) * 10 + m * 10 * mu, d = rnd(2, 8);
+  const Fnet = F - mu * m * 10; if (Fnet <= 0) return null;
+  const Ek = Fnet * d, v = Math.sqrt(2 * Ek / m); const a = Fnet / m; chk8(v * v, 2 * a * d); if (!Number.isInteger(v)) return null;
+  return { q: `Sürtünme katsayısı ${nf(mu)} olan yatay yolda durgun hâlden harekete başlayan ${m} kg kütleli cisme yatay ${nf(F)} N'luk sabit kuvvet ${d} m boyunca uygulanıyor. Cismin son hızı kaç m/s olur? (g = 10 m/s²)`,
+    ...numChoices(v, [Math.sqrt(2 * F * d / m), Math.round(F * d / m), v + 2, v - 1, Math.round(Ek / 10)], { step: 1 }),
+    x: `Net kuvvet = ${nf(F)} − ${nf(mu)}·${m}·10 = ${nf(Fnet)} N. İş–enerji: ${nf(Fnet)}·${d} = ½·${m}·v² ⇒ v² = ${v * v} ⇒ v = ${v} m/s.` };
+});
+G("carpisma-kaybi", ["fizik", "afizik"], "Momentum", 3, () => {
+  const m1 = rnd(1, 6), m2 = rnd(1, 6), v1 = rnd(3, 12), v2 = rnd(-6, 3), V = (m1 * v1 + m2 * v2) / (m1 + m2);
+  if (!Number.isInteger(V) || V === 0) return null;
+  const E0 = m1 * v1 * v1 / 2 + m2 * v2 * v2 / 2, E1 = (m1 + m2) * V * V / 2, loss = E0 - E1;
+  chk8(loss, m1 * m2 * (v1 - v2) ** 2 / (2 * (m1 + m2))); if (loss <= 0) return null;
+  return { q: `${m1} kg ve ${m2} kg kütleli iki cisim aynı doğru üzerinde ${nf(v1)} m/s ve ${nf(v2)} m/s hızlarla (aynı yönü pozitif kabul ediniz) hareket ederken esnek olmayan çarpışma yapıp birlikte hareket ediyor. Çarpışmada ısıya dönüşen enerji kaç joule'dür?`,
+    ...numChoices(loss, [E0, E1, E0 / 2, loss + 5, loss * 2, Math.abs(m1 * v1 - m2 * v2)], { step: 3 }),
+    x: `Momentum korunumu: V = (${m1}·${nf(v1)} + ${m2}·${nf(v2)})/${m1 + m2} = ${nf(V)} m/s. Önceki enerji ${nf(E0)} J, sonraki ${nf(E1)} J. Kayıp = ${nf(loss)} J.` };
+});
+G("dusey-atis", ["fizik"], "Hareket", 2, () => {
+  const v = pick([10, 20, 30, 40]), h0 = pick([0, 15, 25, 40]);
+  const hmax = h0 + v * v / 20; let y = h0, vv = v, mx = y; for (let t = 0; t < 60000; t++) { y += vv * 1e-4; vv -= 10 * 1e-4; mx = Math.max(mx, y); } chk8(hmax, mx, 0.05);
+  return { q: `Yerden ${h0} m yükseklikteki bir balkondan ${v} m/s hızla düşey yukarı atılan cisim yerden en çok kaç metre yüksekliğe çıkar? (g = 10 m/s², hava direnci yok.)`.replace("Yerden 0 m yükseklikteki bir balkondan", "Yer seviyesinden"),
+    ...numChoices(hmax, [v * v / 10 + h0, v * v / 20, h0 + v, h0 + v * 2, hmax + 5], { step: 5 }),
+    x: `Çıkış süresi t = v/g = ${v / 10} s. Çıkılan yükseklik v²/(2g) = ${v * v / 20} m. Toplam: ${h0} + ${v * v / 20} = ${hmax} m.` };
+});
+G("isil-denge", ["fizik"], "Isı ve sıcaklık", 2, () => {
+  const m1 = rnd(1, 6) * 100, m2 = rnd(1, 6) * 100, T1 = rnd(10, 40), T2 = T1 + rnd(2, 6) * 10, Te = (m1 * T1 + m2 * T2) / (m1 + m2);
+  if (!ok3(Te)) return null; chk8(m1 * (Te - T1), m2 * (T2 - Te), 1e-9);
+  return { q: `${m1} g su ${T1}°C'de, ${m2} g su ${T2}°C'dedir. Karıştırıldığında ısı alışverişi yalnızca bu iki kütle arasında olduğuna göre denge sıcaklığı kaç °C olur?`,
+    ...numChoices(Te, [(T1 + T2) / 2, T2 - T1, (m1 * T2 + m2 * T1) / (m1 + m2), Te + 5, Te - 5], { step: 2 }),
+    x: `Aynı sıvı olduğundan m₁(T − ${T1}) = m₂(${T2} − T) ⇒ T = (${m1}·${T1} + ${m2}·${T2})/${m1 + m2} = ${nf(Te)} °C.` };
+});
+G("gaz-izobar", ["fizik", "akimya"], "Gazlar", 2, () => {
+  const V1 = rnd(2, 10) * 2, t1 = pick([27, 127, -73, 227]), t2 = pick([327, 227, 127, 27, 427].filter(t => t !== t1)), T1 = t1 + 273, T2 = t2 + 273;
+  const V2 = V1 * T2 / T1; if (!ok3(V2)) return null; chk8(V1 / T1, V2 / T2);
+  return { q: `Sabit basınçta ${V1} L hacim kaplayan ideal gaz ${t1}°C'den ${t2}°C'ye ısıtılıyor. Gazın son hacmi kaç litre olur?`,
+    ...numChoices(V2, [V1 * t2 / t1, V1 * (t2 + 273) / t1, V1 * t1 / t2, V1 * T1 / T2, V1 * 2], { step: 2 }),
+    x: `Sabit basınçta V/T sabit ve T Kelvin olmalıdır: ${T1} K → ${T2} K. V₂ = ${V1}·${T2}/${T1} = ${nf(V2)} L.` };
+});
+G("coulomb", ["afizik", "fizik"], "Elektrostatik", 3, () => {
+  const d = pick([1, 2, 3]), q1 = rnd(1, 8), q2 = rnd(1, 8) * 3 * d * d / 3, F = 9e9 * q1 * 1e-6 * q2 * 1e-6 / (d * d);
+  if (!ok3(F)) return null; chk8(F, 9e-3 * q1 * q2 / d / d, 1e-9);
+  return { q: `${q1} μC ve ${q2} μC değerindeki iki noktasal yük arasındaki uzaklık ${d} m'dir. Yükler arasındaki elektriksel kuvvetin büyüklüğü kaç N'dur? (k = 9·10⁹ N·m²/C²)`,
+    ...numChoices(F, [F * d, F * d * d, F * 10, F / 10, F + 0.009, F * 2], { step: 0.009 }),
+    x: `F = k·q₁·q₂/d² = 9·10⁹·(${q1}·10⁻⁶)(${q2}·10⁻⁶)/${d * d} = ${nf(F)} N.` };
+});
+G("manyetik-tel", ["afizik"], "Manyetizma", 2, () => {
+  const B = pick([0.1, 0.2, 0.5, 2]), I = rnd(2, 10), L = pick([0.5, 1, 2, 4]), ang = pick([30, 90, 150]), s = ang === 90 ? 1 : 0.5;
+  const F = B * I * L * s; chk8(F, B * I * L * Math.sin(ang * Math.PI / 180), 1e-9);
+  return { q: `${nf(B)} T şiddetindeki düzgün manyetik alanda alanla ${ang}° açı yapan ${nf(L)} m uzunluğundaki telden ${I} A akım geçiyor. Tele etki eden manyetik kuvvet kaç N'dur?`,
+    ...numChoices(F, [B * I * L, B * I * L * 0.866, B * I * L * 2, F / 2, F * 2, B * I], { step: 0.1 }),
+    x: `F = B·I·L·sinθ = ${nf(B)}·${I}·${nf(L)}·sin${ang}° = ${nf(F)} N.` };
+});
+G("induksiyon", ["afizik"], "Manyetizma", 3, () => {
+  const N = rnd(2, 10) * 10, A = pick([0.01, 0.02, 0.05]), dB = rnd(1, 6) / 2, dt = pick([0.1, 0.2, 0.5, 2]);
+  const emf = N * A * dB / dt; if (!ok3(emf)) return null; chk8(emf, N * (A * (dB) - 0) / dt);
+  return { q: `${N} sarımlı ve alanı ${nf(A)} m² olan bir bobinin düzlemine dik manyetik alan ${nf(dt)} s içinde düzgün olarak ${nf(dB)} T artıyor. Bobinde indüklenen emk kaç volttur?`,
+    ...numChoices(emf, [A * dB / dt, N * dB / dt, N * A * dB, emf * 2, emf / 2, N * A / dt], { step: emf / 4 }),
+    x: `ε = N·ΔΦ/Δt = N·A·ΔB/Δt = ${N}·${nf(A)}·${nf(dB)}/${nf(dt)} = ${nf(emf)} V.` };
+});
+G("kapali-boru", ["afizik"], "Dalgalar", 3, () => {
+  const v = pick([340, 320, 360]), L = pick([0.25, 0.5, 0.4, 0.3, 0.2, 0.75]), n = pick([1, 3, 5]);
+  const f = n * v / (4 * L); if (!ok3(f)) return null; chk8(f * 4 * L / n, v);
+  return { q: `Bir ucu kapalı, diğer ucu açık ${nf(L)} m uzunluğundaki borudaki havada ses hızı ${v} m/s'dir. Borunun ${n === 1 ? "temel (1." : n === 3 ? "2." : "3."} ${n === 1 ? "harmonik)" : "rezonans"} frekansı kaç Hz'dir?`.replace("(1. harmonik) frekansı", "temel frekansı").replace("temel (1. harmonik) frekansı", "temel frekansı"),
+    ...numChoices(f, [v / (2 * L) * (n === 1 ? 1 : n), v / (2 * L), v / (4 * L), 2 * f, f / 2, f + 20], { step: 20 }),
+    x: `Bir ucu kapalı boruda f = (2k−1)·v/(4L). Burada çarpan ${n}: f = ${n}·${v}/(4·${nf(L)}) = ${nf(f)} Hz.` };
+});
+G("fotoelektrik", ["afizik"], "Modern fizik", 3, () => {
+  const E = pick([2, 4, 5, 8, 10]), lam = 1240 / E, W = rnd(1, E - 1), Ek = E - W;
+  chk8(1240 / lam - W, Ek, 1e-9); if (Ek <= 0) return null;
+  return { q: `${nf(lam)} nm dalga boylu ışık, bağlama (iş) fonksiyonu ${W} eV olan metal yüzeye düşürülüyor. Sökülen fotoelektronların maksimum kinetik enerjisi kaç eV'dir? (h·c = 1240 eV·nm)`,
+    ...numChoices(Ek, [E, W, E + W, Math.abs(W - Ek) + 1, Ek * 2, E - W + 1], { step: 1 }),
+    x: `Foton enerjisi E = 1240/${nf(lam)} = ${E} eV. Ek = E − W = ${E} − ${W} = ${Ek} eV.` };
+});
+G("bohr-gecis", ["afizik"], "Modern fizik", 2, () => {
+  const [a, b] = pick([[1, 2], [2, 4], [1, 4]]), E = 13.6 * (1 / (a * a) - 1 / (b * b)); chk8(E, 13.6 * (b * b - a * a) / (a * a * b * b), 1e-9);
+  return { q: `Hidrojen atomunda elektron n = ${b} seviyesinden n = ${a} seviyesine geçerken yayımlanan fotonun enerjisi kaç eV'dir? (Eₙ = −13,6/n² eV)`,
+    ...numChoices(E, [13.6 / (a * a), 13.6 / (b * b), 13.6 * (b - a), E / 2, E + 1.9, 13.6], { step: 1.7 }),
+    x: `E = 13,6·(1/${a * a} − 1/${b * b}) = ${nf(E)} eV.` };
+});
+G("yari-omur", ["afizik"], "Modern fizik", 2, () => {
+  const T = rnd(2, 12), n = rnd(2, 5), N0 = pick([64, 128, 256, 640, 800]) * 2 ** 0, t = n * T, left = N0 / 2 ** n;
+  if (!Number.isInteger(left)) return null; let x = N0; for (let i = 0; i < n; i++) x /= 2; chk8(left, x);
+  return { q: `Yarı ömrü ${T} gün olan radyoaktif bir elementin başlangıçta ${N0} çekirdeği vardır. ${t} gün sonra bozunmadan kalan çekirdek sayısı kaçtır?`,
+    ...numChoices(left, [N0 / (2 * n), N0 - left, N0 / t, left * 2, left / 2, N0 / 2], { step: 4 }),
+    x: `${t} gün = ${n} yarı ömür. Kalan = ${N0}/2^${n} = ${left}.` };
+});
+G("sivi-basinc", ["fizik"], "Basınç", 2, () => {
+  const rho = pick([1000, 800, 1200, 1360]), h = rnd(2, 20), P0 = 100000, P = (P0 + rho * 10 * h) / 1000;
+  chk8(P, 100 + rho * 10 * h / 1000);
+  return { q: `Açık hava basıncı 100 kPa olan yerde, özkütlesi ${rho} kg/m³ olan sıvıda ${h} m derinlikteki bir noktadaki toplam basınç kaç kPa'dır? (g = 10 m/s²)`,
+    ...numChoices(P, [rho * 10 * h / 1000, P0 / 1000 + h, P + 100, P - 20, P * 2], { step: 10 }),
+    x: `P = P₀ + ρgh = 100 kPa + ${rho}·10·${h} Pa = 100 + ${rho * 10 * h / 1000} = ${nf(P)} kPa.` };
+});
+G("atwood", ["fizik"], "Kuvvet ve hareket", 3, () => {
+  const m1 = rnd(2, 9), m2 = rnd(1, m1 - 1), a = (m1 - m2) * 10 / (m1 + m2), T = 2 * m1 * m2 * 10 / (m1 + m2);
+  chk8(T, m2 * (10 + a)); chk8(T, m1 * (10 - a)); if (!ok3(T)) return null;
+  return { q: `Sürtünmesiz ve kütlesi önemsiz makaradan geçen ipin uçlarına ${m1} kg ve ${m2} kg kütleli cisimler bağlanıp serbest bırakılıyor. İpteki gerilme kuvveti kaç N'dur? (g = 10 m/s²)`,
+    ...numChoices(T, [m1 * 10, m2 * 10, (m1 + m2) * 5, (m1 - m2) * 10, T + 10, T - 5], { step: 4 }),
+    x: `a = (${m1} − ${m2})·10/(${m1} + ${m2}) = ${nf(a)} m/s². Hafif kütle için T − ${m2}·10 = ${m2}·a ⇒ T = ${nf(T)} N.` };
+});
+G("itme-temas", ["fizik"], "Kuvvet ve hareket", 2, () => {
+  const m1 = rnd(1, 6), m2 = rnd(1, 6), F = rnd(2, 9) * (m1 + m2), a = F / (m1 + m2), N = m2 * a; chk8(N, F * m2 / (m1 + m2));
+  return { q: `Sürtünmesiz yatay düzlemde birbirine temas eden ${m1} kg ve ${m2} kg kütleli cisimlere, ${m1} kg'lık cisme yatay ${F} N kuvvet uygulanarak ikisi birlikte itiliyor. ${m1} kg'lık cismin ${m2} kg'lık cisme uyguladığı kuvvet kaç N'dur?`,
+    ...numChoices(N, [F, F / 2, m1 * a, F - N + 1, N * 2, a], { step: 2 }),
+    x: `Birlikte a = ${F}/${m1 + m2} = ${a} m/s². ${m2} kg'lık cismi yalnızca temas kuvveti hızlandırır: N = ${m2}·${a} = ${N} N.` };
+});
+/* ---- KİMYA ---- */
+G("kutle-yuzde", ["kimya"], "Kimyasal hesaplamalar", 2, () => {
+  const M = { H: 1, C: 12, N: 14, O: 16, Na: 23, Mg: 24, S: 32, Ca: 40, Fe: 56, Cu: 64 };
+  const L = [["CaCO₃", { Ca: 1, C: 1, O: 3 }], ["Fe₂O₃", { Fe: 2, O: 3 }], ["MgO", { Mg: 1, O: 1 }], ["NaOH", { Na: 1, O: 1, H: 1 }], ["SO₃", { S: 1, O: 3 }], ["CuO", { Cu: 1, O: 1 }], ["NH₄NO₃", { N: 2, H: 4, O: 3 }], ["H₂SO₄", { H: 2, S: 1, O: 4 }]];
+  const [ad, f] = pick(L), el = pick(Object.keys(f)), tot = Object.entries(f).reduce((s, [e, n]) => s + M[e] * n, 0), p = 100 * M[el] * f[el] / tot;
+  let t2 = 0; for (const e in f) t2 += 100 * M[e] * f[e] / tot; chk8(t2, 100, 1e-9); if (!ok3(p)) return null;
+  const others = Object.keys(f).filter(e => e !== el).map(e => 100 * M[e] * f[e] / tot);
+  return { q: `${ad} bileşiğinde ${el} elementinin kütlece yüzdesi kaçtır? (H: 1, C: 12, N: 14, O: 16, Na: 23, Mg: 24, S: 32, Ca: 40, Fe: 56, Cu: 64)`,
+    ...numChoices(p, [...others, 100 - p, M[el] * f[el], p + 5, p - 5, p / 2], { step: 5 }),
+    x: `${ad} mol kütlesi = ${tot}. ${el} kütlesi = ${M[el] * f[el]}. Yüzde = ${M[el] * f[el]}/${tot}·100 = ${nf(p)}.` };
+});
+G("kismi-basinc", ["akimya", "kimya"], "Gazlar", 3, () => {
+  const n1 = rnd(1, 6), n2 = rnd(1, 6), n3 = rnd(1, 4), n = n1 + n2 + n3, P = rnd(2, 10) * n / gcd(n, 6) * 1;
+  const pp = n2 / n * P; if (!ok3(pp)) return null; chk8(P * n1 / n + P * n2 / n + P * n3 / n, P, 1e-9);
+  return { q: `Sabit sıcaklıkta kapalı bir kapta ${n1} mol X, ${n2} mol Y ve ${n3} mol Z gazları bulunmaktadır. Toplam basınç ${nf(P)} atm olduğuna göre Y gazının kısmi basıncı kaç atm'dir?`,
+    ...numChoices(pp, [P * n1 / n, P * n3 / n, P / 3, P * n2 / (n1 + n3), pp + 1, pp * 2], { step: P / 10 }),
+    x: `Y'nin mol kesri = ${n2}/${n} . Kısmi basınç = mol kesri × toplam basınç = ${n2}/${n}·${nf(P)} = ${nf(pp)} atm.` };
+});
+G("birlesik-gaz", ["kimya", "akimya"], "Gazlar", 3, () => {
+  const P1 = rnd(1, 4) * 2, V1 = rnd(2, 8) * 2, T1 = pick([300, 400, 600]), P2 = pick([1, 2, 4, 8].filter(x => x !== P1)), T2 = pick([200, 300, 600, 800, 900]);
+  const V2 = P1 * V1 * T2 / (T1 * P2); if (!ok3(V2)) return null; chk8(P1 * V1 / T1, P2 * V2 / T2, 1e-9);
+  return { q: `İdeal bir gaz ${nf(P1)} atm basınçta ${V1} L hacim kaplamaktadır ve sıcaklığı ${T1} K'dir. Gazın basıncı ${nf(P2)} atm ve sıcaklığı ${T2} K yapılırsa hacmi kaç litre olur?`,
+    ...numChoices(V2, [P1 * V1 * T1 / (T2 * P2), V1 * P2 / P1, V1 * T2 / T1, P1 * V1 * P2 / (T1 / T2), V2 * 2, V2 + 2], { step: 1 }),
+    x: `P₁V₁/T₁ = P₂V₂/T₂ ⇒ V₂ = (${nf(P1)}·${V1}·${T2})/(${T1}·${nf(P2)}) = ${nf(V2)} L.` };
+});
+G("denge-kc", ["akimya"], "Kimyasal denge", 3, () => {
+  const A = rnd(1, 4), B = rnd(1, 4), C = rnd(1, 4) * 2, Kc = C * C / (A * B); if (!ok3(Kc)) return null;
+  return { q: `X(g) + Y(g) ⇌ 2Z(g) tepkimesi dengeye ulaştığında [X] = ${A} M, [Y] = ${B} M ve [Z] = ${C} M bulunuyor. Tepkimenin derişimler türünden denge sabiti Kc kaçtır?`,
+    ...numChoices(Kc, [C / (A * B), C * C / (A + B), 2 * C / (A * B), A * B / (C * C), Kc + 1, (A * B) / C], { step: 0.5 }),
+    x: `Kc = [Z]²/([X]·[Y]) = ${C}²/(${A}·${B}) = ${nf(Kc)}. (Katsayı 2 olduğundan [Z] karesi alınır.)` };
+});
+G("hiz-derece", ["akimya"], "Kimyasal tepkimelerde hız", 2, () => {
+  const m = rnd(0, 2), n = rnd(1, 2), x = pick([2, 3]), y = pick([2, 3]), f = x ** m * y ** n; chk8(f, (x ** m) * (y ** n));
+  return { q: `A + B → ürün tepkimesinin hız bağıntısı r = k[A]^${m}[B]^${n}'dir. [A] ${x} katına, [B] ${y} katına çıkarılırsa tepkime hızı kaç katına çıkar?`,
+    ...numChoices(f, [x * y, x ** n * y ** m, x + y, (x * y) ** 2, f * 2, f + 1], { step: 1 }),
+    x: `Hız = k[A]^${m}[B]^${n} ⇒ yeni hız / eski hız = ${x}^${m}·${y}^${n} = ${f} kat.` };
+});
+G("sinirlayici", ["kimya", "akimya"], "Kimyasal hesaplamalar", 3, () => {
+  const a = rnd(1, 6) * 28, b = rnd(1, 9) * 2; const nN = a / 28, nH = b / 2;
+  const prod = Math.min(nN, nH / 3) * 2 * 17; const lim = nN < nH / 3 ? "N₂" : "H₂";
+  const molNH3 = (3 * nN < nH ? nN : nH / 3) * 2; chk8(prod, molNH3 * 17, 1e-9); chk8(nN * 3 <= nH ? nN : nH / 3, Math.min(nN, nH / 3), 1e-9);
+  if (!ok3(prod) || prod <= 0) return null;
+  return { q: `N₂ + 3H₂ → 2NH₃ tepkimesine göre ${a} g N₂ ile ${b} g H₂ tepkimeye giriyor. Tepkime tam verimle gerçekleştiğine göre en çok kaç gram NH₃ oluşur? (H: 1, N: 14)`,
+    ...numChoices(prod, [a + b, (a / 28) * 2 * 17 + 0 * 1 + 17, nH / 3 * 2 * 17 + (lim === "N₂" ? 17 : -17 + 34), prod * 2, prod / 2, nN * 34, nH * 34 / 3 * 1.5], { step: 17 }),
+    x: `n(N₂) = ${a}/28 = ${nN} mol, n(H₂) = ${b}/2 = ${nH} mol. ${nN} mol N₂ için ${3 * nN} mol H₂ gerekir; ${nH < 3 * nN ? "H₂ yetersiz (sınırlayıcı)" : "N₂ sınırlayıcı"}. NH₃ = ${nf(Math.min(nN, nH / 3) * 2)} mol × 17 = ${nf(prod)} g.` };
+});
+G("guclu-baz-ph", ["kimya", "akimya"], "Asitler ve bazlar", 2, () => {
+  const k = rnd(1, 4), [ad, nOH] = pick([["NaOH", 1], ["KOH", 1], ["Ba(OH)₂", 2], ["Ca(OH)₂", 2]]), M = Math.pow(10, -k) / nOH, pH = 14 - k;
+  chk8(-Math.log10(M * nOH), k, 1e-9);
+  const Ms = M >= 0.001 ? nf(M) : M.toExponential().replace("e-", "·10^{−").replace(/$/, "}").replace(/^5·/, "5·").replace("e+", "·10^{");
+  return { q: `${nf(M * 1000) === "0" ? "" : ""}${ad} çözeltisinin derişimi ${M >= 1e-3 ? nf(M) + " M" : (M * Math.pow(10, k + 1)).toFixed(0) + "·10^{−" + (k + 1) + "} M"}'dir. Çözeltinin 25°C'deki pH değeri kaçtır? (Güçlü baz, tam iyonlaşma)`,
+    ...numChoices(pH, [k, 14 - k - 1, 14 - k + 1, 7 + k, 14 + k, 7 - k], { step: 1 }),
+    x: `${ad} çözeltisinde [OH⁻] = ${nOH}·${M >= 1e-3 ? nf(M) : (M * Math.pow(10, k + 1)).toFixed(0) + "·10^{−" + (k + 1) + "}"} = 10^{−${k}} M. pOH = ${k} ⇒ pH = 14 − ${k} = ${pH}.` };
+});
+G("iyon-derisim", ["kimya"], "Çözeltiler", 2, () => {
+  const [ad, cat, an, nc, na] = pick([["Al₂(SO₄)₃", "Al³⁺", "SO₄²⁻", 2, 3], ["CaCl₂", "Ca²⁺", "Cl⁻", 1, 2], ["Na₃PO₄", "Na⁺", "PO₄³⁻", 3, 1], ["Mg(NO₃)₂", "Mg²⁺", "NO₃⁻", 1, 2], ["K₂SO₄", "K⁺", "SO₄²⁻", 2, 1]]);
+  const M = pick([0.1, 0.2, 0.5, 1]), hedef = pick([0, 1]), v = (hedef ? na : nc) * M, tot = (nc + na) * M; chk8(v, M * (hedef ? na : nc));
+  return { q: `${nf(M)} M ${ad} sulu çözeltisinde ${hedef ? an : cat} iyonlarının molar derişimi kaç M'dir? (Tam çözünme kabul ediniz.)`,
+    ...numChoices(v, [M, tot, M * (hedef ? nc : na), v * 2, v / 2, M + 0.1], { step: 0.1 }),
+    x: `${ad} → ${nc}${cat} + ${na}${an}. ${hedef ? an : cat} derişimi = ${hedef ? na : nc}·${nf(M)} = ${nf(v)} M.` };
+});
+G("hess", ["akimya"], "Kimyasal tepkimelerde enerji", 3, () => {
+  const x = -rnd(5, 40) * 10, y = rnd(-30, 25) * 10, k = pick([2, 3]); if (y === 0) return null;
+  const dH = k * (x + y), dH2 = k * x + k * y; chk8(dH, dH2);
+  return { q: `A → B  ΔH = ${sg7(x)} kJ\nB → C  ΔH = ${sg7(y)} kJ\nVerilen tepkimelere göre ${k}A → ${k}C tepkimesinin entalpi değişimi (ΔH) kaç kJ'dir?`,
+    ...numChoices(dH, [x + y, k * x, k * y, x * y, -dH, (x + y) / k], { neg: true, step: 10 }),
+    x: `A → C: ΔH = ${sg7(x)} + (${sg7(y)}) = ${sg7(x + y)} kJ. Tepkime ${k} ile çarpılınca ΔH de ${k} ile çarpılır: ${sg7(dH)} kJ.` };
+});
+G("elektroliz", ["akimya"], "Elektrokimya", 3, () => {
+  const [ad, M, n] = pick([["Cu²⁺", 64, 2], ["Ag⁺", 108, 1], ["Al³⁺", 27, 3], ["Ni²⁺", 59, 2], ["Zn²⁺", 65, 2]]);
+  const mol = pick([1, 2, 0.5]), I = pick([5, 10, 20]), t = 96500 * mol / I, m = M * mol / n; chk8(m, M * I * t / (n * 96500), 1e-6);
+  if (!Number.isInteger(t) || !ok3(m)) return null;
+  return { q: `${ad} iyonu içeren çözeltiden ${I} A'lik akım ${t} saniye geçirilerek katotta metal elde ediliyor. Katotta kaç gram metal toplanır? (Atom kütlesi ${M}, 1 mol elektronun yükü 96500 C)`,
+    ...numChoices(m, [M * mol, M * mol * n, m * 2, m / 2, M / n, m + M / 2], { step: M / 8 }),
+    x: `Geçen yük Q = I·t = ${I}·${t} = ${I * t} C ⇒ ${nf(mol)} mol e⁻. ${ad} için 1 mol metal ${n} mol e⁻ ister. Mol metal = ${nf(mol / n)}; kütle = ${nf(mol / n)}·${M} = ${nf(m)} g.` };
+});
+G("titrasyon", ["kimya", "akimya"], "Asitler ve bazlar", 2, () => {
+  const [a, na] = pick([["HCl", 1], ["H₂SO₄", 2], ["HNO₃", 1]]), [b, nb] = pick([["NaOH", 1], ["KOH", 1], ["Ca(OH)₂", 2]]);
+  const Ma = pick([0.1, 0.2, 0.5]), Va = rnd(2, 10) * 10, Mb = pick([0.1, 0.2, 0.4]), Vb = Ma * Va * na / (Mb * nb); if (!ok3(Vb)) return null;
+  chk8(Ma * Va * na, Mb * Vb * nb);
+  return { q: `${nf(Ma)} M ${Va} mL ${a} çözeltisini tam nötrleştirmek için ${nf(Mb)} M ${b} çözeltisinden kaç mL gerekir?`,
+    ...numChoices(Vb, [Ma * Va / Mb, Va, Ma * Va * na / Mb, Vb * 2, Vb / 2, Ma * Va * nb / (Mb * na)], { step: 5 }),
+    x: `Nötrleşmede H⁺ mol = OH⁻ mol: ${na}·${nf(Ma)}·${Va} = ${nb}·${nf(Mb)}·V ⇒ V = ${nf(Vb)} mL.` };
+});
+G("elektron-dizilim", ["kimya", "akimya"], "Atomun yapısı", 3, () => {
+  const Z = pick([6, 7, 8, 14, 15, 16, 21, 22, 23, 25, 26, 27, 28, 31, 32, 33, 34]);
+  const order = [[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [3, 2], [4, 1]];
+  let left = Z, un = 0; const cf = [];
+  for (const [n, l] of order) { const cap = 2 * (2 * l + 1), e = Math.min(cap, left); left -= e; cf.push([n, l, e]); const orb = 2 * l + 1; un += e <= orb ? e : cap - e; if (!left) break; }
+  const tab = { 6: 2, 7: 3, 8: 2, 14: 2, 15: 3, 16: 2, 21: 1, 22: 2, 23: 3, 25: 5, 26: 4, 27: 3, 28: 2, 31: 1, 32: 2, 33: 3, 34: 2 }; chk8(un, tab[Z]);
+  const nm = ["s", "p", "d"]; const cfs = cf.map(([n, l, e]) => n + nm[l] + "^{" + e + "}").join(" ");
+  return { q: `Atom numarası ${Z} olan nötr atomun temel hâl elektron diziliminde kaç tane yarı dolu (tek elektronlu) orbital bulunur?`,
+    ...numChoices(un, [un + 1, un + 2, Math.max(un - 1, 0), 0, 6, 4], { step: 1 }),
+    x: `Dizilim: ${cfs}. Hund kuralına göre orbitaller önce birer elektronla dolar; son alt katmandaki yalnız elektron sayısı ${un} olur.` };
 });
 /* ===== Şekilli ve grafikli soru kalıpları =====
    Şekiller veri olarak saklanır (fig); çizimi app_fig.js yapar. Şekiller ölçeklidir. */

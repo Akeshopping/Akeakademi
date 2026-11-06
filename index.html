@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=0c36e5acee">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=0c36e5acee">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=0c36e5acee">
+<link rel="manifest" href="/manifest.webmanifest?v=9586f523fd">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=9586f523fd">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=9586f523fd">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=0c36e5acee">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=9586f523fd">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -6636,6 +6636,7 @@ function vSettings() {
     <label class="f">Günlük soru hedefi<input class="in" type="number" min="5" max="500" data-c="prof" data-k="gunluk" value="${esc(p.gunluk)}"></label>
     <label class="f">TYT tarihi<input class="in" type="date" data-c="prof" data-k="examDate" value="${esc(p.examDate || EXAM_DEFAULT)}"></label></div>
     <p class="small muted">ÖSYM'nin açıkladığı 2027 takvimine göre TYT 19 Haziran 2027'de yapılacak. Takvim değişirse tarihi buradan güncelleyebilirsin.</p></div>
+  ${pushKart()}
   ${erisimKart()}
   <div class="card stack"><h2>Kayıt ve yedek</h2>
     <p><b>Durum:</b> ${esc(st)}.</p>
@@ -7973,14 +7974,23 @@ const HESAP_SUB = {
 };
 
 /* ===== Yönetim (yalnızca yönetici hesabı, akeakademi.com) ===== */
-const YON = { veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay" };
+const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay" };
 async function yonYukle() {
   YON.busy = "yukle"; render();
+  try { fetch("/api/yonetim/bildirim", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.bil = j; render(); } }).catch(() => { }); } catch (e) { }
   try { fetch("/api/yonetim/maliyet", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.mal = j; render(); } }).catch(() => { }); } catch (e) { }
   try { const r = await fetch("/api/yonetim/durum", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) YON.veri = j; else YON.err = j.message || "Yönetim bilgileri alınamadı."; } catch (e) { YON.err = "Bağlantı kurulamadı."; }
   YON.busy = ""; render();
 }
 const SIP_DURUM = { gonderildi: ["ok", "Kod gönderildi"], deneme: ["", "Deneme"], kod_uretildi: ["warn", "Kod üretildi"], eposta_yok: ["bad", "E-posta yok"], eposta_hatasi: ["bad", "E-posta gitmedi"], paket_yok: ["", "Paket dışı ürün"] };
+function bildirimYonKarti() {
+  const B = YON.bil; if (!B) return "";
+  const u = s => `${B.origin}/api/bildirim/gonder?s=${s}&k=${B.token}`;
+  return `<div class="card stack"><h2>Telefon bildirimleri (zamanlayıcı)</h2>
+    <div class="tiles">${tile(B.cihaz || 0, "kayıtlı cihaz")}${tile(B.kisi || 0, "bildirim açan öğrenci")}</div>
+    <p class="small muted">Bildirimlerin belirli saatte gitmesi için ücretsiz cron-job.org'da 3 görev açılır. Aşağıdaki adresleri sırayla görevlerin adres kutusuna yapıştır. Bu adresler gizlidir, kimseyle paylaşma.</p>
+    ${[["sabah", "Sabah", "09:00"], ["ogle", "Öğleden sonra", "15:00"], ["aksam", "Akşam", "20:30"]].map(([k, l, sa]) => `<div class="small"><b>${l} (${sa})</b><br><input class="in" readonly onclick="this.select()" value="${esc(u(k))}" style="width:100%"></div>`).join("")}</div>`;
+}
 function maliyetKarti() {
   const M = YON.mal; if (!M) return "";
   const tl = +(LS.get("ake.kur") || 0) || 42, d = v => "$" + (v || 0).toFixed(2), t = v => "≈ " + Math.round((v || 0) * tl).toLocaleString("tr-TR") + " TL";
@@ -8008,7 +8018,7 @@ function vYonetim() {
         <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Deneme siparişi gönder"}</button></div>
       <p class="xs muted">Deneme siparişi para çekmez; seçtiğin paket için gerçek bir kod üretip senin e-postana gönderir ve hesabına tanımlar.</p>
       ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
-    ${maliyetKarti()}
+    ${maliyetKarti()}${bildirimYonKarti()}
     <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
       ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}</div></div>`; }).join("")}</div>`
         : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
@@ -9127,6 +9137,60 @@ Object.assign(OZ_ACT, {
   bsesAc(d) { BSES.on = d.v === "1"; LS.set("ake.bsses", BSES.on ? "1" : "0"); render(); if (BSES.on) bildirimSesi("ok", true); },
   bsesDene() { bildirimSesi("basari", true); }
 });
+
+/* ===== Telefon/tablet bildirimleri (Web Push): giriş yapmış öğrenciler, seçtikleri saatlerde kısa hatırlatma alır ===== */
+var PUSHU = { dur: "", slots: ["sabah", "aksam"], aktif: false, busy: false, msg: "", yuklendi: false };
+const PUSH_SLOT = [["sabah", "Sabah (09:00)"], ["ogle", "Öğleden sonra (15:00)"], ["aksam", "Akşam (20:30)"]];
+const pushDestek = () => !IN_CLAUDE && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+const pushIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const pushStandalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+async function pushReg() { try { return await navigator.serviceWorker.ready; } catch (e) { return null; } }
+async function pushDurumYukle() {
+  PUSHU.yuklendi = true;
+  if (!pushDestek()) return;
+  const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription().catch(() => null);
+  PUSHU.aktif = !!sub && Notification.permission === "granted";
+  if (PUSHU.aktif && HESAP.user) { try { const r = await fetch("/api/bildirim/durum", { credentials: "same-origin" }); const j = await r.json(); const me = (j.cihazlar || []).find(c => sub && c.endpoint === sub.endpoint); if (me) PUSHU.slots = me.slots; else PUSHU.aktif = false; } catch (e) { } }
+  render();
+}
+const u8 = b => { b = b.replace(/-/g, "+").replace(/_/g, "/"); const s = atob(b + "=".repeat((4 - b.length % 4) % 4)); return Uint8Array.from(s, c => c.charCodeAt(0)); };
+async function pushAc() {
+  PUSHU.busy = true; PUSHU.msg = ""; render();
+  try {
+    if (!PUSHU.slots.length) throw new Error("En az bir saat seç.");
+    const izin = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+    if (izin !== "granted") throw new Error("Bildirim izni verilmedi. Tarayıcı ayarlarından izin verebilirsin.");
+    const reg = await pushReg(); if (!reg) throw new Error("Tarayıcın bildirimleri başlatamadı.");
+    const k = await (await fetch("/api/bildirim/anahtar")).json();
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(k.anahtar) });
+    const r = await fetch("/api/bildirim/abone", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ sub: sub.toJSON(), slots: PUSHU.slots }) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.message || "Kaydedilemedi.");
+    PUSHU.aktif = true; PUSHU.msg = "Bildirimler açıldı."; bildirimSesi("basari");
+  } catch (e) { PUSHU.msg = e.message || "Bildirimler açılamadı."; }
+  PUSHU.busy = false; render();
+}
+async function pushKapat() {
+  PUSHU.busy = true; render();
+  try { const reg = await pushReg(), sub = reg && await reg.pushManager.getSubscription(); if (sub) { await fetch("/api/bildirim/iptal", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => { }); await sub.unsubscribe().catch(() => { }); } PUSHU.aktif = false; PUSHU.msg = "Bildirimler kapatıldı."; } catch (e) { PUSHU.msg = "Kapatılamadı."; }
+  PUSHU.busy = false; render();
+}
+function pushKart() {
+  if (IN_CLAUDE) return "";
+  if (!PUSHU.yuklendi) setTimeout(pushDurumYukle, 0);
+  let govde;
+  if (!HESAP.user) govde = `<p class="small muted">Telefon ve tablet bildirimleri için önce hesabınla giriş yap (E-posta veya Google).</p>`;
+  else if (pushIos() && !pushStandalone()) govde = `<p class="small">iPhone ve iPad'de bildirim için siteyi ana ekrana eklemelisin: Safari'de <b>Paylaş</b> düğmesine dokun, <b>Ana Ekrana Ekle</b>'yi seç, ardından ana ekrandaki AKE Akademi simgesinden açıp bu sayfaya tekrar gel.</p>`;
+  else if (!pushDestek()) govde = `<p class="small muted">Bu tarayıcı bildirimleri desteklemiyor. Telefonda Chrome ya da Safari (ana ekrana eklenmiş), bilgisayarda Chrome, Edge veya Firefox kullanabilirsin.</p>`;
+  else if (Notification.permission === "denied") govde = `<p class="small muted">Bildirim izni engellenmiş. Tarayıcı ayarlarından bu site için bildirimlere izin ver, sonra tekrar dene.</p>`;
+  else govde = `<div class="stack">${PUSH_SLOT.map(([k, l]) => `<label class="check small"><input type="checkbox" data-c="pushSlot" data-k="${k}"${PUSHU.slots.includes(k) ? " checked" : ""}${PUSHU.busy ? " disabled" : ""}> ${l}</label>`).join("")}</div>
+    <div class="row">${PUSHU.aktif ? `<button class="btn" data-a="pushKaydet"${PUSHU.busy ? " disabled" : ""}>Saatleri kaydet</button><button class="btn ghost" data-a="pushKapat"${PUSHU.busy ? " disabled" : ""}>Kapat</button>` : `<button class="btn pri" data-a="pushAc"${PUSHU.busy ? " disabled" : ""}>${PUSHU.busy ? "Açılıyor…" : "Bildirimleri aç"}</button>`}</div>`;
+  return `<div class="card stack" id="bildirimler"><h2>Telefon ve tablet bildirimleri</h2>
+    <p class="small muted">Seçtiğin saatlerde günde en fazla 3 kısa hatırlatma gelir: günün sorusu, yanlış tekrarı, çalışma önerisi. İstediğin zaman kapatabilirsin. Yalnızca giriş yaptığın hesapla çalışır.</p>
+    ${govde}${PUSHU.msg ? `<p class="small" style="color:var(--ok)">${esc(PUSHU.msg)}</p>` : ""}</div>`;
+}
+Object.assign(OZ_ACT, { pushAc() { pushAc(); }, pushKaydet() { pushAc(); }, pushKapat() { pushKapat(); } });
+Object.assign(OZ_CHG, { pushSlot(el) { const k = el.dataset.k; PUSHU.slots = el.checked ? [...new Set([...PUSHU.slots, k])] : PUSHU.slots.filter(x => x !== k); } });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
 const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",

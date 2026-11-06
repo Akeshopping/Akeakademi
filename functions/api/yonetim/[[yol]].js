@@ -6,7 +6,7 @@
 //   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, güçlü modelle kontrol eder, onaya koyar
 //   GET  sorular          onay bekleyen sorular ve sayılar
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
-import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR } from "../../../lib/ortak.js";
+import { json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
 /* AI soru üretimi: hızlı model yazar, güçlü model cevabı görmeden çözer; tutanlar onaya düşer */
@@ -68,6 +68,11 @@ export async function onRequest({ request, env, params }) {
     const tok = await ayarOku(env, "shopier_webhook_token"), wid = await ayarOku(env, "shopier_webhook_id");
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
     return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], sayilar: say || {} });
+  }
+  if (ad === "bildirim" && m === "GET") {
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS push (endpoint TEXT PRIMARY KEY, kid TEXT, p256dh TEXT, auth TEXT, slots TEXT, tarih INTEGER)").run();
+    const t = await pushToken(env), n = await env.DB.prepare("SELECT COUNT(*) AS cihaz, COUNT(DISTINCT kid) AS kisi FROM push").first();
+    return json(200, { token: t, cihaz: (n && n.cihaz) || 0, kisi: (n && n.kisi) || 0, origin });
   }
   if (ad === "maliyet" && m === "GET") {
     /* Dolar fiyatları (milyon token başına) env ile değiştirilebilir; akışsız çağrılarda gerçek token, diğerlerinde de akıştan okunan token kullanılır */

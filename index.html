@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=649453322a">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=649453322a">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=649453322a">
+<link rel="manifest" href="/manifest.webmanifest?v=0c36e5acee">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=0c36e5acee">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=0c36e5acee">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=649453322a">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=0c36e5acee">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -2255,7 +2255,11 @@ const BANK = [];
   BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
   function q(s, t, d, text, o, a, x) {
     cnt[s] = (cnt[s] || 0) + 1;
-    BANK.push({ id: s + "-7-" + cnt[s], s, t, d, q: text, o, a, x });
+    const id = s + "-7-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
   }
   q("tarih", "Osmanlı Devleti", 3, "Osmanlı Devleti'nde Karlofça Antlaşması (1699) ile ilgili aşağıdakilerden hangisi söylenemez?",
     ["Osmanlı ilk kez büyük çapta toprak kaybetmiştir.", "Macaristan ve Transilvanya Avusturya'ya bırakılmıştır.", "Antlaşma ile Osmanlı Devleti Rusya ile Azak Kalesi için iki yıllık ateşkes yapmıştır.", "Antlaşmayla Fransa'ya kapitülasyonlar verilmiştir.", "Mora Yarımadası Venedik'e bırakılmıştır."],
@@ -2321,6 +2325,110 @@ const BANK = [];
     1, "Enerji akışı tek yönlüdür ve her basamakta yaklaşık %10 bir üst basamağa aktarılır (on kuralı).");
   q("biyoloji", "Solunum", 3, "Aerobik hücresel solunumda glikozun tam yıkımı sonucunda aşağıdakilerden hangisi oluşur?",
     ["Etil alkol ve CO₂", "Laktik asit", "CO₂, H₂O ve ATP", "Yalnızca O₂", "Piruvat ve NADH"], 2, "Oksijenli solunumda glikoz CO₂ ve H₂O'ya kadar yıkılır; enerji ATP olarak elde edilir.");
+})();
+/* ===== Özgün soru bankası · 8. bölüm: Türkçe, sosyal bilimler, felsefe ve edebiyat (öğretmen onayı önerilir) ===== */
+(function () {
+  const cnt = {};
+  BANK.forEach(b => { cnt[b.s] = (cnt[b.s] || 0) + 1; });
+  function q(s, t, d, text, o, a, x) {
+    cnt[s] = (cnt[s] || 0) + 1;
+    const id = s + "-8-" + cnt[s];
+    /* seçenek sırasını soru koduna göre sabit biçimde karıştır (doğru cevap hep B/C'de toplanmasın) */
+    let h = 2166136261; for (const ch of id + text.slice(0, 20)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    const ord = o.map((_, i) => i); for (let i = ord.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [ord[i], ord[j]] = [ord[j], ord[i]]; }
+    BANK.push({ id, s, t, d, q: text, o: ord.map(i => o[i]), a: ord.indexOf(a), x });
+  }
+  /* ---- TÜRKÇE ---- */
+  q("turkce", "Sözcükte Yapı", 2, "Aşağıdaki sözcüklerden hangisi birleşik sözcüktür?",
+    ["Kalemlik", "Güzelce", "Hanımeli", "Okuyucu", "Gözlük"], 2, "Hanımeli, iki ayrı sözcüğün (hanım + eli) kaynaşmasıyla oluşmuş birleşik sözcüktür. Diğerleri yapım ekiyle türetilmiştir.");
+  q("turkce", "Ses Olayları", 2, "Aşağıdaki sözcüklerden hangisinde ünsüz yumuşaması (ünsüz benzeşmesi değil) görülür? (Sözcüklere -ı/-i eki getirildiğinde)",
+    ["Evi", "Kolu", "Kitabı", "Başı", "Yolu"], 2, "Kitap + ı → kitabı: sondaki sert ünsüz (p), ünlüyle başlayan ek alınca yumuşayıp b'ye dönüşmüştür.");
+  q("turkce", "Ses Olayları", 3, "Aşağıdaki sözcüklerin hangisinde ünlü düşmesi vardır?",
+    ["Kolu", "Omzu", "Evi", "Yolu", "Başı"], 1, "Omuz + u → omzu: ikinci hecedeki dar ünlü (u) ekle birlikte düşmüştür.");
+  q("turkce", "Fiilimsiler", 3, "Aşağıdaki cümlelerin hangisinde isim-fiil (mastar) vardır?",
+    ["Koşan çocuk düştü.", "Gülerek konuştu.", "Çalışmak başarının anahtarıdır.", "Okuyunca anladım.", "Gelen misafir tanıdıktı."],
+    2, "“Çalışmak” sözcüğündeki -mak eki isim-fiil yapar. “Koşan, gelen” sıfat-fiil; “gülerek, okuyunca” zarf-fiildir.");
+  q("turkce", "Cümlenin Ögeleri", 3, "Aşağıdaki cümlelerin hangisinde ** ** içindeki sözcük belirtili nesnedir?",
+    ["Ahmet **kitap** okudu.", "**Ahmet** kitabı masaya bıraktı.", "Ahmet kitabı **masaya** bıraktı.", "Ahmet **kitabı** masaya bıraktı.", "**Dün** kitabı bıraktı."],
+    3, "“Kitabı” -ı hâl ekini almış, ‘neyi?’ sorusuna cevap veren belirtili nesnedir. “Kitap” belirtisiz, “masaya” dolaylı tümleç, “dün” zarf tümleci, “Ahmet” öznedir.");
+  q("turkce", "Noktalama", 3, "Aşağıdaki cümlelerin hangisinde virgül gereksiz (yanlış) kullanılmıştır?",
+    ["Evet, geliyorum.", "Sabah erken kalktı, kahvaltı yaptı, işe gitti.", "Kitabı, okudum.", "Anne, bana bir bak.", "Yarın, belki de öbür gün gelirim."],
+    2, "“Kitabı, okudum.” cümlesinde nesne ile yüklem arasına virgül gelmez. Diğer cümlelerde virgül; evet, sıralama, hitap ve ara söz için doğru kullanılmıştır.");
+  q("turkce", "Yazım Kuralları", 2, "Aşağıdaki sözcüklerden hangisinin yazılışı yanlıştır?",
+    ["Yanlış", "Herkes", "Yanlız", "Birçok", "Hiçbir"], 2, "Doğrusu “yalnız”dır. Diğer sözcüklerin yazılışları doğrudur.");
+  q("turkce", "Söz Varlığı", 2, "“Göz yummak” deyiminin anlamı aşağıdakilerden hangisidir?",
+    ["Uyumak", "Bir yanlışı görmezden gelmek", "Çok sevmek", "Dikkatle bakmak", "Gözünü korumak"], 1, "“Göz yummak”, bir kusur veya yanlışa bilerek karışmamak, görmezden gelmektir.");
+  q("turkce", "Söz Varlığı", 3, "“Damlaya damlaya göl olur.” atasözü aşağıdaki durumlardan hangisiyle ilgilidir?",
+    ["Her gün azar azar biriktirilen paranın zamanla büyük bir meblağa ulaşması", "Yağmurdan sonra göllerin dolması", "Yeni bir göl açılması", "Çok su içmenin zararlı olması", "Su tasarrufunun gerekliliği"],
+    0, "Atasözü, küçük birikimlerin zamanla büyük sonuç verdiğini anlatır. Düz anlamı değil, mecaz anlamı sorulmuştur.");
+  q("turkce", "Tamlamalar", 2, "Aşağıdakilerden hangisi isim tamlamasıdır?",
+    ["Sarı çiçek", "Okuyan çocuk", "Kitabın kapağı", "Çok güzel", "Ali geldi"], 2, "İsim tamlamasında tamlayan (-ın) ve tamlanan (-ı) eki vardır: kitabın kapağı. “Sarı çiçek” sıfat tamlamasıdır.");
+  q("turkce", "Paragraf", 3, "(I) İyi bir dinleyici, konuşmacının sözlerini kesmeden sonuna kadar dinler. (II) Karşısındakinin duygu ve düşüncelerini anlamaya çalışır. (III) Anlamadığı yerde nazikçe soru sorar. (IV) Dinlemek, yalnızca susmak değil, anlamak için çaba göstermektir.\nBu parçanın ana düşüncesi aşağıdakilerden hangisidir?",
+    ["Konuşmacılar dinleyicilere saygı göstermelidir.", "Soru sormak dinlemenin en önemli parçasıdır.", "Etkili dinleme, anlamaya yönelik bilinçli bir çabadır.", "Her konuşma kesintisiz dinlenmelidir.", "Susmak her zaman en doğru davranıştır."],
+    2, "Parça, iyi dinlemenin özelliklerini sayar ve IV. cümlede ‘dinlemek anlamak için çabadır’ diyerek sonucu söyler.");
+  q("turkce", "Paragraf", 3, "Aşağıdaki cümlelerden hangisi paragrafta ‘yardımcı düşünce’ olmaya daha uygundur?",
+    ["Genelleme yapan ve ana düşünceyi özetleyen cümle", "Ana düşünceyi örnek, kanıt ve ayrıntıyla destekleyen cümle", "Konuyla ilgisi olmayan cümle", "Paragrafın başlığını belirten cümle", "Soruyla biten cümle"],
+    1, "Yardımcı düşünceler ana düşünceyi açar, örneklendirir ve destekler.");
+  /* ---- TARİH ---- */
+  q("tarih", "Anadolu Selçuklu", 2, "Kösedağ Savaşı (1243) sonrasında Anadolu Selçuklu Devleti hangi devletin egemenliği altına girmiştir?",
+    ["Memlüklüler", "İlhanlılar (Moğollar)", "Bizans", "Haçlılar", "Eyyubiler"], 1, "Kösedağ'da yenilen Anadolu Selçukluları Moğol (İlhanlı) egemenliğine girmiş ve devlet zayıflayarak beyliklerin doğmasına yol açmıştır.");
+  q("tarih", "Osmanlı Devleti", 3, "Lale Devri (1718–1730) hangi antlaşmanın imzalanmasından sonra başlar?",
+    ["Karlofça", "Prut", "Pasarofça", "Belgrad", "Küçük Kaynarca"], 2, "Pasarofça Antlaşması (1718) sonrası Osmanlı barış dönemine girmiş, Nevşehirli Damat İbrahim Paşa ile Lale Devri başlamıştır.");
+  q("tarih", "Osmanlı Devleti", 3, "Aşağıdakilerden hangisi Küçük Kaynarca Antlaşması'nın (1774) sonuçlarından biridir?",
+    ["Mısır, Osmanlı Devleti'nden ayrılmıştır.", "Kırım Hanlığı bağımsız olmuştur.", "Boğazlar'dan Rus savaş gemilerinin geçişi yasaklanmıştır.", "Osmanlı'da ilk kez anayasa ilan edilmiştir.", "Fransa'ya kapitülasyonlar verilmiştir."],
+    1, "Küçük Kaynarca ile Kırım Hanlığı bağımsız ilan edilmiş; Rusya, Osmanlı'daki Ortodoksların haklarını koruma bahanesi bulmuştur.");
+  q("tarih", "Osmanlı Devleti", 3, "Sened-i İttifak (1808) hangi padişah döneminde imzalanmıştır?",
+    ["III. Selim", "I. Abdülhamid", "II. Mahmut", "IV. Mustafa", "Abdülmecid"], 2, "Sened-i İttifak, Alemdar Mustafa Paşa ile ayanlar arasında II. Mahmut döneminde imzalanmış; padişahın otoritesi ayanlar karşısında sınırlanmıştır.");
+  q("tarih", "Osmanlı Devleti", 2, "Kanun-i Esasi (1876) hangi padişah döneminde ilan edilmiştir?",
+    ["II. Abdülhamid", "II. Mahmut", "V. Mehmet Reşat", "Abdülaziz", "III. Selim"], 0, "Osmanlı'nın ilk anayasası Kanun-i Esasi, II. Abdülhamid döneminde (1876) ilan edildi.");
+  q("tarih", "Kurtuluş Savaşı", 3, "Aşağıdaki antlaşmalardan hangisi TBMM tarafından tanınmamıştır?",
+    ["Moskova", "Kars", "Sevr", "Gümrü", "Mudanya"], 2, "Sevr Antlaşması İstanbul hükûmetine imzalatılmış, TBMM tarafından tanınmamıştır. Diğerleri TBMM'nin imzaladığı antlaşma ve ateşkeslerdir.");
+  q("tarih", "Cumhuriyet Dönemi", 3, "Musul sorunu aşağıdaki antlaşmalardan hangisiyle çözülmüştür?",
+    ["Lozan (1923)", "Ankara (1926)", "Montrö (1936)", "Hatay (1939)", "Sadabat (1937)"], 1, "Lozan'da çözülemeyen Musul sorunu, 1926 Ankara Antlaşması ile Irak'ın sınırları içinde bırakılarak çözüldü.");
+  q("tarih", "Cumhuriyet Dönemi", 3, "Montrö Boğazlar Sözleşmesi (1936) ile Türkiye'nin kazandığı aşağıdaki haklardan hangisidir?",
+    ["Boğazlar'ı yeniden silahlandırma ve askerlendirme hakkı", "Kıbrıs'ın yönetimi", "Hatay'ın alınması", "Kapitülasyonların kaldırılması", "Musul'un alınması"],
+    0, "Montrö ile Boğazlar'ın askerden arındırılma hükmü kalkmış, Türkiye Boğazlar'ı yeniden silahlandırma hakkını kazanmıştır.");
+  /* ---- COĞRAFYA ---- */
+  q("cografya", "Dünya'nın Hareketleri", 2, "Aşağıdakilerden hangisi Dünya'nın günlük hareketinin sonuçlarından biri DEĞİLDİR?",
+    ["Gece ile gündüzün oluşması", "Yerel saat farklarının ortaya çıkması", "Rüzgârların yön sapmasına uğraması", "Mevsimlerin oluşması", "Gün içinde sıcaklık değişimi"],
+    3, "Mevsimler, Dünya'nın yıllık hareketi ve eksen eğikliğinin sonucudur. Diğerleri günlük (dönme) hareketin sonuçlarıdır.");
+  q("cografya", "Dünya'nın Hareketleri", 2, "21 Mart ve 23 Eylül tarihlerinde öğle vakti Güneş ışınları hangi paralele dik düşer?",
+    ["Yengeç Dönencesi", "Oğlak Dönencesi", "Ekvator", "Kuzey Kutup Dairesi", "45° Paraleli"], 2, "Ekinoks günlerinde (21 Mart, 23 Eylül) Güneş ışınları Ekvator'a dik gelir.");
+  q("cografya", "Türkiye'nin Yer Şekilleri", 2, "Aşağıdakilerden hangisi Türkiye'nin en uzun akarsuyudur?",
+    ["Fırat", "Sakarya", "Kızılırmak", "Gediz", "Yeşilırmak"], 2, "Kızılırmak, yaklaşık 1355 km ile tamamı Türkiye sınırları içinde akan en uzun akarsudur. (Fırat daha uzundur ancak büyük bölümü sınır dışındadır.)");
+  q("cografya", "Türkiye'nin İklimi", 2, "Türkiye'de yazları sıcak ve kurak, kışları ılık ve yağışlı geçen iklimin görüldüğü kıyı bölgesinin bitki örtüsü aşağıdakilerden hangisidir?",
+    ["Maki", "Bozkır", "Tundra", "Ormangülü", "Kayın ormanı"], 0, "Akdeniz iklimi bölgelerinde doğal bitki örtüsü kurağa dayanıklı, her dem yeşil çalılardan oluşan makidir.");
+  q("cografya", "Doğal Afetler", 3, "Aşağıdakilerden hangisi deprem tehlikesinin azaltılmasında alınabilecek en etkili ‘önleyici’ tedbirlerden biridir?",
+    ["Yapıların deprem yönetmeliğine uygun ve zemine uygun yapılması", "Deprem sonrası yardım kampanyaları", "Afet sonrası geçici barınak kurulması", "Sigorta primlerinin artırılması", "Depremden sonra enkazın kaldırılması"],
+    0, "Önleyici tedbirler afetten önce alınır: zemin etüdü, yönetmeliğe uygun yapı, denetim. Diğer seçenekler afet sonrası müdahalelerdir.");
+  /* ---- FELSEFE · MANTIK · DİN · PSİKOLOJİ · SOSYOLOJİ ---- */
+  q("felsefe", "Felsefenin Doğuşu", 2, "‘Bilgi erdemdir.’ diyen ve kendi yönteminde sorularla karşısındakini doğruya ulaştırmaya çalışan filozof kimdir?",
+    ["Platon", "Sokrates", "Aristoteles", "Thales", "Descartes"], 1, "Sokrates, ‘ebelik’ (doğurtma) yöntemiyle insanı soru sorarak kendi bilgisini bulmaya yöneltir; ‘bilgi erdemdir’ görüşü ona aittir.");
+  q("felsefe", "Bilgi Felsefesi", 3, "Platon'un idealar kuramına göre gerçek bilgi aşağıdakilerden hangisidir?",
+    ["Duyularla edinilen bilgi", "Ruhun bildiği değişmez ideaların bilgisi", "Deneyle elde edilen bilgi", "Toplumun kabul ettiği bilgi", "Kişisel inançlar"],
+    1, "Platon'a göre duyularla algılanan dünya ideaların gölgesidir; asıl bilgi, değişmeyen ideaların bilgisidir.");
+  q("felsefe", "İslam Felsefesi", 2, "‘İkinci Muallim (Öğretmen)’ unvanıyla anılan İslam filozofu kimdir?",
+    ["İbn Sina", "Gazali", "Farabi", "İbn Rüşd", "Kindi"], 2, "Aristoteles'e ‘Birinci Muallim’ denildiği için Farabi'ye ‘İkinci Muallim’ unvanı verilmiştir.");
+  q("felsefe", "Bilgi Felsefesi", 2, "‘Düşünüyorum, öyleyse varım.’ (Cogito) sözü hangi filozofa aittir?",
+    ["John Locke", "Kant", "Descartes", "Hume", "Spinoza"], 2, "Cogito ergo sum, kesin bilgiye ulaşmak için her şeyden şüphe eden Descartes'a aittir.");
+  q("mantik", "Önermeler", 3, "p doğru (1), q yanlış (0) iken “p ∧ q”, “p ∨ q” ve “p → q” önermelerinin doğruluk değerleri sırasıyla aşağıdakilerden hangisidir?",
+    ["1, 1, 1", "0, 1, 0", "0, 0, 1", "1, 0, 0", "0, 1, 1"], 1, "p ∧ q = 0 (ikisi de doğru değil); p ∨ q = 1 (en az biri doğru); p → q yalnızca doğrudan yanlışa gidildiğinde yanlıştır: 1 → 0 = 0.");
+  q("din", "Vahiy ve Akıl", 2, "Kur'an-ı Kerim'in ilk inen ayetleri hangi surenin başındadır?",
+    ["Fatiha", "Bakara", "Alak", "Yasin", "İhlas"], 2, "İlk inen ayetler (‘Oku!’) Alak Suresi'nin ilk beş ayetidir.");
+  q("psikoloji", "Öğrenme", 2, "Zil sesiyle salya salgılayan köpek deneyini yapan ve klasik koşullanmayı açıklayan bilim insanı kimdir?",
+    ["Skinner", "Pavlov", "Freud", "Piaget", "Bandura"], 1, "İvan Pavlov, nötr uyaranın (zil) doğal uyaranla (yemek) eşleşince tepki (salya) oluşturması olan klasik koşullanmayı keşfetmiştir.");
+  q("sosyoloji", "Sosyolojiye Giriş", 2, "‘Sosyoloji’ terimini ilk kullanan düşünür aşağıdakilerden hangisidir?",
+    ["Emile Durkheim", "Auguste Comte", "Max Weber", "Karl Marx", "İbn Haldun"], 1, "Terimi 19. yüzyılda ilk kullanan Auguste Comte'tur; sosyolojiyi bilimsel bir disiplin olarak yerleştiren ise Durkheim'dir.");
+  /* ---- EDEBİYAT ---- */
+  q("edebiyat", "Divan Edebiyatı", 2, "‘Leyla ile Mecnun’ mesnevisinin yazarı kimdir?",
+    ["Baki", "Nedim", "Fuzuli", "Şeyh Galip", "Nabi"], 2, "Leyla ile Mecnun, Fuzuli'nin en ünlü mesnevisidir; Şeyh Galip'in eseri ise ‘Hüsn ü Aşk’tır.");
+  q("edebiyat", "Servet-i Fünun", 3, "‘Sanat sanat içindir.’ anlayışını benimseyen edebî topluluk aşağıdakilerden hangisidir?",
+    ["Tanzimat 1. Dönem", "Servet-i Fünun", "Fecr-i Ati", "Milli Edebiyat", "Garip"], 1, "Servet-i Fünun sanatçıları sanatı toplumsal fayda için değil sanat için yapmayı savunmuştur.");
+  q("edebiyat", "Cumhuriyet Dönemi Şiiri", 3, "Garip (I. Yeni) akımının kurucuları aşağıdakilerden hangisinde doğru verilmiştir?",
+    ["Cahit Sıtkı, Ahmet Haşim, Ziya Osman", "Orhan Veli, Oktay Rıfat, Melih Cevdet", "Cemal Süreya, Edip Cansever, Turgut Uyar", "Ziya Gökalp, Mehmet Emin, Rıza Tevfik", "Yahya Kemal, Ahmet Hamdi, Necip Fazıl"],
+    1, "Garip akımını 1941'de Orhan Veli Kanık, Oktay Rıfat ve Melih Cevdet Anday başlatmıştır.");
+  q("edebiyat", "Cumhuriyet Dönemi Romanı", 2, "‘Çalıkuşu’ romanının yazarı kimdir?",
+    ["Halide Edib Adıvar", "Reşat Nuri Güntekin", "Peyami Safa", "Yakup Kadri Karaosmanoğlu", "Ahmet Hamdi Tanpınar"], 1, "Çalıkuşu (1922), Reşat Nuri Güntekin'in romanıdır.");
 })();
 /* ===== Soru kalıpları: her soru üretildiği anda cevabı kodla hesaplanır ===== */
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));

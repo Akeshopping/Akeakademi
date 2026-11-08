@@ -19,7 +19,7 @@ self.addEventListener("fetch", e => {
     if (u.pathname.startsWith("/api/")) return; /* sunucu istekleri (hesap, AI) asla önbelleğe alınmaz */
     if (r.mode === "navigate" && u.pathname !== "/") { e.respondWith(fetch(r).catch(() => caches.match("/"))); return; } /* ayrı sayfalar (ör. /sss/) uygulama kabuğunu ezmez */
     const key = r.mode === "navigate" ? "/" : u.pathname;
-    if (r.mode === "navigate" || u.pathname === "/ayar.js") {
+    if (r.mode === "navigate" || u.pathname === "/ayar.js" || u.pathname.startsWith("/sorular/")) {
       e.respondWith(fetch(r).then(res => { if (res.ok) { const cp = res.clone(); caches.open(V).then(c => c.put(key, cp)); } return res; }).catch(() => caches.match(key)));
       return;
     }

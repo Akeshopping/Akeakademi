@@ -1,0 +1,13 @@
+import fs from "node:fs";
+import { sifirla, tumu, incelenecekler } from "./lib.mjs";
+sifirla();
+await import("./yazim/r01-mat.mjs");
+await import("./yazim/r01-mat-2.mjs");
+await import("./yazim/r01-geo.mjs");
+await import("./yazim/r01-amat.mjs");
+const by = {};
+tumu().forEach(e => (by[e.soru.s] = by[e.soru.s] || []).push(e.soru));
+fs.mkdirSync("cikti", { recursive: true });
+for (const s in by) fs.writeFileSync(`cikti/r01-${s}.json`, JSON.stringify(by[s]));
+fs.writeFileSync("cikti/r01-incelenecek.json", JSON.stringify(incelenecekler()));
+console.log(Object.entries(by).map(([s, l]) => s + ":" + l.length).join(" "), "incelenecek:", incelenecekler().length);

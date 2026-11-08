@@ -8876,6 +8876,25 @@ async function ekSorularYukle() {
   } catch (e) { }
 }
 
+/* ===== Sorular klasörü: tur tur eklenen soru dosyaları (/sorular/liste.json) ===== */
+async function sorularKlasoru() {
+  try {
+    const r = await fetch("/sorular/liste.json", { cache: "no-cache" }); if (!r.ok) return;
+    const liste = await r.json(); if (!Array.isArray(liste)) return;
+    const dosyalar = await Promise.all(liste.filter(d => typeof d === "string" && /^[\w.-]+\.json$/.test(d)).map(async d => {
+      try { const rr = await fetch("/sorular/" + d, { cache: "no-cache" }); if (!rr.ok) return []; const a = await rr.json(); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+    }));
+    const var_ = new Set(BANK.map(b => b.id)); let eklenen = 0;
+    dosyalar.forEach(arr => arr.forEach(q => {
+      if (!ekGecerli(q) || var_.has(q.id)) return;
+      try { q.t = KONU_ESLE(q.s, q.t); } catch (e) { }
+      var_.add(q.id); BANK.push(q); eklenen++;
+    }));
+    if (eklenen && !UI.inRun) render();
+  } catch (e) { }
+}
+sorularKlasoru();
+
 /* ===== Yönetim: AI ile soru üretimi ve onay ===== */
 const SORU = { veri: null, busy: {}, err: "", s: "" };
 async function soruYukle() {

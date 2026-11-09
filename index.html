@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=5916c71093">
-<link rel="icon" href="/favicon.ico?v=5916c71093" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=5916c71093">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=5916c71093">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=5916c71093">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=5916c71093">
+<link rel="manifest" href="/manifest.webmanifest?v=cb84d327ff">
+<link rel="icon" href="/favicon.ico?v=cb84d327ff" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=cb84d327ff">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=cb84d327ff">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=cb84d327ff">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=cb84d327ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=5916c71093">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=cb84d327ff">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -1114,6 +1114,15 @@ html.fx-m #aur u{display:none}
 .vitrin{background:linear-gradient(90deg,rgba(14,26,20,.62) 0,rgba(14,26,20,.34) 52%,rgba(14,26,20,0) 78%),radial-gradient(70% 140% at 100% 0%,rgba(74,128,102,.44),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(15,30,24,.78),transparent 70%),linear-gradient(135deg,rgba(37,66,54,.92),rgba(23,23,21,.94))}
 .vitrin p,.vitrin .muted{color:#e3eae5}
 .vitrin::before{opacity:.8}
+</style>
+<style>
+/* tablet / dar masaüstü (900–1209 px): kompakt üst menü: simgeler görünür, etiket yalnızca aktif öğede; diğerleri ekran okuyucuya açık kalır */
+@media (min-width:900px) and (max-width:1279px){
+ .side .nav a{min-width:44px;min-height:44px;justify-content:center;padding:9px 11px;gap:8px}
+ .side .nav a:not(.on) > span{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+ .side .nav a{position:relative}
+ .side{overflow-x:visible}
+}
 </style>
 </head>
 <body>
@@ -7530,7 +7539,7 @@ function navHTML(r) {
     ? `<a class="side-pro on-pro" href="#premium"><b>${esc(planAd(HESAP.paket.plan))} paket</b><span>Paketini yönet</span></a>`
     : `<a class="side-pro" href="#premium"><i>${icon("star")}</i><b>AKE Premium</b><span>AI öğretmen, daha fazla soru ve deneme</span><em>Paketleri gör</em></a>`;
   const bilgi = `<nav class="side-info" aria-label="Bilgi"><a href="#sss">Yardım ve SSS</a><a href="#hakkimizda">Hakkımızda</a><a href="#yasal">Yasal</a></nav>`;
-  return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("") + premium + bilgi;
+  return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" title="${l}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("") + premium + bilgi;
 }
 function header() {
   const [c, t] = saveLabel();

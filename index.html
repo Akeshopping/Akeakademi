@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
-<meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=3648ae4bcf">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=3648ae4bcf">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=3648ae4bcf">
+<meta name="theme-color" content="#f5f0e6">
+<link rel="manifest" href="/manifest.webmanifest?v=76e04e35f3">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=76e04e35f3">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=76e04e35f3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +16,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=3648ae4bcf">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=76e04e35f3">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -95,6 +94,7 @@ sup,sub{font-size:.72em}
 .logo-tile{flex:none;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:28%;overflow:hidden;
   background:linear-gradient(160deg,#0e8bff 0%,#1347d8 45%,#050c30 100%);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 16px -6px rgba(42,92,224,.65)}
+.logo-tile.lg4{background:radial-gradient(120% 120% at 50% 0%,#17325c 0%,#0b1a31 60%,#050d1b 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 14px -8px rgba(7,20,38,.6)}
 .logo-tile.lg2{background:radial-gradient(130% 130% at 30% -10%,#7aa3ff 0%,#1f3f9a 50%,#1544c9 100%)}
 .logo-tile svg{width:100%;height:100%;display:block}
 .brand .wm,.wm{font:800 19px/1 var(--f-disp);letter-spacing:-.012em;white-space:nowrap;color:var(--ink)}
@@ -7081,13 +7081,14 @@ const IC = {
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
 /* ---------- logo: "Yükseliş" — doğru cevaba yükselen eğri ve işaretlenmiş kutucuk (LOGO_NO ile 2 ya da 3'e geçilir) ---------- */
-const LOGO_NO = 1;
+const LOGO_NO = 4;
 const LOGO_V = {
+  4: id => `<svg viewBox="0 0 512 512"><defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dcae"/><stop offset=".5" stop-color="#d4b06a"/><stop offset="1" stop-color="#a98440"/></linearGradient><radialGradient id="${id}k" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#6f93d6" stop-opacity=".55"/><stop offset="1" stop-color="#0a1a33" stop-opacity=".7"/></radialGradient><radialGradient id="${id}c"><stop offset="0" stop-color="#fffbef"/><stop offset=".45" stop-color="#ffe3a6"/><stop offset="1" stop-color="#ffcb6b" stop-opacity="0"/></radialGradient></defs><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 1 196 0" fill="none" stroke="url(#${id}a)" stroke-width="24" stroke-linecap="round"/></g><circle cx="256" cy="256" r="124" fill="url(#${id}k)" stroke="rgba(255,255,255,.4)" stroke-width="8"/><circle cx="256" cy="256" r="58" fill="url(#${id}c)"/><g transform="translate(256 256) rotate(38)"><path d="M-150 0A150 52 0 0 0 150 0" fill="none" stroke="#dfe7f5" stroke-width="14" stroke-linecap="round"/></g><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 0 196 0" fill="none" stroke="url(#${id}a)" stroke-width="26" stroke-linecap="round"/><circle cx="196" cy="0" r="26" fill="#e8c98a"/></g></svg>`,
   1: id => `<svg viewBox="0 0 48 48"><defs><linearGradient id="${id}l" x1="10" y1="38" x2="30" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#cfe0ff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><path d="M11.5 37C16.5 26 22.5 19.6 29.5 15.6" fill="none" stroke="url(#${id}l)" stroke-width="3.4" stroke-linecap="round"/><polygon points="33.20,6.80 35.49,12.24 41.38,12.74 36.91,16.61 38.25,22.36 33.20,19.30 28.15,22.36 29.49,16.61 25.02,12.74 30.91,12.24" fill="#fff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
   2: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path class="lg-egri" pathLength="1" d="M13.2 36.2 24 12.2l10.8 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-hale" cx="24" cy="28.6" r="8" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="28.6" r="3.7" fill="#bff3ff"/></svg>`,
   3: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}f" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b9efff"/><stop offset=".55" stop-color="#2f6bff"/><stop offset="1" stop-color="#14307a"/></radialGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#3f7bff" stop-opacity=".7"/><stop offset="1" stop-color="#3f7bff" stop-opacity="0"/></radialGradient></defs><circle class="lg-egri" cx="12.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-egri" cx="35.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-hale" cx="24" cy="24" r="13" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="24" r="7" fill="url(#${id}f)"/></svg>`
 };
-const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}<canvas class="lg-cv" width="128" height="128"></canvas></span>`;
+const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}${LOGO_NO === 4 ? "" : '<canvas class="lg-cv" width="128" height="128"></canvas>'}</span>`;
 const WORDMARK = `<b class="wm">AKE <span>Akademi</span></b>`;
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const NAVG = [

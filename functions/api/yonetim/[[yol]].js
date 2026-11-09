@@ -5,9 +5,11 @@
 //   POST tekrar-gonder {id}  Bir siparişin kod e-postasını yeniden gönderir
 //   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, onaya koyar
 //   GET  sorular          onay bekleyen sorular ve sayılar
+//   GET  veli             veli raporu özeti ve gönderim geçmişi (öğrenci verisi yok)
 //   GET  aboneler         paketi süren aboneler
 //   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez)
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
+import { yoneticiOzet } from "../../../lib/veli.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -80,6 +82,7 @@ export async function onRequest({ request, env, params }) {
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
     return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], inceleme: (bekleyen && bekleyen.n) || 0, sayilar: say || {} });
   }
+  if (ad === "veli" && m === "GET") return json(200, await yoneticiOzet(env).catch(() => ({ hazir: false })));
   if (ad === "aboneler" && m === "GET") {
     const bugun = new Date().toISOString().slice(0, 10);
     const { results } = await env.DB.prepare("SELECT k.id AS kid, k.eposta AS eposta, k.ad AS ad, c.plan AS plan, c.bitis AS bitis FROM kod c JOIN kullanici k ON k.id = c.kid WHERE c.kid IS NOT NULL AND c.kid != 'silindi' AND (c.bitis IS NULL OR c.bitis >= ?) ORDER BY c.bitis ASC LIMIT 300").bind(bugun).all();

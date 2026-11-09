@@ -1,0 +1,18 @@
+# AKE Akademi · veli raporu zamanlayıcısı. Dağıtım: onay sonrası `wrangler deploy` (bu klasörden).
+name = "ake-veli-rapor"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+# Türkiye saati UTC+3 sabittir (yaz saati yok): TR pazar 19:00 = UTC pazar 16:00.
+# 18:00 ve 20:00 UTC çalışmaları yalnızca geçici hatalı gönderimleri yeniden dener (aynı hafta mükerrer gönderim olmaz).
+[triggers]
+crons = ["0 16 * * SUN", "0 18,20 * * SUN"]
+
+[vars]
+VELI_RAPORU = "0"   # "1" yapılana kadar hiçbir e-posta gönderilmez (hukuki değerlendirme sonrası açılır)
+
+[[d1_databases]]
+binding = "DB"
+database_name = "<MEVCUT_D1_ADI>"      # Pages projesindeki DB ile AYNI veritabanı
+database_id = "<MEVCUT_D1_ID>"
+# Gizli değişkenler (Cloudflare panelinden): RESEND_API_KEY, AKE_GIZLI, (isteğe bağlı) AKE_GONDEREN

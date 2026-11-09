@@ -1233,6 +1233,13 @@ header.top .adm-in .btn:hover{background:rgba(245,241,232,.08)!important}
 @media (prefers-reduced-motion:reduce){.yn-tabs button{transition:none}}
 :root[data-motion="off"] .yn-tabs button{transition:none}
 </style>
+<style id="vl-css">
+.vl-dl{display:grid;gap:10px;margin:0}.vl-dl div{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--sunk)}
+.vl-dl dt{font-size:12.5px;color:var(--ink3);margin:0}.vl-dl dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+@media (min-width:700px){.vl-dl{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.vl-yas{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin:0}.vl-yas legend{padding:0 6px}.vl-yas label{display:flex;gap:10px;align-items:center;min-height:36px;cursor:pointer}
+.vl .card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -9353,7 +9360,7 @@ function vHesap() {
   return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>
     <div class="card stack"><h2>${esc(H.user.ad || "Hesap bilgilerin")}</h2><p><b>E-posta:</b> ${esc(H.user.eposta)}</p><p class="small muted"><b>Kayıt:</b> ${esc(st)}. Çalışma verilerin hesabında saklanır ve giriş yaptığın her cihazda eşitlenir.</p>
       <div class="row">${H.user.yonetici ? `<a class="btn pri" href="#yonetim">Yönetim</a>` : ""}<button class="btn" data-a="cikis">Çıkış yap</button><button class="btn ghost" data-a="hesapSilAsk">Hesabımı sil</button></div></div>
-    ${paketKart()}</div>`;
+    ${paketKart()}${veliKarti()}</div>`;
 }
 function hesapOzetKart() {
   if (IN_CLAUDE) return "";
@@ -9404,6 +9411,65 @@ const HESAP_SUB = {
   }
 };
 
+
+/* ===== Veli Raporu (öğrenci ayarı) · sunucuda VELI_RAPORU=1 olana kadar kart hiç görünmez ===== */
+const VELI = { d: null, busy: "", err: "", msg: "", form: false, onizleme: null };
+const VELI_HATA = { eposta_gecersiz: "E-posta adresi geçersiz.", yas_gerekli: "Yaş grubunu seç.", paket_gerekli: "Veli raporu Atılım ve Premium paketlerinde açılır.", cok_istek: "Bugün çok fazla deneme yaptın. Yarın tekrar dene.", eposta: "Doğrulama e-postası gönderilemedi. Biraz sonra tekrar dene.", onay_gerekli: "Önce velinin onay vermesi gerekir.", kapali: "Veli raporu henüz açık değil." };
+async function veliIstek(path, body) {
+  const r = await fetch("/api/veli/" + path, { method: body === undefined ? "GET" : "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) });
+  let j = {}; try { j = await r.json(); } catch (e) { } return { r, j };
+}
+async function veliYukle() {
+  VELI.busy = "yukle";
+  try { const { r, j } = await veliIstek("durum"); VELI.d = r.ok ? j : { acik: false }; } catch (e) { VELI.d = { acik: false }; }
+  VELI.busy = ""; render();
+}
+function veliKarti() {
+  if (IN_CLAUDE || !HESAP.user) return "";
+  if (!VELI.d && !VELI.busy) setTimeout(veliYukle, 0);
+  const D = VELI.d; if (!D || !D.acik || !D.hazir) return "";
+  const tr = t => t ? new Date(t).toLocaleString("tr-TR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "Henüz yok";
+  const etiket = D.durum === "onayli" ? (D.etkin ? ["ok", "Açık"] : ["", "Kapalı · veli onayladı"]) : D.durum === "bekliyor" ? ["warn", "Veli onayı bekleniyor"] : ["", "Kapalı"];
+  const hata = VELI.err ? `<p class="note" role="alert">${esc(VELI.err)}</p>` : "", msg = VELI.msg ? `<p class="small" style="color:var(--ok)" role="status">${esc(VELI.msg)}</p>` : "";
+  const form = `<div class="stack vl-form"><label class="small" for="vl-ep"><b>Veli e-posta adresi</b></label><input id="vl-ep" class="in" type="email" autocomplete="off" placeholder="veli@ornek.com" maxlength="254">
+    <fieldset class="vl-yas"><legend class="small"><b>Yaş grubun</b></legend><label><input type="radio" name="vl-yas" value="kucuk"> 18 yaşından küçüğüm</label><label><input type="radio" name="vl-yas" value="yetiskin"> 18 yaşındayım veya büyüğüm</label></fieldset>
+    <p class="xs muted">Adresi yazman tek başına yetmez: veliye aydınlatma metni ve açık rıza bağlantısı gönderilir. Veli onay verene kadar hiçbir veri paylaşılmaz. Adresi değiştirirsen eski onay geçersiz olur.</p>
+    <div class="row"><button class="btn pri" data-a="veliAdres"${VELI.busy === "adres" ? " disabled" : ""}>${VELI.busy === "adres" ? "Gönderiliyor…" : "Doğrulama e-postası gönder"}</button>${D.durum !== "yok" ? `<button class="btn ghost" data-a="veliForm" data-v="0">Vazgeç</button>` : ""}</div></div>`;
+  let ic;
+  if (!D.ucretli) ic = `<p class="small muted">Haftalık veli raporu Atılım ve Premium paketlerinde kullanılır.</p><div class="row"><a class="btn" href="#premium">Paketlere bak</a></div>`;
+  else if (D.durum === "yok" || D.durum === "iptal" || VELI.form) ic = form;
+  else if (D.durum === "bekliyor") ic = `<p class="small"><b>${esc(D.veli)}</b> adresine doğrulama e-postası gönderildi. Veli onay verene kadar öğrenci verisi paylaşılmaz.</p><div class="row"><button class="btn" data-a="veliForm" data-v="1">Adresi değiştir</button><button class="btn ghost" data-a="veliGeri">İsteği iptal et</button></div>`;
+  else ic = `<dl class="vl-dl"><div><dt>Veli adresi</dt><dd>${esc(D.veli)} <span class="pill ok">Doğrulandı</span></dd></div><div><dt>Son gönderim</dt><dd>${tr(D.sonGonderim)}</dd></div><div><dt>Sonraki planlı gönderim</dt><dd>${D.etkin && D.sonraki ? tr(D.sonraki) + " (pazar 19.00)" : "Rapor kapalı"}</dd></div></dl>
+    <div class="row"><button class="btn ${D.etkin ? "" : "pri"}" data-a="veliEtkin" data-v="${D.etkin ? 0 : 1}"${VELI.busy ? " disabled" : ""}>${D.etkin ? "Raporu devre dışı bırak" : "Raporu etkinleştir"}</button><button class="btn" data-a="veliOnizle">Rapor önizlemesi</button><button class="btn" data-a="veliForm" data-v="1">Adresi değiştir</button><button class="btn ghost" data-a="veliGeri">İzni geri çek</button></div>`;
+  return `<div class="card stack vl"><div class="card-h"><h2>Veli Raporu</h2><span class="pill ${etiket[0]}">${etiket[1]}</span></div>
+    <p class="small muted">Her pazar 19.00'da, veline haftalık çalışma özetin e-postayla gider: çözülen soru, doğru/yanlış, doğruluk, ders bazlı çözüm ve aktif günler. Varsayılan olarak kapalıdır; yalnızca sen ve velin izin verirseniz çalışır, izni istediğin an geri çekebilirsin.</p>
+    ${hata}${msg}${ic}</div>`;
+}
+Object.assign(OZ_ACT, {
+  veliForm(d) { VELI.form = d.v === "1"; VELI.err = ""; VELI.msg = ""; render(); },
+  async veliAdres() {
+    const ep = (document.getElementById("vl-ep") || {}).value || "", yas = (document.querySelector('input[name="vl-yas"]:checked') || {}).value || "";
+    VELI.err = ""; VELI.msg = ""; VELI.busy = "adres"; render();
+    const { r, j } = await veliIstek("adres", { eposta: ep, yas }).catch(() => ({ r: { ok: false }, j: {} }));
+    VELI.busy = ""; if (r.ok) { VELI.msg = "Doğrulama e-postası veliye gönderildi."; VELI.form = false; VELI.d = null; } else VELI.err = VELI_HATA[j.error] || "İşlem yapılamadı. Tekrar dene.";
+    render();
+  },
+  async veliEtkin(d) {
+    VELI.busy = "etkin"; VELI.err = ""; VELI.msg = ""; render();
+    const { r, j } = await veliIstek("etkin", { deger: d.v === "1" }).catch(() => ({ r: { ok: false }, j: {} }));
+    VELI.busy = ""; if (r.ok) { VELI.msg = d.v === "1" ? "Veli raporu açıldı." : "Veli raporu kapatıldı."; VELI.d = null; } else VELI.err = VELI_HATA[j.error] || "İşlem yapılamadı.";
+    render();
+  },
+  veliGeri() { openModal("İzin geri çekilsin mi?", "<p>Veli raporu gönderimi hemen durur ve verilen izin geri çekilir. Yeniden açmak için veli adresini tekrar doğrulatman gerekir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "İzni geri çek", a: "veliGeriGo", k: "pri" }]); },
+  async veliGeriGo() {
+    UI.modal = null; const { r } = await veliIstek("izin-geri-cek", {}).catch(() => ({ r: { ok: false } }));
+    VELI.err = r.ok ? "" : "İşlem yapılamadı."; VELI.msg = r.ok ? "İzin geri çekildi; rapor gönderimi durdu." : ""; VELI.form = false; VELI.d = null; render();
+  },
+  async veliOnizle() {
+    const { r, j } = await veliIstek("onizleme").catch(() => ({ r: { ok: false }, j: {} })); if (!r.ok) { toast("Önizleme alınamadı."); return; }
+    const x = j.rapor || {}; openModal("Bu haftanın raporu (önizleme)", `<p class="small muted">Veline giden raporun senin verinden hesaplanan hâli. Bu önizleme e-posta göndermez.</p>${x.yeterli ? `<div class="tiles">${tile(x.q, "çözülen soru")}${tile("%" + x.dogruluk, "doğruluk")}${tile(x.aktifGun + "/7", "aktif gün")}</div>` : ""}<p>${esc(x.degerlendirme || "")}</p>`);
+  }
+});
 
 /* ===== Yönetim (yalnızca yönetici hesabı, akeakademi.com) ===== */
 const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay", deposta: "" };

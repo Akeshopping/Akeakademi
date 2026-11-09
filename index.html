@@ -7,9 +7,9 @@
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f6f7fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#06080f" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="/manifest.webmanifest?v=f4f7fdc32e">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f4f7fdc32e">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=f4f7fdc32e">
+<link rel="manifest" href="/manifest.webmanifest?v=56a44b3649">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=56a44b3649">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=56a44b3649">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=f4f7fdc32e">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=56a44b3649">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -10671,6 +10671,7 @@ const ATLAS = (function () {
 /* ---------- sinematik açılış: ışık → parçacıklar → bağlantılar → logo → içerik ---------- */
 /* 3B açılış: /acilis/sinema/ sayfasını tam ekran çerçevede oynatır. Çerçeve açılmazsa veya WebGL yoksa eski 2B açılış çalışır. */
 function atl3dAcilis() {
+  window.__atl3d = 1; /* sayfa her yenilendiğinde bir kez oynar; uygulama içi gezintide tekrarlanmaz */
   try {
     const c = document.createElement("canvas"); if (!(c.getContext("webgl2") || c.getContext("webgl"))) return false;
     if (!window.postMessage || !("onmessage" in window)) return false;
@@ -10692,7 +10693,7 @@ function atl3dAcilis() {
 function atlIntro(zorla) {
   if (document.getElementById("atlIntro")) return;
   let goru3d = false, gorduyse = false; try { goru3d = !!LS.get("ake.intro3d"); gorduyse = !!LS.get("ake.intro"); } catch (e) { }
-  if (!atlHareketAz() && (zorla || !goru3d) && atl3dAcilis()) return;
+  if (!atlHareketAz() && (zorla || !window.__atl3d) && atl3dAcilis()) return;
   if (!zorla && (gorduyse || atlHareketAz())) return;
   try { LS.set("ake.intro", "1"); } catch (e) { }
   const mob = atlMobil(), T = mob ? 2.3 : 2.9, N = mob ? 46 : 90;
@@ -10731,8 +10732,8 @@ function atlIntro(zorla) {
   };
   raf = requestAnimationFrame(step);
 }
-/* ana sayfa dahil her sayfada: 3B açılışı bu tarayıcıda bir kez oynat */
-function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro") || atlHareketAz()) return; window.__atl3d = 1; let g = false; try { g = !!LS.get("ake.intro3d"); } catch (e) { } if (!g) atl3dAcilis(); }
+/* ana sayfa dahil her sayfada: sayfa her yenilendiğinde 3B açılışı oynat */
+function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro") || atlHareketAz()) return; atl3dAcilis(); }
 function atlKur() { if (route() !== "tanitim") return; ATLAS.mount(); atlIntro(false); }
 
 Object.assign(OZ_ACT, {

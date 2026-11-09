@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=41590dff73">
-<link rel="icon" href="/favicon.ico?v=41590dff73" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=41590dff73">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=41590dff73">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=41590dff73">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=41590dff73">
+<link rel="manifest" href="/manifest.webmanifest?v=fbc56854fb">
+<link rel="icon" href="/favicon.ico?v=fbc56854fb" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=fbc56854fb">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=fbc56854fb">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=fbc56854fb">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=fbc56854fb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=41590dff73">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=fbc56854fb">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -747,6 +747,17 @@ html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 body::after{background:var(--aura),radial-gradient(38vmax 38vmax at 50% -12%,rgba(255,255,255,.55),transparent 70%)}
 :root[data-theme="dark"] body::after{background:var(--aura),radial-gradient(40vmax 30vmax at 50% -10%,rgba(71,123,255,.10),transparent 70%)}
 @media (prefers-reduced-motion:reduce){html::before{background-attachment:scroll}}
+
+.stctl{display:flex;flex-wrap:wrap;gap:10px 16px;margin:6px 0 12px}
+.stctl .seg{flex-wrap:wrap}
+/* Mobil: cevap kâğıdı alttan açılan çekmece */
+@media (max-width:899px){
+ .run>.sheet{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:34;border-radius:16px 16px 0 0;box-shadow:0 -10px 30px -12px rgba(7,20,38,.35);padding:10px 14px;max-height:62vh;overflow:auto}
+ .run>.sheet .sheet-grid{grid-template-columns:1fr 1fr}
+ .run{padding-bottom:120px}
+ body:has(.run) .tabbar{display:none}
+ .qnav{bottom:0}
+}
 </style>
 </head>
 <body>
@@ -6834,7 +6845,7 @@ function buildSet(parts, o) {
     const old = pool.filter(q => S.ans[q.id]).sort((a, b) => (S.ans[a.id][3] || 0) - (S.ans[b.id][3] || 0));
     const take = [];
     if (!o.genOnly) for (const q of (o.unsolvedFirst === false ? pool : fresh)) { if (take.length >= n) break; take.push(q); }
-    const gens = o.src === "ai" ? [] : gensOf(s, o.topic);
+    const gens = o.src === "ai" ? [] : gensOf(s, o.topic).filter(g => !o.diff || g.d === o.diff);
     /* Aynı kalıp bir bölümde üst üste gelmesin: her kalıptan en fazla "cap" soru, sonra eski özgün sorular */
     let order = shuffle(gens), i = 0, guard = 0, stale = 0;
     const per = {}, cap = Math.max(2, Math.ceil(n / Math.max(1, gens.length)) + 1, Math.ceil(n * 0.12));
@@ -7098,7 +7109,7 @@ const UI = {
   menu: false, modal: null, toast: null, inRun: false, resultId: null, lastResult: null,
   exam: { type: null, size: "full", custom: {}, mode: "exam", dur: "", unsolved: true },
   bank: { s: "", t: "", d: 0, st: "", src: "", q: "", lim: 40 },
-  studio: { s: null }, gen: { s: null, t: "", d: 2, n: 3, busy: false, stage: "", res: null, err: "" },
+  studio: { s: null, n: 10, d: 0 }, gen: { s: null, t: "", d: 2, n: 3, busy: false, stage: "", res: null, err: "" },
   mist: { tab: "open", s: "" }, cards: { deck: null, queue: [], i: 0, show: false, adding: false },
   chat: (() => { try { return JSON.parse(LS.get("ake.chat") || "[]"); } catch (e) { return []; } })(),
   chatBusy: false, chatImg: null, chatDraft: "", ai: {}, reps: null, planBusy: false, planErr: "", paraDraft: {}
@@ -7354,10 +7365,12 @@ function vStudio() {
   const s = UI.studio.s && SUBJ[UI.studio.s] ? UI.studio.s : (alanDersleri()[0] || "mat"), tops = topicsOf(s), dz = dersOzet(s);
   const grp = ["TYT", "AYT", "YDT"].map(e => [e, Object.keys(SUBJ).filter(k => SUBJ[k].e === e)]);
   return `<div class="view">${resumeBanner()}
-  <div class="vhead"><h1>Soru çöz</h1><p>Önce dersi, sonra konuyu seç; 10 soruluk çözümlü set başlar. Konunun yanındaki renk o konudaki başarını gösterir.</p></div>
+  <div class="vhead"><h1>Soru çöz</h1><p>Önce dersi, sonra konuyu seç; istediğin uzunlukta ve zorlukta çözümlü set başlar. Konunun yanındaki renk o konudaki başarını gösterir.</p></div>
   ${subTabs(SORU_TABS, "studyo")}
   <div class="card"><div class="subj-chips">${grp.map(([e, ks]) => `<div class="grp"><span>${e}</span><div class="seg">${ks.map(k => `<button type="button" data-a="dersSec" data-s="${k}" class="${k === s ? "on" : ""}" aria-pressed="${k === s}">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</button>`).join("")}</div></div>`).join("")}</div></div>
-  <div class="card"><div class="card-h"><h2>${esc(SUBJ[s].n)}</h2><button class="btn sm pri" data-a="dersKarisik" data-s="${s}">Karışık 10 soru</button></div>
+  <div class="card"><div class="card-h"><h2>${esc(SUBJ[s].n)}</h2><button class="btn sm pri" data-a="dersKarisik" data-s="${s}">Karışık ${UI.studio.n || 10} soru</button></div>
+    <div class="stctl"><div class="seg" role="group" aria-label="Test uzunluğu">${[10, 20, 30, 70, 80].map(n => `<button type="button" data-a="stN" data-n="${n}" class="${(UI.studio.n || 10) === n ? "on" : ""}" aria-pressed="${(UI.studio.n || 10) === n}">${n} soru</button>`).join("")}</div>
+    <div class="seg" role="group" aria-label="Zorluk">${[[0, "Karışık"], [1, "Kolay"], [2, "Orta"], [3, "Zor"]].map(([k, l]) => `<button type="button" data-a="stD" data-d="${k}" class="${(UI.studio.d || 0) === k ? "on" : ""}" aria-pressed="${(UI.studio.d || 0) === k}">${l}</button>`).join("")}</div></div>
     <p class="small muted" style="margin-bottom:4px">${dz.n ? `Bu derste ${dz.n} soru çözdün, doğruluğun %${dz.acc}.` : "Bu derste henüz soru çözmedin."} ${tops.length} konu.</p>
     <div>${tops.map(t => { const k = konuOzet(s, t.t); return `<div class="topic-row"><span class="heat ${isiSinif(k.acc)}" aria-hidden="true"></span><div class="grow"><div class="t">${esc(t.t)}</div><div class="s">${t.g ? "Sınırsız soru" : t.n + " soru"}${k.n ? ` · ${k.n} çözdün, %${k.acc} doğru` : " · henüz çözmedin"}</div></div><button class="btn sm" data-a="topicStart" data-s="${s}" data-t="${esc(t.t)}">Çöz</button></div>`; }).join("")}</div>
     <div class="hm-leg" style="margin-top:14px">${heatLegend()}</div></div>
@@ -8290,6 +8303,12 @@ Object.assign(ADM_ACT, {
 
 /* ---------- 15 · Erişilebilirlik: tema, yazı boyutu, okuma dostu yazı tipi ---------- */
 const ERISIM = { tema: LS.get("ake.tema") || "auto", yazi: LS.get("ake.yazi") || "n", font: LS.get("ake.font") || "std", hareket: LS.get("ake.hareket") || "on" };
+const stOpt = () => ({ n: [10, 20, 30, 70, 80].includes(UI.studio.n) ? UI.studio.n : 10, d: [1, 2, 3].includes(UI.studio.d) ? UI.studio.d : 0 });
+function stBaslat(b, baslik, o) {
+  if (!b.qs.length) { toast("Bu seçimde soru bulunamadı. Zorluğu 'Karışık' yap ya da başka bir konu seç."); return; }
+  if (b.qs.length < o.n) toast(`Bu seçimde ${b.qs.length} soru bulundu (istediğin ${o.n}). Test bu kadar soruyla başlıyor.`);
+  startRun({ kind: "practice", title: baslik + (o.d ? " · " + DIFF[o.d] : ""), mode: "study", qs: b.qs });
+}
 const koyuMu = () => ERISIM.tema === "dark";
 function erisimUygula() {
   const d = document.documentElement;
@@ -8683,7 +8702,9 @@ function vUret() {
 Object.assign(OZ_ACT, {
   dersSec(d) { UI.studio.s = d.s; UI.gen.s = d.s; render(); },
   dersAc(d) { UI.studio.s = d.s; UI.gen.s = d.s; go("studyo"); },
-  dersKarisik(d) { if (!SUBJ[d.s]) return; const b = buildSet([[d.s, 10]], { unsolvedFirst: true }); startRun({ kind: "practice", title: `${SUBJ[d.s].n} · karışık`, mode: "study", qs: b.qs }); },
+  dersKarisik(d) { if (!SUBJ[d.s]) return; const o = stOpt(); const b = buildSet([[d.s, o.n]], { unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · karışık`, o); },
+  stN(d) { UI.studio.n = +d.n || 10; render(); },
+  stD(d) { UI.studio.d = +d.d || 0; render(); },
   raporKopya() { const t = veliRaporMetni(); try { navigator.clipboard.writeText(t).then(() => toast("Rapor kopyalandı."), () => toast("Kopyalanamadı; metni seçip kopyalayabilirsin.")); } catch (e) { toast("Kopyalanamadı; metni seçip kopyalayabilirsin."); } },
   pomoMod(d) { if (POMO.run || !POMO_SURE[d.k]) return; POMO.mode = d.k; POMO.kalan = POMO_SURE[d.k]; pomoKaydet(); render(); },
   pomoBasla() { POMO.end = Date.now() + pomoKalan() * 1000; POMO.run = true; pomoKaydet(); if (!pomoTimer) pomoTimer = setInterval(pomoTick, 1000); render(); },
@@ -11189,7 +11210,7 @@ const ACT = {
     else if (d.k === "mini") { UI.exam.type = defaultExam(); UI.exam.size = "quarter"; UI.exam.mode = "exam"; UI.exam.dur = ""; startExamFromUI(); }
     else if (d.k === "weak") { const w = weakTopics(1)[0]; if (w) ACT.topicStart({ s: w.s, t: w.t }); else ACT.quick({ k: "mix" }); }
   },
-  topicStart(d) { const b = buildSet([[d.s, 10]], { topic: d.t, unsolvedFirst: true }); startRun({ kind: "practice", title: `${SUBJ[d.s].n} · ${d.t}`, mode: "study", qs: b.qs }); },
+  topicStart(d) { const o = stOpt(); const b = buildSet([[d.s, o.n]], { topic: d.t, unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · ${d.t}`, o); },
   exType(d) { UI.exam.type = d.k; render(); },
   exSize(d) { UI.exam.size = d.k; render(); },
   exMode(d) { UI.exam.mode = d.k; render(); },

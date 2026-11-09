@@ -128,3 +128,19 @@ test("yönetici deneme siparişi (deneme=true, 0 TL) çalışmaya devam eder", a
   const r = await siparisIsle(e, { id: "deneme-1", paymentStatus: "paid", billingInfo: { email: "yonetici@ornek.com" }, lineItems: [{ productId: "52547800", quantity: 1 }], totals: { total: "0" } }, true);
   assert.notEqual(r.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 1);
 });
+
+// ---- GERÇEK Shopier bildirimi (9 Kasım 2026, 199 TL Atılım 1 ay; kişisel veriler silindi, e-posta yer tutucu) ----
+const GERCEK = () => ({"id":"295937632","status":"unfulfilled","paymentStatus":"paid","installments":false,"dateCreated":"2026-11-09T21:24:50+0300","currency":"TRY","paymentMethod":"creditCard","totals":{"subtotal":"199.00","shipping":"0.00","discount":"0.00","total":"199.00"},"discounts":[],"shippingInfo":{"firstName":"","lastName":"C","nationalId":"","email":"ogrenci@ornek.com","phone":"","company":"","address":"Dijital ürün","district":"","city":"","state":"","postcode":"","country":"Türkiye"},"billingInfo":{},"note":"","lineItems":[{"productId":"52547800","title":"AKE Akademi Atılım Paket – 1 Ay","type":"digital","selection":[],"options":[],"quantity":1,"price":"199.00","total":"199.00"}],"fulfillments":[],"returns":[],"refunds":[]});
+test("GERÇEK örnek yük: kod üretilir (billingInfo boş, e-posta shippingInfo'da)", async () => {
+  const e = env(); const r = await gonder(e, GERCEK());
+  assert.equal(r.status, 200); assert.equal(e.DB.t.kod.length, 1); assert.equal(e.DB.t.kod[0].plan, "orta");
+});
+test("GERÇEK örnek yük: alan okuma (durum/para/tutar)", () => {
+  assert.deepEqual(siparisAlanlari(GERCEK()), { durum: "paid", para: "TRY", toplam: 199 });
+});
+test("GERÇEK yük, tutar 1 TL'ye oynanmış: kod yok", async () => {
+  const e = env(); const o = GERCEK(); o.totals.total = "1.00"; const r = await gonder(e, o); assert.equal(r.j.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 0);
+});
+test("GERÇEK yük, aynı sipariş ikinci kez: tekrar kod yok", async () => {
+  const e = env(); await gonder(e, GERCEK()); await gonder(e, GERCEK()); assert.equal(e.DB.t.kod.length, 1);
+});

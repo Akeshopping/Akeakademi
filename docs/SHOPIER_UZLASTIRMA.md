@@ -18,6 +18,9 @@ Durum: TASARIM + güvenli (kapalı-kalan) kod. Canlıya alınmadı. Bu belge han
 
 Sonuç: ödeme akışı canlıda uçtan uca doğrulanmadan bu değişiklik canlıya önerilmez (bkz. §6).
 
+### 1a. GERÇEK ödeme ile doğrulananlar (9 Kasım 2026, 199 TL Atılım 1 ay, canlı sistem)
+Gerçek bir `order.created` bildirimi alındı ve canlı sistem kodu üretip e-posta gönderdi. Gerçek yükten **doğrulanan** alanlar: `paymentStatus: "paid"`, üst düzey `currency: "TRY"`, `totals.total: "199.00"` (nokta ondalık), `lineItems[].productId` (metin) ve `quantity`, `discounts: []`, `refunds: []`, `status: "unfulfilled"` (teslim durumu, ödeme değil). `billingInfo` boş olabilir; e-posta `shippingInfo.email` içinde de gelebilir (kod ikisine de bakıyor). İmza geçti (HMAC çalışıyor). Hâlâ **doğrulanmayan**: `paid` dışındaki değerler, başarısız ödeme yükü, indirimli sipariş yükü, `refund.updated` yükü, imza başlığının resmi adı.
+
 ## 2. Kodun şu anki güvenli davranışı (kapalı kalır)
 
 Erişim kodu yalnızca şunların HEPSİ doğruysa üretilir: geçerli imza, durum alanı başarılı, ürün kimliği tanınıyor, para birimi TRY/TL, nihai tutar = (liste fiyatı veya sunucuda tanımlı indirimli tutar) × miktar toplamı (kuruşu kuruşuna, tolerans yok), sipariş daha önce işlenmemiş. Biri tutmazsa kod üretilmez ve sipariş `odeme_dogrulanamadi`, `para_dogrulanamadi` veya `tutar_uyusmuyor` olarak (ham verisiyle) kaydedilir. Bildirimdeki indirim alanlarına güvenilmez; yalnızca `AKE_INDIRIMLI` (sunucu ortam değişkeni) tutarları kabul edilir.

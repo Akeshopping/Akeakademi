@@ -6,7 +6,10 @@ Klasördeki dosyalar:
   manifest.webmanifest  Telefona "uygulama" olarak kurulabilmesi için
   sw.js                 İnternet yokken de açılması için
   icons/                Ana ekran simgeleri
-  vercel.json           Vercel ayarları
+  og.png                Paylaşım önizleme görseli (WhatsApp, Instagram)
+  sitemap.xml           Google için site haritası
+  _headers              Cloudflare ayarları (önbellek ve güvenlik)
+  functions/api/ai.js   AI öğretmen sunucusu, Cloudflare (anahtar Cloudflare ayarlarında gizli durur)
 
 Yayınlama (Vercel):
   1. GitHub'da yeni bir depo aç (ör. akeakademi), bu klasördeki her şeyi yükle.

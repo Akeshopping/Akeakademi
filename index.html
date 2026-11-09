@@ -1124,6 +1124,84 @@ html.fx-m #aur u{display:none}
  .side{overflow-x:visible}
 }
 </style>
+<style id="sc3-css">
+/* ===== Soru Çözüm Merkezi V3 · Obsidian Forest: obsidyen #171715, orman #254236, şampanya #C5A572, fildişi #F5F1E8 ===== */
+:root{--sc-sel:#254236;--sc-selbg:rgba(37,66,54,.07);--sc-on:#fff;--sc-gold:#C5A572}
+:root[data-theme="dark"]{--sc-sel:#C5A572;--sc-selbg:rgba(197,165,114,.09);--sc-on:#171715}
+.sc3{gap:18px;max-width:1120px}
+.sc3 .subtabs{max-width:none}
+.sc3-hero{position:relative;overflow:hidden;border-radius:20px;padding:clamp(20px,4vw,34px);color:#f5f1e8;background:radial-gradient(90% 150% at 100% -20%,rgba(37,66,54,.95),rgba(37,66,54,0) 64%),radial-gradient(55% 90% at 0% 130%,rgba(197,165,114,.16),transparent 62%),#171715;border:1px solid rgba(197,165,114,.30);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 26px 50px -32px rgba(23,23,21,.75)}
+.sc3-hero h1{font-size:clamp(26px,4.6vw,38px);line-height:1.1;margin:0;color:#f5f1e8;text-wrap:balance}
+.sc3-sub{margin:8px 0 0;color:#d3ccbd;font-size:16px;max-width:46ch}
+.sc3-prog{margin-top:22px;max-width:560px;padding:14px 16px 15px;border-radius:14px;background:rgba(245,241,232,.07);border:1px solid rgba(245,241,232,.12);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.sc3-prog-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;color:#d3ccbd}
+.sc3-prog-h b{color:#f5f1e8;font-size:17px;font-variant-numeric:tabular-nums}
+.sc3-bar{height:8px;border-radius:99px;background:rgba(245,241,232,.14);margin:10px 0 9px;overflow:hidden}
+.sc3-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#b69a68,#C5A572);transition:width .5s var(--ease)}
+.sc3-prog-s{margin:0;font-size:13.5px;color:#cfc8b9}
+.sc3-grid{display:grid;gap:18px;grid-template-columns:minmax(0,1fr);align-items:start}
+.sc3-steps{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sc3-step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.sc3-sh{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.sc3-sh h2{margin:0;font-size:17px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sc3-n{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font-size:13px;font-weight:700;background:var(--sc-sel);color:var(--sc-on)}
+.sc3-opt-tag{font-size:12.5px;font-weight:600;color:var(--ink2);background:var(--sunk);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.sc3-exams{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.sc3-ex,.sc3-d,.sc3-k,.sc3-o{position:relative;font:inherit;color:var(--ink);text-align:left;cursor:pointer;background:var(--card);border:1.5px solid var(--line);border-radius:14px;transition:border-color .18s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease),transform .12s var(--ease)}
+.sc3-ex:hover,.sc3-d:hover,.sc3-k:hover,.sc3-o:hover{border-color:var(--ink3)}
+.sc3-ex:active,.sc3-d:active,.sc3-k:active,.sc3-o:active{transform:translateY(1px)}
+.sc3-ex.on,.sc3-d.on,.sc3-k.on,.sc3-o.on{border-color:var(--sc-sel);background:var(--sc-selbg);box-shadow:inset 0 0 0 1px var(--sc-sel)}
+.sc3-ex:focus-visible,.sc3-d:focus-visible,.sc3-k:focus-visible,.sc3-o:focus-visible,.sc3 a.btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--sc-sel)}
+.sc3-ck{position:absolute;top:10px;right:10px;color:var(--sc-sel)}
+.sc3-ex{display:flex;flex-direction:column;gap:3px;padding:16px 40px 16px 16px;min-height:104px}
+.sc3-ex-t{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.sc3-ex-s{font-size:13.5px;color:var(--ink2)}
+.sc3-ex-m{margin-top:auto;padding-top:6px;font-size:12.5px;color:var(--ink3)}
+.sc3-ex.yd{grid-column:1/-1;min-height:0;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:14px 40px 14px 16px}
+.sc3-ex.yd .sc3-ex-t{font-size:20px}.sc3-ex.yd .sc3-ex-m{margin:0;padding:0}
+.sc3-ders{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+.sc3-d{display:flex;flex-direction:column;gap:2px;min-height:58px;padding:11px 34px 11px 14px}
+.sc3-d-t{font-weight:600;font-size:15px;line-height:1.25}.sc3-d-s{font-size:12.5px;color:var(--ink3)}
+.sc3-d .sc3-ck{top:50%;transform:translateY(-50%);right:10px}
+.sc3-kl{display:flex;flex-direction:column;gap:6px;max-height:min(52vh,400px);overflow-y:auto;padding:2px;margin:-2px;overscroll-behavior:contain}
+.sc3-k{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 40px 10px 12px;flex:none}
+.sc3-k .heat{flex:none;width:6px;align-self:stretch;border-radius:3px}
+.sc3-k-b{display:flex;flex-direction:column;gap:1px;min-width:0}.sc3-k-t{font-weight:600;font-size:15px;line-height:1.3}.sc3-k-s{font-size:12.5px;color:var(--ink3);line-height:1.35}
+.sc3-k .sc3-ck{top:50%;transform:translateY(-50%)}
+.sc3-leg{margin-top:12px}
+.sc3-pair{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.sc3-pair .sc3-step{padding:16px}
+.sc3-opt{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.sc3-opt5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.sc3-o{min-height:48px;padding:0 10px;text-align:center;font-weight:600;font-size:15px;display:grid;place-items:center}
+.sc3-sum{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.sc3-sum h2,.sc3-osym h2{margin:0 0 12px;font-size:17px}
+.sc3-sum dl{margin:0 0 16px;display:flex;flex-direction:column}
+.sc3-sum dl>div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14.5px}
+.sc3-sum dl>div:last-child{border-bottom:0}
+.sc3-sum dt{color:var(--ink3)}.sc3-sum dd{margin:0;font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+.sc3-bos{font-weight:400;color:var(--ink3)}
+.sc3-go{min-height:52px;font-size:16px}
+.sc3-go-h{margin:10px 0 0}
+.sc3-osym{margin-top:14px;padding:18px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(37,66,54,.08),rgba(37,66,54,.02)),var(--card)}
+:root[data-theme="dark"] .sc3-osym{background:linear-gradient(180deg,rgba(197,165,114,.10),rgba(197,165,114,.02)),var(--card)}
+.sc3-osym-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:0}.sc3-osym-h h2{margin-bottom:8px}
+.sc3-osym p{margin:0 0 14px;font-size:14px;color:var(--ink2);line-height:1.5}
+.sc3-osym .btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+@keyframes sc3-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sc3-new{animation:sc3-in .26s var(--ease) both}
+@media (min-width:700px){
+  .sc3-exams{grid-template-columns:2fr 2fr 1.25fr}.sc3-ex.yd{grid-column:auto;flex-direction:column;align-items:flex-start;gap:3px;min-height:104px}.sc3-ex.yd .sc3-ex-t{font-size:26px}.sc3-ex.yd .sc3-ex-m{margin-top:auto;padding-top:6px}
+  .sc3-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}
+  .sc3-opt{grid-template-columns:repeat(4,minmax(0,1fr))}.sc3-opt5{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media (min-width:700px) and (max-width:1023.98px){.sc3-aside{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sc3-osym{margin-top:0}}
+@media (min-width:1024px){.sc3-grid{grid-template-columns:minmax(0,1fr) 340px}.sc3-aside{position:sticky;top:84px}}
+@media (max-width:699.98px){.sc3-pair .sc3-opt{grid-template-columns:repeat(2,minmax(0,1fr))}.sc3-opt5{grid-template-columns:repeat(3,minmax(0,1fr))}.sc3-hero{border-radius:18px}}
+@media (max-width:420px){.sc3-step{padding:15px}.sc3-ex{padding:14px 38px 14px 14px}}
+@media (prefers-reduced-motion:reduce){.sc3-new{animation:none}.sc3-bar i,.sc3-ex,.sc3-d,.sc3-k,.sc3-o{transition:none}}
+:root[data-motion="off"] .sc3-new{animation:none}:root[data-motion="off"] .sc3-bar i{transition:none}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -7740,19 +7818,47 @@ function vBank() {
 }
 
 /* ---------- Çalışma stüdyosu ---------- */
+/* ---------- Soru Çözüm Merkezi (V3): aşamalı seçim. Soru seçimi ve çözme mantığı eskisiyle aynıdır:
+   konu seçiliyse ACT.topicStart, değilse OZ_ACT.dersKarisik (buildSet + stBaslat + startRun) çağrılır. ---------- */
+const SC_EXAM = [["TYT", "Temel Yeterlilik Testi"], ["AYT", "Alan Yeterlilik Testi"], ["YDT", "Yabancı Dil Testi"]];
+const SC_DIFF = [[1, "Kolay"], [2, "Orta"], [3, "Zor"], [0, "Karışık"]];
+const SC_CHECK = `<svg class="sc3-ck" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/><path d="M5.6 10.4l3 3 5.8-6.2" fill="none" stroke="var(--sc-on)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function scExamBilgi(e) { const set = new Set(Object.keys(SUBJ).filter(k => SUBJ[k].e === e)); return { ders: set.size, soru: allQ().filter(q => set.has(q.s)).length }; }
 function vStudio() {
-  const s = UI.studio.s && SUBJ[UI.studio.s] ? UI.studio.s : (alanDersleri()[0] || "mat"), tops = topicsOf(s), dz = dersOzet(s);
-  const grp = ["TYT", "AYT", "YDT"].map(e => [e, Object.keys(SUBJ).filter(k => SUBJ[k].e === e)]);
-  return `<div class="view">${resumeBanner()}
-  <div class="vhead"><h1>Soru çöz</h1><p>Önce dersi, sonra konuyu seç; istediğin uzunlukta ve zorlukta çözümlü set başlar. Konunun yanındaki renk o konudaki başarını gösterir.</p></div>
+  const St = UI.studio;
+  if (St.s && !SUBJ[St.s]) St.s = null;
+  if (St.s) St.e = SUBJ[St.s].e; else if (!SC_EXAM.some(x => x[0] === St.e)) St.e = defaultExam() === "YDT" ? "YDT" : "TYT";
+  const seen = St.seen || (St.seen = {}), yeni = k => seen[k] ? "" : (seen[k] = 1, " sc3-new");
+  const e = St.e, s = St.s, dersler = Object.keys(SUBJ).filter(k => SUBJ[k].e === e), tops = s ? topicsOf(s) : [];
+  if (St.t && !tops.some(x => x.t === St.t)) St.t = "";
+  const t = St.t || "", o = stOpt(), goal = +S.profile.gunluk || 40, td = S.daily[dayKey()] || { q: 0, c: 0 }, yuz = Math.min(100, Math.round(td.q / goal * 100));
+  const ders = s ? dersOzet(s) : null, dn = s ? SUBJ[s].n.replace(/^AYT /, "") : "";
+  const sec = (no, baslik, id, ek, ic) => `<section class="sc3-step${ek || ""}" id="${id}" aria-labelledby="${id}-h"><div class="sc3-sh"><span class="sc3-n" aria-hidden="true">${no}</span><h2 id="${id}-h">${baslik}</h2></div>${ic}</section>`;
+  const sinav = `<div class="sc3-exams" role="group" aria-label="Sınav türü">${SC_EXAM.map(([k, ad]) => { const b = scExamBilgi(k), on = k === e; return `<button type="button" id="sc3-e-${k}" data-a="stE" data-k="${k}" class="sc3-ex${k === "YDT" ? " yd" : ""}${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-ex-t">${k}</span><span class="sc3-ex-s">${ad}</span><span class="sc3-ex-m">${b.ders} ders · ${fmtN(b.soru)} soru</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
+  const dersBtn = `<div class="sc3-ders" role="group" aria-label="Ders">${dersler.map(k => { const on = k === s, bi = dersBilgi(k); return `<button type="button" id="sc3-s-${k}" data-a="stDers" data-s="${k}" class="sc3-d${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-d-t">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</span><span class="sc3-d-s">${bi.konu} konu</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
+  const konuSatir = (val, ad, alt, isi) => { const on = (val === t); return `<button type="button" id="sc3-t-${val ? "x" + tops.findIndex(x => x.t === val) : "tum"}" data-a="stT" data-t="${esc(val)}" class="sc3-k${on ? " on" : ""}" aria-pressed="${on}"><span class="heat ${isi}" aria-hidden="true"></span><span class="sc3-k-b"><span class="sc3-k-t">${esc(ad)}</span><span class="sc3-k-s">${alt}</span></span>${on ? SC_CHECK : ""}</button>`; };
+  const konu = !s ? "" : !tops.length ? `<div class="empty">Bu ders için henüz konu bulunamadı. Başka bir ders seç.</div>`
+    : `<div class="sc3-kl" role="group" aria-label="Konu">${konuSatir("", "Tüm konular", `${tops.length} konudan karışık${ders.n ? ` · bu derste ${ders.n} soru çözdün, %${ders.acc} doğru` : ""}`, isiSinif(ders.acc))}${tops.map(x => { const k = konuOzet(s, x.t); return konuSatir(x.t, x.t, `${x.g ? "Sınırsız soru" : x.n + " soru"}${k.n ? ` · ${k.n} çözdün, %${k.acc} doğru` : " · henüz çözmedin"}`, isiSinif(k.acc)); }).join("")}</div><div class="hm-leg sc3-leg">${heatLegend()}</div>`;
+  const zorluk = `<div class="sc3-opt" role="group" aria-label="Zorluk seviyesi">${SC_DIFF.map(([k, l]) => `<button type="button" id="sc3-d-${k}" data-a="stD" data-d="${k}" class="sc3-o${o.d === k ? " on" : ""}" aria-pressed="${o.d === k}">${l}</button>`).join("")}</div>`;
+  const adet = `<div class="sc3-opt sc3-opt5" role="group" aria-label="Soru sayısı">${[10, 20, 30, 70, 80].map(n => `<button type="button" id="sc3-n-${n}" data-a="stN" data-n="${n}" class="sc3-o${o.n === n ? " on" : ""}" aria-pressed="${o.n === n}">${n}</button>`).join("")}</div>`;
+  const zl = SC_DIFF.find(x => x[0] === o.d)[1];
+  const ozet = `<aside class="sc3-aside" aria-label="Seçim özeti"><div class="sc3-sum"><h2>Seçimlerin</h2>
+    <dl><div><dt>Sınav</dt><dd>${e}</dd></div><div><dt>Ders</dt><dd>${s ? esc(dn) : `<span class="sc3-bos">Henüz seçmedin</span>`}</dd></div><div><dt>Konu</dt><dd>${s ? esc(t || "Tüm konular") : `<span class="sc3-bos">–</span>`}</dd></div><div><dt>Zorluk</dt><dd>${zl}</dd></div><div><dt>Soru sayısı</dt><dd>${o.n}</dd></div></dl>
+    <button class="btn pri wide sc3-go" id="sc3-go" data-a="stBasla"${s ? "" : " disabled aria-describedby=\"sc3-go-h\""}>Teste başla</button>
+    <p class="xs muted sc3-go-h" id="sc3-go-h" aria-live="polite">${s ? "Çözülmemiş sorular önce gelir; set boyunca doğru cevap ve çözüm her sorudan sonra gösterilir." : "Başlamak için önce bir ders seç."}</p></div>
+    <div class="sc3-osym"><div class="sc3-osym-h"><h2>ÖSYM tarzı sorular</h2><span class="pill">Ayrı bölüm</span></div><p>Öncüllü (I, II, III), “söylenemez / değildir”, paragraf ve çok adımlı zor sorular. İstersen sınav süresiyle çalışırsın.</p><a class="btn wide" href="#osym" id="sc3-osym">ÖSYM tarzıyla çöz</a></div></aside>`;
+  return `<div class="view sc3">${resumeBanner()}
+  <section class="sc3-hero" aria-labelledby="sc3-h1"><h1 id="sc3-h1">Soru Çözüm Merkezi</h1><p class="sc3-sub">Hedefine uygun sorularla ilerle.</p>
+    <div class="sc3-prog"><div class="sc3-prog-h"><span>Bugünkü ilerlemen</span><b>${td.q} / ${goal} soru</b></div>
+      <div class="sc3-bar" role="progressbar" aria-label="Bugünkü ilerlemen" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${Math.min(td.q, goal)}"><i style="width:${yuz}%"></i></div>
+      <p class="sc3-prog-s">${td.q ? `Bugün ${td.q} soru çözdün, %${pct(td.c, td.q)} doğru.${td.q >= goal ? " Günlük hedefine ulaştın." : ""}` : "Bugün henüz soru çözmedin."}</p></div></section>
   ${subTabs(SORU_TABS, "studyo")}
-  <div class="card"><div class="subj-chips">${grp.map(([e, ks]) => `<div class="grp"><span>${e}</span><div class="seg">${ks.map(k => `<button type="button" data-a="dersSec" data-s="${k}" class="${k === s ? "on" : ""}" aria-pressed="${k === s}">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</button>`).join("")}</div></div>`).join("")}</div></div>
-  <div class="card"><div class="card-h"><h2>${esc(SUBJ[s].n)}</h2><button class="btn sm pri" data-a="dersKarisik" data-s="${s}">Karışık ${UI.studio.n || 10} soru</button></div>
-    <div class="stctl"><div class="seg" role="group" aria-label="Test uzunluğu">${[10, 20, 30, 70, 80].map(n => `<button type="button" data-a="stN" data-n="${n}" class="${(UI.studio.n || 10) === n ? "on" : ""}" aria-pressed="${(UI.studio.n || 10) === n}">${n} soru</button>`).join("")}</div>
-    <div class="seg" role="group" aria-label="Zorluk">${[[0, "Karışık"], [1, "Kolay"], [2, "Orta"], [3, "Zor"]].map(([k, l]) => `<button type="button" data-a="stD" data-d="${k}" class="${(UI.studio.d || 0) === k ? "on" : ""}" aria-pressed="${(UI.studio.d || 0) === k}">${l}</button>`).join("")}</div></div>
-    <p class="small muted" style="margin-bottom:4px">${dz.n ? `Bu derste ${dz.n} soru çözdün, doğruluğun %${dz.acc}.` : "Bu derste henüz soru çözmedin."} ${tops.length} konu.</p>
-    <div>${tops.map(t => { const k = konuOzet(s, t.t); return `<div class="topic-row"><span class="heat ${isiSinif(k.acc)}" aria-hidden="true"></span><div class="grow"><div class="t">${esc(t.t)}</div><div class="s">${t.g ? "Sınırsız soru" : t.n + " soru"}${k.n ? ` · ${k.n} çözdün, %${k.acc} doğru` : " · henüz çözmedin"}</div></div><button class="btn sm" data-a="topicStart" data-s="${s}" data-t="${esc(t.t)}">Çöz</button></div>`; }).join("")}</div>
-    <div class="hm-leg" style="margin-top:14px">${heatLegend()}</div></div>
+  <div class="sc3-grid"><div class="sc3-steps">
+    ${sec(1, "Sınavını seç", "sc3-s1", "", sinav)}
+    ${sec(2, "Dersini seç", "sc3-s2", yeni("ders"), dersBtn)}
+    ${s ? sec(3, `Konuyu seç <span class="sc3-opt-tag">${esc(dn)}</span>`, "sc3-s3", yeni("konu"), konu) : ""}
+    ${s ? `<div class="sc3-pair${yeni("opt")}">${sec(4, "Zorluk", "sc3-s4", "", zorluk)}${sec(5, "Soru sayısı", "sc3-s5", "", adet)}</div>` : ""}
+  </div>${ozet}</div>
   </div>`;
 }
 function uretKartlari(s, gs, G2) {
@@ -9084,6 +9190,10 @@ Object.assign(OZ_ACT, {
   dersKarisik(d) { if (!SUBJ[d.s]) return; const o = stOpt(); const b = buildSet([[d.s, o.n]], { unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · karışık`, o); },
   stN(d) { UI.studio.n = +d.n || 10; render(); },
   stD(d) { UI.studio.d = +d.d || 0; render(); },
+  stE(d) { if (!SC_EXAM.some(x => x[0] === d.k)) return; Object.assign(UI.studio, { e: d.k, s: null, t: "", seen: {} }); render(); },
+  stDers(d) { if (!SUBJ[d.s]) return; Object.assign(UI.studio, { s: d.s, t: "" }); UI.gen.s = d.s; render(); if (window.innerWidth < 1024) setTimeout(() => { const el = document.getElementById("sc3-s3"); if (el) el.scrollIntoView({ block: "start", behavior: ERISIM.hareket === "off" || matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth" }); }, 40); },
+  stT(d) { UI.studio.t = d.t || ""; render(); },
+  stBasla() { const St = UI.studio; if (!St.s || !SUBJ[St.s]) { toast("Önce bir ders seç."); return; } if (St.t) ACT.topicStart({ s: St.s, t: St.t }); else OZ_ACT.dersKarisik({ s: St.s }); },
   raporKopya() { const t = veliRaporMetni(); try { navigator.clipboard.writeText(t).then(() => toast("Rapor kopyalandı."), () => toast("Kopyalanamadı; metni seçip kopyalayabilirsin.")); } catch (e) { toast("Kopyalanamadı; metni seçip kopyalayabilirsin."); } },
   pomoMod(d) { if (POMO.run || !POMO_SURE[d.k]) return; POMO.mode = d.k; POMO.kalan = POMO_SURE[d.k]; pomoKaydet(); render(); },
   pomoBasla() { POMO.end = Date.now() + pomoKalan() * 1000; POMO.run = true; pomoKaydet(); if (!pomoTimer) pomoTimer = setInterval(pomoTick, 1000); render(); },

@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=6cd8b88fd9">
-<link rel="icon" href="/favicon.ico?v=6cd8b88fd9" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=6cd8b88fd9">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=6cd8b88fd9">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=6cd8b88fd9">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=6cd8b88fd9">
+<link rel="manifest" href="/manifest.webmanifest?v=f217ffddae">
+<link rel="icon" href="/favicon.ico?v=f217ffddae" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=f217ffddae">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=f217ffddae">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=f217ffddae">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=f217ffddae">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=6cd8b88fd9">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=f217ffddae">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -812,7 +812,8 @@ details.more>summary .small{display:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--aur-o:1}}
 #aur{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .9s ease;transform:translate3d(0,calc(var(--sy,0)*-.05px),0)}
 html:not(.fx-calm) #aur{opacity:var(--aur-o)}
-#aur i{position:absolute;border-radius:50%;width:78vmax;height:78vmax;will-change:transform}
+#aur{contain:strict}
+#aur i{position:absolute;border-radius:50%;width:62vmax;height:62vmax;will-change:transform}
 #aur i:nth-child(1){left:-30vmax;top:-34vmax;background:radial-gradient(circle,rgba(37,66,54,.46),transparent 64%)}
 #aur i:nth-child(2){right:-34vmax;top:18vh;background:radial-gradient(circle,rgba(197,165,114,.2),transparent 64%)}
 #aur i:nth-child(3){left:12vw;bottom:-46vmax;background:radial-gradient(circle,rgba(20,40,32,.28),transparent 64%)}
@@ -878,6 +879,7 @@ html.fx-calm #aur i,html.fx-calm .vitrin::before{animation:none!important}
 .btn.acc,:root[data-theme="dark"] .btn.acc{background:#254236;border-color:rgba(197,165,114,.45);color:#f5f1e8}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.acc{background:#254236;border-color:rgba(197,165,114,.45);color:#f5f1e8}}
 </style>
+<style>html.fx-busy #aur i,html.fx-busy .vitrin::before{animation-play-state:paused!important}html.fx-busy .arc-run{display:none}</style>
 </head>
 <body>
 <div id="app"></div>
@@ -10100,6 +10102,10 @@ const HRK = (() => {
     const v = e.target.closest && e.target.closest(".vitrin"); if (!v) return;
     const b = v.getBoundingClientRect(); v.style.setProperty("--mx", ((e.clientX - b.left) / b.width * 100).toFixed(1) + "%"); v.style.setProperty("--my", ((e.clientY - b.top) / b.height * 100).toFixed(1) + "%");
   }, { passive: true });
+  /* etkileşim sırasında hareketi kısa süre durdur: tıklama/dokunma ana iş parçacığını aurora ile paylaşmasın (INP) */
+  let busyT = 0;
+  const dur = () => { root.classList.add("fx-busy"); clearTimeout(busyT); busyT = setTimeout(() => root.classList.remove("fx-busy"), 700); };
+  addEventListener("pointerdown", dur, { passive: true, capture: true }); addEventListener("keydown", dur, { passive: true, capture: true });
   return { sync };
 })();
 /* ===== Sık sorulan sorular ve geri bildirim formu ===== */

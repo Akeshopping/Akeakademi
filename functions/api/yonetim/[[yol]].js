@@ -71,10 +71,11 @@ export async function onRequest({ request, env, params }) {
   const ad = [].concat(params.yol || [])[0] || "", m = request.method, origin = new URL(request.url).origin;
 
   if (ad === "durum" && m === "GET") {
-    const { results } = await env.DB.prepare("SELECT id, eposta, ad, paket, tutar, tarih, durum FROM siparis ORDER BY tarih DESC LIMIT 50").all();
+    const { results } = await env.DB.prepare("SELECT id, eposta, ad, paket, tutar, tarih, durum FROM siparis ORDER BY (durum IN ('odeme_dogrulanamadi', 'tutar_uyusmuyor', 'para_dogrulanamadi', 'kod_uretilemedi')) DESC, tarih DESC LIMIT 50").all();
+    const bekleyen = await env.DB.prepare("SELECT COUNT(*) AS n FROM siparis WHERE durum IN ('odeme_dogrulanamadi', 'tutar_uyusmuyor', 'para_dogrulanamadi', 'kod_uretilemedi')").first();
     const tok = await ayarOku(env, "shopier_webhook_token"), wid = await ayarOku(env, "shopier_webhook_id");
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
-    return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], sayilar: say || {} });
+    return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], inceleme: (bekleyen && bekleyen.n) || 0, sayilar: say || {} });
   }
   if (ad === "aboneler" && m === "GET") {
     const bugun = new Date().toISOString().slice(0, 10);

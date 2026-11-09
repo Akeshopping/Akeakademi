@@ -15,7 +15,8 @@ function sahteDB() {
     if (/SELECT id FROM siparis WHERE id = \? OR id LIKE \?/i.test(sql)) return { first: t.siparis.find(r => r.id === a[0] || r.id.startsWith(a[0] + "#")) ? { id: a[0] } : null };
     if (/SELECT id FROM kullanici WHERE eposta/i.test(sql)) return { first: t.kullanici.find(u => u.eposta === a[0]) || null };
     if (/INSERT INTO kod/i.test(sql)) { t.kod.push({ anahtar: a[0], kid: a[1], plan: a[2], bitis: a[3], siparis: a[5] }); return {}; }
-    if (/INSERT (OR IGNORE )?INTO siparis/i.test(sql)) { const id = a[0]; if (/OR IGNORE/i.test(sql) && t.siparis.some(r => r.id === id)) return {}; if (t.siparis.some(r => r.id === id)) throw new Error("UNIQUE"); const durum = /'paket_yok'/.test(sql) ? "paket_yok" : /'', '', '', \?, \?, \?, \?\)/.test(sql) ? a[3] : a[6]; t.siparis.push({ id, durum }); return {}; }
+    if (/INSERT (OR IGNORE )?INTO siparis/i.test(sql)) { const id = a[0]; if (/OR IGNORE/i.test(sql) && t.siparis.some(r => r.id === id)) return { meta: { changes: 0 } }; if (t.siparis.some(r => r.id === id)) throw new Error("UNIQUE"); const durum = /'paket_yok'/.test(sql) ? "paket_yok" : /'', '', '', \?, \?, \?, \?\)/.test(sql) ? a[4] : a[6]; t.siparis.push({ id, durum }); return {}; }
+    if (/UPDATE siparis SET durum = 'kod_hatasi_cozuldu'/i.test(sql)) { const r = t.siparis.find(x => x.id === a[0] && x.durum === "kod_uretilemedi"); if (r) r.durum = "kod_hatasi_cozuldu"; return {}; }
     if (/UPDATE siparis SET durum/i.test(sql)) { const r = t.siparis.find(x => x.id === a[1]); if (r) r.durum = a[0]; return {}; }
     return { first: null, all: [] };
   };
@@ -130,7 +131,7 @@ test("yönetici deneme siparişi (deneme=true, 0 TL) çalışmaya devam eder", a
 });
 
 // ---- GERÇEK Shopier bildirimi (9 Kasım 2026, 199 TL Atılım 1 ay; kişisel veriler silindi, e-posta yer tutucu) ----
-const GERCEK = () => ({"id":"295937632","status":"unfulfilled","paymentStatus":"paid","installments":false,"dateCreated":"2026-11-09T21:24:50+0300","currency":"TRY","paymentMethod":"creditCard","totals":{"subtotal":"199.00","shipping":"0.00","discount":"0.00","total":"199.00"},"discounts":[],"shippingInfo":{"firstName":"","lastName":"C","nationalId":"","email":"ogrenci@ornek.com","phone":"","company":"","address":"Dijital ürün","district":"","city":"","state":"","postcode":"","country":"Türkiye"},"billingInfo":{},"note":"","lineItems":[{"productId":"52547800","title":"AKE Akademi Atılım Paket – 1 Ay","type":"digital","selection":[],"options":[],"quantity":1,"price":"199.00","total":"199.00"}],"fulfillments":[],"returns":[],"refunds":[]});
+const GERCEK = () => ({"id":"100000001","status":"unfulfilled","paymentStatus":"paid","installments":false,"dateCreated":"2026-11-09T21:24:50+0300","currency":"TRY","paymentMethod":"creditCard","totals":{"subtotal":"199.00","shipping":"0.00","discount":"0.00","total":"199.00"},"discounts":[],"shippingInfo":{"firstName":"","lastName":"Test","nationalId":"","email":"ogrenci@ornek.com","phone":"","company":"","address":"Dijital ürün","district":"","city":"","state":"","postcode":"","country":"Türkiye"},"billingInfo":{},"note":"","lineItems":[{"productId":"52547800","title":"AKE Akademi Atılım Paket – 1 Ay","type":"digital","selection":[],"options":[],"quantity":1,"price":"199.00","total":"199.00"}],"fulfillments":[],"returns":[],"refunds":[]});
 test("GERÇEK örnek yük: kod üretilir (billingInfo boş, e-posta shippingInfo'da)", async () => {
   const e = env(); const r = await gonder(e, GERCEK());
   assert.equal(r.status, 200); assert.equal(e.DB.t.kod.length, 1); assert.equal(e.DB.t.kod[0].plan, "orta");
@@ -143,4 +144,53 @@ test("GERÇEK yük, tutar 1 TL'ye oynanmış: kod yok", async () => {
 });
 test("GERÇEK yük, aynı sipariş ikinci kez: tekrar kod yok", async () => {
   const e = env(); await gonder(e, GERCEK()); await gonder(e, GERCEK()); assert.equal(e.DB.t.kod.length, 1);
+});
+
+// ---- Yönetici uyarısı, "inceleme bekliyor" kaydı ve kod üretim hatası ----
+function resendIzle() { const eski = globalThis.fetch, cagrilar = []; globalThis.fetch = async (u, i) => { cagrilar.push({ u: String(u), b: JSON.parse(i.body) }); return new Response("{}", { status: 200 }); }; return { cagrilar, bitir: () => { globalThis.fetch = eski; } }; }
+const durumYok = (x = {}) => { const o = GERCEK(); delete o.paymentStatus; return Object.assign(o, x); };
+test("doğrulanamayan sipariş: kod yok, 'inceleme' kaydı + yöneticiye tek uyarı e-postası (müşteri verisi/ham yük yok)", async () => {
+  const e = env(); e.RESEND_API_KEY = "re_test"; const iz = resendIzle();
+  try {
+    const r = await gonder(e, durumYok()); assert.equal(r.j.durum, "odeme_dogrulanamadi"); assert.equal(e.DB.t.kod.length, 0);
+    assert.ok(e.DB.t.siparis.some(x => x.id === "100000001!odeme" && x.durum === "odeme_dogrulanamadi"));
+    assert.equal(iz.cagrilar.length, 1); const m = iz.cagrilar[0].b;
+    assert.deepEqual(m.to, ["alikaaneren13@gmail.com"]); assert.match(m.subject, /İnceleme bekliyor/); assert.match(m.text, /100000001/);
+    assert.ok(!/ogrenci@ornek\.com|AKE-/.test(m.text + m.html), "uyarıda müşteri e-postası veya kod olmamalı");
+    await gonder(e, durumYok()); assert.equal(iz.cagrilar.length, 1, "Shopier tekrar denemesinde ikinci uyarı gitmemeli");
+  } finally { iz.bitir(); }
+});
+test("tutar uyuşmuyor / para birimi: kayıt + uyarı, kod yok", async () => {
+  const e = env(); e.RESEND_API_KEY = "re_test"; const iz = resendIzle();
+  try {
+    const o = GERCEK(); o.totals.total = "99.00"; await gonder(e, o);
+    const u = GERCEK(); u.id = "100000002"; u.currency = "USD"; await gonder(e, u);
+    assert.equal(e.DB.t.kod.length, 0); assert.equal(iz.cagrilar.length, 2);
+    assert.ok(e.DB.t.siparis.some(x => x.id === "100000001!tutar") && e.DB.t.siparis.some(x => x.id === "100000002!tutar"));
+  } finally { iz.bitir(); }
+});
+test("e-posta altyapısı (RESEND_API_KEY) yoksa uyarı atlanır, webhook yine 200 ve kod yok (panel yeterli)", async () => {
+  const e = env(); const iz = resendIzle();
+  try { const r = await gonder(e, durumYok()); assert.equal(r.status, 200); assert.equal(iz.cagrilar.length, 0); assert.equal(e.DB.t.kod.length, 0); assert.ok(e.DB.t.siparis.some(x => x.id === "100000001!odeme")); } finally { iz.bitir(); }
+});
+test("e-posta servisi çökse bile uyarı webhook'u bozmaz", async () => {
+  const e = env(); e.RESEND_API_KEY = "re_test"; const eski = globalThis.fetch; globalThis.fetch = async () => { throw new Error("ağ"); };
+  try { const r = await gonder(e, durumYok()); assert.equal(r.status, 200); assert.equal(e.DB.t.kod.length, 0); } finally { globalThis.fetch = eski; }
+});
+test("ödeme DOĞRULANDI ama kod üretimi başarısız: ayrı 'kod_uretilemedi' kaydı + uyarı, 500 (Shopier tekrar dener); tekrarda çözülür", async () => {
+  const e = env(); e.RESEND_API_KEY = "re_test"; const iz = resendIzle(); const gercekBatch = e.DB.batch;
+  try {
+    e.DB.batch = async () => { throw new Error("d1 hata"); };
+    const r = await gonder(e, GERCEK()); assert.equal(r.status, 500); assert.equal(e.DB.t.kod.length, 0);
+    assert.ok(e.DB.t.siparis.some(x => x.id === "100000001!kod" && x.durum === "kod_uretilemedi")); assert.equal(iz.cagrilar.length, 1); assert.match(iz.cagrilar[0].b.subject, /kod üretilemedi/);
+    await gonder(e, GERCEK()); assert.equal(iz.cagrilar.length, 1, "aynı hata için ikinci uyarı yok");
+    e.DB.batch = gercekBatch; iz.cagrilar.length = 0;
+    const r2 = await gonder(e, GERCEK()); assert.equal(r2.status, 200); assert.equal(e.DB.t.kod.length, 1);
+    assert.equal(e.DB.t.siparis.find(x => x.id === "100000001!kod").durum, "kod_hatasi_cozuldu");
+  } finally { iz.bitir(); }
+});
+test("indirimli sipariş (sunucuda tanımsız) ve iade/yinelenen olay: mevcut güvenli davranış korunur", async () => {
+  const e = env(); const o = GERCEK(); o.totals.discount = "19.90"; o.totals.total = "179.10"; o.discounts = [{ code: "X", amount: "19.90" }]; const r = await gonder(e, o);
+  assert.equal(r.j.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 0);
+  const r2 = await gonder(e, GERCEK(), { event: "refund.updated" }); assert.equal(r2.j.yok_sayildi, "refund.updated"); assert.equal(e.DB.t.kod.length, 0);
 });

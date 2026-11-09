@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { onRequest } from "../functions/api/shopier.js";
-import { hmacHex, tutarOku, beklenenTutar } from "../lib/ortak.js";
+import { hmacHex, tutarOku, kabulTutarlari, tutarGecerliMi, siparisAlanlari } from "../lib/ortak.js";
 
 const TOKEN = "test-webhook-token";
 const GIZLI = "a".repeat(64);
@@ -30,15 +30,21 @@ async function gonder(e, govde, { imza, event = "order.created", method = "POST"
   const r = await onRequest({ request: new Request("https://x.test/api/shopier", { method, headers: h, body: method === "POST" ? ham : undefined }), env: e });
   return { status: r.status, j: await r.json().catch(() => ({})) };
 }
-const siparis = (x = {}) => ({ id: "S100", paymentStatus: "paid", billingInfo: { email: "ogrenci@ornek.com", firstName: "Ali" }, lineItems: [{ productId: "52547800", title: "AKE Atılım 1 ay", quantity: 1 }], totals: { total: "199.00" }, ...x });
+const siparis = (x = {}) => ({ id: "S100", paymentStatus: "paid", billingInfo: { email: "ogrenci@ornek.com", firstName: "Ali" }, lineItems: [{ productId: "52547800", title: "AKE Atılım 1 ay", quantity: 1 }], totals: { total: "199.00", currency: "TRY" }, ...x });
 
 test("geçerli imza + paid + doğru ürün/tutar: kod üretilir ve hesaba bağlanır", async () => {
   const e = env(); const r = await gonder(e, siparis());
   assert.equal(r.status, 200); assert.ok(e.DB.t.kod.length === 1); assert.equal(e.DB.t.kod[0].plan, "orta"); assert.equal(e.DB.t.kod[0].kid, "u1");
 });
-test("premium yıllık, kuponlu ödeme (%20 indirim) reddedilmez", async () => {
-  const e = env(); const r = await gonder(e, siparis({ id: "S101", lineItems: [{ productId: "52547986", quantity: 1 }], totals: { total: "3.511,20" } }));
+test("premium yıllık liste fiyatıyla (4389 TL) geçerli", async () => {
+  const e = env(); const r = await gonder(e, siparis({ id: "S101", lineItems: [{ productId: "52547986", quantity: 1 }], totals: { total: "4.389,00", currency: "TRY" } }));
   assert.equal(r.status, 200); assert.equal(e.DB.t.kod.length, 1); assert.equal(e.DB.t.kod[0].plan, "premium");
+});
+test("indirim: yalnızca sunucuda tanımlı (AKE_INDIRIMLI) tutar kabul edilir; bildirimdeki indirim alanına güvenilmez", async () => {
+  let e = env(); e.AKE_INDIRIMLI = "premium-yil:3511.20"; let r = await gonder(e, siparis({ id: "D1", lineItems: [{ productId: "52547986", quantity: 1 }], totals: { total: "3.511,20", currency: "TRY" } }));
+  assert.equal(e.DB.t.kod.length, 1, JSON.stringify(r));
+  e = env(); r = await gonder(e, siparis({ id: "D2", discount: { total: "877.80", valid: true }, discountTotal: "877.80", lineItems: [{ productId: "52547986", quantity: 1 }], totals: { total: "3.511,20", currency: "TRY" } }));
+  assert.equal(r.j.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 0);
 });
 test("`data` içinde sarılı geçerli sipariş de işlenir", async () => {
   const e = env(); await gonder(e, { data: siparis({ id: "S102" }) }); assert.equal(e.DB.t.kod.length, 1);
@@ -66,19 +72,9 @@ test("ödeme durumu EKSİK: kod üretilmez, denetim kaydı düşer (PAT yok)", a
 test("ödeme durumu boş metin / null: kod yok", async () => {
   for (const v of ["", null, "  "]) { const e = env(); const r = await gonder(e, siparis({ id: "N" + String(v), paymentStatus: v })); assert.equal(r.j.durum, "odeme_dogrulanamadi"); assert.equal(e.DB.t.kod.length, 0); }
 });
-test("durum eksik + SHOPIER_PAT: Shopier API 'paid' derse (id eşleşirse) kod üretilir", async () => {
-  const e = env(); e.SHOPIER_PAT = "pat"; const eski = globalThis.fetch;
-  globalThis.fetch = async (u) => { assert.ok(String(u).startsWith("https://api.shopier.com/v1/orders/M2")); return new Response(JSON.stringify({ data: { id: "M2", paymentStatus: "paid" } }), { status: 200 }); };
-  try { const o = siparis({ id: "M2" }); delete o.paymentStatus; const r = await gonder(e, o); assert.equal(e.DB.t.kod.length, 1, JSON.stringify(r)); } finally { globalThis.fetch = eski; }
-});
-test("durum eksik + API 'pending' / farklı id / hata: kod yok", async () => {
-  const eski = globalThis.fetch;
-  try {
-    for (const yanit of [() => new Response(JSON.stringify({ data: { id: "M3", paymentStatus: "pending" } })), () => new Response(JSON.stringify({ data: { id: "BASKA", paymentStatus: "paid" } })), () => new Response("x", { status: 500 }), () => { throw new Error("ağ"); }]) {
-      const e = env(); e.SHOPIER_PAT = "pat"; globalThis.fetch = async () => yanit(); const o = siparis({ id: "M3" }); delete o.paymentStatus; const r = await gonder(e, o);
-      assert.equal(r.j.durum, "odeme_dogrulanamadi"); assert.equal(e.DB.t.kod.length, 0);
-    }
-  } finally { globalThis.fetch = eski; }
+test("SHOPIER_PAT tanımlı olsa bile Shopier API çağrılmaz (uç nokta doğrulanmadı); durum eksikse kod yok", async () => {
+  const e = env(); e.SHOPIER_PAT = "pat"; const eski = globalThis.fetch; let cagri = 0; globalThis.fetch = async () => { cagri++; return new Response("{}"); };
+  try { const o = siparis({ id: "M2" }); delete o.paymentStatus; const r = await gonder(e, o); assert.equal(r.j.durum, "odeme_dogrulanamadi"); assert.equal(e.DB.t.kod.length, 0); assert.equal(cagri, 0); } finally { globalThis.fetch = eski; }
 });
 test("doğrulanamayan sipariş sonradan geçerli (paid) gelirse yine işlenir (mükerrer sayılmaz)", async () => {
   const e = env(); const o = siparis({ id: "L1" }); delete o.paymentStatus; await gonder(e, o);
@@ -97,22 +93,35 @@ test("gövde JSON değil / dizi / aşırı büyük: kod yok", async () => {
 test("tekrar eden sipariş: ikinci teslimde yeni kod üretilmez", async () => {
   const e = env(); await gonder(e, siparis()); const r = await gonder(e, siparis()); assert.equal(r.j.durum, "zaten"); assert.equal(e.DB.t.kod.length, 1);
 });
-test("tutar/paket uyuşmazlığı: 0 TL ya da beklenenin yarısından az → kod yok + denetim kaydı", async () => {
-  for (const [id, tutar] of [["T1", "0"], ["T2", "1.00"], ["T3", "99"]]) { const e = env(); const r = await gonder(e, siparis({ id, totals: { total: tutar } })); assert.equal(r.j.durum, "tutar_uyusmuyor", id); assert.equal(e.DB.t.kod.length, 0); assert.ok(e.DB.t.siparis.some(s => s.id === id + "!tutar")); }
+test("tutar: %50 tolerans YOK; liste fiyatından 1 kuruş bile farklıysa kod yok + denetim kaydı", async () => {
+  for (const [id, tutar] of [["T1", "0"], ["T2", "1.00"], ["T3", "99"], ["T4", "198.99"], ["T5", "199.01"], ["T6", "100"], ["T7", "399"]]) { const e = env(); const r = await gonder(e, siparis({ id, totals: { total: tutar, currency: "TRY" } })); assert.equal(r.j.durum, "tutar_uyusmuyor", id); assert.equal(e.DB.t.kod.length, 0, id); assert.ok(e.DB.t.siparis.some(s => s.id === id + "!tutar")); }
 });
-test("tutar okunamıyorsa (alan yok) geçerli imzalı paid sipariş reddedilmez", async () => {
-  const e = env(); const o = siparis({ id: "T9" }); delete o.totals; const r = await gonder(e, o); assert.equal(e.DB.t.kod.length, 1, JSON.stringify(r));
+test("para birimi: USD/EUR/boş/yok → kod yok; TRY ve TL kabul", async () => {
+  for (const c of ["USD", "EUR", "", "XYZ"]) { const e = env(); const r = await gonder(e, siparis({ id: "C" + c, totals: { total: "199.00", currency: c } })); assert.equal(r.j.durum, "para_dogrulanamadi", c); assert.equal(e.DB.t.kod.length, 0); }
+  let e = env(); const o = siparis({ id: "CYOK" }); delete o.totals.currency; let r = await gonder(e, o); assert.equal(r.j.durum, "para_dogrulanamadi"); assert.equal(e.DB.t.kod.length, 0);
+  e = env(); await gonder(e, siparis({ id: "CTL", totals: { total: "199", currency: "tl" } })); assert.equal(e.DB.t.kod.length, 1);
+  e = env(); await gonder(e, siparis({ id: "CTRY", currency: "TRY", totals: { total: "199" } })); assert.equal(e.DB.t.kod.length, 1);
+});
+test("tutar alanı yok/okunamıyor → kod yok (kesin doğrulanamaz)", async () => {
+  for (const [id, t] of [["TA", undefined], ["TB", "abc"], ["TC", ""]]) { const e = env(); const o = siparis({ id }); o.totals = { currency: "TRY" }; if (t !== undefined) o.totals.total = t; const r = await gonder(e, o); assert.equal(r.j.durum, "tutar_uyusmuyor", id); assert.equal(e.DB.t.kod.length, 0); }
 });
 test("farklı olay (refund.updated): kod üretilmez", async () => {
   const e = env(); const r = await gonder(e, siparis({ id: "R1" }), { event: "refund.updated" }); assert.equal(e.DB.t.kod.length, 0); assert.ok(r.j.yok_sayildi);
 });
-test("çok adetli sipariş: adet kadar kod (en çok 5), tutar adetle çarpılarak denetlenir", async () => {
-  const e = env(); const r = await gonder(e, siparis({ id: "Q1", lineItems: [{ productId: "52547800", quantity: 3 }], totals: { total: "597" } })); assert.equal(e.DB.t.kod.length, 3, JSON.stringify(r));
-  const e2 = env(); const r2 = await gonder(e2, siparis({ id: "Q2", lineItems: [{ productId: "52547800", quantity: 3 }], totals: { total: "199" } })); assert.equal(r2.j.durum, "tutar_uyusmuyor"); assert.equal(e2.DB.t.kod.length, 0);
+test("çok adetli sipariş: miktar × fiyat kesin eşleşmeli", async () => {
+  let e = env(); let r = await gonder(e, siparis({ id: "Q1", lineItems: [{ productId: "52547800", quantity: 3 }], totals: { total: "597", currency: "TRY" } })); assert.equal(e.DB.t.kod.length, 3, JSON.stringify(r));
+  e = env(); r = await gonder(e, siparis({ id: "Q2", lineItems: [{ productId: "52547800", quantity: 3 }], totals: { total: "199", currency: "TRY" } })); assert.equal(r.j.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 0);
+  e = env(); r = await gonder(e, siparis({ id: "Q3", lineItems: [{ productId: "52547800", quantity: 2 }, { productId: "52547968", quantity: 1 }], totals: { total: "797", currency: "TRY" } })); assert.equal(e.DB.t.kod.length, 3, JSON.stringify(r));
+  e = env(); r = await gonder(e, siparis({ id: "Q4", lineItems: [{ productId: "52547800", quantity: 1 }, { productId: "52547968", quantity: 1 }], totals: { total: "199", currency: "TRY" } })); assert.equal(r.j.durum, "tutar_uyusmuyor");
 });
-test("yardımcılar: tutar ayrıştırma ve beklenen tutar", () => {
+test("ürün–paket eşleşmesi: bilinen ürün kimliği doğru plana gider, tutar başka pakete aitse reddedilir", async () => {
+  const e = env(); const r = await gonder(e, siparis({ id: "U1", lineItems: [{ productId: "52547968", quantity: 1 }], totals: { total: "199", currency: "TRY" } })); assert.equal(r.j.durum, "tutar_uyusmuyor"); assert.equal(e.DB.t.kod.length, 0);
+});
+test("yardımcılar: tutar ayrıştırma, kabul tutarları, alan eşlemesi", () => {
   assert.equal(tutarOku("199,00"), 199); assert.equal(tutarOku("1.234,50"), 1234.5); assert.equal(tutarOku("2,189"), 2189); assert.ok(Number.isNaN(tutarOku("")));
-  assert.equal(beklenenTutar({}, ["orta-ay", "premium-yil"]), 199 + 4389); assert.equal(beklenenTutar({ AKE_FIYATLAR: "orta-ay:249" }, ["orta-ay"]), 249);
+  assert.deepEqual(kabulTutarlari({}, "orta-ay"), [199]); assert.deepEqual(kabulTutarlari({ AKE_FIYATLAR: "orta-ay:249", AKE_INDIRIMLI: "orta-ay:199.5|150" }, "orta-ay"), [249, 199.5, 150]);
+  assert.ok(tutarGecerliMi({}, ["orta-ay", "premium-yil"], 199 + 4389)); assert.ok(!tutarGecerliMi({}, ["orta-ay"], NaN));
+  assert.deepEqual(siparisAlanlari({ paymentStatus: " PAID ", totals: { total: "1,5", currency: "try" } }), { durum: "paid", para: "TRY", toplam: 1.5 });
 });
 test("yönetici deneme siparişi (deneme=true, 0 TL) çalışmaya devam eder", async () => {
   const { siparisIsle } = await import("../lib/ortak.js"); const e = env();

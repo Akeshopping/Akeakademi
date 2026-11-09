@@ -1227,7 +1227,7 @@ html.fx-m #aur u{display:none}
 .adm-main .vhead p{color:#d3ccbd;max-width:60ch}
 .adm-main .vhead .eyebrow{color:#C5A572;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .adm-wrap .card,.adm-main .card{border-radius:16px}
-.top .brand .wm span{color:#C5A572}
+.adm-in .brand .wm span{color:#C5A572}
 header.top .adm-in .btn{background:transparent!important;background-image:none!important;border:1px solid rgba(245,241,232,.28)!important;color:#f5f1e8!important;box-shadow:none!important}
 header.top .adm-in .btn:hover{background:rgba(245,241,232,.08)!important}
 @media (prefers-reduced-motion:reduce){.yn-tabs button{transition:none}}
@@ -9409,8 +9409,9 @@ const HESAP_SUB = {
 const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay", deposta: "" };
 async function yonYukle() {
   YON.busy = "yukle"; render();
-  try { fetch("/api/yonetim/bildirim", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.bil = j; render(); } }).catch(() => { }); } catch (e) { }
-  try { fetch("/api/yonetim/maliyet", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) { YON.mal = j; render(); } }).catch(() => { }); } catch (e) { }
+  YON.analitikHata = false;
+  try { fetch("/api/yonetim/bildirim", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) YON.bil = j; else YON.analitikHata = true; render(); }).catch(() => { YON.analitikHata = true; render(); }); } catch (e) { }
+  try { fetch("/api/yonetim/maliyet", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(j => { if (j) YON.mal = j; else YON.analitikHata = true; render(); }).catch(() => { YON.analitikHata = true; render(); }); } catch (e) { }
   try { const r = await fetch("/api/yonetim/durum", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) YON.veri = j; else YON.err = j.message || "Yönetim bilgileri alınamadı."; } catch (e) { YON.err = "Bağlantı kurulamadı."; }
   YON.busy = ""; render();
 }
@@ -9458,6 +9459,8 @@ function yonKodGonder() {
 function yonVeli() {
   if (!YON.veli && !YON.veliBusy) yonVeliYukle();
   const D = YON.veli; if (!D) return `<div class="empty">Yükleniyor…</div>`;
+  if (D.durum === "yok") return `<div class="card stack"><h2>Henüz etkin değil</h2><p class="small">Haftalık veli raporu bu sürümde yayında değil. Özellik yayınlandığında gönderim sayıları ve geçmişi burada görünecek. Şu an öğrencilere hiçbir veli e-postası gitmiyor.</p></div>`;
+  if (D.durum === "hata") return `<div class="card stack" role="alert"><h2>Veli raporu durumu alınamadı</h2><p class="small">${esc(D.mesaj || "Bağlantı kurulamadı.")}</p><div class="row"><button type="button" class="btn pri" data-a="yonVeliYenile">Tekrar dene</button></div></div>`;
   const tikL = (v, l, ek) => `<div class="li"><span class="pill ${v ? "ok" : "warn"}">${v ? "Hazır" : "Bekliyor"}</span><div class="grow"><div class="t">${l}</div>${ek ? `<div class="s">${ek}</div>` : ""}</div></div>`;
   const hazirKart = `<div class="card stack"><h2>Kurulum durumu</h2><div class="list">${tikL(D.acik, "Özellik anahtarı (VELI_RAPORU)", D.acik ? "Açık" : "Kapalı: hukuki değerlendirme tamamlanana kadar hiçbir rapor gönderilmez.")}${tikL(D.hazir, "Veritabanı tabloları (migration 0001)", D.hazir ? "Uygulandı" : "Henüz uygulanmadı")}</div></div>`;
   if (!D.hazir) return `${hazirKart}<p class="note">Veli raporu henüz canlıda etkin değil. Bu sayfa, migration ve anahtar açıldıktan sonra gönderim sayılarını gösterir.</p>`;
@@ -9472,7 +9475,12 @@ function yonVeli() {
 }
 async function yonVeliYukle() {
   YON.veliBusy = true;
-  try { const r = await fetch("/api/yonetim/veli", { credentials: "same-origin" }); YON.veli = r.ok ? await r.json().catch(() => ({ hazir: false })) : { hazir: false }; } catch (e) { YON.veli = { hazir: false }; }
+  try {
+    const r = await fetch("/api/yonetim/veli", { credentials: "same-origin" });
+    if (r.ok) { const j = await r.json().catch(() => null); YON.veli = j && typeof j === "object" ? j : { durum: "hata", mesaj: "Beklenmeyen yanıt alındı." }; }
+    else if (r.status === 404 || r.status === 405 || r.status === 501) YON.veli = { durum: "yok" }; // API henüz yayında değil
+    else YON.veli = { durum: "hata", mesaj: r.status === 401 || r.status === 403 ? "Bu bölümü görme yetkin yok." : "Sunucu şu an yanıt vermedi (" + r.status + ")." };
+  } catch (e) { YON.veli = { durum: "hata", mesaj: "Bağlantı kurulamadı." }; }
   YON.veliBusy = false; render();
 }
 function vYonetim() {
@@ -9485,13 +9493,13 @@ function vYonetim() {
     uye: () => aboneKarti(),
     siparis: () => yonSiparisler(V),
     kod: () => yonKodGonder(),
-    analitik: () => `${maliyetKarti()}${bildirimYonKarti()}${soruBolumu()}${hataYonetim()}`,
+    analitik: () => `${YON.analitikHata ? `<div class="note" role="alert">Bazı analitik verileri yüklenemedi. <button type="button" class="btn sm" data-a="yonYenile">Tekrar dene</button></div>` : ""}${maliyetKarti()}${bildirimYonKarti()}${soruBolumu()}${hataYonetim()}`,
     veli: () => yonVeli()
   };
   return `<div class="view yn"><header class="yn-hero"><span class="yn-eb">Yönetim paneli</span><h1>AKE Akademi</h1><p>Satışlar, üyelikler ve site kurulumu. Bu sayfa yalnızca sana görünür.</p></header>
     <nav class="yn-tabs" aria-label="Yönetim bölümleri">${YON_TABS.map(([k, l]) => `<button type="button" class="${k === t ? "on" : ""}" data-a="yonTab" data-k="${k}"${k === t ? ' aria-current="page"' : ""}>${l}</button>`).join("")}</nav>
     ${YON.err ? `<p class="note">${esc(YON.err)}</p>` : ""}
-    ${!V ? `<div class="empty">Yükleniyor…</div>` : `<section class="yn-body stack" aria-label="${esc((YON_TABS.find(x => x[0] === t) || [])[1] || "")}">${(sek[t] || sek.ozet)()}</section>`}
+    ${!V ? (YON.err && !YON.busy ? `<div class="empty">Yönetim bilgileri yüklenemedi.<div class="row" style="justify-content:center;margin-top:10px"><button type="button" class="btn pri" data-a="yonYenile">Tekrar dene</button></div></div>` : `<div class="empty">Yükleniyor…</div>`) : `<section class="yn-body stack" aria-label="${esc((YON_TABS.find(x => x[0] === t) || [])[1] || "")}">${(sek[t] || sek.ozet)()}</section>`}
   </div>`;
 }
 
@@ -9502,13 +9510,14 @@ function aboneKarti() {
   const pk = p => ({ premium: "Premium", orta: "Atılım" })[p] || p || "Paket";
   const tr = b => b ? new Date(b + "T00:00:00").toLocaleDateString("tr-TR") : "süresiz";
   return `<div class="card"><div class="card-h"><h2>Aboneler</h2><button class="btn sm ghost" data-a="yonAboneYenile">Yenile</button></div>
-    ${!L ? `<div class="empty">Yükleniyor…</div>` : L.length ? `<div class="list">${L.map(a => `<div class="li mli"><div class="grow"><div class="t">${esc(a.ad || a.eposta || "Abone")}</div><div class="s">${esc(a.eposta || "")} · ${pk(a.plan)} · ${tr(a.bitis)} tarihine kadar</div></div><div class="li-act"><button class="btn sm" data-a="yonAboneIptal" data-k="${esc(a.kid)}">İptal et</button></div></div>`).join("")}</div>`
+    ${YON.aboneHata ? `<div class="empty" role="alert">Aboneler yüklenemedi.<div class="row" style="justify-content:center;margin-top:10px"><button type="button" class="btn pri" data-a="yonAboneYenile">Tekrar dene</button></div></div>` : !L ? `<div class="empty">Yükleniyor…</div>` : L.length ? `<div class="list">${L.map(a => `<div class="li mli"><div class="grow"><div class="t">${esc(a.ad || a.eposta || "Abone")}</div><div class="s">${esc(a.eposta || "")} · ${pk(a.plan)} · ${tr(a.bitis)} tarihine kadar</div></div><div class="li-act"><button class="btn sm" data-a="yonAboneIptal" data-k="${esc(a.kid)}">İptal et</button></div></div>`).join("")}</div>`
       : `<div class="empty">Şu an paketi süren abone yok.</div>`}
     <p class="xs muted">İptal edilen abonenin paketi kapanır; hesabı ve çalışma verileri silinmez.</p></div>`;
 }
 async function aboneYukle() {
   YON.aboneBusy = true;
-  try { const r = await fetch("/api/yonetim/aboneler", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); YON.abone = r.ok ? (j.aboneler || []) : []; } catch (e) { YON.abone = []; }
+  YON.aboneHata = false;
+  try { const r = await fetch("/api/yonetim/aboneler", { credentials: "same-origin" }); const j = await r.json().catch(() => ({})); if (r.ok) YON.abone = j.aboneler || []; else { YON.abone = []; YON.aboneHata = true; } } catch (e) { YON.abone = []; YON.aboneHata = true; }
   YON.aboneBusy = false; render();
 }
 async function yonIstek(path, body) {
@@ -9517,8 +9526,8 @@ async function yonIstek(path, body) {
 }
 Object.assign(OZ_ACT, {
   yonTab(d) { if (!YON_TABS.some(x => x[0] === d.k)) return; YON.tab = d.k; render(); window.scrollTo(0, 0); },
-  yonVeliYenile() { YON.veli = null; yonVeliYukle(); },
-  yonAboneYenile() { YON.abone = null; aboneYukle(); },
+  yonVeliYenile() { YON.veli = null; render(); },
+  yonAboneYenile() { YON.abone = null; YON.aboneHata = false; render(); },
   yonAboneIptal(d) {
     const a = (YON.abone || []).find(x => x.kid === d.k); if (!a) return; YON.iptalKid = a.kid;
     const ad = esc(a.ad || a.eposta || "bu abone");

@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#06111f"><title>AKE Akademi</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#06111f;color:#f4efe4;font:16px system-ui,sans-serif}a{color:#f4efe4}</style></head>
+<body><p>AKE Akademi açılıyor… <a href="konseptler/4-esik-yasayan-bilgi-final/">Devam et</a></p>
+<script>
+/* Etkin açılış konseptini sunucu bildirir (Cloudflare ortam değişkeni AKE_ACILIS). Öğrenciye gösterilen bir ayar yoktur. */
+(function(){var gecerli=["1-bilgi-cekirdegi","2-yasayan-bilgi","3-esik","4-esik-yasayan-bilgi-final"],v="4-esik-yasayan-bilgi-final";
+function git(k){location.replace("konseptler/"+(gecerli.indexOf(k)>-1?k:v)+"/")}
+fetch("/api/acilis",{cache:"no-store"}).then(function(r){return r.ok?r.json():{}}).then(function(j){git(j.konsept)}).catch(function(){git(v)});})();
+</script></body></html>

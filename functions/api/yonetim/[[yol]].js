@@ -108,7 +108,7 @@ export async function onRequest({ request, env, params }) {
     const bugun = new Date().toISOString().slice(0, 10);
     const aktif = await env.DB.prepare("SELECT COUNT(*) AS n FROM kod WHERE kid = ? AND (bitis IS NULL OR bitis >= ?)").bind(kid, bugun).first();
     if (!aktif || !aktif.n) return fail(404, "paket_yok", "Bu kullanıcının iptal edilecek aktif paketi yok (zaten iptal edilmiş olabilir).");
-    const r = await env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(kid).run();
+    const r = await env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ? AND (bitis IS NULL OR bitis >= ?)").bind(kid, bugun).run(); /* yalnızca aktif paketler; süresi dolmuş kayıtlar olduğu gibi kalır */
     const n = (r && r.meta && r.meta.changes) || 0;
     if (!n) return fail(409, "degismedi", "Paket iptal edilemedi; liste yenilenip tekrar denenebilir.");
     return json(200, { ok: true, kapatilan: n });

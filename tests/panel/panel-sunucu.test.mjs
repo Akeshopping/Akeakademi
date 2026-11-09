@@ -274,3 +274,16 @@ test("regresyon: deneme-siparis, tekrar-gonder, siparis-tamamla ve yönetici yet
   assert.equal(env.DB.raw.prepare("SELECT COUNT(*) AS n FROM kod WHERE siparis = 'R1'").get().n, 1);
   assert.equal((await cagir(env, "durum", { cookie: env.ogrenci.cookie })).status, 403); assert.equal((await cagir(env, "durum", { cookie: env.yonetici.cookie })).status, 200);
 });
+
+test("abone-iptal: yalnızca aktif paket kapanır; aynı kullanıcının süresi dolmuş kaydı aynı kid üzerinde kalır; kapatilan=1; ikinci iptal 404 paket_yok; başkasının kayıtları değişmez", async () => {
+  const env = await ortam(); const ekle = (anahtar, kid, plan, bitis) => env.DB.prepare("INSERT INTO kod (anahtar, kid, plan, bitis, tarih, siparis) VALUES (?, ?, ?, ?, 1, 'x')").bind(anahtar, kid, plan, bitis).run();
+  await ekle("ESKIDOLMUS0001A", env.ogrenci.kid, "orta", "2020-01-01"); await ekle("AKTIFPAKET0002B", env.ogrenci.kid, "premium", "2099-01-01");
+  await ekle("DIGERAKTIF0003C", env.diger.kid, "orta", "2099-01-01"); await ekle("DIGERESKI0004D", env.diger.kid, "orta", "2020-01-01");
+  const satir = a => env.DB.raw.prepare("SELECT anahtar, kid, plan, bitis FROM kod WHERE anahtar = ?").get(a), digerOnce = JSON.stringify([satir("DIGERAKTIF0003C"), satir("DIGERESKI0004D")]);
+  const r = await ham(env, { govde: { kid: env.ogrenci.kid } }); assert.equal(r.status, 200); assert.deepEqual(await r.json(), { ok: true, kapatilan: 1 });
+  assert.equal(satir("AKTIFPAKET0002B").kid, "silindi", "aktif kayıt kapandı");
+  assert.equal(JSON.stringify(satir("ESKIDOLMUS0001A")), JSON.stringify({ anahtar: "ESKIDOLMUS0001A", kid: env.ogrenci.kid, plan: "orta", bitis: "2020-01-01" }), "süresi dolmuş kayıt aynı kid üzerinde, değişmeden kaldı");
+  const r2 = await ham(env, { govde: { kid: env.ogrenci.kid } }); assert.equal(r2.status, 404); assert.equal((await r2.json()).error, "paket_yok");
+  assert.equal(satir("ESKIDOLMUS0001A").kid, env.ogrenci.kid, "ikinci iptal de süresi dolmuşa dokunmaz");
+  assert.equal(JSON.stringify([satir("DIGERAKTIF0003C"), satir("DIGERESKI0004D")]), digerOnce, "başka kullanıcının kayıtları değişmedi");
+});

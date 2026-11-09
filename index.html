@@ -1202,6 +1202,37 @@ html.fx-m #aur u{display:none}
 @media (prefers-reduced-motion:reduce){.sc3-new{animation:none}.sc3-bar i,.sc3-ex,.sc3-d,.sc3-k,.sc3-o{transition:none}}
 :root[data-motion="off"] .sc3-new{animation:none}:root[data-motion="off"] .sc3-bar i{transition:none}
 </style>
+<style id="yn-css">
+/* ===== Yönetim paneli V2 · Obsidian Forest ===== */
+.yn{gap:16px;max-width:1120px}
+.yn-hero{position:relative;overflow:hidden;border-radius:18px;padding:clamp(18px,3.5vw,28px);color:#f5f1e8;background:radial-gradient(90% 160% at 100% -30%,rgba(37,66,54,.95),rgba(37,66,54,0) 62%),radial-gradient(50% 90% at 0% 140%,rgba(197,165,114,.15),transparent 70%),#171715;border:1px solid rgba(197,165,114,.28);box-shadow:0 18px 40px -26px rgba(0,0,0,.7)}
+.yn-hero h1{margin:4px 0 0;font-size:clamp(24px,4.2vw,34px);line-height:1.1;color:#f5f1e8}
+.yn-hero p{margin:8px 0 0;color:#d3ccbd;font-size:15px;max-width:52ch}
+.yn-eb{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#C5A572;font-weight:700}
+.yn-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:4px 6px 0;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.yn-tabs::-webkit-scrollbar{display:none}
+.yn-tabs button{flex:0 0 auto;min-height:44px;padding:8px 14px;border:0;border-radius:10px 10px 0 0;background:transparent;color:var(--ink2);font-weight:600;font-size:14px;line-height:1;font-family:inherit;cursor:pointer;box-shadow:inset 0 -3px 0 transparent;transition:color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
+.yn-tabs button:hover{background:var(--sunk)}
+.yn-tabs button.on{color:var(--ink);box-shadow:inset 0 -3px 0 var(--sc-gold,#C5A572);background:var(--sunk)}
+.yn-tabs button:focus-visible{outline:2px solid var(--sc-sel,#254236);outline-offset:-2px}
+.yn-body{gap:16px}
+@media (max-width:560px){.yn-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;gap:6px;padding:0;background:transparent;border:0;border-radius:0}.yn-tabs button{border:1px solid var(--line);border-radius:10px;box-shadow:none;background:var(--card)}.yn-tabs button.on{border-color:var(--sc-sel,#254236);box-shadow:inset 0 0 0 1px var(--sc-sel,#254236);background:var(--card)}}
+.yn-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.yn-tabs button svg{width:17px;height:17px;flex:none}
+/* Claude çalışma ortamındaki yönetim kabuğu (vAdminShell): aynı Obsidian Forest dili */
+.adm-wrap{display:flex;flex-direction:column;gap:0}
+.adm-wrap .yn-tabs{margin-top:16px}
+.adm-main .vhead{position:relative;overflow:hidden;border-radius:18px;padding:clamp(18px,3.5vw,28px);margin:0 0 16px;color:#f5f1e8;background:radial-gradient(90% 160% at 100% -30%,rgba(37,66,54,.95),rgba(37,66,54,0) 62%),radial-gradient(50% 90% at 0% 140%,rgba(197,165,114,.15),transparent 70%),#171715;border:1px solid rgba(197,165,114,.28);box-shadow:0 18px 40px -26px rgba(0,0,0,.7)}
+.adm-main .vhead h1{color:#f5f1e8;margin:4px 0 0}
+.adm-main .vhead p{color:#d3ccbd;max-width:60ch}
+.adm-main .vhead .eyebrow{color:#C5A572;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.adm-wrap .card,.adm-main .card{border-radius:16px}
+.top .brand .wm span{color:#C5A572}
+header.top .adm-in .btn{background:transparent!important;background-image:none!important;border:1px solid rgba(245,241,232,.28)!important;color:#f5f1e8!important;box-shadow:none!important}
+header.top .adm-in .btn:hover{background:rgba(245,241,232,.08)!important}
+@media (prefers-reduced-motion:reduce){.yn-tabs button{transition:none}}
+:root[data-motion="off"] .yn-tabs button{transition:none}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -8445,7 +8476,7 @@ const inDay = (ts, k) => nn(ts) && dayKey(new Date(nn(ts))) === k;
 /* Site sahibi siteyi açınca doğrudan panel gelir; "Uygulamaya dön" dediyse bir sonraki açılışta uygulama gelir */
 UI.admin = LS.get("ake.admin") === "1" || (LS.get("ake.admin") === null && LS.get("ake.owner") === "1");
 const adminMode = () => !!UI.admin && IN_CLAUDE && (cloud.owner || !cloud.ownerKnown);
-const ADM_TABS = [["ozet", "Genel bakış", "chart"], ["kodlar", "Kodlar", "key"], ["kisiler", "Kişiler", "users"], ["bildirimler", "Bildirimler", "inbox"], ["ayarlar", "Duyuru ve ayarlar", "bell"]];
+const ADM_TABS = [["ozet", "Genel Bakış", "chart"], ["kisiler", "Öğrenciler", "users"], ["kodlar", "Erişim Kodları", "key"], ["bildirimler", "Bildirimler", "inbox"], ["ayarlar", "Duyuru ve Ayarlar", "bell"]];
 function vAdminShell() {
   const t = ADM.tab || "ozet";
   let body;
@@ -8458,7 +8489,7 @@ function vAdminShell() {
     <span class="brand">${logoTile("al")}<b class="wm">AKE <span>Yönetim</span></b></span>
     <div class="top-sp"></div>${live ? `<span class="pill ok">${live} kişi sitede</span>` : ""}
     <button class="btn sm" data-a="admExit" title="Öğrenci uygulamasına dön">${icon("home")}<span class="adm-hide">Uygulamaya dön</span></button></div></header>
-  <div class="adm-wrap"><nav class="adm-tabs" aria-label="Yönetim bölümleri">${ADM_TABS.map(([k, l, ic]) => { const on = !ADM.sel && t === k; return `<button type="button" class="${on ? "on" : ""}" data-a="admTab" data-k="${k}"${on ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span></button>`; }).join("")}</nav>
+  <div class="adm-wrap"><nav class="yn-tabs" aria-label="Yönetim bölümleri">${ADM_TABS.map(([k, l, ic]) => { const on = !ADM.sel && t === k; return `<button type="button" class="${on ? "on" : ""}" data-a="admTab" data-k="${k}"${on ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span></button>`; }).join("")}</nav>
   <main id="main" class="adm-main">${body}</main></div>
   ${UI.modal ? modalHTML() : ""}${UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : ""}`;
 }
@@ -8500,7 +8531,7 @@ function vAdmOverview() {
   </div>`;
 }
 function vAdmPeople() {
-  const head = `<div class="vhead"><span class="eyebrow">Yalnızca sen görüyorsun</span><h1>Kişiler</h1><p>Bir kişiye dokunarak nasıl girdiğini, ne çalıştığını ve hareket geçmişini görebilirsin.</p></div>`;
+  const head = `<div class="vhead"><span class="eyebrow">Yalnızca sen görüyorsun</span><h1>Öğrenciler</h1><p>Bir kişiye dokunarak nasıl girdiğini, ne çalıştığını ve hareket geçmişini görebilirsin.</p></div>`;
   const g = admGuard(head); if (g) return g;
   admNames(admPeople().map(p => p.id));
   return `<div class="view">${head}
@@ -9373,6 +9404,7 @@ const HESAP_SUB = {
   }
 };
 
+
 /* ===== Yönetim (yalnızca yönetici hesabı, akeakademi.com) ===== */
 const YON = { bil: null, veri: null, busy: "", err: "", msg: "", dpaket: "orta-ay", deposta: "" };
 async function yonYukle() {
@@ -9401,32 +9433,65 @@ function maliyetKarti() {
     <p class="small muted">AI ile soru üretme: bugün ${M.soruUretBugun || 0}/${M.soruUretLimit} (günlük sınır).${M.butceUsd ? ` Aylık bütçe: ${d(M.butceUsd)}.` : ""}</p>
     ${asim ? `<p class="note">Aylık bütçenin %80'ine ulaşıldı.</p>` : ""}</div>`;
 }
-function vYonetim() {
-  if (IN_CLAUDE || !HESAP.user || !HESAP.user.yonetici) return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Bu sayfa yalnızca site yöneticisine açık.</p></div></div>`;
-  const V = YON.veri;
-  if (!V && !YON.busy && !YON.err) setTimeout(yonYukle, 0);
+const YON_TABS = [["ozet", "Genel Bakış"], ["ogrenci", "Öğrenciler"], ["uye", "Üyelikler"], ["siparis", "Siparişler"], ["kod", "Erişim Kodları"], ["analitik", "Analitik"], ["veli", "Veli Raporları"]];
+function yonSiparisler(V) {
+  const incele = V.inceleme ? `<div class="card" role="alert" style="border:1px solid var(--bad,#c0392b)"><h2>${V.inceleme} sipariş inceleme bekliyor</h2><p class="small">Bu siparişler için otomatik erişim kodu üretilmedi. Shopier panelinde sipariş durumu "Açık" ise müşteriye elle yardım et; sipariş numarasını listede gör.</p></div>` : "";
+  return `${incele}<div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
+      ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}${/!/.test(s.id) ? ` <span class="xs muted">#${esc(s.id.split("!")[0])}</span>` : ""}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}${/!kod$/.test(s.id) && (s.durum === "kod_uretilemedi" || s.durum === "kod_bekliyor") ? `<button class="btn sm" data-a="yonTamamla" data-id="${esc(s.id)}"${YON.busy ? " disabled" : ""}>${YON.busy === "tamamla" + s.id ? "Tamamlanıyor…" : "Eksik kodları tamamla"}</button>` : ""}</div></div>`; }).join("")}</div>`
+        : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>`;
+}
+function yonShopier(V) {
   const tik = (v, l) => `<div class="li"><span class="pill ${v ? "ok" : "bad"}">${v ? "Hazır" : "Eksik"}</span><div class="grow"><div class="t">${l}</div></div></div>`;
-  return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Satışlar, siparişler ve site kurulumu. Bu sayfa yalnızca sana görünür.</p></div>
-    ${YON.err ? `<p class="note">${esc(YON.err)}</p>` : ""}
-    ${!V ? `<div class="empty">Yükleniyor…</div>` : `
-    <div class="tiles">${tile(V.sayilar.kullanici || 0, "kayıtlı hesap")}${tile(V.sayilar.paket || 0, "paketli hesap")}${tile((V.siparisler || []).filter(s => s.durum === "gonderildi").length, "son siparişler")}${tile(V.webhook ? "Açık" : "Kapalı", "otomatik satış")}</div>
-    <div class="card stack"><h2>Otomatik satış (Shopier)</h2>
+  return `<div class="card stack"><h2>Otomatik satış (Shopier)</h2>
       <div class="list">${tik(V.eposta, "E-posta servisi (Resend)")}${tik(V.pat, "Shopier anahtarı (SHOPIER_PAT)")}${tik(V.webhook, "Sipariş bildirimi (webhook)")}</div>
       <p class="small muted">Kurulduğunda Shopier'de ödeme alınan her pakette kod kendiliğinden üretilir, alıcıya e-postayla gider; alıcı aynı e-postayla giriş yaptığında paket hesabına tanımlanır.</p>
-      <div class="row"><button class="btn pri" data-a="yonKur"${!V.pat || YON.busy ? " disabled" : ""}>${YON.busy === "kur" ? "Kuruluyor…" : V.webhook ? "Yeniden kur" : "Otomatik satışı kur"}</button></div>
-      <div class="row" style="border-top:1px solid var(--line2);padding-top:12px"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Atılım · 1 ay"], ["orta-yil", "Atılım · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
+      <div class="row"><button class="btn pri" data-a="yonKur"${!V.pat || YON.busy ? " disabled" : ""}>${YON.busy === "kur" ? "Kuruluyor…" : V.webhook ? "Yeniden kur" : "Otomatik satışı kur"}</button></div></div>`;
+}
+function yonKodGonder() {
+  return `<div class="card stack"><h2>Erişim kodu gönder</h2>
+      <div class="row"><select class="in" data-c="yonPaket" style="max-width:200px">${[["orta-ay", "Atılım · 1 ay"], ["orta-yil", "Atılım · 1 yıl"], ["premium-ay", "Premium · 1 ay"], ["premium-yil", "Premium · 1 yıl"]].map(([k, l]) => `<option value="${k}"${YON.dpaket === k ? " selected" : ""}>${l}</option>`).join("")}</select>
         <input class="in" data-c="yonEposta" type="email" placeholder="Arkadaşının e-postası (boşsa sana gider)" value="${esc(YON.deposta)}" style="flex:1;min-width:200px">
         <button class="btn" data-a="yonDeneme"${YON.busy ? " disabled" : ""}>${YON.busy === "deneme" ? "Gönderiliyor…" : "Kod gönder"}</button></div>
       <p class="xs muted">Para çekmez. Seçtiğin paket için gerçek kod üretip yazdığın e-postaya gönderir (boşsa sana). O e-postayla giriş yapan kişinin hesabına paket tanımlanır.</p>
-      ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>
-    ${aboneKarti()}
-    ${maliyetKarti()}${bildirimYonKarti()}
-    ${V.inceleme ? `<div class="card" role="alert" style="border:1px solid var(--bad,#c0392b)"><h2>${V.inceleme} sipariş inceleme bekliyor</h2><p class="small">Bu siparişler için otomatik erişim kodu üretilmedi. Shopier panelinde sipariş durumu "Açık" ise müşteriye elle yardım et; sipariş numarasını listede gör.</p></div>` : ""}
-    <div class="card"><div class="card-h"><h2>Son siparişler</h2><button class="btn sm ghost" data-a="yonYenile">Yenile</button></div>
-      ${(V.siparisler || []).length ? `<div class="list">${V.siparisler.map(s => { const [c, l] = SIP_DURUM[s.durum] || ["", s.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(s.ad || s.eposta || "Alıcı")}${/!/.test(s.id) ? ` <span class="xs muted">#${esc(s.id.split("!")[0])}</span>` : ""}</div><div class="s">${esc(s.eposta || "e-posta yok")} · ${esc((s.paket || "").replace("-", " · "))}${s.tutar ? " · " + esc(s.tutar) + " TL" : ""} · ${fmtDate(s.tarih)}</div></div><div class="li-act"><span class="pill ${c}">${esc(l)}</span>${s.eposta && s.paket ? `<button class="btn sm ghost" data-a="yonTekrar" data-id="${esc(s.id)}">Kodu yeniden gönder</button>` : ""}${/!kod$/.test(s.id) && (s.durum === "kod_uretilemedi" || s.durum === "kod_bekliyor") ? `<button class="btn sm" data-a="yonTamamla" data-id="${esc(s.id)}"${YON.busy ? " disabled" : ""}>${YON.busy === "tamamla" + s.id ? "Tamamlanıyor…" : "Eksik kodları tamamla"}</button>` : ""}</div></div>`; }).join("")}</div>`
-        : `<div class="empty">Henüz sipariş yok. Shopier'de ödeme alındığında burada görünür.</div>`}</div>
-    ${soruBolumu()}`}
-    ${canliYonetim()}${hataYonetim()}
+      ${YON.msg ? `<p class="small" style="color:var(--ok)">${esc(YON.msg)}</p>` : ""}</div>`;
+}
+function yonVeli() {
+  if (!YON.veli && !YON.veliBusy) yonVeliYukle();
+  const D = YON.veli; if (!D) return `<div class="empty">Yükleniyor…</div>`;
+  const tikL = (v, l, ek) => `<div class="li"><span class="pill ${v ? "ok" : "warn"}">${v ? "Hazır" : "Bekliyor"}</span><div class="grow"><div class="t">${l}</div>${ek ? `<div class="s">${ek}</div>` : ""}</div></div>`;
+  const hazirKart = `<div class="card stack"><h2>Kurulum durumu</h2><div class="list">${tikL(D.acik, "Özellik anahtarı (VELI_RAPORU)", D.acik ? "Açık" : "Kapalı: hukuki değerlendirme tamamlanana kadar hiçbir rapor gönderilmez.")}${tikL(D.hazir, "Veritabanı tabloları (migration 0001)", D.hazir ? "Uygulandı" : "Henüz uygulanmadı")}</div></div>`;
+  if (!D.hazir) return `${hazirKart}<p class="note">Veli raporu henüz canlıda etkin değil. Bu sayfa, migration ve anahtar açıldıktan sonra gönderim sayılarını gösterir.</p>`;
+  const tr = t => t ? new Date(t).toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+  const DUR = { gonderildi: ["ok", "Gönderildi"], hata: ["bad", "Hata"], gonderiliyor: ["warn", "Gönderiliyor"], bekliyor: ["warn", "Bekliyor"] };
+  return `${hazirKart}
+    <div class="tiles">${tile(D.etkin || 0, "etkin rapor aboneliği")}${tile(D.dogrulanmis || 0, "doğrulanmış veli adresi")}${tile(D.basarili || 0, "son hafta başarılı")}${tile(D.basarisiz || 0, "başarısız gönderim")}</div>
+    <div class="card stack"><h2>Zamanlama</h2><p class="small">Son gönderim: <b>${tr(D.son)}</b> · Sonraki planlı: <b>${tr(D.sonraki)}</b> (her pazar 19.00, Türkiye saati).</p>${D.kalici ? `<p class="note">${D.kalici} gönderim ${3} denemeden sonra kalıcı hata verdi; aşağıdaki listede hata kodunu gör.</p>` : ""}</div>
+    <div class="card"><div class="card-h"><h2>Gönderim geçmişi</h2><button class="btn sm ghost" data-a="yonVeliYenile">Yenile</button></div>
+      ${(D.gecmis || []).length ? `<div class="list">${D.gecmis.map(g => { const [c, l] = DUR[g.durum] || ["", g.durum]; return `<div class="li mli"><div class="grow"><div class="t">${esc(g.veli || "—")} <span class="xs muted">öğrenci ${esc(g.ogrenci)}…</span></div><div class="s">${esc(g.hafta)} · ${g.deneme} deneme · ${tr(g.tarih)}${g.hata ? ` · hata: <b>${esc(g.hata)}</b>` : ""}</div></div><span class="pill ${c}">${esc(l)}</span></div>`; }).join("")}</div>` : `<div class="empty">Henüz gönderim yok.</div>`}
+      <p class="xs muted">Panelde öğrenci adı, rapor içeriği veya tam e-posta adresi gösterilmez.</p></div>`;
+}
+async function yonVeliYukle() {
+  YON.veliBusy = true;
+  try { const r = await fetch("/api/yonetim/veli", { credentials: "same-origin" }); YON.veli = r.ok ? await r.json().catch(() => ({ hazir: false })) : { hazir: false }; } catch (e) { YON.veli = { hazir: false }; }
+  YON.veliBusy = false; render();
+}
+function vYonetim() {
+  if (IN_CLAUDE || !HESAP.user || !HESAP.user.yonetici) return `<div class="view"><div class="vhead"><h1>Yönetim</h1><p>Bu sayfa yalnızca site yöneticisine açık.</p></div></div>`;
+  const V = YON.veri, t = YON.tab || "ozet";
+  if (!V && !YON.busy && !YON.err) setTimeout(yonYukle, 0);
+  const sek = {
+    ozet: () => `<div class="tiles">${tile(V.sayilar.kullanici || 0, "kayıtlı hesap")}${tile(V.sayilar.paket || 0, "paketli hesap")}${tile((V.siparisler || []).filter(s => s.durum === "gonderildi").length, "son siparişler")}${tile(V.webhook ? "Açık" : "Kapalı", "otomatik satış")}</div>${V.inceleme ? `<div class="card" role="alert" style="border:1px solid var(--bad,#c0392b)"><h2>${V.inceleme} sipariş inceleme bekliyor</h2><p class="small">Ayrıntı için <button class="btn sm ghost" data-a="yonTab" data-k="siparis">Siparişler</button> sekmesine bak.</p></div>` : ""}${yonShopier(V)}${maliyetKarti()}`,
+    ogrenci: () => `<div class="tiles">${tile(V.sayilar.kullanici || 0, "kayıtlı öğrenci hesabı")}${tile(V.sayilar.paket || 0, "paketli hesap")}${tile(Math.max(0, (V.sayilar.kullanici || 0) - (V.sayilar.paket || 0)), "ücretsiz hesap")}</div><p class="small muted">Gizlilik için bu bölümde öğrenci listesi, ad veya e-posta gösterilmez; yalnızca sayılar yer alır.</p>${canliYonetim()}`,
+    uye: () => aboneKarti(),
+    siparis: () => yonSiparisler(V),
+    kod: () => yonKodGonder(),
+    analitik: () => `${maliyetKarti()}${bildirimYonKarti()}${soruBolumu()}${hataYonetim()}`,
+    veli: () => yonVeli()
+  };
+  return `<div class="view yn"><header class="yn-hero"><span class="yn-eb">Yönetim paneli</span><h1>AKE Akademi</h1><p>Satışlar, üyelikler ve site kurulumu. Bu sayfa yalnızca sana görünür.</p></header>
+    <nav class="yn-tabs" aria-label="Yönetim bölümleri">${YON_TABS.map(([k, l]) => `<button type="button" class="${k === t ? "on" : ""}" data-a="yonTab" data-k="${k}"${k === t ? ' aria-current="page"' : ""}>${l}</button>`).join("")}</nav>
+    ${YON.err ? `<p class="note">${esc(YON.err)}</p>` : ""}
+    ${!V ? `<div class="empty">Yükleniyor…</div>` : `<section class="yn-body stack" aria-label="${esc((YON_TABS.find(x => x[0] === t) || [])[1] || "")}">${(sek[t] || sek.ozet)()}</section>`}
   </div>`;
 }
 
@@ -9451,6 +9516,8 @@ async function yonIstek(path, body) {
   let j = {}; try { j = await r.json(); } catch (e) { } return { r, j };
 }
 Object.assign(OZ_ACT, {
+  yonTab(d) { if (!YON_TABS.some(x => x[0] === d.k)) return; YON.tab = d.k; render(); window.scrollTo(0, 0); },
+  yonVeliYenile() { YON.veli = null; yonVeliYukle(); },
   yonAboneYenile() { YON.abone = null; aboneYukle(); },
   yonAboneIptal(d) {
     const a = (YON.abone || []).find(x => x.kid === d.k); if (!a) return; YON.iptalKid = a.kid;

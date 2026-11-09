@@ -6,7 +6,8 @@
 //   POST soru-uret {s,t,sn,e,d,n,ornek}  AI ile soru üretir, onaya koyar
 //   GET  sorular          onay bekleyen sorular ve sayılar
 //   GET  aboneler         paketi süren aboneler
-//   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez)
+//   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez); kullanıcı/aktif paket yoksa 404
+//   Durum değiştiren (GET/HEAD/OPTIONS dışı) tüm istekler aynı kaynaktan (same-origin) gelmek zorundadır; aksi halde 403 "origin".
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
@@ -55,6 +56,20 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
   return { uretilen: arr.length, gecen: tut.length };
 }
 
+/* Cross-site istek koruması (CSRF): durum değiştiren isteğin Origin'i bu isteğin kendi adresinin origin'i ile birebir aynı olmalı.
+   Joker (wildcard) yok: www ve apex ayrı origin sayılır; tarayıcı hangi adresten sayfayı açtıysa istek de oraya gider (göreli fetch).
+   Origin yoksa (bazı eski istemciler) Sec-Fetch-Site: same-origin ya da aynı origin'li Referer aranır; hiçbiri yoksa reddedilir. */
+const GUVENLI_YONTEM = new Set(["GET", "HEAD", "OPTIONS"]);
+function ayniKaynak(request) {
+  if (GUVENLI_YONTEM.has(request.method)) return true;
+  const beklenen = new URL(request.url).origin, o = request.headers.get("origin");
+  if (o !== null) return o === beklenen;
+  if (request.headers.get("sec-fetch-site") === "same-origin") return true;
+  const ref = request.headers.get("referer");
+  if (ref) { try { return new URL(ref).origin === beklenen; } catch (e) { return false; } }
+  return false;
+}
+
 const API = "https://api.shopier.com/v1";
 async function shopier(env, path, opt) {
   const r = await fetch(API + path, Object.assign({ headers: { Authorization: "Bearer " + env.SHOPIER_PAT, "content-type": "application/json", accept: "application/json" } }, opt || {})).catch(() => null);
@@ -65,6 +80,7 @@ async function shopier(env, path, opt) {
 
 export async function onRequest({ request, env, params }) {
   if (!env.DB) return fail(500, "yapilandirma");
+  if (!ayniKaynak(request)) return fail(403, "origin", "Bu istek farklı bir siteden geldiği için reddedildi.");
   await sema(env);
   const u = await oturum(request, env);
   if (!u || !yoneticiMi(env, u)) return fail(403, "yetki");
@@ -88,8 +104,14 @@ export async function onRequest({ request, env, params }) {
   if (ad === "abone-iptal" && m === "POST") {
     let b = {}; try { b = await request.json(); } catch (e) { }
     const kid = String(b.kid || ""); if (!kid || kid === "silindi") return fail(400, "kid");
-    await env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(kid).run();
-    return json(200, { ok: true });
+    if (!(await env.DB.prepare("SELECT id FROM kullanici WHERE id = ?").bind(kid).first())) return fail(404, "kullanici_yok", "Bu kullanıcı bulunamadı.");
+    const bugun = new Date().toISOString().slice(0, 10);
+    const aktif = await env.DB.prepare("SELECT COUNT(*) AS n FROM kod WHERE kid = ? AND (bitis IS NULL OR bitis >= ?)").bind(kid, bugun).first();
+    if (!aktif || !aktif.n) return fail(404, "paket_yok", "Bu kullanıcının iptal edilecek aktif paketi yok (zaten iptal edilmiş olabilir).");
+    const r = await env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(kid).run();
+    const n = (r && r.meta && r.meta.changes) || 0;
+    if (!n) return fail(409, "degismedi", "Paket iptal edilemedi; liste yenilenip tekrar denenebilir.");
+    return json(200, { ok: true, kapatilan: n });
   }
   if (ad === "bildirim" && m === "GET") {
     await env.DB.prepare("CREATE TABLE IF NOT EXISTS push (endpoint TEXT PRIMARY KEY, kid TEXT, p256dh TEXT, auth TEXT, slots TEXT, tarih INTEGER)").run();

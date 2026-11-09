@@ -5,7 +5,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import { sema, kullaniciBulVeyaAc, oturumAc, aktifPaket, ayarOku } from "../../lib/ortak.js";
+import { sema, kullaniciBulVeyaAc, oturumAc, aktifPaket, ayarOku, ayarYaz, hmacHex } from "../../lib/ortak.js";
+import { onRequest as shopierIstek } from "../../functions/api/shopier.js";
 import { onRequest } from "../../functions/api/yonetim/[[yol]].js";
 
 function d1() {
@@ -29,8 +30,10 @@ async function ortam(ek = {}) {
   const kisi = async (eposta) => { const kid = await kullaniciBulVeyaAc(env, { eposta, ad: eposta.split("@")[0] }); const cookie = (await oturumAc(env, kid)).split(";")[0]; return { kid, cookie }; };
   env.yonetici = await kisi("yonetici@test.dev"); env.ogrenci = await kisi("ogrenci@test.dev"); env.diger = await kisi("diger@test.dev"); ag.length = 0; resend = 200; shopierDavranis = null; return env;
 }
-const cagir = (env, yol, { method = "GET", govde, cookie, hamGovde } = {}) => onRequest({
-  request: new Request("https://akeakademi.com/api/yonetim/" + yol, { method, headers: { ...(cookie ? { cookie } : {}), "content-type": "application/json" }, body: method === "GET" ? undefined : (hamGovde ?? JSON.stringify(govde || {})) }),
+const ORIGIN = "https://akeakademi.com";
+// Tarayıcı gibi: durum değiştiren isteklerde varsayılan olarak doğru Origin gönderilir. origin: null → Origin başlığı hiç yok. ek: ek başlıklar. host: istek adresi.
+const cagir = (env, yol, { method = "GET", govde, cookie, hamGovde, origin = ORIGIN, ek = {}, host = ORIGIN } = {}) => onRequest({
+  request: new Request(host + "/api/yonetim/" + yol, { method, headers: { ...(cookie ? { cookie } : {}), "content-type": "application/json", ...(origin !== null && method !== "GET" ? { origin } : {}), ...ek }, body: method === "GET" ? undefined : (hamGovde ?? JSON.stringify(govde || {})) }),
   env, params: { yol: yol.split("/") }
 });
 const adm = (env, yol, o = {}) => cagir(env, yol, { ...o, cookie: env.yonetici.cookie });
@@ -88,16 +91,15 @@ test("sözleşme: durum / aboneler / maliyet / bildirim / sorular yanıt alanlar
 });
 
 /* ---- 4) Üyelik iptali ---- */
-test("üyelik iptali: yalnızca verilen kullanıcının paketi kapanır, hesap silinmez, tekrar çağrı zararsız, hatalı girişler reddedilir", async () => {
+test("üyelik iptali: yalnızca verilen kullanıcının paketi kapanır, hesap silinmez, hatalı girişler reddedilir", async () => {
   const env = await ortam(); await kodVer(env, env.ogrenci.kid, "premium"); await kodVer(env, env.diger.kid, "orta");
   assert.ok(await paketVar(env, env.ogrenci.kid)); const hesaplar = sayim(env, "kullanici");
   for (const g of [{}, { kid: "" }, { kid: "silindi" }]) assert.equal((await adm(env, "abone-iptal", { method: "POST", govde: g })).status, 400);
   assert.equal((await adm(env, "abone-iptal", { method: "POST", hamGovde: "{bozuk" })).status, 400, "bozuk JSON güvenle reddedilir");
   assert.ok(await paketVar(env, env.ogrenci.kid), "hatalı istekler paketi bozmamalı");
-  const r = await adm(env, "abone-iptal", { method: "POST", govde: { kid: env.ogrenci.kid } }); assert.equal(r.status, 200); assert.deepEqual(await r.json(), { ok: true });
+  const r = await adm(env, "abone-iptal", { method: "POST", govde: { kid: env.ogrenci.kid } }); assert.equal(r.status, 200); assert.deepEqual(await r.json(), { ok: true, kapatilan: 1 });
   assert.ok(!(await paketVar(env, env.ogrenci.kid)), "iptal edilenin paketi kapanır"); assert.ok(await paketVar(env, env.diger.kid), "diğer abone etkilenmez");
   assert.equal(sayim(env, "kullanici"), hesaplar, "hesap silinmez");
-  assert.equal((await adm(env, "abone-iptal", { method: "POST", govde: { kid: env.ogrenci.kid } })).status, 200, "tekrar iptal hata vermez");
   const liste = (await (await adm(env, "aboneler")).json()).aboneler; assert.deepEqual(liste.map(x => x.kid), [env.diger.kid]);
   assert.equal((await adm(env, "abone-iptal", { method: "GET" })).status, 404, "GET ile iptal edilemez");
 });
@@ -162,4 +164,113 @@ test("Shopier kurulum: SHOPIER_PAT yoksa 400; geçersiz anahtar 400; başarıda 
   assert.equal(await ayarOku(env, "shopier_webhook_token"), "gizli-imza-anahtari"); assert.ok(!JSON.stringify(j).includes("gizli-imza"), "imza anahtarı yanıtta dönmez");
   assert.equal((await (await adm(env, "durum")).json()).webhook, true);
   shopierDavranis = async (url, opt) => (opt.method === "POST" ? new Response("{}", { status: 500 }) : Response.json([])); r = await adm(env, "shopier-kur", { method: "POST" }); assert.equal(r.status, 502);
+});
+
+/* ===================== Production Hardening V1 ===================== */
+const POSTLAR = ["shopier-kur", "deneme-siparis", "tekrar-gonder", "siparis-tamamla", "abone-iptal", "soru-uret", "soru-karar"];
+const ham = (env, o = {}) => cagir(env, o.yol || "abone-iptal", { method: o.method || "POST", cookie: env.yonetici.cookie, govde: { kid: env.diger.kid, id: "1!kod", paket: "premium-yil", eposta: "x@test.dev", karar: "onay" }, ...o });
+
+/* A) Origin / CSRF */
+test("origin: yönetici + doğru Origin + POST → izin; GET ekranları Origin olmadan da normal çalışır", async () => {
+  const env = await ortam(); await kodVer(env, env.diger.kid, "orta");
+  assert.equal((await ham(env)).status, 200, "doğru Origin ile iptal çalışır");
+  for (const yol of ["durum", "aboneler", "bildirim", "maliyet", "sorular"]) {
+    assert.equal((await adm(env, yol)).status, 200, "GET " + yol);
+    assert.equal((await cagir(env, yol, { cookie: env.yonetici.cookie, ek: { origin: "https://evil.example" } })).status, 200, "GET Origin'e bakmaz: " + yol);
+  }
+});
+for (const [ad, ek] of [["yabancı site", { origin: "https://evil.example" }], ["sahte benzer alan adı (akeakademi.com.evil.example)", { origin: "https://akeakademi.com.evil.example" }], ["alt alan adı gibi görünen sahte (evil.akeakademi.com)", { origin: "https://evil.akeakademi.com" }], ["www (istek apex'e giderken farklı origin)", { origin: "https://www.akeakademi.com" }], ["http şeması", { origin: "http://akeakademi.com" }], ["farklı port", { origin: "https://akeakademi.com:8443" }], ["'null' origin (sandbox/yönlendirme)", { origin: "null" }], ["boş Origin", { origin: "" }]]) {
+  test(`origin: yönetici oturumu olsa bile ${ad} ile gelen durum değiştiren istek 403 'origin' alır; hiçbir şey değişmez`, async () => {
+    const env = await ortam({ SHOPIER_PAT: "pat" }); await kodVer(env, env.diger.kid); const once = durumlar(env);
+    for (const yol of POSTLAR) { const r = await ham(env, { yol, origin: ek.origin }); assert.equal(r.status, 403, yol); assert.equal((await r.json()).error, "origin", yol); }
+    for (const method of ["PUT", "PATCH", "DELETE"]) assert.equal((await ham(env, { method, origin: ek.origin })).status, 403, method);
+    assert.equal(durumlar(env), once); assert.equal(ag.length, 0, "dış çağrı yok"); assert.ok(await paketVar(env, env.diger.kid), "üyelik etkilenmedi");
+  });
+}
+test("origin: Origin yoksa Sec-Fetch-Site/Referer aranır; hiçbiri yoksa ya da yabancıysa reddedilir", async () => {
+  const env = await ortam(); await kodVer(env, env.diger.kid);
+  assert.equal((await ham(env, { origin: null })).status, 403, "hiçbir kanıt yok");
+  assert.equal((await ham(env, { origin: null, ek: { "sec-fetch-site": "cross-site" } })).status, 403);
+  assert.equal((await ham(env, { origin: null, ek: { referer: "https://evil.example/sayfa" } })).status, 403);
+  assert.equal((await ham(env, { origin: null, ek: { referer: "bozuk adres" } })).status, 403);
+  assert.equal((await ham(env, { origin: null, ek: { "sec-fetch-site": "same-origin" } })).status, 200, "aynı kaynak kanıtı");
+  await kodVer(env, env.diger.kid); assert.equal((await ham(env, { origin: null, ek: { referer: ORIGIN + "/#yonetim" } })).status, 200, "aynı origin'li Referer");
+  await kodVer(env, env.diger.kid); assert.equal((await ham(env, { origin: "https://evil.example", ek: { "sec-fetch-site": "same-origin" } })).status, 403, "Origin varsa o belirleyicidir");
+});
+test("origin: www alan adından gelen istek (Origin = istek adresinin origin'i) çalışır; apex Origin'i www'ya karşı reddedilir; joker yok", async () => {
+  const env = await ortam(); await kodVer(env, env.diger.kid);
+  assert.equal((await ham(env, { host: "https://www.akeakademi.com", origin: "https://www.akeakademi.com" })).status, 200);
+  await kodVer(env, env.diger.kid); assert.equal((await ham(env, { host: "https://www.akeakademi.com", origin: "https://akeakademi.com" })).status, 403);
+});
+test("origin: öğrenci + doğru Origin yine 403 'yetki'; oturumsuz 403; yönetici olmayan için de yabancı Origin 403", async () => {
+  const env = await ortam(); const once = durumlar(env);
+  for (const yol of POSTLAR) {
+    let r = await cagir(env, yol, { method: "POST", cookie: env.ogrenci.cookie }); assert.equal(r.status, 403); assert.equal((await r.json()).error, "yetki", yol);
+    r = await cagir(env, yol, { method: "POST" }); assert.equal(r.status, 403); assert.equal((await r.json()).error, "yetki");
+    assert.equal((await cagir(env, yol, { method: "POST", cookie: env.ogrenci.cookie, origin: "https://evil.example" })).status, 403);
+  }
+  assert.equal(durumlar(env), once); assert.equal(ag.length, 0);
+});
+test("çerez yapısı değişmedi: HttpOnly; Secure; SameSite=Lax", async () => {
+  const env = await ortam(); const c = await oturumAc(env, env.yonetici.kid); assert.match(c, /HttpOnly/); assert.match(c, /Secure/); assert.match(c, /SameSite=Lax/);
+});
+test("Shopier webhook'una Origin kontrolü uygulanmaz: imzalı bildirim yabancı/yok Origin ile de işlenir; geçersiz imza 401 (403 origin değil)", async () => {
+  const env = await ortam(); await ayarYaz(env, "shopier_webhook_token", "wh-token");
+  const o = { id: "WH1", paymentStatus: "paid", billingInfo: { email: "alici@test.dev", firstName: "Ali" }, lineItems: [{ productId: "52547800", quantity: 1 }], totals: { total: "199.00", currency: "TRY" } };
+  const body = JSON.stringify(o), imza = (await hmacHex("wh-token", body)).hex;
+  const gonder = (h, b = body) => shopierIstek({ request: new Request(ORIGIN + "/api/shopier", { method: "POST", headers: { "content-type": "application/json", "shopier-event": "order.created", ...h }, body: b }), env });
+  let r = await gonder({ "shopier-signature": imza, origin: "https://evil.example" }); assert.equal(r.status, 200, JSON.stringify(await r.clone().json())); assert.equal(env.DB.raw.prepare("SELECT COUNT(*) AS n FROM kod WHERE siparis = 'WH1'").get().n, 1);
+  r = await gonder({ "shopier-signature": "yanlis", origin: ORIGIN }); assert.equal(r.status, 401); assert.equal((await r.json()).error, "imza");
+  r = await gonder({}); assert.equal(r.status, 401, "imzasız");
+  assert.ok(!readFileSync(new URL("../../functions/api/shopier.js", import.meta.url), "utf8").toLowerCase().includes("origin"), "webhook kodunda origin mantığı yok");
+});
+
+/* B) Üyelik iptali: yeni davranış */
+test("abone-iptal: var olan üyelik → 200, yalnızca o kullanıcının kodları kapanır, hesap silinmez, diğer kullanıcı etkilenmez", async () => {
+  const env = await ortam(); await kodVer(env, env.ogrenci.kid, "premium"); await kodVer(env, env.ogrenci.kid, "orta"); await kodVer(env, env.diger.kid, "orta");
+  const hesaplar = sayim(env, "kullanici"), kodlar = sayim(env, "kod");
+  const r = await ham(env, { govde: { kid: env.ogrenci.kid } }); assert.equal(r.status, 200); assert.deepEqual(await r.json(), { ok: true, kapatilan: 2 });
+  assert.equal(await paketVar(env, env.ogrenci.kid), false); assert.equal(await paketVar(env, env.diger.kid), true, "diğer kullanıcı etkilenmedi");
+  assert.equal(sayim(env, "kullanici"), hesaplar, "hesap silinmedi"); assert.equal(sayim(env, "kod"), kodlar, "kod kayıtları silinmez, yalnızca bağ kapanır");
+  assert.equal(env.DB.raw.prepare("SELECT COUNT(*) AS n FROM kod WHERE kid = 'silindi'").get().n, 2);
+  assert.ok(env.DB.raw.prepare("SELECT id FROM kullanici WHERE id = ?").get(env.ogrenci.kid), "kullanıcı satırı duruyor");
+});
+test("abone-iptal: olmayan kid → 404 kullanici_yok; boş/geçersiz kid → 400; hiçbir veri değişmez", async () => {
+  const env = await ortam(); await kodVer(env, env.diger.kid); const once = durumlar(env);
+  let r = await ham(env, { govde: { kid: "yok-boyle-kullanici" } }); assert.equal(r.status, 404); assert.equal((await r.json()).error, "kullanici_yok");
+  for (const g of [{}, { kid: "" }, { kid: "silindi" }, { kid: null }]) assert.equal((await ham(env, { govde: g })).status, 400, JSON.stringify(g));
+  assert.equal((await ham(env, { hamGovde: "{bozuk" })).status, 400);
+  assert.equal(durumlar(env), once);
+});
+test("abone-iptal: kullanıcı var ama paketi yok → 404 paket_yok; süresi dolmuş paket 'aktif' sayılmaz ve değiştirilmez", async () => {
+  const env = await ortam(); await kodVer(env, env.ogrenci.kid, "orta", "2020-01-01"); const once = durumlar(env);
+  let r = await ham(env, { govde: { kid: env.ogrenci.kid } }); assert.equal(r.status, 404); assert.equal((await r.json()).error, "paket_yok");
+  r = await ham(env, { govde: { kid: env.diger.kid } }); assert.equal(r.status, 404); assert.equal((await r.json()).error, "paket_yok");
+  assert.equal(durumlar(env), once, "hiçbir kayıt değişmedi");
+});
+test("abone-iptal: aynı üyeliği ikinci kez iptal → sessiz 200 yok, açık 404; sonuç tutarlı", async () => {
+  const env = await ortam(); await kodVer(env, env.ogrenci.kid, "premium"); await kodVer(env, env.diger.kid, "orta");
+  assert.equal((await ham(env, { govde: { kid: env.ogrenci.kid } })).status, 200);
+  const r2 = await ham(env, { govde: { kid: env.ogrenci.kid } }); assert.equal(r2.status, 404); const j2 = await r2.json(); assert.equal(j2.error, "paket_yok"); assert.ok(j2.message && !j2.ok);
+  assert.equal(await paketVar(env, env.diger.kid), true); assert.equal((await (await adm(env, "aboneler")).json()).aboneler.length, 1);
+});
+test("abone-iptal: süresiz (bitis boş) paket aktif sayılır ve iptal edilir; yarışta 0 satır değişirse 409", async () => {
+  const env = await ortam(); await env.DB.prepare("INSERT INTO kod (anahtar, kid, plan, bitis, tarih, siparis) VALUES ('SURESIZ1234ABCD', ?, 'premium', NULL, 1, 'x')").bind(env.ogrenci.kid).run();
+  assert.equal((await ham(env, { govde: { kid: env.ogrenci.kid } })).status, 200);
+  await kodVer(env, env.diger.kid); const gercek = env.DB.prepare.bind(env.DB);
+  env.DB.prepare = q => { const s = gercek(q); return /^UPDATE kod SET kid = 'silindi'/.test(q) ? { bind: (...a) => ({ run: async () => ({ meta: { changes: 0 } }) }) } : s; };
+  const r = await ham(env, { govde: { kid: env.diger.kid } }); assert.equal(r.status, 409); assert.equal((await r.json()).error, "degismedi");
+});
+
+/* C) Regresyon: Origin kontrolü eklendikten sonra diğer yönetim işlemleri aynı çalışıyor */
+test("regresyon: deneme-siparis, tekrar-gonder, siparis-tamamla ve yönetici yetkilendirmesi Origin'li istekle çalışır", async () => {
+  const env = await ortam();
+  let r = await ham(env, { yol: "deneme-siparis", govde: { paket: "premium-ay", eposta: "alici@test.dev" } }); const j = await r.json(); assert.equal(r.status, 200); assert.equal(j.durum, "deneme"); assert.match(j.kodlar[0].kod, /^AKE-/);
+  const sid = env.DB.raw.prepare("SELECT id FROM siparis WHERE id LIKE 'deneme-%'").get().id; ag.length = 0;
+  assert.equal((await ham(env, { yol: "tekrar-gonder", govde: { id: sid } })).status, 200); assert.deepEqual(JSON.parse(ag[0].body).to, ["alici@test.dev"]);
+  const hamSip = { id: "R1", paymentStatus: "paid", currency: "TRY", totals: { total: "199.00" }, billingInfo: { email: "a@test.dev", firstName: "Ali" }, lineItems: [{ productId: "52547800", quantity: 1 }] };
+  await env.DB.prepare("INSERT INTO siparis (id, eposta, ad, paket, anahtar, tutar, tarih, durum, ham) VALUES ('R1!kod', 'a@test.dev', '0/1', '', '', '199', ?, 'kod_uretilemedi', ?)").bind(Date.now() - 1e6, JSON.stringify(hamSip)).run();
+  assert.equal((await ham(env, { yol: "siparis-tamamla", govde: { id: "R1!kod" } })).status, 200);
+  assert.equal(env.DB.raw.prepare("SELECT COUNT(*) AS n FROM kod WHERE siparis = 'R1'").get().n, 1);
+  assert.equal((await cagir(env, "durum", { cookie: env.ogrenci.cookie })).status, 403); assert.equal((await cagir(env, "durum", { cookie: env.yonetici.cookie })).status, 200);
 });

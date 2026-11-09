@@ -16,7 +16,7 @@ async function sayfa(sen = {}, w = 1280, h = 860, hash = "yonetim") {
   p.on("pageerror", e => hatalar.push(e.message));
   await p.route("**/acilis/**", r => r.abort());
   await p.route("**/api/**", async r => {
-    const u = new URL(r.request().url()), yol = u.pathname, m = r.request().method(), body = r.request().postData(); TUM.add(m + " " + yol); log.push({ m, yol, body: body ? JSON.parse(body) : null });
+    const u = new URL(r.request().url()), yol = u.pathname, m = r.request().method(), body = r.request().postData(); TUM.add(m + " " + yol); if (m === "POST" && yol.startsWith("/api/yonetim/")) { const og = r.request().headers().origin; if (og !== new URL(r.request().url()).origin) hatalar.push("POST Origin başlığı eksik/yanlış: " + yol + " → " + og); } log.push({ m, yol, body: body ? JSON.parse(body) : null });
     say[yol] = (say[yol] || 0) + 1;
     const ozel = sen[yol]; if (ozel) { const y = ozel(say[yol], body); if (y) return r.fulfill(y); }
     if (yol === "/api/hesap/ben") return r.fulfill(J({ kullanici: { id: "k1", eposta: "yonetici@ornek.com", ad: "Yönetici", yonetici: true }, paket: { plan: "premium", bitis: "2099-01-01" } }));

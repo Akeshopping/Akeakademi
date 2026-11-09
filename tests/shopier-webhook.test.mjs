@@ -305,7 +305,7 @@ import { sha256 } from "../lib/ortak.js";
 const yonetim = await import("../functions/api/yonetim/[[yol]].js");
 async function yon(e, govde, { kid = "adm", yol = "siparis-tamamla" } = {}) {
   const tok = "t".repeat(48) + kid; e.DB.t.oturum.push({ hash: await sha256(tok), kid });
-  const r = await yonetim.onRequest({ request: new Request("https://x.test/api/yonetim/" + yol, { method: "POST", headers: { cookie: "ake_s=" + tok, "content-type": "application/json" }, body: JSON.stringify(govde) }), env: e, params: { yol: [yol] } });
+  const r = await yonetim.onRequest({ request: new Request("https://x.test/api/yonetim/" + yol, { method: "POST", headers: { cookie: "ake_s=" + tok, "content-type": "application/json", origin: "https://x.test" /* tarayıcı gibi: aynı kaynak */ }, body: JSON.stringify(govde) }), env: e, params: { yol: [yol] } });
   return { status: r.status, j: await r.json().catch(() => ({})) };
 }
 async function yarimSiparis(e, adet = 3) { const gercek = e.DB.batch; let n = 0; e.DB.batch = async l => { n++; if (n >= 2) throw new Error("d1"); return gercek(l); }; await gonder(e, COKLU(adet)); e.DB.batch = gercek; }

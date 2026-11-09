@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=4f351ff342">
-<link rel="icon" href="/favicon.ico?v=4f351ff342" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=4f351ff342">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=4f351ff342">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=4f351ff342">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=4f351ff342">
+<link rel="manifest" href="/manifest.webmanifest?v=6cd8b88fd9">
+<link rel="icon" href="/favicon.ico?v=6cd8b88fd9" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=6cd8b88fd9">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=6cd8b88fd9">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=6cd8b88fd9">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=6cd8b88fd9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=4f351ff342">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=6cd8b88fd9">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -757,6 +757,126 @@ body::after{background:var(--aura),radial-gradient(38vmax 38vmax at 50% -12%,rgb
  body:has(.run) .tabbar{display:none}
  .qnav{bottom:0}
 }
+/* ===== dokunma hedefi: en az 44×44 CSS px (görsel boyut gerektiğinde dolgu/arka plan kırpmasıyla korunur) ===== */
+.btn,.btn.sm,.btn.lg{min-height:44px}
+.btn.sm{min-width:44px;padding-top:5px;padding-bottom:5px}
+.tema-btn{min-width:44px;min-height:44px}
+.top-in .brand,.atl-top .brand{min-height:44px;min-width:44px}
+.nav a,.side .nav a{min-height:44px}
+.subtabs a{display:flex;align-items:center;justify-content:center;min-height:44px}
+.foot nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 6px}
+input.in,select.in,textarea.in{min-height:44px}
+.seg button,.segs button,.adm-tabs button{min-height:44px}
+.atl-ic{width:44px;height:44px}
+.atl-nav button,.atl-nav a,.atl-leg button{min-height:44px}
+.atl-link{display:inline-flex;align-items:center;min-height:44px}
+.hm-cells{gap:0}.hm-cells button{width:44px;height:44px;padding:11px;background-clip:content-box;border-radius:16px}
+label.check{min-height:44px;align-items:center}
+.check input[type=checkbox],.check input[type=radio]{width:22px;height:22px;flex:none}
+.side-info a{display:flex;align-items:center;min-height:44px;min-width:44px}
+.srow{min-height:44px;align-items:center}
+</style>
+
+<style>
+/* panel: Daha fazla */
+details.more{padding:0}
+details.more>summary{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:12px 18px;cursor:pointer;list-style:none;flex-wrap:wrap}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--ink3);border-bottom:2px solid var(--ink3);transform:rotate(45deg);margin-left:auto;transition:transform .2s}
+details.more[open]>summary::after{transform:rotate(-135deg)}
+details.more .more-b{display:flex;flex-direction:column;gap:14px;padding:0 14px 14px}
+.vitrin .arc{opacity:.45}
+</style>
+
+<style>
+/* ÖSYM kitapçığı tadında soru okuma */
+.qcard .qbody{padding:22px 22px 24px;max-width:760px}
+.qtext,.passage{font-family:"Source Serif 4",Georgia,"Times New Roman",serif}
+.qtext{font-size:18px;line-height:1.7;font-weight:500;color:var(--ink)}
+.passage{font-size:16.5px;line-height:1.8;background:transparent;border-left:3px solid var(--gold);border-radius:0;padding:4px 0 4px 16px;color:var(--ink2)}
+.opt{min-height:56px;align-items:center;padding:12px 14px;font-size:16px}
+.opt:focus-visible,.srow:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.qnav{gap:12px}
+.qnav .btn.pri{min-width:132px}
+.rprog i.cur{background:var(--gold)}
+@media (max-width:640px){.qcard .qbody{padding:16px 14px 20px}.qtext{font-size:17px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+details.more>summary{flex-wrap:nowrap}
+details.more>summary .small{display:none}
+@media (min-width:700px){details.more>summary .small{display:inline}}
+</style>
+<style>
+/* ===== Signature hareket katmanı ===== */
+:root{--aur-o:.9}
+:root[data-theme="dark"]{--aur-o:1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--aur-o:1}}
+#aur{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .9s ease;transform:translate3d(0,calc(var(--sy,0)*-.05px),0)}
+html:not(.fx-calm) #aur{opacity:var(--aur-o)}
+#aur i{position:absolute;border-radius:50%;width:78vmax;height:78vmax;will-change:transform}
+#aur i:nth-child(1){left:-30vmax;top:-34vmax;background:radial-gradient(circle,rgba(37,66,54,.46),transparent 64%)}
+#aur i:nth-child(2){right:-34vmax;top:18vh;background:radial-gradient(circle,rgba(197,165,114,.2),transparent 64%)}
+#aur i:nth-child(3){left:12vw;bottom:-46vmax;background:radial-gradient(circle,rgba(20,40,32,.28),transparent 64%)}
+html.fx-on:not(.fx-lite) #aur i:nth-child(1){animation:aurA 24s ease-in-out infinite alternate}
+html.fx-on:not(.fx-lite) #aur i:nth-child(2){animation:aurB 29s ease-in-out infinite alternate}
+html.fx-on:not(.fx-lite) #aur i:nth-child(3){animation:aurC 33s ease-in-out infinite alternate}
+@keyframes aurA{to{transform:translate3d(24vw,14vh,0) scale(1.18)}}
+@keyframes aurB{to{transform:translate3d(-20vw,-16vh,0) scale(1.14)}}
+@keyframes aurC{to{transform:translate3d(10vw,-8vh,0) scale(1.15)}}
+.shell,.view{position:relative}
+
+/* katmanlı belirme */
+html.fx-on .rvl{opacity:0;transform:translate3d(0,22px,0) scale(.985)}
+html.fx-on .rvl.rvi{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*70ms)}
+html.fx-on .rvl.nt{transition:none!important;transition-delay:0s!important}
+
+/* Merhaba kartı */
+.vitrin::before,.vitrin::after{content:"";position:absolute;inset:-25%;z-index:-1;pointer-events:none}
+.vitrin::before{background:radial-gradient(42% 52% at 28% 42%,rgba(37,66,54,.20),transparent 70%),radial-gradient(34% 46% at 78% 58%,rgba(197,165,114,.22),transparent 70%)}
+.vitrin::after{inset:0;background:radial-gradient(260px 180px at var(--mx,72%) var(--my,28%),rgba(241,223,182,.20),transparent 70%);opacity:.9}
+html.fx-on .vitrin::before{animation:vAur 16s ease-in-out infinite alternate}
+@keyframes vAur{from{transform:translate3d(-4%,-2%,0) scale(1)}to{transform:translate3d(5%,3%,0) scale(1.08)}}
+.vitrin .arc{transform:translate3d(0,calc(var(--sy,0)*.04px),0)}
+html:not(.fx-on) .arc-run{display:none}
+.arc-run{filter:drop-shadow(0 0 5px rgba(241,223,182,.9))}
+.vitrin h1,.vitrin p,.vitrin .btn{position:relative}
+
+/* butonlar: ışık geçişi, basılma, durumlar */
+.btn{transition:transform .16s ease,box-shadow .2s ease,filter .2s ease,border-color .2s ease,background-color .2s ease}
+.btn.pri{position:relative;overflow:hidden;isolation:isolate}
+.btn.pri::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.38) 50%,transparent 65%);transform:translateX(-120%);transition:transform .7s ease}
+.btn.pri:hover::after{transform:translateX(120%)}
+.btn.pri:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn:focus-visible,.nav a:focus-visible,.subtabs a:focus-visible,.seg button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn[aria-busy="true"],.btn.busy{pointer-events:none;color:transparent!important;position:relative}
+.btn[aria-busy="true"]::before,.btn.busy::before{content:"";position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid var(--on-pri);border-right-color:transparent;animation:btnSpin .7s linear infinite}
+@keyframes btnSpin{to{transform:rotate(360deg)}}
+.btn.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.btn.err{border-color:var(--bad);background:rgba(168,55,42,.08);color:var(--bad)}
+.btn.acc{box-shadow:inset 0 0 0 1px rgba(197,165,114,.35)}
+.btn.acc:hover{box-shadow:inset 0 0 0 1px var(--gold)}
+.btn.ghost:hover{box-shadow:inset 0 -2px 0 var(--gold)}
+
+/* şampanya altını: seçili/aktif ayrıntılar */
+.seg button.on{box-shadow:inset 0 -3px 0 var(--gold)}
+.subtabs a.on{box-shadow:inset 0 -3px 0 var(--gold)}
+.nav a.on{box-shadow:inset 3px 0 0 var(--gold),var(--shadow)}
+.nav a.on svg{color:var(--gold-ink)}
+.bar i{background:linear-gradient(90deg,#254236 0%,#3d6b57 70%,#c5a572 100%)}
+.card-h h2::before{content:"";display:inline-block;width:3px;height:.9em;margin-right:9px;border-radius:2px;background:var(--gold);vertical-align:-.1em}
+.rprog i.dn{background:var(--form)}
+html.fx-calm #aur i,html.fx-calm .vitrin::before{animation:none!important}
+@media (prefers-reduced-motion:reduce){#aur i,.vitrin::before,.arc-run,.btn.pri::after{animation:none!important;transition:none!important}.arc-run{display:none}}
+</style>
+<style>
+/* birincil = şampanya yüzey + obsidyen metin; ikincil = orman yeşili; küçük satır içi "pri" koyu antrasit kalır */
+.btn.pri,.btn.pri:hover,.btn.pri:active{background:var(--grad);color:var(--on-pri);border-color:transparent}
+.btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 8px 20px -12px rgba(111,90,47,.65)}
+.btn.pri:hover{filter:brightness(1.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 12px 24px -12px rgba(111,90,47,.75)}
+.btn.pri:active{filter:brightness(.96);box-shadow:inset 0 2px 5px rgba(111,90,47,.4)}
+.btn.pri.sm,.btn.pri.sm:hover,.btn.pri.sm:active{background:#30302b;color:#fff;filter:none}
+.btn.acc,:root[data-theme="dark"] .btn.acc{background:#254236;border-color:rgba(197,165,114,.45);color:#f5f1e8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.acc{background:#254236;border-color:rgba(197,165,114,.45);color:#f5f1e8}}
 </style>
 </head>
 <body>
@@ -7145,12 +7265,12 @@ const IC = {
 const LOGO_NO = 5;
 const LOGO_V = {
   5: id => `<svg viewBox="0 0 64 64"><path fill-rule="evenodd" fill="#b69a68" d="M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z"/></svg>`,
-  4: id => `<svg viewBox="0 0 512 512"><defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dcae"/><stop offset=".5" stop-color="#d4b06a"/><stop offset="1" stop-color="#a98440"/></linearGradient><radialGradient id="${id}k" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#5f9a80" stop-opacity=".55"/><stop offset="1" stop-color="#171715" stop-opacity=".7"/></radialGradient><radialGradient id="${id}c"><stop offset="0" stop-color="#fffbef"/><stop offset=".45" stop-color="#ffe3a6"/><stop offset="1" stop-color="#ffcb6b" stop-opacity="0"/></radialGradient></defs><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 1 196 0" fill="none" stroke="url(#${id}a)" stroke-width="24" stroke-linecap="round"/></g><circle cx="256" cy="256" r="124" fill="url(#${id}k)" stroke="rgba(255,255,255,.4)" stroke-width="8"/><circle cx="256" cy="256" r="58" fill="url(#${id}c)"/><g transform="translate(256 256) rotate(38)"><path d="M-150 0A150 52 0 0 0 150 0" fill="none" stroke="#f5f1e8" stroke-width="14" stroke-linecap="round"/></g><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 0 196 0" fill="none" stroke="url(#${id}a)" stroke-width="26" stroke-linecap="round"/><circle cx="196" cy="0" r="26" fill="#e8c98a"/></g></svg>`,
+  4: id => `<svg viewBox="0 0 512 512"><defs><linearGradient id="${id}r" gradientUnits="userSpaceOnUse" x1="-420" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#f1dfb6" stop-opacity="0"/><stop offset=".55" stop-color="#f1dfb6" stop-opacity=".95"/><stop offset="1" stop-color="#7fae96" stop-opacity="0"/><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="1700 0" dur="9s" repeatCount="indefinite"/></linearGradient><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dcae"/><stop offset=".5" stop-color="#d4b06a"/><stop offset="1" stop-color="#a98440"/></linearGradient><radialGradient id="${id}k" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#5f9a80" stop-opacity=".55"/><stop offset="1" stop-color="#171715" stop-opacity=".7"/></radialGradient><radialGradient id="${id}c"><stop offset="0" stop-color="#fffbef"/><stop offset=".45" stop-color="#ffe3a6"/><stop offset="1" stop-color="#ffcb6b" stop-opacity="0"/></radialGradient></defs><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 1 196 0" fill="none" stroke="url(#${id}a)" stroke-width="24" stroke-linecap="round"/></g><circle cx="256" cy="256" r="124" fill="url(#${id}k)" stroke="rgba(255,255,255,.4)" stroke-width="8"/><circle cx="256" cy="256" r="58" fill="url(#${id}c)"/><g transform="translate(256 256) rotate(38)"><path d="M-150 0A150 52 0 0 0 150 0" fill="none" stroke="#f5f1e8" stroke-width="14" stroke-linecap="round"/></g><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 0 196 0" fill="none" stroke="url(#${id}a)" stroke-width="26" stroke-linecap="round"/><circle cx="196" cy="0" r="26" fill="#e8c98a"/></g></svg>`,
   1: id => `<svg viewBox="0 0 48 48"><defs><linearGradient id="${id}l" x1="10" y1="38" x2="30" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f5f1e8"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><path d="M11.5 37C16.5 26 22.5 19.6 29.5 15.6" fill="none" stroke="url(#${id}l)" stroke-width="3.4" stroke-linecap="round"/><polygon points="33.20,6.80 35.49,12.24 41.38,12.74 36.91,16.61 38.25,22.36 33.20,19.30 28.15,22.36 29.49,16.61 25.02,12.74 30.91,12.24" fill="#fff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
   2: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path class="lg-egri" pathLength="1" d="M13.2 36.2 24 12.2l10.8 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-hale" cx="24" cy="28.6" r="8" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="28.6" r="3.7" fill="#b69a68"/></svg>`,
   3: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}f" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b69a68"/><stop offset=".55" stop-color="#254236"/><stop offset="1" stop-color="#30302b"/></radialGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#5f9a80" stop-opacity=".7"/><stop offset="1" stop-color="#5f9a80" stop-opacity="0"/></radialGradient></defs><circle class="lg-egri" cx="12.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-egri" cx="35.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-hale" cx="24" cy="24" r="13" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="24" r="7" fill="url(#${id}f)"/></svg>`
 };
-const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}${LOGO_NO === 4 ? "" : '<canvas class="lg-cv" width="128" height="128"></canvas>'}</span>`;
+const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}</span>`;
 const WORDMARK = `<b class="wm">AKE <span>Akademi</span></b>`;
 const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
 const NAVG = [
@@ -7218,7 +7338,7 @@ function aiBox(key, idle) {
 
 /* ---------- Çalışma alanım ---------- */
 const ARC_D = "M0 292 C 300 292, 540 246, 770 178 S 1070 46, 1200 22";
-const arcSVG = (id) => `<svg class="arc" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}a" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#254236" stop-opacity="0"/><stop offset=".25" stop-color="#254236"/><stop offset=".7" stop-color="#b69a68"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".2"/></linearGradient><filter id="${id}g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="7" opacity=".55" filter="url(#${id}g)" vector-effect="non-scaling-stroke"/><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+const arcSVG = (id) => `<svg class="arc" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}a" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#254236" stop-opacity="0"/><stop offset=".25" stop-color="#254236"/><stop offset=".7" stop-color="#b69a68"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".2"/></linearGradient><filter id="${id}g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="7" opacity=".55" filter="url(#${id}g)" vector-effect="non-scaling-stroke"/><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><path class="arc-run" d="${ARC_D}" fill="none" stroke="url(#${id}r)" stroke-width="3.4" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
 function netGelisimKart() {
   const L = S.exams.filter(e => typeof e.net === "number").slice(-10);
   if (L.length < 2) return "";
@@ -7231,7 +7351,7 @@ function netGelisimKart() {
 }
 function vHome() {
   const p = S.profile, goal = +p.gunluk || 40, today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
-  const prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
+  const ng = netGelisimKart(), prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
   const dateStr = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
   return `<div class="view">${resumeBanner()}
   <div class="home-head vitrin">${arcSVG("hv")}<div><h1>${p.name ? `Merhaba ${esc(p.name)}` : "Merhaba"}</h1><p class="muted">${esc(dateStr)} · YKS 2027'ye <b>${daysLeft()}</b> gün</p></div><a class="btn pri" href="#studyo">Soru çöz</a></div>
@@ -7240,17 +7360,20 @@ function vHome() {
     <div class="bar ${today.q >= goal ? "ok" : ""}"><i style="width:${Math.min(100, pct(today.q, goal))}%"></i></div>
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
-    <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
-  ${netGelisimKart()}${kartGunSorusu()}${kartKoc()}${veriUyari()}${canliKart(true)}${ligMini()}
-  <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
-    <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
-  <div class="grid2">
-    <section class="card"><div class="card-h"><h2>Son deneme</h2>${last ? `<button class="btn sm ghost" data-a="openResult" data-id="${last.id}">Sonucu aç</button>` : ""}</div>
-      ${last ? `<div class="row" style="gap:22px"><div class="net-big"><b class="num">${nfx(last.net)}</b><span class="muted">net</span></div><div class="stack" style="gap:4px"><b>${esc(last.title)}</b><span class="small muted">${fmtDate(last.date)} · ${last.d} doğru, ${last.y} yanlış, ${last.b} boş</span></div></div>` : `<div class="empty">Henüz deneme çözmedin.<div style="margin-top:10px"><button class="btn sm pri" data-a="quick" data-k="mini">Mini deneme başlat</button></div></div>`}</section>
+    </section>
+  ${veriUyari()}
+  <div class="${ng ? "grid2" : ""}">${ng}
     <section class="card"><div class="card-h"><h2>Zayıf konuların</h2><a class="btn sm ghost" href="#gelisim">Gelişimim</a></div>
       ${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : "warn"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çöz</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözdükçe en çok zorlandığın konular burada listelenir.</div>`}</section>
   </div>
+  <details class="card more"><summary><b>Daha fazla</b><span class="small muted">Günün sorusu, koç, ders seçimi, son deneme, istatistikler</span></summary><div class="more-b">
+  ${kartGunSorusu()}${kartKoc()}${canliKart(true)}${ligMini()}
+  <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
+    <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
+    <section class="card"><div class="card-h"><h2>Son deneme</h2>${last ? `<button class="btn sm ghost" data-a="openResult" data-id="${last.id}">Sonucu aç</button>` : ""}</div>
+      ${last ? `<div class="row" style="gap:22px"><div class="net-big"><b class="num">${nfx(last.net)}</b><span class="muted">net</span></div><div class="stack" style="gap:4px"><b>${esc(last.title)}</b><span class="small muted">${fmtDate(last.date)} · ${last.d} doğru, ${last.y} yanlış, ${last.b} boş</span></div></div>` : `<div class="empty">Henüz deneme çözmedin.<div style="margin-top:10px"><button class="btn sm pri" data-a="quick" data-k="mini">Mini deneme başlat</button></div></div>`}</section>
   <div class="tiles">${tile(tot.q, "çözülen soru")}${tile("%" + pct(tot.c, tot.q), "genel doğruluk")}${tile(streak(), "günlük seri")}${tile(S.exams.length, "deneme")}</div>
+  </div></details>
   </div>`;
 }
 function taskRow(t) {
@@ -9861,6 +9984,7 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
   var lgc = null, L = null;
   function lgKur() { if (lgc) return; lgc = document.createElement("canvas"); lgc.width = lgc.height = 128; L = mk(lgc, LG, { alpha: true, premultipliedAlpha: false, antialias: true, preserveDrawingBuffer: true }); }
   function logolar(T) {
+    return; /* eski yıldız logosu: Eşik K artık yalnızca SVG */
     var list = document.querySelectorAll("canvas.lg-cv"); if (!list.length) return;
     if (!lgc) lgKur(); if (!L) return;
     var g = L.gl; g.viewport(0, 0, 128, 128); g.clearColor(0, 0, 0, 0); g.clear(g.COLOR_BUFFER_BIT);
@@ -9890,7 +10014,7 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
   }
   function baslat() {
     if (OTO) return;
-    bgKur(); lgKur();
+    bgKur();
     if (RM) { setInterval(function () { dongu(performance.now()); }, 700); dongu(performance.now()); } else requestAnimationFrame(dongu);
   }
   /* --- eğim: telefonu oynatınca yansıma kayar --- */
@@ -9946,6 +10070,37 @@ void main(){vec2 p=(gl_FragCoord.xy/R-.5)*2.*1.05;float s=ss(p);float e=.006;
     setTimeout(function () { bit = true; R.kill(); d.remove(); }, 2400);
   }
   return { baslat: baslat, giris: giris, egim: egim, pop: pop, kick: function () { }, koyu: koyu };
+})();
+/* Hareket katmanı: canlı aurora, katmanlı kaydırma, Merhaba kartı ışığı. Soru çözme ve odak sayfalarında kapalıdır. */
+const HRK = (() => {
+  const RM = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const lite = RM || !!(navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 3);
+  const CALM = { studyo: 1, banka: 1, paragraf: 1, deneme: 1, yanlislar: 1, kartlar: 1, sonuc: 1, canli: 1, ogretmen: 1, kisa: 1, osym: 1, uret: 1, tanitim: 1 };
+  let aur = null, last = null, io = null, tick = false, safety = 0;
+  const root = document.documentElement;
+  function ensure() { if (aur) return; aur = document.createElement("div"); aur.id = "aur"; aur.setAttribute("aria-hidden", "true"); aur.innerHTML = "<i></i><i></i><i></i>"; document.body.insertBefore(aur, document.body.firstChild); }
+  function sync(r, inRun) {
+    try {
+      ensure();
+      const calm = !!inRun || !!CALM[r];
+      root.classList.toggle("fx-calm", calm); root.classList.toggle("fx-lite", !!lite); root.classList.toggle("fx-on", !RM && !calm);
+      if (io) { io.disconnect(); io = null; } clearTimeout(safety);
+      if (calm || RM) { last = null; return; }
+      const els = Array.prototype.slice.call(document.querySelectorAll("#main .view > .card, #main .view > section, #main .view > .vhead, #main .view > .grid2 > *, #main .view > .tiles > *, #main .plans > *"));
+      const fresh = last !== r; last = r;
+      if (!fresh || !("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("rvl", "rvi", "nt")); return; }
+      io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("rvi"); io.unobserve(x.target); } }), { rootMargin: "0px 0px -6% 0px", threshold: .04 });
+      els.forEach((e, i) => { e.classList.add("rvl"); e.style.setProperty("--i", Math.min(i, 5)); io.observe(e); });
+      safety = setTimeout(() => els.forEach(e => e.classList.add("rvi")), 1600);
+    } catch (e) { }
+  }
+  addEventListener("scroll", () => { if (tick || !root.classList.contains("fx-on") || lite) return; tick = true; requestAnimationFrame(() => { tick = false; root.style.setProperty("--sy", Math.min(window.scrollY, 1600)); }); }, { passive: true });
+  addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse" || !root.classList.contains("fx-on")) return;
+    const v = e.target.closest && e.target.closest(".vitrin"); if (!v) return;
+    const b = v.getBoundingClientRect(); v.style.setProperty("--mx", ((e.clientX - b.left) / b.width * 100).toFixed(1) + "%"); v.style.setProperty("--my", ((e.clientY - b.top) / b.height * 100).toFixed(1) + "%");
+  }, { passive: true });
+  return { sync };
 })();
 /* ===== Sık sorulan sorular ve geri bildirim formu ===== */
 var SSS = [
@@ -10323,7 +10478,7 @@ const ATL_CSS = `
 .atl-nav button,.atl-nav a{border:0;background:none;color:var(--ink2);font:500 14.5px/1 var(--f-body);padding:10px 12px;border-radius:8px;cursor:pointer;transition:color var(--t-btn) var(--ease),background var(--t-btn) var(--ease)}
 .atl-nav button:hover,.atl-nav a:hover{color:var(--ink);background:var(--sunk)}
 .atl-act{margin-left:auto;display:flex;align-items:center;gap:8px}
-.atl-ic{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink2);display:grid;place-items:center;cursor:pointer;transition:color var(--t-btn) var(--ease),border-color var(--t-btn) var(--ease)}
+.atl-ic{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink2);display:grid;place-items:center;cursor:pointer;transition:color var(--t-btn) var(--ease),border-color var(--t-btn) var(--ease)}
 .atl-ic:hover{color:var(--ink);border-color:var(--ink3)}
 .atl-ic svg{width:18px;height:18px}
 .atl-b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;font:600 15px/1 var(--f-body);border:1px solid var(--line);color:var(--ink);background:var(--card);cursor:pointer;white-space:nowrap;transition:transform var(--t-btn) var(--ease),background var(--t-btn) var(--ease),border-color var(--t-btn) var(--ease),box-shadow var(--t-btn) var(--ease)}
@@ -10360,7 +10515,7 @@ const ATL_CSS = `
 .atl-tip b{display:block;font-weight:600}
 .atl-tip span{color:var(--ink2);font-size:12.5px}
 .atl-leg{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.atl-leg button{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:500 13px/1 var(--f-body);cursor:pointer;transition:border-color var(--t-btn) var(--ease),background var(--t-btn) var(--ease)}
+.atl-leg button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:500 13px/1 var(--f-body);cursor:pointer;transition:border-color var(--t-btn) var(--ease),background var(--t-btn) var(--ease)}
 .atl-leg button:hover,.atl-leg button:focus-visible{border-color:var(--form);background:var(--form-soft)}
 .atl-leg i{width:7px;height:7px;border-radius:50%;background:var(--c)}
 .atl-leg small{color:var(--ink3);font:500 11.5px/1 var(--f-mono)}
@@ -10457,10 +10612,10 @@ const ATL_CSS = `
 .atl-end .atl-cta{justify-content:center}
 .atl-ft{border-top:1px solid var(--line);padding:28px 0 calc(28px + env(safe-area-inset-bottom,0px));color:var(--ink3);font-size:13.5px}
 .atl-ft .atl-w{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between}
-.atl-ft nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+.atl-ft nav{display:flex;flex-wrap:wrap;gap:0 14px}.atl-ft nav a{display:inline-flex;align-items:center;min-height:44px;min-width:44px}.atl-ft .ctl button,.atl .ctl button{min-height:44px}
 .atl-ft nav a:hover{color:var(--ink)}
 .atl-ft .ctl{display:flex;gap:8px;flex-wrap:wrap}
-.atl-ft .ctl button{min-height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink2);font:500 13px/1 var(--f-body);cursor:pointer}
+.atl-ft .ctl button{min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink2);font:500 13px/1 var(--f-body);cursor:pointer}
 .atl-ft .ctl button:hover{color:var(--ink);border-color:var(--ink3)}
 .atl-ft p{width:100%;font-size:12.5px}
 /* belirme (yalnızca hareket açıkken) */
@@ -11082,6 +11237,7 @@ function render() {
   if (aid) { const el = document.getElementById(aid); if (el && el !== document.activeElement) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) { } } }
   const ci = document.getElementById("chatIn"); if (ci) { ci.style.height = "auto"; ci.style.height = Math.min(160, ci.scrollHeight) + "px"; }
   if (UI.scrollChat) { UI.scrollChat = false; const c = document.getElementById("chat"); if (c) c.lastElementChild && c.lastElementChild.scrollIntoView({ block: "end" }); }
+  HRK.sync(r, !!(RUN && UI.inRun));
   presSoon();
 }
 const go = h => { if (location.hash === "#" + h) render(); else location.hash = "#" + h; };

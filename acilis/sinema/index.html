@@ -2,7 +2,17 @@
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#171715"><title>AKE Akademi açılışı</title>
 <link rel="stylesheet" href="../ortak/ortak.css">
 <script type="importmap">{"imports":{"three":"../vendor/three.module.min.js"}}</script>
-<style>html,body{overflow:hidden;background:#171715}.gecis{height:0!important}.ust{display:none}</style></head>
+<style>html,body{overflow:hidden;background:#171715}.gecis{height:0!important}.ust{display:none}.marka-final{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(60% 55% at 50% 46%,#1f3a2f 0%,#171715 72%);opacity:0;transition:opacity .45s ease}
+.marka-final.on{opacity:1}
+.mf-in{display:flex;flex-direction:column;align-items:center;gap:18px;transform:scale(.94);opacity:0;transition:transform 1.6s cubic-bezier(.2,.7,.2,1),opacity 1s ease .25s}
+.marka-final.on .mf-in{transform:none;opacity:1}
+.mf-logo{width:clamp(92px,22vmin,150px);height:auto;filter:drop-shadow(0 0 22px rgba(197,165,114,.28))}
+.mf-edge{stroke-dasharray:16 84;stroke-dashoffset:0;animation:mfEdge 2.2s linear .3s 1 both;opacity:.95;filter:drop-shadow(0 0 2px #f1dfb6)}
+@keyframes mfEdge{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+.mf-wm{font:700 clamp(20px,4.6vmin,28px)/1 "AKE Sans",system-ui,sans-serif;color:#f5f1e8;letter-spacing:.01em;opacity:0;animation:mfW .9s ease .9s forwards}
+.mf-wm span{font-weight:500;color:#c5a572}
+@keyframes mfW{to{opacity:1}}
+</style></head>
 <body><canvas id="sahne" aria-hidden="true"></canvas>
 <header class="ust" aria-hidden="true"></header>
 <button type="button" class="atla">Animasyonu geç</button>

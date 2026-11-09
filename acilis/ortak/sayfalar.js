@@ -44,14 +44,34 @@ export function sayfaCiz(c, [ust, baslik, satir, tur], fontHazir) {
 
 
 /* Yolculuğun son sayfası: çalışma ekranının başlığıyla aynı yazı. Kamera yaklaşınca gerçek arayüze dönüşür. */
+/* Son sayfa: gerçek uygulamanın ilk açılış ekranı (üst çubuk + "Seni tanıyalım" kartı + "Bugünün programı").
+   Renkler, yazı tipi ve metinler gerçek arayüzle aynıdır; uydurma sayı yok. İlerleme: orman yeşili. */
+const ESIK_K = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
+function yk(x, X, Y, W, H, R) { x.beginPath(); x.roundRect ? x.roundRect(X, Y, W, H, R) : x.rect(X, Y, W, H); }
 export function sonSayfaCiz(c, fontHazir) {
   const x = c.getContext("2d"), W = c.width, H = c.height, F = fontHazir ? '"AKE Sans"' : "system-ui,sans-serif";
   x.fillStyle = "#F5F1E8"; x.fillRect(0, 0, W, H);
-  x.fillStyle = "#6F5A2F"; x.font = `700 22px ${F}`; x.fillText("BUGÜN", 52, 92);
-  x.fillStyle = "#1c1b18"; x.font = `700 54px ${F}`;
-  ["Bugün 40 soru", "hedefin var.", "26'sını çözdün."].forEach((t, i) => x.fillText(t, 52, 190 + i * 70));
-  x.fillStyle = "#D8D0C2"; x.fillRect(52, 440, 408, 14); x.fillStyle = "#1c1b18"; x.fillRect(52, 440, 408 * .65, 14);
-  x.fillStyle = "#4b483f"; x.font = `400 26px ${F}`; x.fillText("26 / 40 soru", 52, 500);
-  x.fillStyle = "#B69A68"; x.beginPath(); x.roundRect ? x.roundRect(52, 560, 250, 70, 14) : x.rect(52, 560, 250, 70); x.fill();
-  x.fillStyle = "#171715"; x.font = `700 27px ${F}`; x.fillText("Devam et", 112, 604);
+  /* üst çubuk */
+  x.fillStyle = "#FBF8F1"; x.fillRect(0, 0, W, 76); x.fillStyle = "#E6DFD1"; x.fillRect(0, 76, W, 2);
+  yk(x, 28, 18, 40, 40, 11); x.fillStyle = "#171715"; x.fill();
+  x.save(); x.translate(28 + 20 - 32 * .44, 18 + 20 - 33 * .44); x.scale(.44, .44); x.fillStyle = "#B69A68"; x.fill(new Path2D(ESIK_K), "evenodd"); x.restore();
+  x.fillStyle = "#1C1B18"; x.textBaseline = "alphabetic"; x.font = `700 26px ${F}`; x.fillText("AKE", 78, 48); const wA = x.measureText("AKE ").width;
+  x.font = `500 26px ${F}`; x.fillText("Akademi", 78 + wA, 48);
+  /* kart: Seni tanıyalım */
+  const X0 = 28, CW = W - 56; yk(x, X0, 108, CW, 360, 14); x.fillStyle = "#FBF8F1"; x.fill(); x.strokeStyle = "#D8D0C2"; x.lineWidth = 2; x.stroke();
+  x.fillStyle = "#1C1B18"; x.font = `700 30px ${F}`; x.fillText("Seni tanıyalım", X0 + 24, 166);
+  [[0, "#254236"], [1, "#E6DFD1"], [2, "#E6DFD1"]].forEach(([i, col]) => { yk(x, X0 + CW - 24 - 3 * 34 + i * 36, 150, 30, 7, 4); x.fillStyle = col; x.fill(); });
+  x.fillStyle = "#4B483F"; x.font = `700 17px ${F}`; x.fillText("Adın", X0 + 24, 212);
+  yk(x, X0 + 24, 226, CW - 48, 56, 10); x.strokeStyle = "#D8D0C2"; x.stroke(); x.fillStyle = "#66625A"; x.font = `400 21px ${F}`; x.fillText("Adını yaz", X0 + 40, 262);
+  x.fillStyle = "#1C1B18"; x.font = `500 22px ${F}`; x.fillText("Alanın", X0 + 24, 322);
+  let px = X0 + 24, py = 340; x.font = `700 19px ${F}`;
+  [["Sayısal", 1], ["Eşit Ağırlık", 0], ["Sözel", 0]].forEach(([t, on]) => { const w = x.measureText(t).width + 44; yk(x, px, py, w, 46, 23);
+    if (on) { x.fillStyle = "#254236"; x.fill(); x.fillStyle = "#F5F1E8"; } else { x.fillStyle = "#FBF8F1"; x.fill(); x.strokeStyle = "#D8D0C2"; x.stroke(); x.fillStyle = "#1C1B18"; }
+    x.fillText(t, px + 22, py + 31); px += w + 10; });
+  yk(x, X0 + 24, 400, 126, 50, 10); x.fillStyle = "#30302B"; x.fill(); x.fillStyle = "#F5F1E8"; x.font = `700 20px ${F}`; x.fillText("Devam", X0 + 24 + 34, 432);
+  /* kart: Bugünün programı */
+  yk(x, X0, 492, CW, 260, 14); x.fillStyle = "#FBF8F1"; x.fill(); x.strokeStyle = "#D8D0C2"; x.stroke();
+  x.fillStyle = "#1C1B18"; x.font = `700 26px ${F}`; x.fillText("Bugünün programı", X0 + 24, 544);
+  x.fillStyle = "#4B483F"; x.font = `500 17px ${F}`; x.textAlign = "right"; x.fillText("0/4 tamam", X0 + CW - 24, 542); x.textAlign = "left";
+  yk(x, X0 + 24, 566, CW - 48, 12, 6); x.fillStyle = "#EDE7DA"; x.fill();
 }

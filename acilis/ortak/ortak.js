@@ -78,15 +78,23 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   /* açılış */
   let acilisBasi = 0, acilisT = 0, oynuyor = false;
   const anahtar = "ake.acilis." + kavram;
-  function acilisBitir(kaydet) {
+  /* marka finali: Eşik K belirir, kenarında şampanya ışığı dolaşır, sonra gerçek siteye geçilir (yalnızca ?sinema) */
+  function markaFinali(bitir) {
+    const m = document.createElement("div"); m.className = "marka-final"; m.setAttribute("aria-hidden", "true");
+    const d = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
+    m.innerHTML = `<div class="mf-in"><svg class="mf-logo" viewBox="0 0 64 64"><defs><linearGradient id="mfg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="0" y2="40"><stop offset="0" stop-color="#b69a68"/><stop offset=".5" stop-color="#f1dfb6"/><stop offset="1" stop-color="#b69a68"/><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="110 0" dur="1.9s" begin="0.5s" fill="freeze"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#mfg)" d="${d}"/><path class="mf-edge" fill="none" stroke="#f1dfb6" stroke-width=".9" stroke-linejoin="round" pathLength="100" d="${d}"/></svg><b class="mf-wm">AKE <span>Akademi</span></b></div>`;
+    document.body.appendChild(m); void m.offsetWidth; m.classList.add("on");
+    setTimeout(bitir, 2500);
+  }
+  function acilisBitir(kaydet, hizli) {
     oynuyor = false; D.classList.remove("oynuyor", "kilit"); setTimeout(() => kutu && kutu.classList.add("serbest"), 1000); durum.g = 1; if (kaydet !== false && !sinema) depo(anahtar, "goruldu");
-    haber("acilis-bitti");
+    if (sinema && !azHareket && !hizli) markaFinali(() => haber("acilis-bitti")); else haber("acilis-bitti");
     if (yolculuk && !azHareket && !sinema) { calismayaGit(); const c = $("#calisma"); if (c) { c.classList.add("gir"); setTimeout(() => c.classList.remove("gir"), 1200); } }
     ciz();
   }
   function acilisOyna() { if (azHareket) { acilisBitir(false); return; } durum.g = 0; acilisBasi = 0; acilisT = 0; oynuyor = true; D.classList.add("oynuyor"); if (yolculuk) D.classList.add("kilit"); scrollTo({ top: 0, behavior: "instant" }); calistir(); }
-  atla.addEventListener("click", () => acilisBitir());
-  addEventListener("keydown", e => { if (e.key === "Escape" && oynuyor) acilisBitir(); });
+  atla.addEventListener("click", () => acilisBitir(undefined, true));
+  addEventListener("keydown", e => { if (e.key === "Escape" && oynuyor) acilisBitir(undefined, true); });
   const tekrar = $("#tekrar"); if (tekrar) tekrar.addEventListener("click", acilisOyna);
   const hb = $("#hareket");
   if (hb) { hb.textContent = azHareket ? "Hareketi aç" : "Hareketi kapat"; hb.addEventListener("click", () => { depo("ake.hareket", azHareket ? "acik" : "kapali"); location.reload(); }); }

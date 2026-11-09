@@ -2,8 +2,6 @@
   Cache-Control: no-cache
 /ayar.js
   Cache-Control: no-cache
-/sorular/*
-  Cache-Control: no-cache
 /icons/*
   Cache-Control: public, max-age=86400
 /og.png

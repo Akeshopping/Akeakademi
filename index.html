@@ -6,9 +6,11 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=1ce6d03bfc">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=1ce6d03bfc">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=1ce6d03bfc">
+<link rel="manifest" href="/manifest.webmanifest?v=aa7c549522">
+<link rel="icon" href="/favicon.ico?v=aa7c549522" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=aa7c549522">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=aa7c549522">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=aa7c549522">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -16,7 +18,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=1ce6d03bfc">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=aa7c549522">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -710,6 +712,27 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.012em}
 }
 @media (max-width:899px){.qnav{position:sticky;bottom:0;background:var(--paper);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));z-index:15}}
 @media (max-width:899px){.runbar [data-a="flag"]{display:none}}
+
+/* Üst gezinme çubuğu (masaüstü): yan menü yerine üstte */
+@media (min-width:900px){
+ .shell{grid-template-columns:minmax(0,1fr);gap:0;max-width:1240px}
+ .side{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:30;display:flex;align-items:center;gap:2px;padding:6px 0;max-height:none;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;border-radius:0;box-shadow:0 1px 0 var(--glass-line);background:var(--paper)}
+ .side::-webkit-scrollbar{display:none}
+ .side h4,.side-pro,.side-info{display:none}
+ .side .nav{display:flex;gap:2px;flex:none}
+ .side .nav a{white-space:nowrap;padding:9px 12px;border-radius:9px;font-size:14px}
+ .side .nav a.on{background:transparent;box-shadow:inset 0 -3px 0 var(--c1);border-radius:9px 9px 0 0;color:var(--ink);font-weight:650}
+ #main{width:100%;max-width:none;padding-top:18px}
+ .side .nav a[href="#hakkimizda"],.side .nav a[href="#yasal"]{display:none}
+ .side .nav a{padding:9px 9px;gap:7px;font-size:13.5px}
+ .side{gap:0}
+ .shell:has(.run) .side{display:none}
+ .shell:has(.run) #main{max-width:1100px;margin-inline:auto}
+ .run>.runbar{top:calc(58px + env(safe-area-inset-top,0px))}
+}
+.adm-tabs{padding-bottom:0;border-bottom:1px solid var(--line)}
+.adm-tabs button{border:0;border-radius:9px 9px 0 0;background:transparent;box-shadow:none}
+.adm-tabs button.on{background:transparent;color:var(--ink);box-shadow:inset 0 -3px 0 var(--c1)}
 </style>
 </head>
 <body>

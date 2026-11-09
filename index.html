@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=e69d5c42e8">
-<link rel="icon" href="/favicon.ico?v=e69d5c42e8" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=e69d5c42e8">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e69d5c42e8">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=e69d5c42e8">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=e69d5c42e8">
+<link rel="manifest" href="/manifest.webmanifest?v=0abe0b0fa2">
+<link rel="icon" href="/favicon.ico?v=0abe0b0fa2" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=0abe0b0fa2">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=0abe0b0fa2">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=0abe0b0fa2">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=0abe0b0fa2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=e69d5c42e8">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=0abe0b0fa2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -1009,6 +1009,39 @@ html.fx-m #aur i:nth-child(3),html.fx-m #aur::after{display:none}
 @media (prefers-reduced-motion:reduce){#aur b::before,#aur b::after{animation:none!important}.lyr{animation:none!important;opacity:1!important;transform:none!important}.vitrin::after{animation:none!important}.btn{transition:none!important}}
 html.fx-calm #aur b::before,html.fx-calm #aur b::after,html.fx-busy #aur b::before,html.fx-busy #aur b::after{animation-play-state:paused!important}
 html.fx-calm .lyr{animation:none!important;opacity:1!important;transform:none!important}
+</style>
+<style>
+/* ===== FINAL: Seni tanıyalım / Bugünün programı / Zayıf konuların rafinesi ===== */
+/* Seni tanıyalım */
+.ob{gap:18px;padding:22px 24px}
+.ob .card-h h2{font-size:21px;letter-spacing:-.012em}
+.ob-nokta{align-items:center;gap:6px}.ob-nokta small{font:600 12px var(--f-body,inherit);letter-spacing:.04em;color:var(--ink2);margin-right:6px;text-transform:uppercase}
+.ob-nokta i{width:30px;height:4px;border-radius:4px;background:var(--line2);transition:background-color .3s var(--ease)}.ob-nokta i.on{background:var(--form)}.ob-nokta i.cur{background:#b69a68;box-shadow:0 0 8px rgba(197,165,114,.55)}
+.ob .f{display:flex;flex-direction:column;gap:8px;font:600 13px var(--f-body,inherit);letter-spacing:.02em;color:var(--ink2)}
+.ob .f > span{font-size:13px;font-weight:600;color:var(--ink2)}
+.ob .in{height:50px;font:500 16px var(--f-body,inherit);color:var(--ink);padding:0 16px;border-radius:12px;background:#fffdf8}
+.ob .ob-chips{margin-top:0;gap:10px}.ob-chip{padding:0 18px;font-size:15px}
+.ob-chip.on{box-shadow:inset 0 0 0 1px rgba(197,165,114,.55),0 6px 14px -8px rgba(37,66,54,.7)}
+.ob .row{margin-top:2px;gap:10px}.ob .row .btn.pri{min-width:132px;min-height:48px}
+@media (max-width:640px){.ob{padding:18px 16px}.ob .row .btn.pri{flex:1}}
+/* Bugünün programı */
+.today .card-h .small{display:inline-flex;padding:4px 10px;border-radius:999px;background:rgba(37,66,54,.08);color:var(--form);font-weight:600}
+.today .bar{height:8px;border-radius:8px;margin:6px 0 10px}
+.today .tasks{gap:2px;margin-top:6px}
+.gtask{padding:12px 10px;margin:0 -10px;border-bottom:0;border-radius:12px;gap:14px;transition:background-color .2s var(--ease)}
+.gtask + .gtask{box-shadow:0 -1px 0 var(--line2)}
+@media (hover:hover){.gtask:not(.done):hover{background:rgba(37,66,54,.045)}}
+.gtask .ck{width:24px;height:24px;border-width:1.6px}
+.gtask .t{font-size:15.5px;letter-spacing:-.005em}.gtask .s{margin-top:2px}
+.tasks > .gtask:not(.done):first-child,.tasks > .gtask.done + .gtask:not(.done){background:linear-gradient(90deg,rgba(197,165,114,.16),rgba(197,165,114,.04));box-shadow:inset 3px 0 0 #b69a68}
+.tasks > .gtask:not(.done):first-child .ck,.tasks > .gtask.done + .gtask:not(.done) .ck{border-color:#b69a68;box-shadow:0 0 0 3px rgba(197,165,114,.22)}
+.gtask .btn.sm{min-width:64px}
+/* Zayıf konuların */
+.wbar{height:5px;border-radius:5px;background:var(--line2);margin-top:7px;max-width:220px;overflow:hidden}.wbar i{display:block;height:100%;border-radius:5px;background:#b9873a}.wbar.bad i{background:#b4503f}
+.card .li .t{font-weight:600}
+.card .empty{padding:20px;border-radius:14px;background:linear-gradient(180deg,rgba(37,66,54,.04),transparent);border:1px dashed var(--line);color:var(--ink2);text-align:center;line-height:1.55}
+/* mobil: aurora perdesi sabit, animasyon yok */
+html.fx-m #aur b::after,html.fx-m #aur b::before{animation:none!important}
 </style>
 </head>
 <body>
@@ -7496,7 +7529,7 @@ function vHome() {
   ${veriUyari()}
   <div class="${ng ? "grid2" : ""}">${ng}
     <section class="card"><div class="card-h"><h2>Zayıf konuların</h2><a class="btn sm ghost" href="#gelisim">Gelişimim</a></div>
-      ${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : "warn"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çöz</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözdükçe en çok zorlandığın konular burada listelenir.</div>`}</section>
+      ${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div><div class="wbar ${w.acc < 50 ? "bad" : "warn"}" aria-hidden="true"><i style="width:${Math.max(4, Math.min(100, w.acc))}%"></i></div></div><span class="pill ${w.acc < 50 ? "bad" : "warn"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çöz</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözdükçe en çok zorlandığın konular burada listelenir.</div>`}</section>
   </div>
   <details class="card more"><summary><b>Daha fazla</b><span class="small muted">Günün sorusu, koç, ders seçimi, son deneme, istatistikler</span></summary><div class="more-b">
   ${kartGunSorusu()}${kartKoc()}${canliKart(true)}${ligMini()}
@@ -7772,7 +7805,7 @@ function vProgress() {
   <div class="card"><div class="card-h"><h2>Son 14 gün</h2><span class="small muted">günlük çözülen soru</span></div>${barChart(days)}</div>
   <div class="grid2">
     <div class="card"><h2 style="margin-bottom:10px">Ders bazında doğruluk</h2>${subs.length ? subs.map(x => `<div class="hbar"><span>${esc(SUBJ[x.s].n)}</span><span class="tr"><i style="width:${x.acc}%;background:${x.acc >= 70 ? "var(--ok)" : x.acc >= 50 ? "var(--warn)" : "var(--bad)"}"></i></span><span class="v">%${x.acc}</span></div>`).join("") : `<div class="empty">Henüz veri yok.</div>`}</div>
-    <div class="card"><h2 style="margin-bottom:10px">Öncelikli konular</h2>${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div></div><span class="pill ${w.acc < 50 ? "bad" : w.acc < 70 ? "warn" : "ok"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözünce sıralama oluşur.</div>`}</div>
+    <div class="card"><h2 style="margin-bottom:10px">Öncelikli konular</h2>${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div><div class="wbar ${w.acc < 50 ? "bad" : "warn"}" aria-hidden="true"><i style="width:${Math.max(4, Math.min(100, w.acc))}%"></i></div></div><span class="pill ${w.acc < 50 ? "bad" : w.acc < 70 ? "warn" : "ok"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözünce sıralama oluşur.</div>`}</div>
   </div>${rozetKart()}${yolHaritasi()}${netTahminKart()}
   ${isiHaritasi()}
   ${veliRaporKart()}
@@ -9981,7 +10014,7 @@ function obKart(goal) {
       <div class="f"><span>Alanın</span><div class="ob-chips">${Object.entries(ALAN).map(([k, v]) => chip("obSec", "alan", k, v, alan === k)).join("")}</div></div>`
     : A === 2 ? `<div class="f"><span>Hedef YKS puanın ne? <small class="muted">(sonra değiştirebilirsin)</small></span><div class="ob-chips">${[350, 400, 450, 480].map(v => chip("obSec", "hedef", v, v, OB.hedef === v)).join("")}${chip("obSec", "hedef", 0, "Bilmiyorum", !OB.hedef)}</div></div><p class="small muted" style="margin:0">Hedefine göre her ders için kaç net gerektiğini Gelişimim sayfasında göstereceğiz.</p>`
     : `<div class="f"><span>Günde kaç soru çözmek istersin?</span><div class="ob-chips">${[20, 40, 60, 100].map(v => chip("obSec", "gunluk", v, v + " soru", gun === v)).join("")}</div></div><p class="small muted" style="margin:0">Alışkanlık oluşturmak için küçük başla; hedefi istediğin zaman değiştirebilirsin.</p>`;
-  return `<div class="card stack ob"><div class="card-h" style="margin:0"><h2>${A === 1 ? "Seni tanıyalım" : A === 2 ? "Hedefin ne?" : "Günlük hedefin"}</h2><span class="ob-nokta">${[1, 2, 3].map(i => `<i class="${i <= A ? "on" : ""}"></i>`).join("")}</span></div>
+  return `<div class="card stack ob"><div class="card-h" style="margin:0"><h2>${A === 1 ? "Seni tanıyalım" : A === 2 ? "Hedefin ne?" : "Günlük hedefin"}</h2><span class="ob-nokta"><small>Adım ${A}/3</small>${[1, 2, 3].map(i => `<i class="${i < A ? "on" : i === A ? "on cur" : ""}"></i>`).join("")}</span></div>
     ${govde}<div class="row">${A > 1 ? `<button type="button" class="btn ghost" data-a="obAdim" data-v="-1">Geri</button>` : ""}<button type="button" class="btn pri" data-a="obAdim" data-v="1">${A === 3 ? "Başla" : "Devam"}</button></div></div>`;
 }
 Object.assign(KART_ACT, {
@@ -10222,7 +10255,9 @@ const HRK = (() => {
       root.classList.toggle("fx-calm", calm); root.classList.toggle("fx-lite", !!lite); root.classList.toggle("fx-on", !RM && !calm); root.classList.toggle("fx-home", r === "bugun");
       if (io) { io.disconnect(); io = null; } clearTimeout(safety);
       if (calm || RM) { last = null; return; }
-      const els = Array.prototype.slice.call(document.querySelectorAll("#main .view > .card, #main .view > section, #main .view > .vhead, #main .view > .grid2 > *, #main .view > .tiles > *, #main .plans > *"));
+      /* katmanlı geçiş yalnızca 2-3 önemli bölümde: ana sayfada program, zayıf konular, "Daha fazla"; diğer sayfalarda ilk ekranın altındaki ilk 2 blok */
+      const els = r === "bugun" ? Array.prototype.slice.call(document.querySelectorAll("#main .view > .card.today, #main .view > div > section.card, #main .view > details.more"))
+        : Array.prototype.slice.call(document.querySelectorAll("#main .view > .card, #main .view > section, #main .view > .grid2 > *")).slice(1, 3);
       const fresh = last !== r; last = r;
       if (SD && !lite) { els.forEach((e, i) => { e.classList.remove("rvl", "rvi", "nt"); e.classList.add("lyr"); e.style.setProperty("--i", Math.min(i, 5)); }); return; }
       if (!fresh || !("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("rvl", "rvi", "nt")); return; }

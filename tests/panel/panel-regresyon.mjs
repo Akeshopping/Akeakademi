@@ -5,6 +5,7 @@ const require = createRequire(process.cwd() + "/"); const pw = require("playwrig
 const KOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const srv = http.createServer((q, r) => { const f = q.url.split("?")[0]; if (f === "/" || f === "/index.html") { r.setHeader("content-type", "text/html; charset=utf-8"); return r.end(readFileSync(KOK + "/index.html")); } r.statusCode = 404; r.end("yok"); });
 await new Promise(r => srv.listen(0, "127.0.0.1", r)); const URL0 = "http://127.0.0.1:" + srv.address().port + "/";
+const TUM = new Set();
 const b = await pw.chromium.launch(); let gecen = 0, kalan = 0; const hatalar = [];
 const t = (ad, ok, ek = "") => { ok ? gecen++ : kalan++; console.log(ok ? "GEÇTİ " : "KALDI ", ad, ok ? "" : ek); };
 const J = (o, st = 200) => ({ status: st, contentType: "application/json", body: JSON.stringify(o) });
@@ -15,7 +16,7 @@ async function sayfa(sen = {}, w = 1280, h = 860, hash = "yonetim") {
   p.on("pageerror", e => hatalar.push(e.message));
   await p.route("**/acilis/**", r => r.abort());
   await p.route("**/api/**", async r => {
-    const u = new URL(r.request().url()), yol = u.pathname, m = r.request().method(), body = r.request().postData(); log.push({ m, yol, body: body ? JSON.parse(body) : null });
+    const u = new URL(r.request().url()), yol = u.pathname, m = r.request().method(), body = r.request().postData(); TUM.add(m + " " + yol); log.push({ m, yol, body: body ? JSON.parse(body) : null });
     say[yol] = (say[yol] || 0) + 1;
     const ozel = sen[yol]; if (ozel) { const y = ozel(say[yol], body); if (y) return r.fulfill(y); }
     if (yol === "/api/hesap/ben") return r.fulfill(J({ kullanici: { id: "k1", eposta: "yonetici@ornek.com", ad: "Yönetici", yonetici: true }, paket: { plan: "premium", bitis: "2099-01-01" } }));
@@ -29,8 +30,10 @@ async function sayfa(sen = {}, w = 1280, h = 860, hash = "yonetim") {
     if (yol === "/api/yonetim/siparis-tamamla" || yol === "/api/yonetim/tekrar-gonder" || yol === "/api/yonetim/abone-iptal") return r.fulfill(J({ ok: true }));
     if (yol === "/api/yonetim/deneme-siparis") return r.fulfill(J({ ok: true, kodlar: [{ kod: "AKE-TEST-0000-0000-0000" }] }));
     if (yol === "/api/yonetim/veli") return r.fulfill(J({ hata: "yok" }, 404));
-    if (yol.startsWith("/api/yonetim/") || yol.startsWith("/api/hesap/")) return r.fulfill(J({}));
-    if (m !== "GET" && !yol.startsWith("/api/sosyal/")) { hatalar.push("TANIMSIZ API ÇAĞRISI " + m + " " + yol); return r.fulfill(J({}, 500)); } return r.fulfill(J({})); // öğrenci tarafı okuma çağrıları: boş yanıt, yazma çağrıları ise test hatası
+    // Katı mod: yukarıda açıkça tanımlanmamış HER çağrı (GET dahil) testi başarısız kılar. Öğrenci kabuğunun arka plan çağrıları da tek tek burada adlandırılır.
+    const ARKA = { "GET /api/sorular": { sorular: [] }, "GET /api/sosyal/ben": {}, "GET /api/sosyal/canli": {}, "GET /api/sosyal/lig": {}, "GET /api/hata": {}, "POST /api/sosyal/canli/olustur": {} };
+    if (ARKA[m + " " + yol]) return r.fulfill(J(ARKA[m + " " + yol]));
+    hatalar.push("TANIMSIZ API ÇAĞRISI " + m + " " + yol); return r.fulfill(J({}, 500));
   });
   await p.addInitScript(() => { try { localStorage.setItem("ake.intro", "1"); } catch (e) { } });
   await p.goto(URL0 + "#" + hash, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(1600);
@@ -90,10 +93,14 @@ p = await sayfa({ "/api/yonetim/shopier-kur": () => J({ message: "Kurulamadı (s
 const kd = await p.$('[data-a="yonKur"]'); if (kd) { await kd.click(); await p.waitForTimeout(500); t("Shopier kurulum hatası kullanıcıya gösterilir", /sahte hata/.test(await p.evaluate(() => document.body.innerText))); } await p.context().close();
 p = await sayfa({ "/api/yonetim/tekrar-gonder": () => J({}, 500) }); await tab(p, "siparis"); await p.click('[data-a="yonTekrar"][data-id="1001!1"]'); await p.waitForTimeout(400);
 t("Kod yeniden gönderme hatası: 'Gönderilemedi' bildirimi", /Gönderilemedi/.test(await p.evaluate(() => document.body.innerText))); await p.context().close();
+p = await sayfa({ "/api/yonetim/deneme-siparis": () => J({ durum: "eposta_hatasi", kodlar: [{ kod: "AKE-HATA-0000-0000-0000" }] }) }); await tab(p, "kod"); await p.click('[data-a="yonDeneme"]'); await p.waitForTimeout(500);
+{ const g = await govde(p); t("E-posta gitmediğinde panel 'gönderildi' demez, kodu elle iletmeyi söyler", /e-posta gönderilemedi/.test(g) && !/adresine gönderildi/.test(g) && /AKE-HATA/.test(g), g.slice(0, 160)); } await p.context().close();
 // 8) Öğrenci ekranı CSS yalıtımı: öğrenci başlığındaki 'Akademi' altın renge boyanmamalı
 p = await sayfa({}, 1280, 860, "bugun"); const renk = await p.evaluate(() => { const e = document.querySelector("header.top .brand .wm span"); return e ? getComputedStyle(e).color : null; });
 t("Öğrenci başlığı: 'Akademi' rengi yönetim stilinden etkilenmiyor", renk && renk !== "rgb(197, 165, 114)", String(renk));
 t("Öğrenci ekranında yönetim sınıfı yok", (await p.$$eval(".yn,.yn-tabs,.yn-hero", e => e.length)) === 0); await p.context().close();
+const BE = readFileSync(KOK + "/functions/api/yonetim/[[yol]].js", "utf8"), ROTA = new Set([...BE.matchAll(/ad === "([\w-]+)" && m === "(GET|POST)"/g)].map(x => x[2] + " /api/yonetim/" + x[1]));
+const yoksa = [...TUM].filter(x => x.includes("/api/yonetim/") && !ROTA.has(x) && x !== "GET /api/yonetim/veli"); t("Ön yüzün çağırdığı tüm yönetim uçları (yöntem+adres) gerçek backend'de var", yoksa.length === 0 && TUM.size > 10, yoksa.join(", "));
 t("Hiç tanımsız/gerçek API çağrısı yapılmadı", !hatalar.some(h => /TANIMSIZ/.test(h)), hatalar.join(" | "));
 t("Sayfa hatası yok (tüm senaryolar)", !hatalar.some(h => !/TANIMSIZ/.test(h)), hatalar.join(" | "));
 await b.close(); srv.close(); console.log(`\n${gecen} geçti, ${kalan} kaldı`); process.exit(kalan ? 1 : 0);

@@ -71,8 +71,11 @@ export async function onRequest({ request, env, params }) {
   const ad = [].concat(params.yol || [])[0] || "", m = request.method, origin = new URL(request.url).origin;
 
   if (ad === "durum" && m === "GET") {
-    const { results } = await env.DB.prepare("SELECT id, eposta, ad, paket, tutar, tarih, durum FROM siparis ORDER BY (durum IN ('odeme_dogrulanamadi', 'tutar_uyusmuyor', 'para_dogrulanamadi', 'kod_uretilemedi')) DESC, tarih DESC LIMIT 50").all();
-    const bekleyen = await env.DB.prepare("SELECT COUNT(*) AS n FROM siparis WHERE durum IN ('odeme_dogrulanamadi', 'tutar_uyusmuyor', 'para_dogrulanamadi', 'kod_uretilemedi')").first();
+    /* inceleme bekleyenler: doğrulanamayan ödeme/tutar/para, kod üretim hatası, yarım kalmış (5 dk+) kod üretimi, takılmış (10 dk+) e-posta gönderimi */
+    const INC = "(durum IN ('odeme_dogrulanamadi', 'tutar_uyusmuyor', 'para_dogrulanamadi', 'kod_uretilemedi') OR (durum = 'kod_bekliyor' AND tarih < ?) OR (durum = 'gonderiliyor' AND tarih < ?))";
+    const simdi = Date.now(), t1 = simdi - 300000, t2 = simdi - 600000;
+    const { results } = await env.DB.prepare("SELECT id, eposta, ad, paket, tutar, tarih, durum FROM siparis ORDER BY (" + INC + ") DESC, tarih DESC LIMIT 50").bind(t1, t2).all();
+    const bekleyen = await env.DB.prepare("SELECT COUNT(*) AS n FROM siparis WHERE " + INC).bind(t1, t2).first();
     const tok = await ayarOku(env, "shopier_webhook_token"), wid = await ayarOku(env, "shopier_webhook_id");
     const say = await env.DB.prepare("SELECT (SELECT COUNT(*) FROM kullanici) AS kullanici, (SELECT COUNT(*) FROM kod WHERE kid IS NOT NULL AND kid != 'silindi') AS paket").first();
     return json(200, { pat: !!env.SHOPIER_PAT, eposta: !!env.RESEND_API_KEY, webhook: !!tok, webhookId: wid || "", siparisler: results || [], inceleme: (bekleyen && bekleyen.n) || 0, sayilar: say || {} });
@@ -158,6 +161,19 @@ export async function onRequest({ request, env, params }) {
     const r = await epostaGonder(env, { to: s.eposta, subject: "AKE Akademi erişim kodun", text: `Erişim kodun (${adi}): ${kod}\nakeakademi.com'da bu e-postayla giriş yap.`, html: epostaSablon("Erişim kodun", `<p style="margin:0">${adi}</p><div style="font-size:22px;font-weight:800;letter-spacing:2px;color:#1c38b0;margin-top:8px">${kod}</div><p style="margin:12px 0 0">akeakademi.com'da bu e-postayla giriş yap; paketin otomatik tanımlanır.</p>`) });
     if (r.ok) await env.DB.prepare("UPDATE siparis SET durum = 'gonderildi' WHERE id = ?").bind(s.id).run();
     return r.ok ? json(200, { ok: true }) : fail(502, "eposta");
+  }
+  if (ad === "siparis-tamamla" && m === "POST") {
+    /* Yarım kalmış kod üretimini güvenle tamamlar: yönetici yalnızca bir işaret kaydını seçer; plan, tutar ve e-posta kayıtlı doğrulanmış yükten gelir
+       ve sipariş, webhook ile aynı kontrollerden (ödeme, para, ürün, tutar) yeniden geçer. Hazır kalemler tekrar üretilmez. */
+    let b = {}; try { b = await request.json(); } catch (e) { }
+    const sid = String(b.id || ""); if (!/^[\w.-]{1,64}!kod$/.test(sid)) return fail(400, "gecersiz");
+    const k = await env.DB.prepare("SELECT id, durum, tarih, ham FROM siparis WHERE id = ?").bind(sid).first();
+    if (!k || !["kod_uretilemedi", "kod_bekliyor"].includes(k.durum)) return fail(404, "yok", "Bu kayıt tamamlanmayı beklemiyor.");
+    if (k.durum === "kod_bekliyor" && Date.now() - (+k.tarih || 0) < 120000) return fail(409, "suruyor", "İşlem hâlâ sürüyor olabilir; 2 dakika sonra tekrar dene.");
+    let o = null; try { o = JSON.parse(k.ham); } catch (e) { }
+    if (!o || typeof o !== "object" || String(o.id || "") + "!kod" !== sid) return fail(422, "ham_yok", "Sipariş verisi kayıtta tam değil; erişim kodunu Shopier panelindeki siparişe bakıp elle gönder.");
+    try { const r = await siparisIsle(env, o); console.log("siparis-tamamla", u.eposta, sid, r.durum); return json(200, { ok: true, durum: r.durum }); }
+    catch (e) { console.error("siparis-tamamla", sid, e && e.message); return fail(500, "tamamlanamadi", "Tamamlanamadı; birazdan tekrar dene."); }
   }
   return fail(404, "yok");
 }

@@ -63,3 +63,17 @@ Olay yükü ve alanları resmi olarak doğrulanamadı; aşağıdaki kurallar do�
 2. Ortam değişkenleri: gerekiyorsa `AKE_INDIRIMLI`, `AKE_FIYATLAR` (liste fiyatı değişirse).
 3. Düşük tutarlı gerçek bir test siparişiyle (sizin onayınızla) uçtan uca doğrulama: ödeme → webhook → kod → e-posta → hesapta paket.
 4. §3'teki bildirim ve destek metni.
+
+## 7. Çoklu kalem, kısmi hata ve eşzamanlılık (uygulandı)
+
+Şema değişikliği YOK: mevcut `siparis` ve `kod` tablolarıyla çalışır (migration gerekmedi).
+
+**Kalem düzeyi izleme.** Tek kalemli siparişte kimlik `<id>`, çok kalemlide `<id>#1`, `<id>#2` ... Her kalem kendi `siparis` satırı ve kendi `kod` satırıdır (`kod.siparis` = kalem kimliği). Durumlar: `kod_uretildi` → `gonderiliyor` (e-posta talep edildi) → `gonderildi` | `eposta_hatasi` | `eposta_yok`.
+
+**Sipariş düzeyi işaret.** Kod üretimi sırasında `<id>!kod` satırı yazılır: `kod_bekliyor` (sürüyor veya yarıda kaldı), `kod_uretilemedi` (hata yakalandı; `ad` alanında "1/3 kod hazır" özeti), `kod_hatasi_cozuldu` (sonradan tamamlandı, kayıt kalır). Sorunsuz biten siparişte işaret silinir. İşaretin `ham` alanı, webhook'ta imza ve ödeme kontrolünden geçmiş sipariş yükünü taşır.
+
+**Güvenli tamamlama.** Tekrar gelen webhook yalnızca EKSİK kalemleri üretir; hazır kalemlerin kodu değişmez. Çift kod koruması: kod ve sipariş satırı tek atomik `batch`te eklenir, aynı kalem için eşzamanlı ikinci istek UNIQUE ile geri alınır ve kalemin hazır olduğunu görüp geçer. Rastgele kod çakışmasında aynı istek 3 kez yeni kodla dener. Her kodun e-postasını yalnızca bir istek gönderir (`kod_uretildi` → `gonderiliyor` atomik talep).
+
+**Shopier tekrar denemesine güvenmeden.** Yönetici panelinde "inceleme bekliyor" kartı şunları sayar: doğrulanamayan ödeme/tutar/para, `kod_uretilemedi`, 5 dk'dan eski `kod_bekliyor`, 10 dk'dan eski `gonderiliyor`. `kod_uretilemedi` ve `kod_bekliyor` satırlarında "Eksik kodları tamamla" düğmesi vardır. Uç nokta: `POST /api/yonetim/siparis-tamamla {id: "<id>!kod"}` — yalnızca yönetici; yönetici plan/tutar/e-posta girmez; kayıtlı yük ödeme, para birimi, ürün ve tutar kontrollerinden yeniden geçer; `kod_bekliyor` kaydı 2 dakikadan yeniyse reddedilir.
+
+**Bilinen sınırlar.** (a) İşaretin `ham` alanı 4000 karakterle sınırlı; çok uzun siparişte JSON kesilirse tamamlama 422 verir ve kod elle gönderilir. (b) `gonderiliyor`'da takılan satır için mevcut "Kodu yeniden gönder" kullanılır. (c) Gerçek D1 `batch` atomikliği ve `meta.changes` davranışı sahte veritabanıyla test edildi; canlı D1'de denenmedi.

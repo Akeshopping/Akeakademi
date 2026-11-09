@@ -6,11 +6,11 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=ae0e423e7f">
-<link rel="icon" href="/favicon.ico?v=ae0e423e7f" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=ae0e423e7f">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=ae0e423e7f">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=ae0e423e7f">
+<link rel="manifest" href="/manifest.webmanifest?v=d7ba1d07c5">
+<link rel="icon" href="/favicon.ico?v=d7ba1d07c5" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=d7ba1d07c5">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=d7ba1d07c5">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=d7ba1d07c5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -18,7 +18,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=ae0e423e7f">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=d7ba1d07c5">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -723,6 +723,9 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.012em}
  .side .nav a{white-space:nowrap;padding:9px 12px;border-radius:9px;font-size:14px}
  .side .nav a.on{background:transparent;box-shadow:inset 0 -3px 0 var(--c1);border-radius:9px 9px 0 0;color:var(--ink);font-weight:650}
  #main{width:100%;max-width:none;padding-top:18px}
+ .view{max-width:1040px;margin-inline:auto;width:100%}
+ .side{justify-content:flex-start}
+ .side .nav:first-of-type{margin-left:auto}.side .nav:last-of-type{margin-right:auto}
  .side .nav a[href="#hakkimizda"],.side .nav a[href="#yasal"]{display:none}
  .side .nav a{padding:9px 9px;gap:7px;font-size:13.5px}
  .side{gap:0}
@@ -10768,7 +10771,7 @@ function atlIntro(zorla) {
   if (document.getElementById("atlIntro")) return;
   let goru3d = false, gorduyse = false; try { goru3d = !!LS.get("ake.intro3d"); gorduyse = !!LS.get("ake.intro"); } catch (e) { }
   if (!atlHareketAz() && (zorla || !window.__atl3d) && atl3dAcilis()) return;
-  if (!zorla && (gorduyse || atlHareketAz())) return;
+  if (!zorla && atlHareketAz()) return;
   try { LS.set("ake.intro", "1"); } catch (e) { }
   const mob = atlMobil(), T = mob ? 2.3 : 2.9, N = mob ? 46 : 90;
   const ov = document.createElement("div"); ov.className = "atl-intro"; ov.id = "atlIntro";

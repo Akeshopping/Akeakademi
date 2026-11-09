@@ -1,0 +1,8 @@
+{
+  "name": "ake-d1-entegrasyon-testleri",
+  "private": true,
+  "type": "module",
+  "description": "Gerçek Cloudflare D1 davranışını (workerd/Miniflare) kullanan yerel veli raporu entegrasyon testleri",
+  "scripts": { "test": "node --test veli-d1.test.mjs" },
+  "devDependencies": { "miniflare": "^4.20260730.0" }
+}

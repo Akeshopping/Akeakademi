@@ -8,7 +8,7 @@ const D = document.documentElement;
 export const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 export const yumusak = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 export const kolay = t => 1 - Math.pow(1 - clamp(t), 3);
-export const KREM = new THREE.Color("#f5f0e6"), GECE = new THREE.Color("#06111f");
+export const KREM = new THREE.Color("#F5F1E8"), GECE = new THREE.Color("#171715");
 
 function depo(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
@@ -25,7 +25,7 @@ function panelYaz() {
         <a class="btn" href="../../calisma/soru.html">Devam et</a></section>
       <section class="blok hedef" aria-labelledby="hd-b"><div class="k-bas" id="hd-b">Günlük hedef</div><div class="buyuk">26 <small>/ 40 soru</small></div><div class="cubuk" aria-hidden="true"><u style="width:65%"></u></div><p class="aciklama">Bir set daha çözersen hedef tamam.</p></section>
       <section class="blok net" aria-labelledby="nt-b"><div class="k-bas" id="nt-b">TYT net gelişimi</div><div class="buyuk">71,5 <small>net · son 5 deneme</small></div>
-        <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Son beş deneme: 61,25 netten 71,5 nete"><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="#0d1b33" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 5 : 3}" fill="${i === 4 ? "#2f62e8" : "#0d1b33"}"/>`).join("")}</svg></section>
+        <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Son beş deneme: 61,25 netten 71,5 nete"><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="#1c1b18" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 5 : 3}" fill="${i === 4 ? "#254236" : "#1c1b18"}"/>`).join("")}</svg></section>
       <section class="blok zayif" aria-labelledby="zy-b"><div class="k-bas" id="zy-b">Zayıf konular</div><ul class="liste">
         <li><span><b>Fonksiyonlar</b><small>AYT Matematik · 13 soruda 5 doğru</small></span><span class="oran">%38</span></li>
         <li><span><b>Hücre bölünmeleri</b><small>Biyoloji · 9 soruda 4 doğru</small></span><span class="oran">%44</span></li>
@@ -51,7 +51,7 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   const cv = $("#sahne"), ust = $(".ust"), atla = $(".atla"), gyazi = $(".gecis-yazi"), kutu = $(".acilis .metin-kutu");
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: !mobil, powerPreference: "high-performance" }); }
-  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#173a6b,#06111f 70%)"; return; }
+  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#254236,#171715 70%)"; return; }
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(fov, 1, .05, 200);
   const pm = new THREE.PMREMGenerator(renderer); const env = pm.fromScene(new RoomEnvironment(renderer), .04).texture; scene.environment = env;

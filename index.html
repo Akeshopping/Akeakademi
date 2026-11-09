@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
-<meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=fbc56854fb">
-<link rel="icon" href="/favicon.ico?v=fbc56854fb" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=fbc56854fb">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=fbc56854fb">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=fbc56854fb">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=fbc56854fb">
+<meta name="theme-color" content="#f5f1e8">
+<link rel="manifest" href="/manifest.webmanifest?v=4f351ff342">
+<link rel="icon" href="/favicon.ico?v=4f351ff342" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=4f351ff342">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=4f351ff342">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=4f351ff342">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=4f351ff342">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=fbc56854fb">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=4f351ff342">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -34,34 +34,34 @@
 /* Düzen: masaüstünde sol menü + tek içerik sütunu; telefonda üst şerit + alt sekme çubuğu.
    Görsel motif: ÖSYM optik cevap kâğıdı — turuncu baskı çizgileri, kurşun kalemle doldurulan A–E kutucukları. */
 :root{
-  --paper:#f5f0e6; --card:#fffcf6; --sunk:#efe8da; --ink:#071426; --ink2:#43506a; --ink3:#5f6a82;
-  --line:#ddd3c1; --line2:#e8e0d0;
-  --glass:rgba(255,252,246,.95); --glass-line:rgba(7,20,38,.08); --top-bg:rgba(245,240,230,.86);
-  --form:#2a5ce0; --form-ink:#1f4cc4; --form-soft:#e3eafc; --brand:#2a5ce0;
-  --c1:#2a5ce0; --c2:#c9a86a; --c3:#157a60; --grad:linear-gradient(180deg,#3f72f5 0%,#2a5ce0 100%);
-  --wm:linear-gradient(180deg,#0d2038 0%,#071426 100%);
-  --gold:#c9a86a; --gold-ink:#7f6127; --navy:#071426; --ocean:#0d2038; --ivory:#f5f0e6;
-  --ok:#157a60; --ok-soft:#dff3ec; --bad:#c42f4b; --bad-soft:#fce8ec; --warn:#8f5a00; --warn-soft:#fbf0d9;
-  --pencil:#071426; --on-ink:#ffffff;
+  --paper:#f5f1e8; --card:#fbf8f1; --sunk:#ede7da; --ink:#1c1b18; --ink2:#4b483f; --ink3:#66625a;
+  --line:#d8d0c2; --line2:#e6dfd1;
+  --glass:rgba(251,248,241,.95); --glass-line:rgba(23,23,21,.08); --top-bg:rgba(245,241,232,.88);
+  --form:#254236; --form-ink:#1c3329; --form-soft:#d5ddcf; --brand:#254236;
+  --c1:#254236; --c2:#b69a68; --c3:#1d6b4a; --grad:linear-gradient(180deg,#c3a874 0%,#b69a68 100%);
+  --wm:linear-gradient(180deg,#30302b 0%,#171715 100%);
+  --gold:#b69a68; --gold-ink:#6f5a2f; --navy:#171715; --ocean:#30302b; --ivory:#f5f1e8;
+  --ok:#1d6b4a; --ok-soft:#dcebe3; --bad:#a8372a; --bad-soft:#f6e2de; --warn:#7d5200; --warn-soft:#f6ead0;
+  --pencil:#171715; --on-ink:#f5f1e8; --on-pri:#171715;
   --f-disp:"AKE Sans","Atkinson Hyperlegible Next","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-body:"AKE Sans","Atkinson Hyperlegible Next","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"AKE Sans",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --r:12px; --r-s:8px;
   --ease:cubic-bezier(.2,.7,.2,1); --t-btn:180ms; --t-card:280ms; --t-page:380ms;
-  --shadow:0 1px 2px rgba(7,20,38,.04),0 10px 28px -18px rgba(7,20,38,.24);
-  --aura:radial-gradient(60vmax 42vmax at 104% -6%,rgba(201,168,106,.10),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(71,123,255,.07),transparent 62%);
+  --shadow:0 1px 2px rgba(23,23,21,.04),0 10px 28px -18px rgba(23,23,21,.26);
+  --aura:radial-gradient(60vmax 42vmax at 104% -6%,rgba(182,154,104,.10),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(37,66,54,.07),transparent 62%);
 }
 
 :root[data-theme="dark"]{
-  --paper:#071426; --card:#0d2038; --sunk:#0a1a2f; --ink:#f5f0e6; --ink2:#b4b8c0; --ink3:#8590a3;
-  --line:#1d3352; --line2:#152a45;
-  --glass:rgba(13,32,56,.95); --glass-line:rgba(245,240,230,.07); --top-bg:rgba(7,20,38,.86);
-  --form:#86a8ff; --form-ink:#a9c0ff; --form-soft:#13284a; --brand:#86a8ff; --wm:linear-gradient(180deg,#f5f0e6 0%,#d9cfbd 100%);
-  --grad:linear-gradient(180deg,#477bff 0%,#2f63ea 100%); --c1:#477bff; --c3:#39bfa0;
-  --gold:#c9a86a; --gold-ink:#d8bd88;
-  --ok:#39bfa0; --ok-soft:#0d2b2b; --bad:#f06c86; --bad-soft:#341822; --warn:#e3b55e; --warn-soft:#2b2412;
-  --aura:radial-gradient(60vmax 42vmax at 104% -6%,rgba(201,168,106,.08),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(71,123,255,.10),transparent 62%);
-  --pencil:#e9e3d7; --on-ink:#071426; --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 32px -18px rgba(0,0,0,.7); color-scheme:dark}
+  --paper:#171715; --card:#201f1c; --sunk:#1b1a18; --ink:#f5f1e8; --ink2:#b8b2a4; --ink3:#908b7f;
+  --line:#35332e; --line2:#2a2925;
+  --glass:rgba(32,31,28,.95); --glass-line:rgba(245,241,232,.07); --top-bg:rgba(23,23,21,.88);
+  --form:#8fb3a0; --form-ink:#b5ceb8; --form-soft:#1d2f27; --brand:#8fb3a0; --wm:linear-gradient(180deg,#f5f1e8 0%,#d8d0c2 100%);
+  --grad:linear-gradient(180deg,#c3a874 0%,#b69a68 100%); --c1:#5f9a80; --c3:#5fc79a;
+  --gold:#b69a68; --gold-ink:#d1b98c;
+  --ok:#5fc79a; --ok-soft:#12281f; --bad:#f08a7c; --bad-soft:#33201d; --warn:#e3b55e; --warn-soft:#2b2412;
+  --aura:radial-gradient(60vmax 42vmax at 104% -6%,rgba(182,154,104,.08),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(95,154,128,.07),transparent 62%);
+  --pencil:#e9e3d7; --on-ink:#171715; --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 32px -18px rgba(0,0,0,.7); color-scheme:dark}
 *{box-sizing:border-box}
 /* hareket sistemi: kapatılabilir */
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -95,10 +95,11 @@ sup,sub{font-size:.72em}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
 /* logo: kömür siyahı kare içinde yükselen eğri; yazı: AKE kalın, Akademi ince */
 .logo-tile{flex:none;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:28%;overflow:hidden;
-  background:linear-gradient(160deg,#0e8bff 0%,#1347d8 45%,#050c30 100%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 16px -6px rgba(42,92,224,.65)}
-.logo-tile.lg4{background:radial-gradient(120% 120% at 50% 0%,#17325c 0%,#0b1a31 60%,#050d1b 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 14px -8px rgba(7,20,38,.6)}
-.logo-tile.lg2{background:radial-gradient(130% 130% at 30% -10%,#7aa3ff 0%,#1f3f9a 50%,#1544c9 100%)}
+  background:linear-gradient(160deg,#254236 0%,#254236 45%,#171715 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 16px -6px rgba(37,66,54,.65)}
+.logo-tile.lg4{background:radial-gradient(120% 120% at 50% 0%,#30302b 0%,#171715 60%,#171715 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 14px -8px rgba(23,23,21,.6)}
+.logo-tile.lg5{background:#171715;box-shadow:inset 0 0 0 1px rgba(182,154,104,.28),0 6px 14px -8px rgba(23,23,21,.55)}.logo-tile.lg5 svg{width:70%;height:70%}
+.logo-tile.lg2{background:radial-gradient(130% 130% at 30% -10%,#d5ddcf 0%,#254236 50%,#254236 100%)}
 .logo-tile svg{width:100%;height:100%;display:block}
 .brand .wm,.wm{font:800 19px/1 var(--f-disp);letter-spacing:-.012em;white-space:nowrap;color:var(--ink)}
 .wm span{font-weight:500}
@@ -121,7 +122,7 @@ sup,sub{font-size:.72em}
 .nav a:hover{background:var(--line2);color:var(--ink)}
 .nav a.on{background:var(--card);color:var(--ink);box-shadow:inset 3px 0 0 var(--c1),var(--shadow)}
 .nav a.on svg{color:var(--c1)}
-.side-pro{display:flex;flex-direction:column;gap:4px;margin:18px 4px 0;padding:14px;border-radius:14px;text-decoration:none;color:#fff;background:linear-gradient(150deg,#0d2038,#0d1a45);box-shadow:0 8px 22px -8px rgba(42,92,224,.55)}
+.side-pro{display:flex;flex-direction:column;gap:4px;margin:18px 4px 0;padding:14px;border-radius:14px;text-decoration:none;color:#fff;background:linear-gradient(150deg,#30302b,#30302b);box-shadow:0 8px 22px -8px rgba(37,66,54,.55)}
 .side-pro i{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.2);display:grid;place-items:center;margin-bottom:4px}
 .side-pro i svg{width:16px;height:16px;color:#fff}
 .side-pro b{font:700 15px/1.2 var(--f-disp)}
@@ -170,8 +171,8 @@ main{min-width:0;padding-block:24px 64px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 15px;border-radius:9px;border:1px solid var(--line);background:var(--card);
   font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;color:var(--ink);white-space:nowrap;transition:background .15s,border-color .15s}
 .btn:hover{border-color:var(--ink3)}
-.btn.pri{background:var(--grad);border-color:transparent;color:#fff;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 8px 20px -10px rgba(20,48,122,.7)}
-.btn.pri:hover{filter:brightness(1.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 26px -10px rgba(42,92,224,.85)}
+.btn.pri{background:var(--grad);border-color:transparent;color:var(--on-pri);font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 20px -12px rgba(111,90,47,.6)}
+.btn.pri:hover{filter:brightness(1.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 26px -10px rgba(37,66,54,.85)}
 .btn.pri:active{transform:translateY(1px)}
 .btn.acc{background:var(--form);border-color:var(--form);color:#fff}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--ink2)}
@@ -205,7 +206,7 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .cd-sub b{font-family:var(--f-mono);color:var(--ink)}
 .goal{display:flex;flex-direction:column;gap:10px;justify-content:center}
 .bar{height:8px;border-radius:99px;background:var(--line2);overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(180deg,#5a8dff 0%,#2a5ce0 100%);border-radius:99px;box-shadow:0 0 10px rgba(42,92,224,.35)}
+.bar i{display:block;height:100%;background:linear-gradient(180deg,#5f9a80 0%,#254236 100%);border-radius:99px;box-shadow:0 0 10px rgba(37,66,54,.35)}
 .bar.ok i{background:var(--ok)}
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:700px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -394,14 +395,14 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .oda{display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink2);margin:0}
 .oda:not(.dolu) .canli-nokta{background:var(--ink3);animation:none}
 .oda b{color:var(--ink)}
-.xp-kart{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#fff;border-color:transparent;background:radial-gradient(70% 140% at 100% 0%,rgba(0,184,255,.5),transparent 60%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.22),transparent 60%),radial-gradient(90% 120% at 30% 0%,rgba(42,92,224,.55),transparent 70%),#0e1120}
+.xp-kart{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#fff;border-color:transparent;background:radial-gradient(70% 140% at 100% 0%,rgba(182,154,104,.5),transparent 60%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.22),transparent 60%),radial-gradient(90% 120% at 30% 0%,rgba(37,66,54,.55),transparent 70%),#171715}
 .xp-kart .muted,.xp-kart .faint{color:rgba(255,255,255,.88)}
 .xp-big{display:flex;flex-direction:column;gap:2px}
-.xp-big b{font:900 46px/1 var(--f-disp);letter-spacing:-.02em;text-shadow:0 1px 2px rgba(6,16,43,.2)}
+.xp-big b{font:900 46px/1 var(--f-disp);letter-spacing:-.02em;text-shadow:0 1px 2px rgba(23,23,21,.2)}
 .xp-big span{font-weight:700}
 .lb-n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--f-body);background:var(--sunk);color:var(--ink2)}
 .lb-n.m1{background:linear-gradient(135deg,#ffe08a,#f2a300);color:#432b00}
-.lb-n.m2{background:linear-gradient(135deg,#eef2f8,#a9b5c7);color:#26304a}
+.lb-n.m2{background:linear-gradient(135deg,#f5f1e8,#d5ddcf);color:#30302b}
 .lb-n.m3{background:linear-gradient(135deg,#f8cba6,#c4733a);color:#3a1b05}
 .lb-row .bar{height:6px;margin-top:6px}
 .lb-row.ben{background:var(--form-soft);border-radius:10px;padding-left:10px;padding-right:10px;border-bottom-color:transparent}
@@ -451,7 +452,7 @@ html.krom body::after{display:none}
 .logo-tile{position:relative}
 .logo-tile canvas.lg-cv{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .2s}
 .logo-tile canvas.lg-cv.on{opacity:1}
-.krom-pop{position:fixed;left:50%;top:42%;width:min(62vw,250px);aspect-ratio:1;margin-left:calc(min(62vw,250px)/-2);margin-top:calc(min(62vw,250px)/-2);z-index:120;pointer-events:none;animation:kPop 2.4s cubic-bezier(.2,.9,.25,1) forwards;filter:drop-shadow(0 22px 40px rgba(42,92,224,.45))}
+.krom-pop{position:fixed;left:50%;top:42%;width:min(62vw,250px);aspect-ratio:1;margin-left:calc(min(62vw,250px)/-2);margin-top:calc(min(62vw,250px)/-2);z-index:120;pointer-events:none;animation:kPop 2.4s cubic-bezier(.2,.9,.25,1) forwards;filter:drop-shadow(0 22px 40px rgba(37,66,54,.45))}
 .krom-pop canvas{width:100%;height:100%;display:block}
 .krom-pop.son{transition:opacity .6s}
 @keyframes kPop{0%{opacity:0;transform:scale(.2) rotate(-40deg)}22%{opacity:1;transform:scale(1.12) rotate(6deg)}34%{transform:scale(1) rotate(0)}85%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15) translateY(-16px)}}
@@ -496,7 +497,7 @@ html.krom body::after{display:none}
 .hbar .v{font-family:var(--f-mono);text-align:right;font-size:12.5px}
 
 /* ---------- katmanlar ---------- */
-.modal-bg{position:fixed;inset:0;z-index:60;background:rgba(10,14,24,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.modal-bg{position:fixed;inset:0;z-index:60;background:rgba(23,23,21,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}
 @media (min-width:640px){.modal-bg{align-items:center}}
 .modal{background:var(--card);border-radius:14px;width:100%;max-width:520px;max-height:86vh;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px -20px rgba(0,0,0,.5);margin-bottom:env(safe-area-inset-bottom,0px)}
 .modal .acts{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
@@ -607,12 +608,12 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 .nav a.on{background:var(--glass)}
 @media (max-width:899px){.tabbar{background:var(--top-bg);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);border-top-color:var(--glass-line)}}
 .vitrin{position:relative;overflow:hidden;isolation:isolate;padding:26px 24px;border-radius:18px;border:1px solid var(--glass-line);
-  background:radial-gradient(70% 130% at 100% 0%,rgba(42,92,224,.16),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.13),transparent 62%),rgba(255,255,255,.62);box-shadow:var(--shadow)}
+  background:radial-gradient(70% 130% at 100% 0%,rgba(37,66,54,.16),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.13),transparent 62%),rgba(255,255,255,.62);box-shadow:var(--shadow)}
 .vitrin .arc{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.7}
 .vitrin h1{font-size:clamp(28px,5vw,38px);letter-spacing:-.01em}
-:root[data-theme="dark"] .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(42,92,224,.32),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.10),transparent 62%),#0e1019}
+:root[data-theme="dark"] .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(37,66,54,.32),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.10),transparent 62%),#171715}
 :root[data-theme="dark"] .vitrin .arc{opacity:1}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(42,92,224,.32),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.10),transparent 62%),#0e1019}:root:not([data-theme="light"]) .vitrin .arc{opacity:1}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(37,66,54,.32),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(57,191,160,.10),transparent 62%),#171715}:root:not([data-theme="light"]) .vitrin .arc{opacity:1}}
 @media (max-width:640px){.vitrin{padding:20px 18px;border-radius:16px}.vitrin .arc{top:auto;bottom:0;height:46%}}
 
 /* ---- rozetler, seri, paylaşım kartı ---- */
@@ -622,7 +623,7 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 .rz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
 .rz{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:12px 8px;border-radius:16px;border:1px solid var(--line);opacity:.5;filter:grayscale(1)}
 .rz.on{opacity:1;filter:none;background:var(--glass);border-color:var(--glass-line)}
-.rz-m{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#1F5BFF,#00B8FF);box-shadow:0 6px 16px -6px rgba(42,92,224,.6)}
+.rz-m{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#254236,#b69a68);box-shadow:0 6px 16px -6px rgba(37,66,54,.6)}
 .rz:not(.on) .rz-m{background:var(--line2);color:var(--ink2);box-shadow:none}
 .rz b{font-size:13px} .rz small{font-size:11px;color:var(--ink2);line-height:1.3}
 .kart-on{display:flex;justify-content:center;margin-bottom:10px} .kart-on img{max-height:56vh;max-width:100%;border-radius:18px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
@@ -665,26 +666,24 @@ select.in{appearance:none;-webkit-appearance:none;padding-right:36px;cursor:poin
 textarea.in{resize:vertical;min-height:110px;font:inherit}
 
 /* ---------- AKE Akademi Premium tasarım katmanı ---------- */
-:root{--ink:#0d1b33;--ink2:#45506a;--ink3:#5a6580;--pencil:#0d1b33;--card:#fbf8f1;--line:#e0d8c8;--line2:#ebe4d5;--r:12px}
-:root[data-theme="dark"]{--ink:#f5f0e6;--ink2:#b4b8c0;--ink3:#8590a3;--pencil:#e9e3d7;--card:#0d2038;--line:#1d3352;--line2:#152a45}
+:root{--ink:#30302b;--ink2:#254236;--ink3:#66625a;--pencil:#30302b;--card:#fbf8f1;--line:#e0d8c8;--line2:#ebe4d5;--r:12px}
 body{font-family:var(--f-body);font-weight:400;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 h1,h2,h3,h4{font-weight:700;letter-spacing:-.012em}
 /* düğmeler: lacivert ana düğme, belirgin etkileşim durumları, en az 44 px dokunma alanı */
 .btn{min-height:44px;padding:0 18px;border-radius:12px;font-size:15px;font-weight:600;transition:background .18s var(--ease),border-color .18s var(--ease),box-shadow .18s var(--ease),transform .12s var(--ease)}
 .btn:hover{border-color:var(--ink3);background:#fffdf8}
 .btn:active{transform:translateY(1px)}
-.btn:focus-visible,.opt:focus-visible,.seg button:focus-visible{outline:none;box-shadow:0 0 0 3px var(--paper),0 0 0 5px #2f62e8}
-.btn.pri{background:#0d1b33;color:#fff;border-color:transparent;box-shadow:0 1px 2px rgba(13,27,51,.18),0 10px 20px -12px rgba(13,27,51,.55)}
-.btn.pri:hover{background:#1a2c4d;filter:none;box-shadow:0 1px 2px rgba(13,27,51,.2),0 14px 24px -12px rgba(13,27,51,.6)}
-.btn.pri:active{background:#0a1528;box-shadow:inset 0 2px 5px rgba(0,0,0,.35)}
-.btn.acc{background:#0d1b33;border-color:#0d1b33;color:#fff}
-.btn.acc:hover{background:#1a2c4d}
+.btn:focus-visible,.opt:focus-visible,.seg button:focus-visible{outline:none;box-shadow:0 0 0 3px var(--paper),0 0 0 5px #254236}
+.btn.pri{background:#30302b;color:#fff;border-color:transparent;box-shadow:0 1px 2px rgba(48,48,43,.18),0 10px 20px -12px rgba(48,48,43,.55)}
+.btn.pri:hover{background:#30302b;filter:none;box-shadow:0 1px 2px rgba(48,48,43,.2),0 14px 24px -12px rgba(48,48,43,.6)}
+.btn.pri:active{background:#171715;box-shadow:inset 0 2px 5px rgba(0,0,0,.35)}
+.btn.acc{background:#30302b;border-color:#30302b;color:#fff}
+.btn.acc:hover{background:#30302b}
+:root[data-theme="dark"] .btn.acc{background:var(--grad);border-color:transparent;color:#171715}
 .btn[disabled]{opacity:.42;transform:none;box-shadow:none}
-:root[data-theme="dark"] .btn.pri,:root[data-theme="dark"] .btn.acc{background:#f5f0e6;color:#0d1b33;border-color:transparent}
-:root[data-theme="dark"] .btn.pri:hover,:root[data-theme="dark"] .btn.acc:hover{background:#fffdf8}
 .seg button{min-height:44px}
-.seg button.on{background:#0d1b33;border-color:#0d1b33;color:#fff}
-:root[data-theme="dark"] .seg button.on{background:#f5f0e6;border-color:#f5f0e6;color:#0d1b33}
+.seg button.on{background:#30302b;border-color:#30302b;color:#fff}
+:root[data-theme="dark"] .seg button.on{background:#f5f0e6;border-color:#f5f0e6;color:#30302b}
 @media (pointer:coarse){.btn.sm{min-height:44px}}
 /* soru çözme ekranı: ortalı okuma genişliği, geniş satır aralığı, rahat dokunma alanı */
 .run{max-width:780px;margin-inline:auto;width:100%}
@@ -703,7 +702,7 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.012em}
 /* Çözüm ekranı: ilerleme çubuğu + sağda cevap kâğıdı */
 .rprog{display:flex;gap:3px;height:6px}
 .rprog i{flex:1;min-width:2px;border-radius:3px;background:var(--line)}
-.rprog i.dn{background:#2f62e8;opacity:.55}.rprog i.cur{background:var(--pencil,#0d1b33)}
+.rprog i.dn{background:#254236;opacity:.55}.rprog i.cur{background:var(--pencil,#30302b)}
 .rmain{display:flex;flex-direction:column;gap:14px;min-width:0}
 @media (min-width:900px){
  .run{display:grid;grid-template-columns:minmax(0,1fr) 300px;max-width:1080px;column-gap:20px;align-items:start}
@@ -740,19 +739,19 @@ h1,h2,h3,h4{font-weight:700;letter-spacing:-.012em}
 
 /* Sakin, markaya uyumlu arka plan: sıcak krem zemin, ince sınav kâğıdı ızgarası, köşelerde altın ve mavi ışık */
 html::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
- background-image:linear-gradient(rgba(13,27,51,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(13,27,51,.045) 1px,transparent 1px);
+ background-image:linear-gradient(rgba(48,48,43,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(48,48,43,.045) 1px,transparent 1px);
  background-size:44px 44px;background-position:-1px -1px;
  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 0%,rgba(0,0,0,.35) 55%,transparent 100%);mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 0%,rgba(0,0,0,.35) 55%,transparent 100%)}
-:root[data-theme="dark"] html::before,html[data-theme="dark"]::before{background-image:linear-gradient(rgba(180,200,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(180,200,255,.05) 1px,transparent 1px)}
+:root[data-theme="dark"] html::before,html[data-theme="dark"]::before{background-image:linear-gradient(rgba(213,221,207,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(213,221,207,.05) 1px,transparent 1px)}
 body::after{background:var(--aura),radial-gradient(38vmax 38vmax at 50% -12%,rgba(255,255,255,.55),transparent 70%)}
-:root[data-theme="dark"] body::after{background:var(--aura),radial-gradient(40vmax 30vmax at 50% -10%,rgba(71,123,255,.10),transparent 70%)}
+:root[data-theme="dark"] body::after{background:var(--aura),radial-gradient(40vmax 30vmax at 50% -10%,rgba(95,154,128,.10),transparent 70%)}
 @media (prefers-reduced-motion:reduce){html::before{background-attachment:scroll}}
 
 .stctl{display:flex;flex-wrap:wrap;gap:10px 16px;margin:6px 0 12px}
 .stctl .seg{flex-wrap:wrap}
 /* Mobil: cevap kâğıdı alttan açılan çekmece */
 @media (max-width:899px){
- .run>.sheet{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:34;border-radius:16px 16px 0 0;box-shadow:0 -10px 30px -12px rgba(7,20,38,.35);padding:10px 14px;max-height:62vh;overflow:auto}
+ .run>.sheet{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:34;border-radius:16px 16px 0 0;box-shadow:0 -10px 30px -12px rgba(23,23,21,.35);padding:10px 14px;max-height:62vh;overflow:auto}
  .run>.sheet .sheet-grid{grid-template-columns:1fr 1fr}
  .run{padding-bottom:120px}
  body:has(.run) .tabbar{display:none}
@@ -7143,12 +7142,13 @@ const IC = {
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M21 20c0-2.8-1.8-5.1-4.3-5.8"/>'
 };
 /* ---------- logo: "Yükseliş" — doğru cevaba yükselen eğri ve işaretlenmiş kutucuk (LOGO_NO ile 2 ya da 3'e geçilir) ---------- */
-const LOGO_NO = 4;
+const LOGO_NO = 5;
 const LOGO_V = {
-  4: id => `<svg viewBox="0 0 512 512"><defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dcae"/><stop offset=".5" stop-color="#d4b06a"/><stop offset="1" stop-color="#a98440"/></linearGradient><radialGradient id="${id}k" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#6f93d6" stop-opacity=".55"/><stop offset="1" stop-color="#0a1a33" stop-opacity=".7"/></radialGradient><radialGradient id="${id}c"><stop offset="0" stop-color="#fffbef"/><stop offset=".45" stop-color="#ffe3a6"/><stop offset="1" stop-color="#ffcb6b" stop-opacity="0"/></radialGradient></defs><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 1 196 0" fill="none" stroke="url(#${id}a)" stroke-width="24" stroke-linecap="round"/></g><circle cx="256" cy="256" r="124" fill="url(#${id}k)" stroke="rgba(255,255,255,.4)" stroke-width="8"/><circle cx="256" cy="256" r="58" fill="url(#${id}c)"/><g transform="translate(256 256) rotate(38)"><path d="M-150 0A150 52 0 0 0 150 0" fill="none" stroke="#dfe7f5" stroke-width="14" stroke-linecap="round"/></g><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 0 196 0" fill="none" stroke="url(#${id}a)" stroke-width="26" stroke-linecap="round"/><circle cx="196" cy="0" r="26" fill="#e8c98a"/></g></svg>`,
-  1: id => `<svg viewBox="0 0 48 48"><defs><linearGradient id="${id}l" x1="10" y1="38" x2="30" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#cfe0ff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><path d="M11.5 37C16.5 26 22.5 19.6 29.5 15.6" fill="none" stroke="url(#${id}l)" stroke-width="3.4" stroke-linecap="round"/><polygon points="33.20,6.80 35.49,12.24 41.38,12.74 36.91,16.61 38.25,22.36 33.20,19.30 28.15,22.36 29.49,16.61 25.02,12.74 30.91,12.24" fill="#fff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
-  2: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path class="lg-egri" pathLength="1" d="M13.2 36.2 24 12.2l10.8 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-hale" cx="24" cy="28.6" r="8" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="28.6" r="3.7" fill="#bff3ff"/></svg>`,
-  3: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}f" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b9efff"/><stop offset=".55" stop-color="#2f6bff"/><stop offset="1" stop-color="#14307a"/></radialGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#3f7bff" stop-opacity=".7"/><stop offset="1" stop-color="#3f7bff" stop-opacity="0"/></radialGradient></defs><circle class="lg-egri" cx="12.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-egri" cx="35.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-hale" cx="24" cy="24" r="13" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="24" r="7" fill="url(#${id}f)"/></svg>`
+  5: id => `<svg viewBox="0 0 64 64"><path fill-rule="evenodd" fill="#b69a68" d="M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z"/></svg>`,
+  4: id => `<svg viewBox="0 0 512 512"><defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1dcae"/><stop offset=".5" stop-color="#d4b06a"/><stop offset="1" stop-color="#a98440"/></linearGradient><radialGradient id="${id}k" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#5f9a80" stop-opacity=".55"/><stop offset="1" stop-color="#171715" stop-opacity=".7"/></radialGradient><radialGradient id="${id}c"><stop offset="0" stop-color="#fffbef"/><stop offset=".45" stop-color="#ffe3a6"/><stop offset="1" stop-color="#ffcb6b" stop-opacity="0"/></radialGradient></defs><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 1 196 0" fill="none" stroke="url(#${id}a)" stroke-width="24" stroke-linecap="round"/></g><circle cx="256" cy="256" r="124" fill="url(#${id}k)" stroke="rgba(255,255,255,.4)" stroke-width="8"/><circle cx="256" cy="256" r="58" fill="url(#${id}c)"/><g transform="translate(256 256) rotate(38)"><path d="M-150 0A150 52 0 0 0 150 0" fill="none" stroke="#f5f1e8" stroke-width="14" stroke-linecap="round"/></g><g transform="translate(256 256) rotate(-26)"><path d="M-196 0A196 70 0 0 0 196 0" fill="none" stroke="url(#${id}a)" stroke-width="26" stroke-linecap="round"/><circle cx="196" cy="0" r="26" fill="#e8c98a"/></g></svg>`,
+  1: id => `<svg viewBox="0 0 48 48"><defs><linearGradient id="${id}l" x1="10" y1="38" x2="30" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f5f1e8"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><path d="M11.5 37C16.5 26 22.5 19.6 29.5 15.6" fill="none" stroke="url(#${id}l)" stroke-width="3.4" stroke-linecap="round"/><polygon points="33.20,6.80 35.49,12.24 41.38,12.74 36.91,16.61 38.25,22.36 33.20,19.30 28.15,22.36 29.49,16.61 25.02,12.74 30.91,12.24" fill="#fff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
+  2: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}g"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path class="lg-egri" pathLength="1" d="M13.2 36.2 24 12.2l10.8 24" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-hale" cx="24" cy="28.6" r="8" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="28.6" r="3.7" fill="#b69a68"/></svg>`,
+  3: id => `<svg viewBox="0 0 48 48"><defs><radialGradient id="${id}f" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#b69a68"/><stop offset=".55" stop-color="#254236"/><stop offset="1" stop-color="#30302b"/></radialGradient><radialGradient id="${id}g"><stop offset="0" stop-color="#5f9a80" stop-opacity=".7"/><stop offset="1" stop-color="#5f9a80" stop-opacity="0"/></radialGradient></defs><circle class="lg-egri" cx="12.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-egri" cx="35.5" cy="24" r="4.6" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/><circle class="lg-hale" cx="24" cy="24" r="13" fill="url(#${id}g)"/><circle class="lg-nokta" cx="24" cy="24" r="7" fill="url(#${id}f)"/></svg>`
 };
 const logoTile = (id, cls) => `<span class="logo-tile lg${LOGO_NO}${cls ? " " + cls : ""}" aria-hidden="true">${LOGO_V[LOGO_NO](id)}${LOGO_NO === 4 ? "" : '<canvas class="lg-cv" width="128" height="128"></canvas>'}</span>`;
 const WORDMARK = `<b class="wm">AKE <span>Akademi</span></b>`;
@@ -7218,7 +7218,7 @@ function aiBox(key, idle) {
 
 /* ---------- Çalışma alanım ---------- */
 const ARC_D = "M0 292 C 300 292, 540 246, 770 178 S 1070 46, 1200 22";
-const arcSVG = (id) => `<svg class="arc" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}a" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#1b3a8f" stop-opacity="0"/><stop offset=".25" stop-color="#1b3a8f"/><stop offset=".7" stop-color="#00b8ff"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".2"/></linearGradient><filter id="${id}g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="7" opacity=".55" filter="url(#${id}g)" vector-effect="non-scaling-stroke"/><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+const arcSVG = (id) => `<svg class="arc" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}a" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#254236" stop-opacity="0"/><stop offset=".25" stop-color="#254236"/><stop offset=".7" stop-color="#b69a68"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".2"/></linearGradient><filter id="${id}g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="7" opacity=".55" filter="url(#${id}g)" vector-effect="non-scaling-stroke"/><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
 function netGelisimKart() {
   const L = S.exams.filter(e => typeof e.net === "number").slice(-10);
   if (L.length < 2) return "";
@@ -7226,7 +7226,7 @@ function netGelisimKart() {
   const pts = L.map((e, k) => [P + k * (W - 2 * P) / (L.length - 1), H - P - (e.net - mn) / r * (H - 2 * P)]);
   const fark = L[L.length - 1].net - L[0].net;
   return `<section class="card"><div class="card-h"><h2>Net gelişimin</h2><span class="pill ${fark >= 0 ? "ok" : "bad"}">${fark >= 0 ? "+" : ""}${nfx(fark)} net</span></div>
-    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Son ${L.length} denemenin net grafiği" style="display:block"><polyline fill="none" stroke="#2f62e8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(q => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" ")}"/>${pts.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3.5" fill="#2f62e8"/>`).join("")}</svg>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Son ${L.length} denemenin net grafiği" style="display:block"><polyline fill="none" stroke="#254236" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(q => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" ")}"/>${pts.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3.5" fill="#254236"/>`).join("")}</svg>
     <p class="small muted" style="margin-top:6px">Son ${L.length} deneme · ilk ${nfx(L[0].net)} → son ${nfx(L[L.length - 1].net)} net</p></section>`;
 }
 function vHome() {
@@ -8320,8 +8320,8 @@ function erisimUygula() {
   if (ERISIM.hareket === "off") d.setAttribute("data-motion", "off"); else d.removeAttribute("data-motion");
   /* telefon durum çubuğu rengi (web sürümünde) */
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
-    const med = m.getAttribute("media") || "", dflt = /dark/.test(med) ? "#0b0c12" : "#f4f5f7";
-    m.setAttribute("content", ERISIM.tema === "auto" ? dflt : (ERISIM.tema === "dark" ? "#0b0c12" : "#f4f5f7"));
+    const med = m.getAttribute("media") || "", dflt = /dark/.test(med) ? "#171715" : "#f3efe6";
+    m.setAttribute("content", ERISIM.tema === "auto" ? dflt : (ERISIM.tema === "dark" ? "#171715" : "#f3efe6"));
   });
 }
 function erisimSet(k, v) {
@@ -9593,20 +9593,20 @@ function kartVeri(t, id) {
 async function kartCiz(v) {
   const W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d"), F = '"AKE Sans", system-ui, -apple-system, sans-serif';
   try { await Promise.race([document.fonts.load('700 120px "AKE Sans"'), new Promise(r => setTimeout(r, 900))]); } catch (e) { }
-  g.fillStyle = "#0b0c12"; g.fillRect(0, 0, W, H);
-  let gr = g.createRadialGradient(W * 0.92, 120, 0, W * 0.92, 120, 900); gr.addColorStop(0, "rgba(27,58,143,.55)"); gr.addColorStop(1, "rgba(27,58,143,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#171715"; g.fillRect(0, 0, W, H);
+  let gr = g.createRadialGradient(W * 0.92, 120, 0, W * 0.92, 120, 900); gr.addColorStop(0, "rgba(37,66,54,.55)"); gr.addColorStop(1, "rgba(37,66,54,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   gr = g.createRadialGradient(80, H - 160, 0, 80, H - 160, 800); gr.addColorStop(0, "rgba(0,217,163,.35)"); gr.addColorStop(1, "rgba(0,217,163,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); };
   /* logo */
-  const lg = g.createLinearGradient(80, 100, 220, 240); lg.addColorStop(0, "#1F5BFF"); lg.addColorStop(1, "#00B8FF"); g.fillStyle = lg; rr(80, 100, 120, 120, 34); g.fill();
+  const lg = g.createLinearGradient(80, 100, 220, 240); lg.addColorStop(0, "#254236"); lg.addColorStop(1, "#b69a68"); g.fillStyle = lg; rr(80, 100, 120, 120, 34); g.fill();
   g.strokeStyle = "#fff"; g.lineWidth = 12; g.lineCap = "round"; g.beginPath(); g.moveTo(112, 190); g.quadraticCurveTo(140, 110, 176, 130); g.stroke();
   g.fillStyle = "#00D9A3"; g.beginPath(); g.arc(176, 130, 11, 0, 7); g.fill();
   g.fillStyle = "#fff"; g.textBaseline = "alphabetic"; g.textAlign = "left"; g.font = `800 56px ${F}`; g.fillText("AKE", 228, 176); const w1 = g.measureText("AKE ").width; g.fillStyle = "rgba(255,255,255,.62)"; g.font = `600 56px ${F}`; g.fillText("Akademi", 228 + w1, 176);
   /* içerik */
-  g.fillStyle = "#7fb0ff"; g.font = `700 36px ${F}`; if ("letterSpacing" in g) g.letterSpacing = "6px"; g.fillText(v.ust, 80, 560); if ("letterSpacing" in g) g.letterSpacing = "0px";
+  g.fillStyle = "#d5ddcf"; g.font = `700 36px ${F}`; if ("letterSpacing" in g) g.letterSpacing = "6px"; g.fillText(v.ust, 80, 560); if ("letterSpacing" in g) g.letterSpacing = "0px";
   g.fillStyle = "rgba(255,255,255,.86)"; g.font = `600 46px ${F}`; const bas = String(v.baslik || ""); g.fillText(bas.length > 34 ? bas.slice(0, 33) + "…" : bas, 80, 636);
   g.fillStyle = "#fff"; let fs = 420; g.font = `800 ${fs}px ${F}`; while (g.measureText(v.buyuk).width > W - 160 && fs > 160) { fs -= 20; g.font = `800 ${fs}px ${F}`; }
-  const tg = g.createLinearGradient(80, 700, 80 + g.measureText(v.buyuk).width, 1000); tg.addColorStop(0, "#fff"); tg.addColorStop(1, "#9fd4ff"); g.fillStyle = tg; g.fillText(v.buyuk, 70, 640 + fs * 0.92);
+  const tg = g.createLinearGradient(80, 700, 80 + g.measureText(v.buyuk).width, 1000); tg.addColorStop(0, "#fff"); tg.addColorStop(1, "#d5ddcf"); g.fillStyle = tg; g.fillText(v.buyuk, 70, 640 + fs * 0.92);
   g.fillStyle = "rgba(255,255,255,.7)"; g.font = `600 54px ${F}`; g.fillText(v.alt, 84, 640 + fs * 0.92 + 84);
   const n = v.satir.length, cols = n > 3 ? 2 : 1, rh = 150, top = 1170;
   v.satir.forEach(([l, val], i) => {
@@ -10329,8 +10329,8 @@ const ATL_CSS = `
 .atl-b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;font:600 15px/1 var(--f-body);border:1px solid var(--line);color:var(--ink);background:var(--card);cursor:pointer;white-space:nowrap;transition:transform var(--t-btn) var(--ease),background var(--t-btn) var(--ease),border-color var(--t-btn) var(--ease),box-shadow var(--t-btn) var(--ease)}
 .atl-b:hover{border-color:var(--ink3)}
 .atl-b:active{transform:translateY(1px)}
-.atl-b.p{background:var(--grad);border-color:transparent;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 24px -14px rgba(42,92,224,.9)}
-.atl-b.p:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 14px 30px -14px rgba(42,92,224,1)}
+.atl-b.p{background:var(--grad);border-color:transparent;color:var(--on-pri,#171715);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 24px -14px rgba(37,66,54,.9)}
+.atl-b.p:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 14px 30px -14px rgba(37,66,54,1)}
 .atl-b.lg{min-height:52px;padding:0 24px;font-size:16px;border-radius:12px}
 .atl-b svg{width:16px;height:16px}
 .atl-eb{font:500 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
@@ -10339,7 +10339,11 @@ const ATL_CSS = `
 .atl-sec{padding-top:var(--sec)}
 .atl-hd{margin-bottom:clamp(28px,4vw,44px)}
 /* hero */
-.atl-hero{position:relative;padding-top:clamp(36px,6vw,72px)}
+.atl-hero{position:relative;padding-top:clamp(36px,6vw,72px);padding-bottom:clamp(40px,5vw,72px);overflow:hidden;isolation:isolate;background:radial-gradient(90% 120% at 80% 0%,#262622 0%,#171715 60%,#121210 100%);color:var(--ink);--paper:#171715;--card:#22211e;--sunk:#2a2925;--ink:#f5f1e8;--ink2:#d0cabc;--ink3:#aaa497;--line:#3d3b35;--line2:#33312c;--form:#8fb3a0;--c1:#5f9a80;--gold-ink:#d1b98c}
+.atl-hero::before{content:"";position:absolute;left:-6%;right:-6%;top:-8%;height:92%;z-index:0;pointer-events:none;background:radial-gradient(42% 56% at 14% 8%,rgba(37,66,54,.85),transparent 70%),radial-gradient(36% 50% at 58% 0%,rgba(182,154,104,.30),transparent 70%),radial-gradient(40% 56% at 96% 14%,rgba(95,154,128,.32),transparent 70%);filter:blur(28px);-webkit-mask-image:linear-gradient(#000 35%,transparent);mask-image:linear-gradient(#000 35%,transparent);animation:atlAu 54s ease-in-out infinite alternate;will-change:transform}
+.atl-hero .atl-w{position:relative;z-index:1}
+@keyframes atlAu{to{transform:translate3d(3%,5%,0) scale(1.07)}}
+@media (prefers-reduced-motion:reduce){.atl-hero::before{animation:none}}
 .atl-hero .atl-w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:clamp(24px,4vw,56px);align-items:center}
 .atl-hero h1{font:650 clamp(38px,5.2vw,64px)/1.03 var(--f-disp);letter-spacing:-.04em;margin:18px 0 0;max-width:13ch}
 .atl-hero h1 span{display:block;color:var(--ink3)}
@@ -10464,14 +10468,14 @@ const ATL_CSS = `
 :root:not([data-motion="off"]) .atl-rv.atl-on{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.atl-rv{opacity:1!important;transform:none!important}}
 /* açılış */
-.atl-intro{position:fixed;inset:0;z-index:200;background:#071426;display:grid;place-items:center;transition:opacity .45s var(--ease)}
+.atl-intro{position:fixed;inset:0;z-index:200;background:#171715;display:grid;place-items:center;transition:opacity .45s var(--ease)}
 .atl-intro.out{opacity:0;pointer-events:none}
 .atl-intro canvas{position:absolute;inset:0;width:100%;height:100%}
 .atl-intro .lg{position:relative;display:grid;justify-items:center;gap:14px;opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease);margin-top:clamp(220px,34vh,320px)}
 .atl-intro .lg.on{opacity:1;transform:none}
 .atl-intro .lg b{font:600 15px/1 "AKE Sans",system-ui,sans-serif;letter-spacing:.42em;color:#f5f0e6;padding-left:.42em}
 .atl-intro .lg small{font:500 11px/1 "AKE Sans",ui-monospace,monospace;letter-spacing:.2em;color:#c9a86a;text-transform:uppercase}
-.atl-intro3d{position:fixed;inset:0;z-index:9999;background:#06111f;opacity:1;transition:opacity .55s ease}.atl-intro3d.out{opacity:0;pointer-events:none}.atl-intro3d iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#06111f}
+.atl-intro3d{position:fixed;inset:0;z-index:9999;background:#171715;opacity:1;transition:opacity .55s ease}.atl-intro3d.out{opacity:0;pointer-events:none}.atl-intro3d iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#171715}
 .atl-skip{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));min-height:44px;padding:0 16px;border-radius:99px;border:1px solid rgba(245,240,230,.3);background:rgba(245,240,230,.06);color:#f5f0e6;font:500 14px/1 "AKE Sans",system-ui,sans-serif;cursor:pointer;z-index:2}
 .atl-skip:hover{background:rgba(245,240,230,.14)}
 .atl-skip:focus-visible{outline:2px solid #c9a86a;outline-offset:3px}
@@ -10491,12 +10495,12 @@ function tnSoru() {
 
 /* ATLAS bölgeleri: dersleri öğrenme alanlarına toplar */
 const ATL_REG = [
-  { k: "mat", n: "Matematik", s: ["mat", "geo", "amat"], c: "#477bff" },
+  { k: "mat", n: "Matematik", s: ["mat", "geo", "amat"], c: "#5f9a80" },
   { k: "tr", n: "Türkçe", s: ["turkce"], c: "#c9a86a" },
   { k: "fen", n: "Fen", s: ["fizik", "kimya", "biyoloji", "afizik", "akimya", "abiyoloji"], c: "#39bfa0" },
-  { k: "sos", n: "Sosyal", s: ["tarih", "cografya", "felsefe", "din", "tarih2", "cografya2", "psikoloji", "sosyoloji", "mantik"], c: "#9fb3d9" },
+  { k: "sos", n: "Sosyal", s: ["tarih", "cografya", "felsefe", "din", "tarih2", "cografya2", "psikoloji", "sosyoloji", "mantik"], c: "#d5ddcf" },
   { k: "ede", n: "Edebiyat", s: ["edebiyat"], c: "#d9a38a" },
-  { k: "ydt", n: "İngilizce", s: ["ingilizce"], c: "#b9a6e0" }
+  { k: "ydt", n: "İngilizce", s: ["ingilizce"], c: "#d5ddcf" }
 ];
 let ATL_VERI = null, ATL_VK = -1;
 function atlVeri() {
@@ -10650,8 +10654,8 @@ const ATLAS = (function () {
   }
   function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z); }
   function colors() {
-    const cs = getComputedStyle(document.documentElement), g = k => (cs.getPropertyValue(k) || "").trim();
-    col = { bg: g("--paper") || "#071426", ink: g("--ink") || "#f5f0e6", gold: g("--gold") || "#c9a86a", form: g("--c1") || "#477bff", dark: koyuMu() };
+    const cs = getComputedStyle(document.getElementById("atlCv") || document.documentElement), g = k => (cs.getPropertyValue(k) || "").trim();
+    col = { bg: g("--paper") || "#171715", ink: g("--ink") || "#f5f0e6", gold: g("--gold") || "#c9a86a", form: g("--c1") || "#5f9a80", dark: koyuMu() };
   }
   function rgba(hex, a) { const h = hex.replace("#", ""), v = h.length === 3 ? h.split("").map(x => x + x).join("") : h; const n = parseInt(v, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
   function size() { if (!cv) return; const r = cv.getBoundingClientRect(); DPR = Math.min(window.devicePixelRatio || 1, low ? 1 : atlMobil() ? 1.5 : 2); W = Math.max(1, Math.round(r.width * DPR)); H = Math.max(1, Math.round(r.height * DPR)); cv.width = W; cv.height = H; }
@@ -10828,7 +10832,7 @@ function atlIntro(zorla) {
     if (!t0) t0 = now; const t = (now - t0) / 1000, k = T / 2.9;
     x.clearRect(0, 0, w, h);
     const g1 = e(t / (.7 * k)), gl = x.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * .45);
-    gl.addColorStop(0, `rgba(201,168,106,${.22 * g1})`); gl.addColorStop(.4, `rgba(71,123,255,${.06 * g1})`); gl.addColorStop(1, "rgba(7,20,38,0)");
+    gl.addColorStop(0, `rgba(201,168,106,${.22 * g1})`); gl.addColorStop(.4, `rgba(95,154,128,${.06 * g1})`); gl.addColorStop(1, "rgba(23,23,21,0)");
     x.fillStyle = gl; x.fillRect(0, 0, w, h);
     const pos = ps.map(p => { const a = e((t - (.3 + p.d) * k) / (.6 * k)), m = e((t - (.95 + p.d * .6) * k) / (.85 * k)); return [p.sx + (p.tx - p.sx) * m, p.sy + (p.ty - p.sy) * m, a]; });
     const lw = e((t - 1.35 * k) / (.7 * k));

@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=0abe0b0fa2">
-<link rel="icon" href="/favicon.ico?v=0abe0b0fa2" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=0abe0b0fa2">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=0abe0b0fa2">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=0abe0b0fa2">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=0abe0b0fa2">
+<link rel="manifest" href="/manifest.webmanifest?v=5916c71093">
+<link rel="icon" href="/favicon.ico?v=5916c71093" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=5916c71093">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=5916c71093">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=5916c71093">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=5916c71093">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=0abe0b0fa2">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=5916c71093">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -1042,6 +1042,78 @@ html.fx-calm .lyr{animation:none!important;opacity:1!important;transform:none!im
 .card .empty{padding:20px;border-radius:14px;background:linear-gradient(180deg,rgba(37,66,54,.04),transparent);border:1px dashed var(--line);color:var(--ink2);text-align:center;line-height:1.55}
 /* mobil: aurora perdesi sabit, animasyon yok */
 html.fx-m #aur b::after,html.fx-m #aur b::before{animation:none!important}
+</style>
+<style>
+/* ===== V2.4: güçlü aurora, imleç ışığı, cam yüzey, buton cam/ışık, paketler ===== */
+/* 1) Aurora: ışık katmanları belirgin (neon değil: doygunluk düşük, şampanya çok hafif) */
+#aur b{background:linear-gradient(180deg,#171715 0,#12211a 24%,rgba(37,66,54,.78) 52%,rgba(37,66,54,.30) 78%,rgba(37,66,54,0) 100%)}
+#aur b::before{background:
+ radial-gradient(36% 46% at 16% 32%,rgba(104,190,148,.78),transparent 70%),
+ radial-gradient(32% 42% at 56% 20%,rgba(78,164,122,.72),transparent 70%),
+ radial-gradient(26% 36% at 88% 38%,rgba(197,165,114,.30),transparent 72%)}
+#aur b::after{background:repeating-linear-gradient(100deg,transparent 0 64px,rgba(120,205,160,.24) 100px,rgba(197,165,114,.06) 126px,transparent 176px)}
+html:not(.fx-home) #aur i:nth-child(3){background:radial-gradient(circle,rgba(46,110,82,.62),transparent 62%)}
+html:not(.fx-home) #aur i:nth-child(4){background:radial-gradient(circle,rgba(26,70,52,.58),transparent 62%)}
+html:not(.fx-home) #aur i:nth-child(2){background:radial-gradient(circle,rgba(197,165,114,.20),transparent 62%)}
+/* aurora diğer sayfalarda da canlı: üstte yumuşak yeşil perde (ana sayfada sahne var) */
+html:not(.fx-home):not(.fx-calm) #aur::before{opacity:1}
+/* imleç ışığı: küçük gecikmeyle izler (yalnızca fare, yalnızca fx-on) */
+#aur u{position:absolute;left:0;top:0;width:640px;height:640px;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .6s ease;will-change:transform;
+ background:radial-gradient(circle,rgba(120,205,160,.20) 0,rgba(197,165,114,.07) 38%,transparent 66%)}
+html.fx-ptr.fx-on:not(.fx-lite) #aur u{opacity:1}
+/* parallax: sahne ve ışıklar kaydırmada daha belirgin ayrışır */
+@supports (animation-timeline:scroll()){@keyframes pxS{to{transform:translate3d(0,-34%,0)}}}
+/* 2) Büyük yüzeylerde imleç ışığı */
+.glow{position:relative}
+.glow::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s ease;
+ background:radial-gradient(320px 220px at var(--mx,50%) var(--my,30%),rgba(241,223,182,.14),transparent 70%)}
+@media (hover:hover){html.fx-on:not(.fx-lite) .glow:hover::after{opacity:1}}
+.vitrin.glow::after{opacity:.9}
+/* 3) Premium cam: Merhaba/karşılama paneli */
+.vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(74,128,102,.50),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(15,30,24,.70),transparent 70%),linear-gradient(135deg,rgba(37,66,54,.84),rgba(23,23,21,.88));
+ border:1px solid rgba(197,165,114,.30);box-shadow:inset 0 1px 0 rgba(241,223,182,.34),inset 0 0 0 1px rgba(110,190,150,.12),inset 0 -50px 70px -50px rgba(0,0,0,.4),0 28px 56px -26px rgba(0,0,0,.65)}
+@supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+ html:not(.fx-lite) .vitrin{-webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25)}
+ html.fx-m:not(.fx-lite) .vitrin{-webkit-backdrop-filter:blur(8px) saturate(1.15);backdrop-filter:blur(8px) saturate(1.15)}
+}
+/* düşük güçlü cihazda / hareket azaltılmışta: cam yok, opak ve kaliteli zemin */
+html.fx-lite .vitrin{background:radial-gradient(70% 140% at 100% 0%,rgba(74,128,102,.55),transparent 62%),linear-gradient(135deg,#254236,#171715)}
+/* üyelik kartları: koyu cam */
+.glass-d{background:linear-gradient(135deg,rgba(37,66,54,.88),rgba(23,23,21,.92));color:#f5f1e8;border:1px solid rgba(197,165,114,.28);box-shadow:inset 0 1px 0 rgba(241,223,182,.28),0 18px 40px -24px rgba(0,0,0,.6)}
+@supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){html:not(.fx-lite) .glass-d{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}}
+.glass-d .eyebrow{color:#d9c28f}.glass-d .uy-s{color:#cbd6ce}.glass-d b{color:#f5f1e8}
+.uyelik,.uy-ozet{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 20px}
+.uy-i{display:flex;flex-direction:column;gap:3px;min-width:0}.uy-ad{font:700 19px/1.2 var(--f-disp);letter-spacing:-.01em}
+.glass-d .btn:not(.pri):not(.acc){background:rgba(245,241,232,.10);border-color:rgba(197,165,114,.45);color:#f5f1e8}
+.glass-d .btn:not(.pri):not(.acc):hover{background:rgba(245,241,232,.16)}
+.plans .card.cur{border-color:#b69a68;box-shadow:0 0 0 1px #b69a68,var(--shadow)}
+.plans .card.cur .pill{background:rgba(197,165,114,.2);color:#6f5a2f;border-color:rgba(182,154,104,.6)}
+/* 4) Butonlar: ikincil = hafif cam + kenar ışığı + şampanya yansıması; birincil aynen kalır */
+.btn:not(.pri):not(.acc):not(.ghost):not(:disabled){background:linear-gradient(180deg,rgba(255,253,248,.78),rgba(251,248,241,.55));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(197,165,114,.16),0 1px 2px rgba(23,23,21,.06);position:relative;overflow:hidden}
+.btn:not(.pri):not(.acc):not(.ghost):not(:disabled)::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s ease;
+ background:radial-gradient(90px 60px at var(--bx,50%) var(--by,50%),rgba(226,198,140,.38),transparent 70%)}
+@media (hover:hover){.btn:not(.pri):not(.acc):not(.ghost):not(:disabled):hover::before{opacity:1}.btn:not(.pri):not(.acc):not(.ghost):not(:disabled):hover{border-color:rgba(197,165,114,.75)}}
+.top .btn:not(.pri):not(.acc),.vitrin .btn:not(.pri):not(.acc){-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+html.fx-lite .top .btn,html.fx-lite .vitrin .btn{-webkit-backdrop-filter:none;backdrop-filter:none}
+.btn:not(:disabled):active{transform:translateY(0) scale(.97)}
+/* birincil CTA: şampanya yansıması hafifçe artar */
+@media (hover:hover){.btn.pri:not(:disabled):hover{filter:brightness(1.04)}}
+/* klavye focus: belirgin, iki tonlu halka */
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid #171715;outline-offset:2px;box-shadow:0 0 0 6px #c5a572;border-radius:10px}
+.top :where(a,button):focus-visible,.glass-d :where(a,button):focus-visible,.vitrin :where(a,button):focus-visible,.tabbar :where(a,button):focus-visible{outline-color:#f5f1e8}
+@media (prefers-reduced-motion:reduce){#aur u{display:none}.glow::after{transition:none}}
+html.fx-m #aur u{display:none}
+</style>
+<style>
+@media (min-width:900px){.side .nav a{padding:9px 8px;gap:6px;font-size:13.5px}.side{gap:0}.side .nav{gap:0}}
+.glass-d .btn:not(.pri):not(.acc):not(.ghost):not(:disabled){background:rgba(245,241,232,.10);border-color:rgba(197,165,114,.5);color:#f5f1e8;box-shadow:inset 0 1px 0 rgba(241,223,182,.22)}
+.glass-d .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):hover{background:rgba(245,241,232,.17)}
+</style>
+<style>
+/* okunabilirlik: cam yüzeyin metin tarafı daha koyu (aurora ışığı metnin altına parlak düşmesin) */
+.vitrin{background:linear-gradient(90deg,rgba(14,26,20,.62) 0,rgba(14,26,20,.34) 52%,rgba(14,26,20,0) 78%),radial-gradient(70% 140% at 100% 0%,rgba(74,128,102,.44),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(15,30,24,.78),transparent 70%),linear-gradient(135deg,rgba(37,66,54,.92),rgba(23,23,21,.94))}
+.vitrin p,.vitrin .muted{color:#e3eae5}
+.vitrin::before{opacity:.8}
 </style>
 </head>
 <body>
@@ -7441,7 +7513,7 @@ const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const NAVG = [
   ["Çalış", [["bugun", "Ana sayfa", "home"], ["studyo", "Soru çöz", "stack"], ["deneme", "Denemeler", "clock"], ["ogretmen", "AI öğretmen", "spark"]]],
   ["Takip", [["yanlislar", "Tekrar", "cards"], ["plan", "Planım", "cal"], ["gelisim", "Gelişimim", "chart"]]],
-  ["Hesap", [["ayarlar", "Ayarlar", "gear"]]]
+  ["Hesap", [["premium", "Paketler ve Üyelik", "star"], ["ayarlar", "Ayarlar", "gear"]]]
 ];
 /* alt sayfalar hangi ana menüye ait */
 const NAVACT = { koc: "gelisim", banka: "studyo", paragraf: "studyo", osym: "studyo", uret: "studyo", kartlar: "yanlislar", kisa: "yanlislar", sonuc: "deneme", canli: "deneme" };
@@ -7514,6 +7586,15 @@ function netGelisimKart() {
     <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Son ${L.length} denemenin net grafiği" style="display:block"><polyline fill="none" stroke="#254236" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(q => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" ")}"/>${pts.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3.5" fill="#254236"/>`).join("")}</svg>
     <p class="small muted" style="margin-top:6px">Son ${L.length} deneme · ilk ${nfx(L[0].net)} → son ${nfx(L[L.length - 1].net)} net</p></section>`;
 }
+/* Giriş sonrası "Paketler ve Üyelik" erişimi: mevcut paket durumu + #premium sayfasına bağlantı (yeni fiyat/ödeme yok) */
+function uyelikKart() {
+  if (typeof IN_CLAUDE !== "undefined" && IN_CLAUDE) return "";
+  const H = HESAP; if (!H || !H.user) return "";
+  const pk = H.paket, ad = pk ? planAd(pk.plan) : "Ücretsiz";
+  const bit = pk && pk.bitis ? new Date(pk.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
+  return `<section class="card uyelik glass-d glow" aria-label="Paketler ve Üyelik"><div class="uy-i"><span class="eyebrow">Paketler ve Üyelik</span><b class="uy-ad">${esc(ad)} paket</b><span class="small uy-s">${pk ? (bit ? `Bitiş: ${esc(bit)}` : "Aktif") : "AI öğretmen ve daha yüksek haklar için paketleri incele"}</span></div><a class="btn ${pk ? "" : "pri"}" href="#premium">${pk ? "Üyeliği yönet" : "Paketleri gör"}</a></section>
+  `;
+}
 function vHome() {
   const p = S.profile, goal = +p.gunluk || 40, today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
   const ng = netGelisimKart(), prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
@@ -7521,6 +7602,7 @@ function vHome() {
   return `<div class="view">${resumeBanner()}
   <div class="home-head vitrin">${arcSVG("hv")}<div><h1>${p.name ? `Merhaba ${esc(p.name)}` : "Merhaba"}</h1><p class="muted">${esc(dateStr)} · YKS 2027'ye <b>${daysLeft()}</b> gün</p></div><a class="btn pri" href="#studyo">Soru çöz</a></div>
   ${p.ok ? "" : obKart(goal)}
+  ${uyelikKart()}
   <section class="card today"><div class="card-h"><h2>Bugünün programı</h2><span class="small muted">${done}/${prog.length} tamam</span></div>
     <div class="bar ${today.q >= goal ? "ok" : ""}"><i style="width:${Math.min(100, pct(today.q, goal))}%"></i></div>
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
@@ -10247,7 +10329,7 @@ const HRK = (() => {
   const mq = matchMedia("(max-width:760px), (pointer:coarse)"); const setM = () => root.classList.toggle("fx-m", mq.matches); setM();
   if (mq.addEventListener) mq.addEventListener("change", setM);
   root.classList.toggle("fx-sd", SD);
-  function ensure() { if (aur) return; aur = document.createElement("div"); aur.id = "aur"; aur.setAttribute("aria-hidden", "true"); aur.innerHTML = "<b></b><i></i><i></i><i></i>"; document.body.insertBefore(aur, document.body.firstChild); }
+  function ensure() { if (aur) return; aur = document.createElement("div"); aur.id = "aur"; aur.setAttribute("aria-hidden", "true"); aur.innerHTML = "<b></b><u></u><i></i><i></i><i></i>"; document.body.insertBefore(aur, document.body.firstChild); }
   function sync(r, inRun) {
     try {
       ensure();
@@ -10267,11 +10349,24 @@ const HRK = (() => {
     } catch (e) { }
   }
   addEventListener("scroll", () => { if (tick || SD || !root.classList.contains("fx-on") || lite) return; tick = true; requestAnimationFrame(() => { tick = false; root.style.setProperty("--sy", Math.min(window.scrollY, 1600)); }); }, { passive: true });
+  /* İmleç etkileşimi (yalnızca fare): arka plan ışığı küçük gecikmeyle imleci izler; büyük panellerde ve butonlarda yumuşak ışık.
+     Ağır iş yok: yalnızca transform ve iki CSS değişkeni yazılır; döngü imleç durunca kendiliğinden biter. */
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, first = true;
+  const follow = () => {
+    raf = 0; if (!aur) return; const u = aur.querySelector("u"); if (!u) return;
+    cx += (tx - cx) * .07; cy += (ty - cy) * .07; u.style.transform = "translate3d(" + (cx - 320).toFixed(1) + "px," + (cy - 320).toFixed(1) + "px,0)";
+    if (Math.abs(tx - cx) + Math.abs(ty - cy) > .6) raf = requestAnimationFrame(follow);
+  };
   addEventListener("pointermove", e => {
-    if (e.pointerType !== "mouse" || !root.classList.contains("fx-on")) return;
-    const v = e.target.closest && e.target.closest(".vitrin"); if (!v) return;
-    const b = v.getBoundingClientRect(); v.style.setProperty("--mx", ((e.clientX - b.left) / b.width * 100).toFixed(1) + "%"); v.style.setProperty("--my", ((e.clientY - b.top) / b.height * 100).toFixed(1) + "%");
+    if (e.pointerType !== "mouse" || !root.classList.contains("fx-on") || lite) return;
+    tx = e.clientX; ty = e.clientY; if (first) { cx = tx; cy = ty; first = false; root.classList.add("fx-ptr"); }
+    if (!raf) raf = requestAnimationFrame(follow);
+    const t = e.target; if (!t || !t.closest) return;
+    const v = t.closest(".vitrin,.glow"); if (v) { const b = v.getBoundingClientRect(); v.style.setProperty("--mx", ((e.clientX - b.left) / b.width * 100).toFixed(1) + "%"); v.style.setProperty("--my", ((e.clientY - b.top) / b.height * 100).toFixed(1) + "%"); }
+    const bt = t.closest(".btn"); if (bt) { const b = bt.getBoundingClientRect(); bt.style.setProperty("--bx", (e.clientX - b.left).toFixed(0) + "px"); bt.style.setProperty("--by", (e.clientY - b.top).toFixed(0) + "px"); }
   }, { passive: true });
+  document.addEventListener("pointerleave", () => root.classList.remove("fx-ptr"), { passive: true });
+  document.addEventListener("pointerenter", () => { if (!first) root.classList.add("fx-ptr"); }, { passive: true });
   /* etkileşim sırasında hareketi kısa süre durdur: tıklama/dokunma ana iş parçacığını aurora ile paylaşmasın (INP) */
   let busyT = 0;
   const dur = () => { root.classList.add("fx-busy"); clearTimeout(busyT); busyT = setTimeout(() => root.classList.remove("fx-busy"), 700); };
@@ -11233,6 +11328,15 @@ function planlar() {
       feats: ["Atılım paketindeki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
   ];
 }
+function uyelikOzet() {
+  const H = HESAP, pk = H.paket;
+  if (!H.user) return `<div class="card glass-d glow uy-ozet"><div class="uy-i"><span class="eyebrow">Üyeliğin</span><b class="uy-ad">Giriş yapmadın</b><span class="small uy-s">Paket satın almadan önce giriş yap; ödeme, giriş yaptığın e-postaya tanımlanır.</span></div><a class="btn pri" href="#hesap">Giriş yap</a></div>`;
+  const k = H.kullanim || { mesaj: 0, guclu: 0 }, L = H.limit;
+  const bit = pk && pk.bitis ? new Date(pk.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
+  return `<div class="card glass-d glow uy-ozet"><div class="uy-i"><span class="eyebrow">Mevcut üyeliğin</span><b class="uy-ad">${esc(pk ? planAd(pk.plan) : "Ücretsiz")} paket</b><span class="small uy-s">${esc(H.user.eposta || "")}${bit ? " · Bitiş: " + esc(bit) : ""}</span>
+    ${pk && L ? `<span class="small uy-s">Bu ay AI mesajı: <b>${k.mesaj} / ${L.mesaj}</b> · Gelişmiş çözüm: <b>${k.guclu} / ${L.guclu}</b></span>` : ""}</div>
+    ${pk ? `<a class="btn" href="#hesap">Hesabımda yönet</a>` : ""}</div>`;
+}
 function vPremium() {
   const Y = UI.prem.yil, P = planlar(), satici = !!(AYAR.adSoyad && AYAR.eposta);
   const li = t => `<li class="pf"><span class="pf-i on" aria-hidden="true"></span>${t}</li>`;
@@ -11245,8 +11349,9 @@ function vPremium() {
       : `<div class="price"><b>${m}<small> TL</small></b><span>/ ay</span></div><p class="xs muted">Yıllık alırsan ${y ? y + " TL" + (avantaj ? ", " + avantaj : "") : "daha avantajlı"}</p>`;
   };
   const acik = p => p.link && okLink(Y ? p.link.yil : p.link.ay) && satici;
-  const kart = p => `<div class="card stack${p.k === "premium" ? " prem" : ""}${UI.prem.sel === p.k ? " sel" : ""}">
-      <div class="card-h" style="margin:0"><h2>${p.n}</h2><span class="pill${p.k === "ucretsiz" ? "" : " form"}">${p.tag}</span></div>${fiyat(p)}
+  const mevcut = k => !IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.user && (HESAP.paket ? HESAP.paket.plan === k : k === "ucretsiz");
+  const kart = p => `<div class="card stack glow${p.k === "premium" ? " prem" : ""}${UI.prem.sel === p.k ? " sel" : ""}${mevcut(p.k) ? " cur" : ""}">
+      <div class="card-h" style="margin:0"><h2>${p.n}</h2><span class="pill${p.k === "ucretsiz" ? "" : " form"}">${mevcut(p.k) ? "Mevcut paketin" : p.tag}</span></div>${fiyat(p)}
       <ul class="pfl">${p.feats.map(li).join("")}</ul>
       ${p.k === "ucretsiz" ? `<a class="btn" href="#bugun">Hemen başla</a>` : acik(p) ? `<button class="btn ${p.k === "premium" ? "acc" : "pri"}" data-a="premSec" data-k="${p.k}">${UI.prem.sel === p.k ? "Seçildi" : "Bu paketi seç"}</button>` : `<button class="btn" disabled>Çok yakında</button>`}
     </div>`;
@@ -11260,6 +11365,7 @@ function vPremium() {
     </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Atılım ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
     <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Atılım ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
+    ${(!IN_CLAUDE && typeof HESAP !== "undefined") ? uyelikOzet() : ""}
     <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık${(() => { const a = Number(String(AYAR.fiyatOrta).replace(/[^\d]/g, "")), y = Number(String(AYAR.yillikOrta).replace(/[^\d]/g, "")), f = a && y ? 12 - y / a : 0; return f >= 0.95 && Math.abs(f - Math.round(f)) < 0.05 ? " · " + Math.round(f) + " ay bedava" : ""; })()}</button></div>
     <div class="grid3 plans">${P.map(kart).join("")}</div>
     ${buy}

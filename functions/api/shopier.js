@@ -8,6 +8,7 @@ export async function onRequest({ request, env }) {
   if (!env.DB) return fail(500, "yapilandirma");
   await sema(env);
   const ham = await request.text();
+  if (ham.length > 200000) return fail(413, "buyuk");
   const token = await ayarOku(env, "shopier_webhook_token");
   if (!token) return fail(503, "kurulmadi");
   const imza = request.headers.get("shopier-signature") || "", h = await hmacHex(token, ham);
@@ -16,6 +17,7 @@ export async function onRequest({ request, env }) {
   if (olay && olay !== "order.created") return json(200, { ok: true, yok_sayildi: olay });
   let o; try { o = JSON.parse(ham); } catch (e) { return fail(400, "json"); }
   if (o && o.data && !o.id) o = o.data;
+  if (!o || typeof o !== "object" || Array.isArray(o)) return fail(400, "json");
   try { const r = await siparisIsle(env, o); return json(200, { ok: true, durum: r.durum }); }
   catch (e) { console.error("siparis", e); return fail(500, "islem"); /* Shopier tekrar dener */ }
 }

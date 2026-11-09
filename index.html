@@ -6,9 +6,9 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=e09bfffced">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e09bfffced">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=e09bfffced">
+<link rel="manifest" href="/manifest.webmanifest?v=7e07bc0010">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7e07bc0010">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7e07bc0010">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -16,7 +16,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=e09bfffced">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=7e07bc0010">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -323,7 +323,7 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.5}
 .msg.a ul,.msg.a ol{padding-left:20px;margin-bottom:0}
 :root[data-fs="l"] #main{zoom:1.12}
 :root[data-fs="xl"] #main{zoom:1.25}
-:root[data-font="okuma"]{--f-body:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif;--f-disp:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif}
+:root[data-font="okuma"]{--f-body:"AKE Sans","Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif;--f-disp:"AKE Sans","Atkinson Hyperlegible Next","Atkinson Hyperlegible",Verdana,Tahoma,sans-serif}
 :root[data-font="okuma"] body{letter-spacing:.012em;line-height:1.7}
 .erisim-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .erisim-row>b{font-weight:600}
@@ -8243,7 +8243,6 @@ Object.assign(ADM_ACT, {
 
 /* ---------- 15 · Erişilebilirlik: tema, yazı boyutu, okuma dostu yazı tipi ---------- */
 const ERISIM = { tema: LS.get("ake.tema") || "auto", yazi: LS.get("ake.yazi") || "n", font: LS.get("ake.font") || "std", hareket: LS.get("ake.hareket") || "on" };
-const OKUMA_FONT = "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap";
 const koyuMu = () => ERISIM.tema === "dark";
 function erisimUygula() {
   const d = document.documentElement;
@@ -8251,7 +8250,6 @@ function erisimUygula() {
   if (ERISIM.yazi === "l" || ERISIM.yazi === "xl") d.setAttribute("data-fs", ERISIM.yazi); else d.removeAttribute("data-fs");
   if (ERISIM.font === "okuma") {
     d.setAttribute("data-font", "okuma");
-    if (!document.getElementById("okumaFont")) { const l = document.createElement("link"); l.id = "okumaFont"; l.rel = "stylesheet"; l.href = OKUMA_FONT; document.head.appendChild(l); }
   } else d.removeAttribute("data-font");
   if (ERISIM.hareket === "off") d.setAttribute("data-motion", "off"); else d.removeAttribute("data-motion");
   /* telefon durum çubuğu rengi (web sürümünde) */
@@ -11421,7 +11419,7 @@ addEventListener("pagehide", () => { try { clearTimeout(saveTimer); flush(); } c
 /* Krom şerit + yıldız: arka plan, giriş animasyonu (oturum başına bir kez), hareketli logolar, telefon eğimi */
 /* İlk kez gelen ve hiç soru çözmemiş ziyaretçi tanıtım sayfasıyla karşılanır (bir kez) */
 try { if (!location.hash && !totals().q && !LS.get("ake.kod") && !adminMode()) location.hash = "#tanitim"; } catch (e) { }
-KROM.baslat(); KROM.egim(); KROM.giris();
+KROM.baslat(); KROM.egim();
 if (RUN && RUN.dur && RUN.mode === "exam" && RUN.start + RUN.dur * 1000 <= Date.now()) { UI.inRun = false; finishRun(true); }
 else { render(); if (RUN) startTick(); }
 initCloud();

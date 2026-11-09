@@ -6,9 +6,9 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f0e6">
-<link rel="manifest" href="/manifest.webmanifest?v=7e07bc0010">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=7e07bc0010">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=7e07bc0010">
+<link rel="manifest" href="/manifest.webmanifest?v=1ce6d03bfc">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=1ce6d03bfc">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png?v=1ce6d03bfc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -16,7 +16,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=7e07bc0010">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=1ce6d03bfc">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -7171,6 +7171,16 @@ function aiBox(key, idle) {
 /* ---------- Çalışma alanım ---------- */
 const ARC_D = "M0 292 C 300 292, 540 246, 770 178 S 1070 46, 1200 22";
 const arcSVG = (id) => `<svg class="arc" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="${id}a" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#1b3a8f" stop-opacity="0"/><stop offset=".25" stop-color="#1b3a8f"/><stop offset=".7" stop-color="#00b8ff"/><stop offset="1" stop-color="#00d9a3" stop-opacity=".2"/></linearGradient><filter id="${id}g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="7"/></filter></defs><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="7" opacity=".55" filter="url(#${id}g)" vector-effect="non-scaling-stroke"/><path d="${ARC_D}" fill="none" stroke="url(#${id}a)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+function netGelisimKart() {
+  const L = S.exams.filter(e => typeof e.net === "number").slice(-10);
+  if (L.length < 2) return "";
+  const W = 300, H = 80, P = 8, mn = Math.min(...L.map(e => e.net)), mx = Math.max(...L.map(e => e.net)), r = (mx - mn) || 1;
+  const pts = L.map((e, k) => [P + k * (W - 2 * P) / (L.length - 1), H - P - (e.net - mn) / r * (H - 2 * P)]);
+  const fark = L[L.length - 1].net - L[0].net;
+  return `<section class="card"><div class="card-h"><h2>Net gelişimin</h2><span class="pill ${fark >= 0 ? "ok" : "bad"}">${fark >= 0 ? "+" : ""}${nfx(fark)} net</span></div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Son ${L.length} denemenin net grafiği" style="display:block"><polyline fill="none" stroke="#2f62e8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(q => q[0].toFixed(1) + "," + q[1].toFixed(1)).join(" ")}"/>${pts.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="3.5" fill="#2f62e8"/>`).join("")}</svg>
+    <p class="small muted" style="margin-top:6px">Son ${L.length} deneme · ilk ${nfx(L[0].net)} → son ${nfx(L[L.length - 1].net)} net</p></section>`;
+}
 function vHome() {
   const p = S.profile, goal = +p.gunluk || 40, today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
   const prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
@@ -7183,7 +7193,7 @@ function vHome() {
     <div class="tasks">${prog.map(gtaskHTML).join("")}</div>
     ${tasks.length ? `<h3 style="margin-top:14px">Planındaki görevler</h3><div class="list">${tasks.map(taskRow).join("")}</div>` : ""}
     <p class="small muted" style="margin-top:10px">Program her sabah zayıf konularına, tekrar zamanı gelen yanlışlarına ve kartlarına göre yeniden hazırlanır.</p></section>
-  ${kartGunSorusu()}${kartKoc()}${veriUyari()}${canliKart(true)}${ligMini()}
+  ${netGelisimKart()}${kartGunSorusu()}${kartKoc()}${veriUyari()}${canliKart(true)}${ligMini()}
   <section class="card"><div class="card-h"><h2>Ders seç</h2><a class="btn sm ghost" href="#studyo">Tüm dersler</a></div>
     <div class="ders-grid">${alanDersleri().map(s => { const o = dersOzet(s); return `<button type="button" class="ders" data-a="dersAc" data-s="${s}"><b>${esc(SUBJ[s].n)}</b><div class="dbar"><i class="${isiSinif(o.acc)}" style="width:${o.n ? Math.max(8, o.acc) : 0}%"></i></div><small>${(i => `${i.konu} konu · ${i.soru}${i.kalip ? "+" : ""} soru`)(dersBilgi(s))}${o.n ? ` · %${o.acc} doğru` : ""}</small></button>`; }).join("")}</div></section>
   <div class="grid2">

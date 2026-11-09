@@ -6,12 +6,12 @@
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);}catch(e){}</script>
 <meta name="theme-color" content="#f5f1e8">
-<link rel="manifest" href="/manifest.webmanifest?v=dd6d203cf6">
-<link rel="icon" href="/favicon.ico?v=dd6d203cf6" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=dd6d203cf6">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=dd6d203cf6">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=dd6d203cf6">
-<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=dd6d203cf6">
+<link rel="manifest" href="/manifest.webmanifest?v=e69d5c42e8">
+<link rel="icon" href="/favicon.ico?v=e69d5c42e8" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png?v=e69d5c42e8">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png?v=e69d5c42e8">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=e69d5c42e8">
+<link rel="apple-touch-icon-precomposed" href="/icons/apple-touch-icon.png?v=e69d5c42e8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AKE Akademi">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="AKE Akademi · YKS 2027">
 <meta property="og:description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
-<meta property="og:image" content="https://akeakademi.com/og.png?v=dd6d203cf6">
+<meta property="og:image" content="https://akeakademi.com/og.png?v=e69d5c42e8">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://akeakademi.com/">
@@ -936,6 +936,79 @@ html.fx-on:not(.fx-lite) #aur i:nth-child(3){animation:aurC 26s ease-in-out infi
 @keyframes aurC{to{transform:translate3d(22vw,-16vh,0) scale(1.28)}}
 @keyframes aurSway{0%{transform:skewX(-12deg) scaleY(.9)}100%{transform:skewX(12deg) scaleY(1.35) translateX(7vw)}}
 html.fx-on:not(.fx-lite) #aur::before{animation:aurSway 12s ease-in-out infinite alternate}
+</style>
+<style>
+/* ===== V2.2: sinematik aurora sahnesi, katmanlı scroll, logo, buton rötuşu ===== */
+:root{--ease:cubic-bezier(.22,.8,.24,1);--t-fast:.16s;--t-mid:.28s}
+/* --- Aurora sahnesi: üst menüden doğan obsidyen→orman gökyüzü (yalnızca ana sayfada) --- */
+#aur b{position:absolute;left:0;right:0;top:0;height:min(76vh,620px);opacity:0;transition:opacity .9s ease;pointer-events:none;
+ background:linear-gradient(180deg,#171715 0,#14221c 26%,rgba(37,66,54,.62) 54%,rgba(37,66,54,.2) 80%,rgba(37,66,54,0) 100%);will-change:transform}
+html.fx-home:not(.fx-calm) #aur b{opacity:1}
+#aur b::before,#aur b::after{content:"";position:absolute;pointer-events:none}
+/* 1. katman: yavaş yeşil ışık kütleleri */
+#aur b::before{inset:-12% -22% 0;background:
+ radial-gradient(34% 44% at 18% 34%,rgba(92,176,136,.62),transparent 70%),
+ radial-gradient(30% 40% at 58% 22%,rgba(66,148,110,.55),transparent 70%),
+ radial-gradient(24% 34% at 90% 40%,rgba(197,165,114,.34),transparent 72%)}
+/* 2. katman: dikey ışık perdeleri (kuzey ışığı) */
+#aur b::after{left:-10%;right:-10%;top:0;height:86%;
+ background:repeating-linear-gradient(100deg,transparent 0 70px,rgba(110,190,150,.16) 105px,rgba(197,165,114,.07) 128px,transparent 175px);
+ -webkit-mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.7) 45%,transparent 92%);mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.7) 45%,transparent 92%)}
+html.fx-on:not(.fx-lite) #aur b::before{animation:stA 23s cubic-bezier(.45,.05,.4,.95) infinite alternate}
+html.fx-on:not(.fx-lite) #aur b::after{animation:stB 31s cubic-bezier(.4,.1,.5,.9) infinite alternate}
+@keyframes stA{0%{transform:translate3d(-5%,0,0) scale(1)}38%{transform:translate3d(4%,3%,0) scale(1.1)}71%{transform:translate3d(9%,-2%,0) scale(1.04)}100%{transform:translate3d(-2%,4%,0) scale(1.14)}}
+@keyframes stB{0%{transform:translate3d(-6%,0,0) skewX(-9deg) scaleY(.92)}45%{transform:translate3d(3%,2%,0) skewX(5deg) scaleY(1.08)}100%{transform:translate3d(8%,-1%,0) skewX(12deg) scaleY(1)}}
+/* ana sayfada eski yeşil perde ve alt parıltı sahneye devredilir */
+html.fx-home #aur::before{opacity:.5}
+/* mobil: daha hafif varyasyon (tek ışık katmanı, sakin perde) */
+html.fx-m #aur b{height:min(60vh,470px)}
+html.fx-m #aur b::after{opacity:.7}
+html.fx-m:not(.fx-lite) #aur b::after{animation-duration:44s}
+html.fx-m #aur i:nth-child(3),html.fx-m #aur::after{display:none}
+/* arka plan paralaksı: kaydırmaya bağlı (ana iş parçacığı kullanmaz) */
+@supports (animation-timeline:scroll()){
+ @keyframes pxS{to{transform:translate3d(0,-22%,0)}}
+ @keyframes pxA{to{translate:0 -110px}}@keyframes pxB{to{translate:0 -190px}}@keyframes pxC{to{translate:0 -280px}}
+ html.fx-sd:not(.fx-lite) #aur b{animation:pxS linear both;animation-timeline:scroll(root);animation-range:0 700px}
+ html.fx-sd.fx-on:not(.fx-lite) #aur i:nth-child(1){animation:aurA 18s ease-in-out infinite alternate,pxA linear both;animation-timeline:auto,scroll(root);animation-range:normal,0 1600px}
+ html.fx-sd.fx-on:not(.fx-lite) #aur i:nth-child(2){animation:aurB 22s ease-in-out infinite alternate,pxB linear both;animation-timeline:auto,scroll(root);animation-range:normal,0 1600px}
+ html.fx-sd.fx-on:not(.fx-lite) #aur i:nth-child(3){animation:aurC 26s ease-in-out infinite alternate,pxC linear both;animation-timeline:auto,scroll(root);animation-range:normal,0 1600px}
+}
+/* --- Katmanlı bölüm geçişi: derinlikten gel, öne otur, çıkarken geri çekil --- */
+@supports (animation-timeline:view()){
+ @keyframes lyr{0%{opacity:.5;transform:translate3d(0,44px,-70px) rotateX(5deg) scale(.96)}20%{opacity:1;transform:none}78%{opacity:1;transform:none}100%{opacity:.78;transform:translate3d(0,-14px,-36px) scale(.975)}}
+ @keyframes lyrm{0%{opacity:.6;transform:translate3d(0,22px,0) scale(.982)}22%{opacity:1;transform:none}80%{opacity:1;transform:none}100%{opacity:.86;transform:translate3d(0,-6px,0) scale(.99)}}
+ html.fx-sd.fx-on:not(.fx-lite) #main .view{perspective:1200px;perspective-origin:50% 30%}
+ html.fx-sd.fx-on:not(.fx-lite) .lyr{transform-origin:50% 0;animation:lyr linear both;animation-timeline:view();animation-range:cover 0% cover calc(100% - var(--i,0)*1.5%)}
+ html.fx-sd.fx-m.fx-on:not(.fx-lite) .lyr{animation-name:lyrm}
+ html.fx-sd.fx-on:not(.fx-lite) .lyr.vitrin{animation:none}
+}
+/* --- Merhaba kartı: hacim, kenar ışığı, mobilde kendiliğinden hareket --- */
+.vitrin{box-shadow:inset 0 1px 0 rgba(241,223,182,.30),inset 0 0 0 1px rgba(197,165,114,.20),inset 0 -40px 60px -40px rgba(0,0,0,.35),0 26px 50px -26px rgba(0,0,0,.6),0 2px 0 rgba(197,165,114,.10)}
+@keyframes vSweep{0%{translate:-55% 0}100%{translate:18% 0}}
+@media (hover:none),(pointer:coarse){html.fx-on:not(.fx-lite) .vitrin::after{animation:vSweep 10s ease-in-out infinite alternate}}
+/* --- Logo: daha büyük, daha net --- */
+.brand{gap:12px}
+.logo-tile{width:38px;height:38px;border-radius:27%}
+.logo-tile.lg5{background:radial-gradient(120% 120% at 50% 0%,#26302b 0%,#171715 62%);box-shadow:inset 0 0 0 1px rgba(197,165,114,.62),0 0 0 1px rgba(23,23,21,.9),0 0 16px -2px rgba(197,165,114,.30),0 8px 16px -8px rgba(0,0,0,.7)}
+.logo-tile.lg5 svg{width:74%;height:74%}
+.brand .wm,.wm{font-size:21px;letter-spacing:-.015em}
+.top .wm,.top .wm span{color:#f5f1e8}.top .wm span{opacity:.86;font-weight:700}
+@media (max-width:420px){.logo-tile{width:35px;height:35px}.brand{gap:10px}.brand .wm{font-size:18px}}
+@media (max-width:350px){.logo-tile{width:34px;height:34px}}
+.giris-logo .logo-tile{width:56px;height:56px}
+/* --- Buton rötuşu: kısa, sakin, tutarlı --- */
+.btn,.seg button,.subtabs a,.nav a,.tabbar a,.chip,.tile{transition:transform var(--t-fast) var(--ease),box-shadow var(--t-mid) var(--ease),background-color var(--t-mid) var(--ease),border-color var(--t-mid) var(--ease),color var(--t-fast) ease,opacity var(--t-fast) ease}
+@media (hover:hover){.btn:not(:disabled):hover{transform:translateY(-1px)}.btn.pri:not(:disabled):hover{box-shadow:0 10px 22px -10px rgba(197,165,114,.75),0 0 0 1px rgba(241,223,182,.45) inset}.btn.ghost:not(:disabled):hover,.btn:not(.pri):not(:disabled):hover{border-color:rgba(197,165,114,.7)}}
+.btn:not(:disabled):active{transform:translateY(0) scale(.975);transition-duration:.08s}
+.btn:focus-visible,.seg button:focus-visible,.subtabs a:focus-visible,.nav a:focus-visible,.tabbar a:focus-visible,.brand:focus-visible,.chip:focus-visible,summary:focus-visible{outline:2px solid #171715;outline-offset:2px;box-shadow:0 0 0 5px #c5a572}
+.top .btn:focus-visible,.top .brand:focus-visible,.tabbar a:focus-visible{outline-color:#f5f1e8}
+.nav a svg,.tabbar a svg,.btn svg{transform:translateY(-.5px)}
+.nav a.on,.tabbar a.on{position:relative}
+.tabbar a.on::before{content:"";position:absolute;left:30%;right:30%;top:0;height:2px;border-radius:2px;background:#c5a572;box-shadow:0 0 10px rgba(197,165,114,.6)}
+@media (prefers-reduced-motion:reduce){#aur b::before,#aur b::after{animation:none!important}.lyr{animation:none!important;opacity:1!important;transform:none!important}.vitrin::after{animation:none!important}.btn{transition:none!important}}
+html.fx-calm #aur b::before,html.fx-calm #aur b::after,html.fx-busy #aur b::before,html.fx-busy #aur b::after{animation-play-state:paused!important}
+html.fx-calm .lyr{animation:none!important;opacity:1!important;transform:none!important}
 </style>
 </head>
 <body>
@@ -10137,23 +10210,28 @@ const HRK = (() => {
   const CALM = { studyo: 1, banka: 1, paragraf: 1, deneme: 1, yanlislar: 1, kartlar: 1, sonuc: 1, canli: 1, ogretmen: 1, kisa: 1, osym: 1, uret: 1, tanitim: 1 };
   let aur = null, last = null, io = null, tick = false, safety = 0;
   const root = document.documentElement;
-  function ensure() { if (aur) return; aur = document.createElement("div"); aur.id = "aur"; aur.setAttribute("aria-hidden", "true"); aur.innerHTML = "<i></i><i></i><i></i>"; document.body.insertBefore(aur, document.body.firstChild); }
+  const SD = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline", "view()")); /* kaydırma-bağlı animasyonlar: ana iş parçacığına yük bindirmez */
+  const mq = matchMedia("(max-width:760px), (pointer:coarse)"); const setM = () => root.classList.toggle("fx-m", mq.matches); setM();
+  if (mq.addEventListener) mq.addEventListener("change", setM);
+  root.classList.toggle("fx-sd", SD);
+  function ensure() { if (aur) return; aur = document.createElement("div"); aur.id = "aur"; aur.setAttribute("aria-hidden", "true"); aur.innerHTML = "<b></b><i></i><i></i><i></i>"; document.body.insertBefore(aur, document.body.firstChild); }
   function sync(r, inRun) {
     try {
       ensure();
       const calm = !!inRun || !!CALM[r];
-      root.classList.toggle("fx-calm", calm); root.classList.toggle("fx-lite", !!lite); root.classList.toggle("fx-on", !RM && !calm);
+      root.classList.toggle("fx-calm", calm); root.classList.toggle("fx-lite", !!lite); root.classList.toggle("fx-on", !RM && !calm); root.classList.toggle("fx-home", r === "bugun");
       if (io) { io.disconnect(); io = null; } clearTimeout(safety);
       if (calm || RM) { last = null; return; }
       const els = Array.prototype.slice.call(document.querySelectorAll("#main .view > .card, #main .view > section, #main .view > .vhead, #main .view > .grid2 > *, #main .view > .tiles > *, #main .plans > *"));
       const fresh = last !== r; last = r;
+      if (SD && !lite) { els.forEach((e, i) => { e.classList.remove("rvl", "rvi", "nt"); e.classList.add("lyr"); e.style.setProperty("--i", Math.min(i, 5)); }); return; }
       if (!fresh || !("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("rvl", "rvi", "nt")); return; }
       io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("rvi"); io.unobserve(x.target); } }), { rootMargin: "0px 0px -6% 0px", threshold: .04 });
       els.forEach((e, i) => { e.classList.add("rvl"); e.style.setProperty("--i", Math.min(i, 5)); io.observe(e); });
       safety = setTimeout(() => els.forEach(e => e.classList.add("rvi")), 1600);
     } catch (e) { }
   }
-  addEventListener("scroll", () => { if (tick || !root.classList.contains("fx-on") || lite) return; tick = true; requestAnimationFrame(() => { tick = false; root.style.setProperty("--sy", Math.min(window.scrollY, 1600)); }); }, { passive: true });
+  addEventListener("scroll", () => { if (tick || SD || !root.classList.contains("fx-on") || lite) return; tick = true; requestAnimationFrame(() => { tick = false; root.style.setProperty("--sy", Math.min(window.scrollY, 1600)); }); }, { passive: true });
   addEventListener("pointermove", e => {
     if (e.pointerType !== "mouse" || !root.classList.contains("fx-on")) return;
     const v = e.target.closest && e.target.closest(".vitrin"); if (!v) return;

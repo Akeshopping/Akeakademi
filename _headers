@@ -1,6 +1,16 @@
 /sw.js
-  Cache-Control: no-cache
+  Cache-Control: no-cache, max-age=0, must-revalidate
 /ayar.js
+  Cache-Control: no-cache
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sss/*
+  Cache-Control: no-cache
+/matematik-yks-sorulari/*
+  Cache-Control: no-cache
+/manifest.webmanifest
   Cache-Control: no-cache
 /icons/*
   Cache-Control: public, max-age=86400

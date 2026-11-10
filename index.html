@@ -12221,7 +12221,22 @@ initRoom();
 </script>
 <script>
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
-  addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => { }); });
+  /* Yeni sürüm yayınlanınca eski worker beklemede kalmasın: sw.js HTTP önbelleğine hiç girmez (updateViaCache:"none"),
+     kayıttan sonra ve sekme öne gelince (en çok 5 dakikada bir) güncelleme sorulur. Yeni worker devralınca sayfa en fazla
+     bir kez yenilenir (oturumda tek sefer; çözüm/deneme sürerken yenilenmez, bir sonraki açılış zaten güncel gelir). */
+  let swOnceVardi = !!navigator.serviceWorker.controller, swSon = 0;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!swOnceVardi) { swOnceVardi = true; return; } /* ilk kurulum: sayfa zaten ağdan geldi */
+    try { if (sessionStorage.getItem("ake.swyenile")) return; sessionStorage.setItem("ake.swyenile", "1"); } catch (e) { return; }
+    try { if (RUN || (typeof UI !== "undefined" && UI.inRun)) return; } catch (e) { }
+    location.reload();
+  });
+  addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then(reg => {
+      const sor = () => { if (Date.now() - swSon < 300000) return; swSon = Date.now(); reg.update().catch(() => { }); };
+      sor(); document.addEventListener("visibilitychange", () => { if (!document.hidden) sor(); });
+    }).catch(() => { });
+  });
 }
 </script>
 </body>

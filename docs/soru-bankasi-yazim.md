@@ -36,3 +36,9 @@ Başka runtime INSERT/UPDATE yolu yoktur.
 
 ## Bu PR'da yapılmayanlar
 Production migration, remote D1 apply, bayrak açma, `index.html` V2 entegrasyonu, `/api/sorular` kapatma, `sorular/*.json` ve gömülü BANK kaldırma.
+
+## Onay (soru-karar) atomikliği — PR 3 düzeltmesi
+- Batch'in son ifadesi bir assert'tür: başlangıçta bekleyen **her** hedef satır batch sonunda `durum='onayli'` ve `h, govde, a, x, rk, kaynak` dolu olmalıdır (sayım == hedef sayısı). Aksi halde (araya giren red/durum değişikliği/silme, çatışmayla no-op olan UPDATE) batch'in tamamı geri alınır, istek 409 döner.
+- Kanonik alanları zaten dolu bekleyen satırlar da doğrulanır (`dogrulaSoru`, `h` govdeyle uyumu, çatışma). Aynı `h` + farklı cevap/çözüm onaylanmaz; tam duplicate ise `kopya_of` kanonik kayda bağlanır (mevcut `kopya_of` korunur).
+- Kanonik/çatışma kaynağı olarak yalnız `durum IN ('banka','onayli')` satırlar sayılır (red/bekleyen satır kanonik olamaz).
+- **Conservative false-positive conflict:** çatışma karşılaştırması `x` için ham metindir (boşluk/NFC farkı çatışma sayılır); fail-closed ve bilinçlidir, atomiklik bozulmasın diye bu PR'da normalize edilmedi.

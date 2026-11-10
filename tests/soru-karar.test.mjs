@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
-import { soruYazKanonik } from "../lib/soru-yaz.js";
+import { soruYazKanonik, kanonikAlanlar } from "../lib/soru-yaz.js";
 import { kanonikHash } from "../lib/soru-kanonik.js";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com" } });
@@ -49,4 +49,54 @@ test("eşzamanlı değişiklik (araya giren çatışma) → ASSERT/WHERE ile bat
   DB.hook.araSql = [0, `INSERT INTO soru (id, s, t, d, json, durum, tarih, karar, kaynak, rk, h, govde, a, x) VALUES ('araya', 'mat', 'K', 2, NULL, 'banka', 0, 0, 'ai', 1, '${h}', '{}', ${k.a}, '${k.x}')`];
   const r = await karar(["i1", "i2"], "onay"); DB.hook.hedef = null; DB.hook.araSql = null;
   assert.equal(r.s, 409); assert.equal(w("i1").durum, "bekliyor"); assert.equal(w("i2").durum, "bekliyor"); assert.equal(w("i1").h, null);
+});
+
+/* ---- PR 3 düzeltmesi: son assert hedeflerin HEPSİNİN onayli+kanonik olmasını ister; hazır-canonical satırlar da denetlenir ---- */
+const HEDEF = /UPDATE soru SET durum = 'onayli'/;
+const durumlar = ids => ids.map(id => (w(id) || { durum: "YOK" }).durum);
+test("RACE: preflight sonrası, batch öncesi B red yapılır → istek BAŞARISIZ (409), A onaylı KALMAZ, 'onaylanan:2' yok", async () => {
+  temizle(); bek("r1", 21); bek("r2", 22);
+  DB.hook.hedef = HEDEF; DB.hook.once = () => DB.db.prepare("UPDATE soru SET durum = 'red' WHERE id = 'r2'").run();
+  const r = await karar(["r1", "r2"], "onay"); DB.hook.hedef = null; DB.hook.once = null;
+  assert.equal(r.s, 409); assert.equal(r.j.onaylanan, undefined); assert.equal(r.j.hatalar[0].id, "*");
+  assert.deepEqual(durumlar(["r1", "r2"]), ["bekliyor", "red"]);   // A geri alındı; dış değişiklik (red) korunur
+  assert.equal(w("r1").h, null); assert.equal(w("r1").kaynak, null);
+});
+test("RACE: aynı durum, hazır-canonical satırlarla da başarısız olur", async () => {
+  temizle(); await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(31) }, { durum: "bekliyor", idUret: () => "p1" }); await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(32) }, { durum: "bekliyor", idUret: () => "p2" });
+  DB.hook.hedef = HEDEF; DB.hook.once = () => DB.db.prepare("UPDATE soru SET durum = 'red' WHERE id = 'p2'").run();
+  const r = await karar(["p1", "p2"], "onay"); DB.hook.hedef = null; DB.hook.once = null;
+  assert.equal(r.s, 409); assert.deepEqual(durumlar(["p1", "p2"]), ["bekliyor", "red"]);
+});
+test("durum değişikliği (başka bir duruma) ve SİLİNME: bekleyen satır batch öncesi değişirse istek başarılı sayılmaz", async () => {
+  for (const [ad, sql] of [["banka", "UPDATE soru SET durum = 'banka' WHERE id = 'v2'"], ["silinme", "DELETE FROM soru WHERE id = 'v2'"], ["onayli (başkası onayladı)", "UPDATE soru SET durum = 'onayli' WHERE id = 'v2'"]]) {
+    temizle(); bek("v1", 41); bek("v2", 42);
+    DB.hook.hedef = HEDEF; DB.hook.once = () => DB.db.exec(sql);
+    const r = await karar(["v1", "v2"], "onay"); DB.hook.hedef = null; DB.hook.once = null;
+    assert.equal(r.s, 409, ad); assert.equal(w("v1").durum, "bekliyor", ad); assert.equal(w("v1").h, null, ad);
+  }
+});
+test("hazır canonical bekleyen + aynı h + FARKLI cevap/çözüm → onaylanmaz (409); satır 'bekliyor' kalır", async () => {
+  temizle(); const m = await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(51) });   // yayında kanonik
+  const q = { id: "hz1", s: "mat", t: "K", d: 2, ...sentetik(51), a: (sentetik(51).a + 1) % 5 }, k = (await kanonikAlanlar(q)).alan;
+  DB.db.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar, kaynak, rk, h, govde, a, x) VALUES ('hz1','mat','K',2,?, 'bekliyor',1,0,?,?,?,?,?,?)").run(JSON.stringify(q), k.kaynak, k.rk, k.h, k.govde, k.a, k.x);
+  const r = await karar(["hz1"], "onay"); assert.equal(r.s, 409); assert.match(r.j.hatalar[0].neden, /catisma/); assert.equal(w("hz1").durum, "bekliyor"); assert.equal(w(m.id).kopya_of, null);
+});
+test("hazır canonical bekleyen + tam duplicate → kopya_of kanonik ID'ye bağlanır, sonra onaylanır; eski kayıtlar değişmez", async () => {
+  temizle(); const m = await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(52) }); const once = w(m.id);
+  await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(52) }, { durum: "bekliyor", idUret: () => "hz2" });
+  const r = await karar(["hz2"], "onay"); assert.equal(r.s, 200, r.t); assert.equal(r.j.kopya, 1);
+  assert.equal(w("hz2").durum, "onayli"); assert.equal(w("hz2").kopya_of, m.id); assert.deepEqual(w(m.id), once);
+});
+test("hazır canonical ama tutarsız (h govdeyle uyuşmuyor / yarım dolu) → 409, onaylanmaz", async () => {
+  temizle(); const q = { id: "hz3", s: "mat", t: "K", d: 2, ...sentetik(53) }, k = (await kanonikAlanlar(q)).alan;
+  const ekle = (id, h, x) => DB.db.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar, kaynak, rk, h, govde, a, x) VALUES (?,'mat','K',2,?, 'bekliyor',1,0,?,?,?,?,?,?)").run(id, JSON.stringify(q), k.kaynak, k.rk, h, k.govde, k.a, x);
+  ekle("hz3", "yanlis-hash", k.x); ekle("hz4", k.h, null);
+  assert.equal((await karar(["hz3"], "onay")).s, 409); assert.equal((await karar(["hz4"], "onay")).s, 409); assert.deepEqual(durumlar(["hz3", "hz4"]), ["bekliyor", "bekliyor"]);
+});
+test("hazır canonical bekleyen (kopya_of NULL) + tam duplicate: onayda UPDATE kopya_of'u bağlar", async () => {
+  temizle(); const m = await soruYazKanonik(T.env, { s: "mat", t: "K", d: 2, ...sentetik(54) });
+  const q = { id: "hz5", s: "mat", t: "K", d: 2, ...sentetik(54) }, k = (await kanonikAlanlar(q)).alan;
+  DB.db.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar, kaynak, rk, h, govde, a, x) VALUES ('hz5','mat','K',2,?, 'bekliyor',1,0,?,?,?,?,?,?)").run(JSON.stringify(q), k.kaynak, k.rk, k.h, k.govde, k.a, k.x);
+  const r = await karar(["hz5"], "onay"); assert.equal(r.s, 200, r.t); assert.equal(w("hz5").durum, "onayli"); assert.equal(w("hz5").kopya_of, m.id); assert.equal(w(m.id).kopya_of, null);
 });

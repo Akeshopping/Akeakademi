@@ -893,7 +893,7 @@
       "Deponun ağır kapısı güçlükle açıldı."
     ],
     "a": 4,
-    "x": "Deponun kapısı belirtili isim tamlamasıdır. Ağır sıfatı, tamlanan kapıdan önce ve tamlayan deponundan sonra yer alır.\n\nDiğer seçenekler\n“Depo kapısı akşam kapandı.” — Depo kapısı belirtisiz isim tamlamasıdır ve iki sözcük bitişik sıradadır.\n“Eski deponun kapısı kapandı.” — Eski sıfatı tamlayandan önce gelir.\n“Kapının kolu boyandı.” — Tamlayan ile tamlanan arasında bir sözcük yoktur.\n“Yeni depo kapısı takıldı.” — Yeni sözcüğü tamlayan ile tamlanan arasında değildir."
+    "x": "Deponun kapısı belirtili isim tamlamasıdır. Ağır sıfatı, tamlayan olan “deponun” ile tamlanan olan “kapısı” arasına girmiştir.\n\nDiğer seçenekler\n“Depo kapısı akşam kapandı.” — Depo kapısı belirtisiz isim tamlamasıdır ve iki sözcük bitişik sıradadır.\n“Eski deponun kapısı kapandı.” — Eski sıfatı tamlayandan önce gelir.\n“Kapının kolu boyandı.” — Tamlayan ile tamlanan arasında bir sözcük yoktur.\n“Yeni depo kapısı takıldı.” — Yeni sözcüğü tamlayan ile tamlanan arasında değildir."
   },
   {
     "id": "AKE-YKS-02-TUR-TAM-007",
@@ -1636,7 +1636,7 @@
     "s": "afizik",
     "t": "Tork ve denge",
     "d": 1,
-    "q": "Yatay bir çubuğun O noktasında sabit dönme ekseni vardır. Çubuğun sağ ucuna eşit büyüklükte kuvvetler farklı yönlerde, birer birer uygulanıyor. Hangi kuvvetin O’ya göre torku sıfırdır?",
+    "q": "Yatay bir çubuğun sol ucu O noktasıdır. Çubuk, O’dan geçen ve düşey dönme düzlemine dik olan sabit bir eksen çevresinde dönebiliyor. Sağ ucuna bu düzlemdeki eşit büyüklükte kuvvetler farklı yönlerde birer birer uygulanıyor. Seçeneklerdeki açılar yatayla yapılmaktadır. Hangi kuvvetin bu eksene göre torku sıfırdır?",
     "o": [
       "Çubuk boyunca O’ya yönelmiş kuvvet",
       "Çubuğa dik aşağı yönlü kuvvet",
@@ -1645,7 +1645,7 @@
       "Çubuğa dik yukarı yönlü kuvvet"
     ],
     "a": 0,
-    "x": "Kuvvetin etki doğrusu eksenden geçerse eksene dik uzaklık sıfırdır. Çubuk boyunca O’ya yöneltilen kuvvet bu durumu sağlar.\n\nDiğer seçenekler\n“Çubuğa dik aşağı yönlü kuvvet” — Uzaklık vardır ve kuvvet çubuğa diktir.\n“Sol aşağı 30° yönlü kuvvet” — Aşağı yönlü bileşen tork oluşturur.\n“Sağ yukarı 45° yönlü kuvvet” — Düşey bileşen tork oluşturur.\n“Çubuğa dik yukarı yönlü kuvvet” — Çubuğa dik kuvvetin moment kolu sıfır değildir."
+    "x": "Çubuk boyunca O’ya yöneltilen kuvvetin etki doğrusu dönme ekseninden geçer. Kuvvet kolu sıfır olduğundan bu kuvvetin eksene göre torku da sıfırdır.\n\nDiğer seçenekler\n“Çubuğa dik aşağı yönlü kuvvet” — Uzaklık vardır ve kuvvet çubuğa diktir.\n“Sol aşağı 30° yönlü kuvvet” — Aşağı yönlü bileşen tork oluşturur.\n“Sağ yukarı 45° yönlü kuvvet” — Düşey bileşen tork oluşturur.\n“Çubuğa dik yukarı yönlü kuvvet” — Çubuğa dik kuvvetin moment kolu sıfır değildir."
   },
   {
     "id": "AKE-YKS-02-AFIZ-TOR-004",
@@ -2404,7 +2404,7 @@
     "s": "ingilizce",
     "t": "Linkers",
     "d": 1,
-    "q": "The hill trail remained closed for another week ---- the fallen trees had already been removed.",
+    "q": "Inspectors cleared the hill trail for public use on Monday morning after crews removed the fallen trees. The trail remained closed for another week ---- it had already been declared safe.",
     "o": [
       "even though",
       "only if",
@@ -2413,7 +2413,7 @@
       "until"
     ],
     "a": 0,
-    "x": "Devrilen ağaçlar temizlendiğinde yolun açılması beklenir. Buna rağmen kapanışın sürmesi beklentiye aykırıdır. Bu karşıtlığı even though kurar.\n\nDiğer seçenekler\n“only if” — Ağaçların kaldırılmasını kapanış için zorunlu koşul yapar.\n“because” — Temizlenmeyi kapanışın gerekçesi yapar.\n“so that” — Yolun kapatılmasını ağaçların zaten kaldırılmış olması amacına bağlar.\n“until” — Önceden tamamlanmış işi kapanışın bitiş sınırı yapar."
+    "x": "Pazartesi günü yolun güvenli olduğu açıklandı. Kapanışın buna rağmen bir hafta daha sürmesi beklentiye aykırıdır. Even though bu ilişkiyi kurar.\n\nDiğer seçenekler\n“only if” — Güvenlik onayını kapanışın zorunlu koşulu yapar.\n“because” — Yolun güvenli bulunmasını kapanışın nedeni yapar.\n“so that” — Önceden verilen güvenlik onayını daha sonraki kapanışın amacı yapar.\n“until” — Pazartesi verilen onayı bir hafta süren kapanışın bitiş sınırı yapar."
   },
   {
     "id": "AKE-YKS-02-YDT-LIN-002",
@@ -2461,7 +2461,7 @@
       "provided that"
     ],
     "a": 4,
-    "x": "İlk cümle tek bir izin koşulu bulunduğunu söyler. Provided that, haritanın çıkarılmasını personelin eşlik etmesi koşuluna bağlar.\n\nDiğer seçenekler\n“now that” — Koşulu önceden gerçekleşmiş bir olgu gibi sunar.\n“whereas” — Kuralın koşulu yerine iki ayrı durum arasında karşıtlık kurar.\n“as though” — Eşlik etme durumunu görünüş veya varsayımsal benzerlik olarak verir.\n“even if” — Personel eşlik etse de etmese de izin varmış anlamına gelir."
+    "x": "İlk cümle tek bir izin koşulu bulunduğunu söyler. Provided that, haritanın çıkarılmasını personelin eşlik etmesi koşuluna bağlar.\n\nDiğer seçenekler\n“now that” — Koşulu önceden gerçekleşmiş bir olgu gibi sunar.\n“whereas” — Kuralın koşulu yerine iki ayrı durum arasında karşıtlık kurar.\n“as though” — Eşlik etme durumunu görünüş veya varsayımsal benzerlik olarak verir.\n“even if” — Olası bir duruma rağmen izin verildiğini söyler. Metindeki zorunlu eşlik koşulunu kurmaz."
   },
   {
     "id": "AKE-YKS-02-YDT-LIN-005",
@@ -2484,7 +2484,7 @@
     "s": "ingilizce",
     "t": "Linkers",
     "d": 2,
-    "q": "Researchers could not compare the century-old coastal records ---- the readings from different stations had been converted to the same scale.",
+    "q": "Researchers could not compare the century-old coastal records ---- the readings from different stations had been converted to the same scale. Comparisons began as soon as the conversion was complete.",
     "o": [
       "now that",
       "as long as",
@@ -2493,14 +2493,14 @@
       "until"
     ],
     "a": 4,
-    "x": "Kayıtlar ortak ölçeğe çevrilene dek karşılaştırma yapılamaz. Until bu zaman sınırını kurar.\n\nDiğer seçenekler\n“now that” — Dönüşümü karşılaştırılamamanın güncel gerekçesi yapar.\n“as long as” — Ortak ölçeğe dönüştürme, karşılaştırmayı engelleyen devamlı koşul değildir.\n“once” — Dönüşüm sonrasında da karşılaştırma yapılamadığını düşündürür.\n“since” — Dönüşümü karşılaştırılamamanın nedeni yapar."
+    "x": "Kayıtlar ortak ölçeğe çevrilene dek karşılaştırma yapılamaz. Son cümle, dönüşümün tamamlanmasıyla karşılaştırmanın başladığını gösterir. Until bu zaman sınırını kurar.\n\nDiğer seçenekler\n“now that” — Dönüşümü karşılaştırılamamanın güncel gerekçesi yapar.\n“as long as” — Ortak ölçeğe dönüştürme, karşılaştırmayı engelleyen devamlı koşul değildir.\n“once” — Dönüşüm sonrasında da karşılaştırma yapılamadığını düşündürür.\n“since” — Dönüşümden beri karşılaştırma yapılamadığını veya dönüşümün karşılaştırmayı engellediğini düşündürür. Son cümle, dönüşümün ardından karşılaştırmanın başladığını söyler."
   },
   {
     "id": "AKE-YKS-02-YDT-LIN-007",
     "s": "ingilizce",
     "t": "Linkers",
     "d": 2,
-    "q": "The repair team placed a numbered marker beside each damaged tile ---- later crews could match every photograph to its exact location.",
+    "q": "Unmarked tiles would be indistinguishable in the close-up photographs. The repair team placed a numbered marker beside each damaged tile before photographing it ---- later crews could match every image to its exact location.",
     "o": [
       "so that",
       "unless",
@@ -2516,7 +2516,7 @@
     "s": "ingilizce",
     "t": "Linkers",
     "d": 2,
-    "q": "The village had no workshop large enough to house the restored boat. ---- building an entirely new structure, the volunteers extended an unused railway shed.",
+    "q": "The village needed a larger workshop for the restored boat, but the project could use only existing buildings. ---- building an entirely new structure, the volunteers extended an unused railway shed.",
     "o": [
       "Regardless of",
       "In addition to",
@@ -2525,7 +2525,7 @@
       "Instead of"
     ],
     "a": 4,
-    "x": "Gönüllüler, yeni bina seçeneğinin yerine kullanılmayan kulübeyi büyütmüştür. Instead of gerçekleşmeyen seçeneği tanıtır.\n\nDiğer seçenekler\n“Regardless of” — Yeni bina yapılıp yapılmamasının etkisiz olduğunu söyler.\n“In addition to” — Her iki yapım işinin de gerçekleştiğini düşündürür.\n“Owing to” — Yeni bina yapımını kulübenin büyütülmesinin nedeni olarak verir.\n“Along with” — İki işin birlikte yapıldığını düşündürür."
+    "x": "Proje mevcut yapıları kullanmakla sınırlıdır. Gönüllüler kullanılmayan kulübeyi büyütmüştür. Instead of, elenen yeni inşaat seçeneğini belirtir.\n\nDiğer seçenekler\n“Regardless of” — Yeni bina yapılıp yapılmamasının etkisiz olduğunu söyler.\n“In addition to” — Her iki yapım işinin de gerçekleştiğini düşündürür.\n“Owing to” — Yeni bina yapımını kulübenin büyütülmesinin nedeni olarak verir.\n“Along with” — İki işin birlikte yapıldığını düşündürür."
   },
   {
     "id": "AKE-YKS-02-YDT-LIN-009",
@@ -2628,7 +2628,7 @@
     "s": "ingilizce",
     "t": "Phrasal Verbs",
     "d": 2,
-    "q": "Repeated readings from two independent instruments allowed the engineers to ---- a faulty sensor as the source of the discrepancy.",
+    "q": "The discrepancy remained when engineers replaced the original sensor with a calibrated one and kept the rest of the setup unchanged. This allowed them to ---- a fault in the original sensor as the sole cause.",
     "o": [
       "rule out",
       "put up with",
@@ -2637,14 +2637,14 @@
       "pass on"
     ],
     "a": 0,
-    "x": "Bağımsız ölçümler sayesinde bir olasılık nedenler arasından çıkarılmıştır. Rule out burada bir ihtimali elemek anlamına gelir.\n\nDiğer seçenekler\n“put up with” — Bir soruna katlanmak, nedenini elemekten farklıdır.\n“turn into” — Bir şeyin başka bir şeye dönüşmesini belirtir.\n“take after” — Birine benzemek demektir.\n“pass on” — Bilgiyi veya bir nesneyi başkasına aktarmayı anlatır."
+    "x": "Düzeneğin geri kalanı sabitken sensör değiştirilmiş ve fark sürmüştür. İlk sensördeki bir arıza bu farkı tek başına açıklayamaz. Rule out, bir ihtimali elemek anlamına gelir.\n\nDiğer seçenekler\n“put up with” — Bir soruna katlanmak, nedenini elemekten farklıdır.\n“turn into” — Bir şeyin başka bir şeye dönüşmesini belirtir.\n“take after” — Birine benzemek demektir.\n“pass on” — Bilgiyi veya bir nesneyi başkasına aktarmayı anlatır."
   },
   {
     "id": "AKE-YKS-02-YDT-PHV-006",
     "s": "ingilizce",
     "t": "Phrasal Verbs",
     "d": 2,
-    "q": "Before recommending the new cooling system, the technicians had to ---- a series of controlled tests under different operating conditions.",
+    "q": "To gather performance data before making a recommendation, the technicians had to ---- a series of controlled tests on the new cooling system under different operating conditions.",
     "o": [
       "turn against",
       "break down",
@@ -2756,7 +2756,7 @@
     "s": "ingilizce",
     "t": "Quantifiers",
     "d": 1,
-    "q": "We brought two lamps to the campsite, but ---- worked after the heavy rain. We had to borrow a lamp from a neighbour.",
+    "q": "We brought two lamps to the campsite, but ---- worked after the heavy rain. We were left without any light and had to borrow a lamp from a neighbour.",
     "o": [
       "either",
       "neither",
@@ -2772,7 +2772,7 @@
     "s": "ingilizce",
     "t": "Quantifiers",
     "d": 2,
-    "q": "Compared with the printed guide, the revised version uses ---- pages and ---- ink, while keeping all the diagrams.",
+    "q": "The revised version of the guide uses ---- pages and ---- ink than the original edition, while keeping all the diagrams.",
     "o": [
       "fewer / less",
       "fewer / few",
@@ -2829,7 +2829,7 @@
       "None of"
     ],
     "a": 4,
-    "x": "Altı örneğin tamamı kırıldığı için hiçbiri dayanım koşulunu sağlamamıştır. None of bu grubun hiçbir üyesini belirtir.\n\nDiğer seçenekler\n“Several of” — Örneklerden bazılarının dayanım koşulunu sağladığını bildirir.\n“Every one of” — Tüm örneklerin koşulu sağladığını söyler.\n“Both of” — Hem iki örnek varsayar hem de olumlu sonuç bildirir.\n“Neither of” — Neither of yalnızca iki seçenekten söz eder."
+    "x": "Altı örneğin her biri asgari yükün altında kırılmıştır. Hiçbiri dayanım koşulunu sağlamadığı için none of kullanılır.\n\nDiğer seçenekler\n“Several of” — Örneklerden bazılarının dayanım koşulunu sağladığını bildirir.\n“Every one of” — Tüm örneklerin koşulu sağladığını söyler.\n“Both of” — Hem iki örnek varsayar hem de olumlu sonuç bildirir.\n“Neither of” — Neither of yalnızca iki seçenekten söz eder."
   },
   {
     "id": "AKE-YKS-02-YDT-QUA-008",
@@ -3148,8 +3148,8 @@
       "Can I remove a page and photograph it separately?"
     ],
     "a": 0,
-    "x": "Görevli “o açıyla” kapakları destekleyeceğini söylüyor. Ziyaretçinin sorusu, defteri düzleştirmeden, kısmen açık bir açıda fotoğraflamaya ilişkindir.\n\nDiğer seçenekler\n“Could I close it and photograph just the outside cover?” — Kapalı defterde sayfaları kısmen açık tutacak bir açı yoktur.\n“May I scan it if I press the pages down very slowly?” — Görevlinin açıkladığı düzleştirme yasağıyla çelişir.\n“Would a brighter lamp make it safe to flatten the pages?” — Daha güçlü ışık fiziksel düzleştirmeyi güvenli yapmaz.\n“Can I remove a page and photograph it separately?” — Defterin açılma açısını veya kapakların desteklenmesini açıklamaz.",
-    "p": "Archivist: You can photograph this notebook, but the pages are too fragile to flatten on the scanner.\nVisitor: ----\nArchivist: Yes. The cradle will support the covers at that angle."
+    "x": "Görevli, sayfalar fotoğraflanırken desteğin defteri o açıda tutacağını söylüyor. Ziyaretçi, defteri düzleştirmeden kısmen açık tutarak fotoğraf çekmeyi sormuştur.\n\nDiğer seçenekler\n“Could I close it and photograph just the outside cover?” — Son replik, fotoğrafın iç sayfalara ait olduğunu belirtir.\n“May I scan it if I press the pages down very slowly?” — Görevlinin açıkladığı düzleştirme yasağıyla çelişir.\n“Would a brighter lamp make it safe to flatten the pages?” — Daha güçlü ışık fiziksel düzleştirmeyi güvenli yapmaz.\n“Can I remove a page and photograph it separately?” — Defterin açılma açısını veya kapakların desteklenmesini açıklamaz.",
+    "p": "Archivist: You can photograph this notebook, but the pages are too fragile to flatten on the scanner.\nVisitor: ----\nArchivist: Yes. The cradle will hold it at that angle while you photograph the pages."
   },
   {
     "id": "AKE-YKS-02-YDT-DIA-007",

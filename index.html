@@ -7413,6 +7413,11 @@ function aiUsage() { return sunucuSayac() ? HESAP.kullanim.mesaj : ayOku("ake.ai
 function planAd(p) { return p === "premium" ? "Premium" : p === "deneme" ? "7 günlük deneme" : "Atılım"; }
 /* Ücretsiz kullanım sınırı: günde 20 soru, ayda 1 deneme (canlı denemeler serbest) */
 function ucretsizMi() {
+  /* Hesap sunucusu varken karar sunucudadır: yalnızca giriş yapmış ve sunucudan geçerli paket gelmiş kullanıcı ücretli sayılır.
+     Cihazdaki eski Premium/Atılım kaydı (WEBAI) bunu geçersiz kılamaz. Hesap henüz yüklenmediyse ücretsiz sayılır;
+     kotaAl bu durumda hakkı vermeden bekletir (yerel Premium'a güvenip geçiş verilmez). */
+  if (sunucuKota()) return !(HESAP.hazir && HESAP.user && HESAP.paket);
+  /* Hesap sunucusu yoksa (Claude paneli, çevrimdışı) eski yerel davranış */
   if (HESAP.paket) return false;
   if (WEBAI.plan && (!WEBAI.bitis || WEBAI.bitis >= dayKey())) return false;
   return true;

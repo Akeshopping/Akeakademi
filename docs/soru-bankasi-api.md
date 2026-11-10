@@ -50,6 +50,8 @@ Doğrulama: yerel SQLite kabuğunda (iç içe geçen istekler, her noktada hata 
 
 ## CUTOVER BLOCKER / SONRAKİ PR: yönetim soru üretim write-path'i
 
+> **PR 3 ile giderildi (yalnız `AKE_SORU_V2=1` iken).** Ayrıntı ve cutover sırası: [`soru-bankasi-yazim.md`](soru-bankasi-yazim.md). Aşağıdaki metin PR 2 zamanındaki durumu anlatır.
+
 `functions/api/yonetim/[[yol]].js` → `soru-uret` bugün yeni `onayli` soruları **legacy biçimde** yazar (`id, s, t, d, json, durum, tarih, karar`); `govde, a, x, h, rk, kaynak` kanonik kolonlarını **doldurmaz**. V2 uygun-soru koşulu (`durum IN ('banka','onayli') AND kopya_of IS NULL AND govde IS NOT NULL AND a IS NOT NULL AND x IS NOT NULL`) olduğundan, production göçünden SONRA üretilen yeni legacy `ok-*` soruları kanonik backfill/write-path yapılmazsa V2 havuzuna GİRMEZ. Bu PR'da yönetim kodu değiştirilmedi.
 
 **V2 frontend cutover'ı ve `/api/sorular`'ın kapatılması öncesinde, yönetim soru üretim write-path'i kanonik kolonları (`govde, a, x, h, rk, kaynak`) atomik olarak dolduracak şekilde güncellenmek ZORUNDADIR.** Bu iş sonraki uygun PR'a blocker olarak taşınmıştır.

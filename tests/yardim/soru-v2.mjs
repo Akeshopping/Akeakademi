@@ -12,7 +12,7 @@ const tick = () => new Promise(r => setImmediate(r));
 
 export function d1() {
   const db = new DatabaseSync(":memory:");
-  const sayac = { prepare: 0, batch: 0, geriAlma: 0 };
+  const sayac = { prepare: 0, batch: 0, geriAlma: 0, sql: [] };   // sql: hazırlanan tüm SQL metinleri (şema/ALTER çağrısı yokluğu testleri için)
   const hook = { konum: null, hedef: null, hep: false, once: null, araSql: null };   // once: bir sonraki hedef batch'ten ÖNCE (işlem dışı) çalışır; araSql: [i, sql] — işlem İÇİNDE i. ifadeden önce   // konum: bu sıradaki ifadeden ÖNCE hata ver; ifade sayısına eşitse tüm ifadelerden sonra, commit'ten önce
   const mk = (sql, a = []) => ({
     _sql: sql, _a: a, bind: (...x) => mk(sql, x),
@@ -21,7 +21,7 @@ export function d1() {
     run: async () => { await tick(); const r = db.prepare(sql).run(...a); return { meta: { changes: r.changes } }; }
   });
   const DB = {
-    prepare: sql => { sayac.prepare++; return mk(sql); },
+    prepare: sql => { sayac.prepare++; sayac.sql.push(sql); return mk(sql); },
     batch: async arr => {
       sayac.batch++; await tick();
       if (hook.once && (!hook.hedef || arr.some(s => hook.hedef.test(s._sql)))) { const f = hook.once; hook.once = null; f(); }
@@ -45,7 +45,7 @@ export function d1() {
 }
 
 const KOK = "https://akeakademi.com";
-export async function kur({ bayrak = "1", ekEnv = {} } = {}) {
+export async function kur({ bayrak = "1", ekEnv = {}, kanonik = true } = {}) {
   const DB = d1();
   const env = { DB, AKE_GIZLI: "test-gizli", ...(bayrak == null ? {} : { AKE_SORU_V2: bayrak }), ...ekEnv };
   const hesap = await import(pathToFileURL(resolve("functions/api/hesap/[[yol]].js")).href);
@@ -55,7 +55,7 @@ export async function kur({ bayrak = "1", ekEnv = {} } = {}) {
     request: new Request(KOK + "/api/hesap/" + yol, { method: m, headers: { "content-type": "application/json", "cf-connecting-ip": ip || "10.0.0.1", ...(cookie ? { cookie } : {}) }, body: govde ? JSON.stringify(govde) : undefined }),
     env, params: { yol: yol.split("/") } });
   let sema = false;
-  const hazirla = async () => { if (sema) return; await hesapIstek("ben"); await soruKanonikSema(DB); sema = true; };
+  const hazirla = async () => { if (sema) return; await hesapIstek("ben"); if (kanonik) await soruKanonikSema(DB); sema = true; };
   /* gerçek hesap ucuyla giriş: giriş satırına bilinen kod yazılır, kod-dogrula çağrılır */
   async function giris(eposta) {
     await hazirla();
@@ -104,3 +104,21 @@ export function sizintiBul(v, yasak = YASAKLI_ANAHTAR) {
   return bulunan;
 }
 export const SORU_ANAHTARLARI = new Set(["id", "s", "t", "d", "p", "q", "o"]);
+
+/* ---- yönetim uçları + sahte Anthropic (PR 3) ---- */
+export async function yonetimIstek(T, yol, { m = "POST", govde, cookie } = {}) {
+  const mod = await import(pathToFileURL(resolve("functions/api/yonetim/[[yol]].js")).href);
+  const r = await mod.onRequest({ request: new Request(KOK + "/api/yonetim/" + yol, { method: m, headers: { "content-type": "application/json", origin: KOK, ...(cookie ? { cookie } : {}) }, body: m === "GET" ? undefined : JSON.stringify(govde || {}) }), env: T.env, params: { yol: [yol] } });
+  const t = await r.text(); let j = null; try { j = JSON.parse(t); } catch (e) { }
+  return { s: r.status, j, t };
+}
+/* Gerçek Anthropic çağrısı YOK: fetch yer değiştirir; api.anthropic.com'a giden istek verilen sentetik soruları döndürür, başka her ağ çağrısı hata verir. */
+export function aiStub(sorular) {
+  const orijinal = globalThis.fetch, cagri = { n: 0 };
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("api.anthropic.com")) { cagri.n++; return new Response(JSON.stringify({ content: [{ type: "text", text: JSON.stringify(sorular) }], usage: { input_tokens: 1, output_tokens: 1 } }), { status: 200, headers: { "content-type": "application/json" } }); }
+    throw new Error("beklenmeyen ağ çağrısı: " + url);
+  };
+  return { cagri, geriAl: () => { globalThis.fetch = orijinal; } };
+}
+export const sentetik = (i, ek = {}) => ({ p: "", q: `SENTETIK-SORU-${i}`, o: [0, 1, 2, 3, 4].map(k => `SENTETIK-SIK-${i}-${k}`), a: i % 5, x: `SENTETIK-COZUM-${i}`, ...ek });

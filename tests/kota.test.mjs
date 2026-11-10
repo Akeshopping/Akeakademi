@@ -6,6 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { sha256 } from "../lib/ortak.js";
+import { kotaKimligiEposta } from "../lib/kota.js";
 
 /* D1 benzeri ince kabuk. Sorgular çalıştırılırken hazırlanır (D1 gibi); şema önbelleği (semaHazir)
    modül düzeyinde olduğundan tüm testler tek veritabanını paylaşır, hesaplar e-postayla ayrılır. */
@@ -75,7 +76,8 @@ test("eşzamanlı istekler sınırı aşamaz", async () => {
   const sonuc = await Promise.all(Array.from({ length: 12 }, () => al(e, cookie, "soru", 5)));
   const toplam = sonuc.reduce((t, r) => t + (r.s === 200 ? r.j.verildi : 0), 0);
   assert.ok(toplam <= 20, "verilen " + toplam); assert.equal(toplam, 20);
-  assert.equal(e.DB.db.prepare("SELECT adet FROM ucretsiz WHERE kid IN (SELECT id FROM kullanici WHERE eposta='f@ornek.com') AND tur='soru'").get().adet, 20);
+  /* sayaç artık e-postadan türetilen takma adlı kimlikte tutulur (ucretsiz_kimlik) */
+  assert.equal(e.DB.db.prepare("SELECT adet FROM ucretsiz_kimlik WHERE kimlik = ? AND tur='soru'").get(await kotaKimligiEposta(e, "f@ornek.com")).adet, 20);
 });
 test("ücretli paketi olan sınırsız, sayaç tutulmaz", async () => {
   const e = env(), { cookie } = await girisYap(e, "g@ornek.com");
@@ -83,6 +85,7 @@ test("ücretli paketi olan sınırsız, sayaç tutulmaz", async () => {
   e.DB.db.prepare("INSERT INTO kod (anahtar, kid, plan, bitis, tarih) VALUES ('X1', ?, 'orta', '2999-01-01', 0)").run(kid);
   const r = await al(e, cookie, "soru", 100); assert.equal(r.s, 200); assert.equal(r.j.sinirsiz, true);
   assert.equal(e.DB.db.prepare("SELECT COUNT(*) n FROM ucretsiz WHERE kid = ?").get(kid).n, 0);
+  assert.equal(e.DB.db.prepare("SELECT COUNT(*) n FROM ucretsiz_kimlik WHERE kimlik = ?").get(await kotaKimligiEposta(e, "g@ornek.com")).n, 0);
 });
 test("yeni gün: soru hakkı yenilenir; deneme ay içinde yenilenmez", async () => {
   const e = env(), { cookie } = await girisYap(e, "h@ornek.com"), gercek = Date.now;
@@ -102,10 +105,11 @@ test("geçersiz istekler reddedilir", async () => {
   for (const g of [{ tur: "x", adet: 1 }, { tur: "soru", adet: 0 }, { tur: "soru", adet: -3 }, { tur: "soru", adet: "a" }, { tur: "soru", adet: 9999 }, {}])
     assert.equal((await al(e, cookie, g.tur, g.adet)).s, 400, JSON.stringify(g));
 });
-test("hesap silinince kota satırları da silinir", async () => {
+test("hesap silinince eski kid'li kota satırları silinir; takma adlı kayıt kalır (ayrıntılar: kota-yeniden-acma.test.mjs)", async () => {
   const e = env(), { cookie } = await girisYap(e, "j@ornek.com"); await al(e, cookie, "soru", 3);
-  const kid = e.DB.db.prepare("SELECT id FROM kullanici WHERE eposta='j@ornek.com'").get().id;
-  assert.equal(e.DB.db.prepare("SELECT COUNT(*) n FROM ucretsiz WHERE kid = ?").get(kid).n, 1);
+  const kid = e.DB.db.prepare("SELECT id FROM kullanici WHERE eposta='j@ornek.com'").get().id, kimlik = await kotaKimligiEposta(e, "j@ornek.com");
+  assert.equal(e.DB.db.prepare("SELECT adet FROM ucretsiz_kimlik WHERE kimlik = ? AND tur='soru'").get(kimlik).adet, 3);
   assert.equal((await istek(e, "sil", { m: "POST", cookie })).status, 200);
   assert.equal(e.DB.db.prepare("SELECT COUNT(*) n FROM ucretsiz WHERE kid = ?").get(kid).n, 0);
+  assert.equal(e.DB.db.prepare("SELECT adet FROM ucretsiz_kimlik WHERE kimlik = ? AND tur='soru'").get(kimlik).adet, 3);
 });

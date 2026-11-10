@@ -23,7 +23,7 @@
 
 import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
-import { kotaDurum, kotaAl } from "../../../lib/kota.js";
+import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
@@ -150,6 +150,10 @@ export async function onRequest({ request, env, params }) {
   }
   if (ad === "sil" && m === "POST") {
     try { await sosyalSil(env, u.id); } catch (e) { console.error("sosyal sil", e); }
+    /* Ücretsiz kota kötüye kullanımı önleme kaydı: bu günün soru ve bu ayın deneme kullanımı, e-postadan türetilen takma adlı kimliğe
+       yazılır (düz e-posta, ad, Google kimliği, kid tutulmaz). Böylece aynı e-postayla yeniden açınca hak sıfırlanmaz. Kişisel hesap verisi
+       aşağıda mevcut şekilde silinir. Hata olursa silme yine de tamamlanır. */
+    await kotaKorumaYaz(env, u.id).catch(() => { });
     await env.DB.batch([
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),
@@ -159,6 +163,7 @@ export async function onRequest({ request, env, params }) {
       env.DB.prepare("DELETE FROM giris WHERE eposta = ?").bind(u.eposta || ""),
       env.DB.prepare("DELETE FROM kullanici WHERE id = ?").bind(u.id)
     ]);
+    await kotaTemizle(env, true).catch(() => { }); /* geçmiş dönemlerin takma adlı kayıtlarını da sil */
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
   }
   return fail(404, "yok");

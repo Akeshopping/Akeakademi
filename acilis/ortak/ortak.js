@@ -1,6 +1,6 @@
 /* AKE Akademi · açılış sahneleri için ortak altyapı
    Three.js yerel dosyadan yüklenir (CDN yok). Görünmezken, sekme gizliyken ve hareket azaltıldığında çizim durur. */
-import * as THREE from "three";
+import * as THREE from "../vendor/three.module.min.js";
 import { RoomEnvironment } from "./RoomEnvironment.js";
 
 const $ = s => document.querySelector(s);
@@ -42,7 +42,7 @@ function panelYaz() {
 export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) {
   panelYaz();
   const azHareket = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches || depo("ake.hareket") === "kapali"; } catch (e) { return false; } })();
-  const mobil = Math.min(innerWidth, innerHeight) < 700 || matchMedia("(pointer: coarse)").matches;
+  const mobil = Math.min(innerWidth, innerHeight) < 700 || matchMedia("(any-pointer: coarse)").matches;
   if (azHareket) D.classList.add("az");
   if (yolculuk) D.classList.add("yolculuk");
   /* ?sinema: ana sitede tam ekran iframe olarak oynar; her seferinde oynar, bitince üst sayfaya haber verir */
@@ -50,8 +50,9 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   const haber = m => { if (!sinema) return; try { parent.postMessage({ ake: m }, location.origin); } catch (e) { } };
   const cv = $("#sahne"), ust = $(".ust"), atla = $(".atla"), gyazi = $(".gecis-yazi"), kutu = $(".acilis .metin-kutu");
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: !mobil, powerPreference: "high-performance" }); }
-  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#254236,#171715 70%)"; return; }
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: !mobil, powerPreference: mobil ? "default" : "high-performance" }); }
+  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#254236,#171715 70%)"; haber("acilis-hata"); return; }
+  if (sinema) cv.addEventListener("webglcontextlost", () => haber("acilis-hata"), { once: true });
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(fov, 1, .05, 200);
   const pm = new THREE.PMREMGenerator(renderer); const env = pm.fromScene(new RoomEnvironment(renderer), .04).texture; scene.environment = env;
@@ -99,7 +100,6 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   const hb = $("#hareket");
   if (hb) { hb.textContent = azHareket ? "Hareketi aç" : "Hareketi kapat"; hb.addEventListener("click", () => { depo("ake.hareket", azHareket ? "acik" : "kapali"); location.reload(); }); }
   if (sinema ? azHareket : (depo(anahtar) === "goruldu" || azHareket)) acilisBitir(false); else acilisOyna();
-  haber("acilis-hazir");
 
   /* çizim */
   function ciz() {
@@ -140,6 +140,7 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   addEventListener("scroll", () => { if (azHareket) return; if (kaydirma() < 1) calistir(); else ciz(); }, { passive: true });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) calistir(); });
   calistir(); ciz();
+  if (oynuyor) haber("acilis-hazir");
 
   /* kayıt için belirli kareyi çizme (yalnızca ekran kaydında kullanılır) */
   window.__kare = (t, g) => { durum.t = t; durum.dt = 1 / 30; if (g != null) { durum.g = g; oynuyor = g < 1; D.classList.toggle("oynuyor", g < .72); } ciz(); };

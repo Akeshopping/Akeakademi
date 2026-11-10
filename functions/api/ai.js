@@ -15,8 +15,52 @@
 
 import { json, fail, sema, oturum, aktifPaket, kodBagla, kullanimAl, kullanimArtir, limitler, kodCoz, giderYaz } from "../../lib/ortak.js";
 
-const IMG_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_IMAGE_BASE64 = 5_000_000;
+const MAX_REQUEST_BYTES = 7_000_000;
+const IMAGE_FORMATS = new Map([
+  ["image/jpeg", bytes => bytes.length > 5 && bytes.startsWith("\xff\xd8\xff") && bytes.endsWith("\xff\xd9")],
+  ["image/png", bytes => bytes.length >= 45 && bytes.startsWith("\x89PNG\r\n\x1a\n\x00\x00\x00\x0dIHDR") && bytes.endsWith("\x00\x00\x00\x00IEND\xaeB\x60\x82")],
+  ["image/webp", webpMatches],
+  ["image/gif", bytes => bytes.length >= 14 && /^(GIF87a|GIF89a)/.test(bytes) && bytes.endsWith("\x3b")],
+]);
 const hits = new Map();
+
+function webpMatches(bytes) {
+  if (bytes.length < 20 || !bytes.startsWith("RIFF") || bytes.slice(8, 12) !== "WEBP") return false;
+  const riffSize = (bytes.charCodeAt(4) | bytes.charCodeAt(5) << 8 | bytes.charCodeAt(6) << 16 | bytes.charCodeAt(7) << 24) >>> 0;
+  return riffSize === bytes.length - 8 && ["VP8 ", "VP8L", "VP8X"].includes(bytes.slice(12, 16));
+}
+
+function imageMatches(image) {
+  const matches = IMAGE_FORMATS.get(image.media_type);
+  const data = image.data;
+  if (!matches || typeof data !== "string" || !data.length || data.length > MAX_IMAGE_BASE64) return false;
+  try { return matches(atob(data)); } catch { return false; }
+}
+
+// null signals an oversized body. Count streamed bytes even when Content-Length is absent.
+async function readAiJson(request) {
+  if (Number(request.headers.get("content-length")) > MAX_REQUEST_BYTES) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return {};
+  const decoder = new TextDecoder();
+  let size = 0, text = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_REQUEST_BYTES) {
+        await reader.cancel().catch(() => {});
+        return null;
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+    const value = JSON.parse(text + decoder.decode());
+    return value && typeof value === "object" ? value : {};
+  } catch { return {}; }
+  finally { reader.releaseLock(); }
+}
 
 export async function onRequest({ request, env }) {
   if (request.method !== "POST") return fail(405, "method");
@@ -25,8 +69,8 @@ export async function onRequest({ request, env }) {
   const MODEL = { hizli: env.AKE_MODEL_HIZLI || "claude-haiku-5-5", guclu: env.AKE_MODEL_GUCLU || "claude-sonnet-5-5" };
   const EFOR = ["low", "medium", "high"].includes(env.AKE_EFOR_GUCLU) ? env.AKE_EFOR_GUCLU : "medium";
 
-  let b = {}; try { b = await request.json(); } catch (e) { b = {}; }
-  if (!b || typeof b !== "object") b = {};
+  const b = await readAiJson(request);
+  if (b === null) return fail(413, "prompt_too_large");
 
   /* Hesap ve paket: AI, hesaba bağlı ve süresi geçmemiş bir erişim koduyla çalışır.
      Veritabanı bağlı değilse (eski kurulum) yalnızca koda bakılır. */
@@ -64,8 +108,8 @@ export async function onRequest({ request, env }) {
   if (!merged.length || merged[merged.length - 1].role !== "user") return fail(400, "bos");
   if (merged.reduce((a, m) => a + m.content.length, 0) > 80000) return fail(413, "prompt_too_large");
 
-  if (b.image && typeof b.image.data === "string") {
-    if (!IMG_TYPES.includes(b.image.media_type) || b.image.data.length > 5000000) return fail(400, "image_rejected");
+  if (b.image != null) {
+    if (!imageMatches(b.image)) return fail(400, "image_rejected");
     const last = merged[merged.length - 1];
     last.content = [{ type: "image", source: { type: "base64", media_type: b.image.media_type, data: b.image.data } }, { type: "text", text: last.content }];
   }

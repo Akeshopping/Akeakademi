@@ -7400,7 +7400,14 @@ function daysLeft() {
 }
 
 /* ---------- yapay zekâ (Claude) ---------- */
-const AI = { fn: null, ready: !(window.claude && typeof window.claude.use === "function"), off: false, images: false };
+/* Ortam kararı (üyelik/kota otoritesi): akeakademi.com ve diğer tüm gerçek adreslerde karar SUNUCUDADIR; sunucu doğrulanamazsa
+   yetki verilmez (fail closed). Cihazdaki eski Premium kaydına (WEBAI) yalnızca iki kontrollü ortamda güvenilir:
+   1) localhost / 127.0.0.1 / [::1] / *.localhost geliştirme önizlemesi, 2) Claude paneli (window.claude; hesap sunucusu hiç yok).
+   akeakademi.com'da window.claude taklidi yerel moda geçirmez. Bunu açan gizli parametre/anahtar yoktur. */
+const URETIM_HOST = /(^|\.)akeakademi\.com$/i.test(location.hostname);
+const DEV_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|::1|[^.]+\.localhost)$/i.test(location.hostname);
+const CLAUDE_PANELI = !URETIM_HOST && !!(window.claude && typeof window.claude.use === "function");
+const AI = { fn: null, ready: !CLAUDE_PANELI, off: false, images: false };
 /* akeakademi.com: AI, erişim koduyla bu sitenin sunucusundaki /api/ai üzerinden çalışır (anahtar sunucuda gizli kalır) */
 const WEBAI = { code: LS.get("ake.kod") || "", plan: LS.get("ake.plan") || "", bitis: LS.get("ake.bitis") || "" };
 const ayKey = () => dayKey().slice(0, 7);
@@ -7417,7 +7424,7 @@ function ucretsizMi() {
      Cihazdaki eski Premium/Atılım kaydı (WEBAI) bunu geçersiz kılamaz. Hesap henüz yüklenmediyse ücretsiz sayılır;
      kotaAl bu durumda hakkı vermeden bekletir (yerel Premium'a güvenip geçiş verilmez). */
   if (sunucuKota()) return !(HESAP.hazir && HESAP.user && HESAP.paket);
-  /* Hesap sunucusu yoksa (Claude paneli, çevrimdışı) eski yerel davranış */
+  /* Yerel yedek yalnızca geliştirme önizlemesi (localhost) ve Claude paneli için; üretimde buraya düşülmez */
   if (HESAP.paket) return false;
   if (WEBAI.plan && (!WEBAI.bitis || WEBAI.bitis >= dayKey())) return false;
   return true;
@@ -7564,9 +7571,9 @@ function webAI() {
 }
 function webAIAc() { AI.fn = webAI(); AI.off = false; AI.images = true; AI.imgTypes = ["image/jpeg", "image/png", "image/webp"]; }
 function webAIKapat() { WEBAI.code = ""; WEBAI.plan = ""; WEBAI.bitis = ""; LS.del("ake.kod"); LS.del("ake.plan"); LS.del("ake.bitis"); AI.fn = null; AI.images = false; }
-const premOnly = () => !(window.claude && typeof window.claude.use === "function") && WEBAI.plan !== "premium";
+const premOnly = () => !CLAUDE_PANELI && WEBAI.plan !== "premium";
 async function initAI() {
-  if (!(window.claude && typeof window.claude.use === "function")) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; } /* web: hesap varsa initHesap paketi yükleyince AI açılır */
+  if (!CLAUDE_PANELI) { if (WEBAI.code) webAIAc(); AI.ready = true; render(); return; } /* web: hesap varsa initHesap paketi yükleyince AI açılır */
   try { AI.fn = await window.claude.use("sample"); } catch (e) { AI.fn = null; }
   AI.ready = true;
   if (AI.fn) { try { const l = await AI.fn.limits(); AI.images = !!(l && l.images); AI.imgTypes = l && l.images ? l.images.mediaTypes : []; } catch (e) { } }
@@ -7680,7 +7687,7 @@ function header() {
     <div class="top-sp"></div>
     <div id="savest" class="save ${c}" title="${t}"><i></i><span class="lbl">${t}</span></div>
     ${cloud.owner && IN_CLAUDE ? `<button class="btn sm adm-go" data-a="admEnter" title="Yönetim paneli (yalnızca sen görüyorsun)">${icon("users")}<span>Panel</span></button>` : ""}
-    ${!IN_CLAUDE && !HESAP.yok && HESAP.hazir ? (HESAP.user ? `<a class="btn sm ghost hesap-btn" href="#hesap" aria-label="Hesabım" title="${esc(HESAP.user.eposta)}"><span class="av">${esc((HESAP.user.ad || HESAP.user.eposta || "?").slice(0, 1).toLocaleUpperCase("tr"))}</span></a>` : `<a class="btn sm giris-btn" href="#hesap" aria-label="Giriş yap">${icon("users")}<span>Giriş yap</span></a>`) : ""}
+    ${!IN_CLAUDE && !HESAP.yok && HESAP.hazir && !HESAP.hata ? (HESAP.user ? `<a class="btn sm ghost hesap-btn" href="#hesap" aria-label="Hesabım" title="${esc(HESAP.user.eposta)}"><span class="av">${esc((HESAP.user.ad || HESAP.user.eposta || "?").slice(0, 1).toLocaleUpperCase("tr"))}</span></a>` : `<a class="btn sm giris-btn" href="#hesap" aria-label="Giriş yap">${icon("users")}<span>Giriş yap</span></a>`) : ""}
     <button type="button" class="btn sm ghost tema-btn" data-a="temaHizli" aria-label="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}" title="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}">${icon(koyuMu() ? "sun" : "moon")}</button>
     <div class="chip-cd" title="YKS 2027 TYT oturumuna kalan gün"><b>${daysLeft()}</b><span>gün · YKS 2027</span></div>
   </div></header>`;
@@ -8158,6 +8165,11 @@ async function kotaAl(tur, adet) {
     const v = Math.min(adet, h.kalanSoru); if (v < 1) return 0; h.d.n = (h.d.n || 0) + v; h.kaydet(); return v;
   }
   if (!HESAP.hazir) { toast("Hesabın yükleniyor, birazdan tekrar dene."); return -1; }
+  if (HESAP.hata) { /* sunucu doğrulanamadı: yetki verme; bağlantı mesajı göster (paket/giriş mesajı DEĞİL) ve arkada yeniden dene */
+    toast(HESAP_DOGRULANAMADI);
+    if (!UI.hesapDene) { UI.hesapDene = true; hesapBenDene().then(d => { if (d === "ok") hesapEsitle().catch(() => { }); }).finally(() => { UI.hesapDene = false; render(); }); }
+    return -1;
+  }
   if (!HESAP.user) { kotaGirisModal(); return -1; }
   if (UI.kotaBusy) return -1; UI.kotaBusy = true;
   try {
@@ -9284,7 +9296,7 @@ Object.assign(OZ_ACT, {
 });
 const OZ_CHG = { sesliMod(el) { SESLI.on = !!el.checked; LS.set("ake.sesli", SESLI.on ? "1" : "0"); render(); } };
 /* ===== Hesap (akeakademi.com): e-posta ya da Google ile giriş, ilerlemenin hesapta saklanması, kodun hesaba bağlanması ===== */
-const HESAP = { hazir: !!(window.claude && typeof window.claude.use === "function"), yok: !!(window.claude && typeof window.claude.use === "function"), user: null, paket: null, kullanim: null, limit: null, ucr: null, ayar: { google: false, eposta: false }, adim: "eposta", eposta: "", busy: false, err: "" };
+const HESAP = { hazir: CLAUDE_PANELI, yok: CLAUDE_PANELI, hata: false, user: null, paket: null, kullanim: null, limit: null, ucr: null, ayar: { google: false, eposta: false }, adim: "eposta", eposta: "", busy: false, err: "" };
 async function hesapIstek(path, opt) {
   const r = await fetch("/api/hesap/" + path, Object.assign({ credentials: "same-origin", headers: { "content-type": "application/json" } }, opt || {}));
   let j = {}; try { j = await r.json(); } catch (e) { }
@@ -9336,16 +9348,31 @@ async function hesapEsitle() {
   } catch (e) { cloud.state = "local"; cloud.col = null; }
   render();
 }
+/* Hesap durumu: yükleniyor (hazir=false) · ücretli/ücretsiz (user) · oturumsuz (401) · doğrulanamadı (hata) · geliştirme (yok).
+   Ağ hatası, zaman aşımı, 5xx ya da beklenmeyen cevap "hesap sistemi yok" demek DEĞİLDİR: hata sayılır, yetki verilmez.
+   HESAP.yok yalnızca geliştirme önizlemesinde (localhost) ve Claude panelinde, hesap sunucusu bulunamadığında açılır. */
+const HESAP_ZAMAN_ASIMI = 12000;
+const HESAP_DOGRULANAMADI = "Hesap bilgilerin doğrulanamadı. İnternet bağlantını kontrol edip tekrar dene.";
+const hesapHataKart = () => `<div class="card stack" style="max-width:560px"><h2>Hesabın doğrulanamadı</h2><p class="muted">${HESAP_DOGRULANAMADI}</p><div class="row"><button class="btn pri" data-a="hesapTekrarDene">Tekrar dene</button></div></div>`;
+async function hesapBenDene() {
+  const ac = new AbortController(), zt = setTimeout(() => ac.abort(), HESAP_ZAMAN_ASIMI);
+  try {
+    const { r, j } = await hesapIstek("ben", { signal: ac.signal });
+    if (j.ayar) HESAP.ayar = j.ayar;
+    if (r.ok) { HESAP.hata = false; hesapUygula(j); HESAP.hazir = true; return "ok"; }
+    if (r.status === 401) { HESAP.hata = false; HESAP.user = null; HESAP.paket = null; HESAP.ucr = null; AI.fn = null; AI.images = false; return "giris"; }
+    if (DEV_HOST) { HESAP.yok = true; return "yok"; } /* geliştirme önizlemesi: hesap sunucusu çalışmıyor, yerel yedek */
+    HESAP.hata = true; return "hata";
+  } catch (e) {
+    if (DEV_HOST) { HESAP.yok = true; return "yok"; }
+    HESAP.hata = true; return "hata";
+  } finally { clearTimeout(zt); }
+}
 async function initHesap() {
   if (IN_CLAUDE) return;
-  try {
-    const { r, j } = await hesapIstek("ben");
-    if (j.ayar) HESAP.ayar = j.ayar;
-    if (r.ok) { hesapUygula(j); HESAP.hazir = true; render(); await hesapEsitle(); sosyalBasla(); }
-    else if (r.status === 401) { AI.fn = null; AI.images = false; }
-    else HESAP.yok = true; /* hesap sunucusu henüz kurulmadı: eski kod sistemi çalışır */
-  } catch (e) { HESAP.yok = true; }
+  const d = await hesapBenDene();
   HESAP.hazir = true;
+  if (d === "ok") { render(); await hesapEsitle(); sosyalBasla(); }
   ekSorularYukle();
   const h = location.hash || "";
   if (/giris=ok/.test(h)) { toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor."); history.replaceState(null, "", "#hesap"); }
@@ -9401,6 +9428,7 @@ function vHesap() {
   const H = HESAP;
   if (IN_CLAUDE || H.yok) return `<div class="view"><div class="vhead"><h1>Hesabım</h1><p>${IN_CLAUDE ? "Bu sürümde ilerlemen Claude hesabına bağlı olarak saklanır." : "Hesap sistemi çok yakında açılıyor. O zamana kadar ilerlemen bu cihazda saklanır; Ayarlar'dan yedek alabilirsin."}</p></div></div>`;
   if (!H.hazir) return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div><div class="empty">Yükleniyor…</div></div>`;
+  if (H.hata) return `<div class="view"><div class="vhead"><h1>Hesabım</h1></div>${hesapHataKart()}</div>`;
   if (!H.user) return `<div class="view"><div class="giris-sayfa">
     <div class="card stack giris-kart"><div class="giris-logo">${logoTile ? logoTile("lg-giris", "") : ""}</div><h1>AKE Akademi'ye hoş geldin</h1><p class="muted" style="margin:0">Ücretsiz hesapla ilerlemen her cihazda seninle olur.</p>${girisFormu()}</div>
     <ul class="giris-fayda"><li><b>Her cihazda seninle</b><span>Telefonu değiştirsen de çözdüğün sorular, yanlış defterin ve netlerin kaybolmaz.</span></li><li><b>Arkadaş ligi ve canlı denemeler</b><span>Her pazar Türkiye genelinde sıralamaya gir, rozet kazan.</span></li><li><b>Hesapsız da kullanabilirsin</b><span>Ama verilerin yalnızca bu cihazda kalır; tarayıcı verisi silinirse gider.</span></li></ul></div></div>`;
@@ -9421,6 +9449,7 @@ function hesapOzetKart() {
 function tutorGirisKapisi() {
   if (HESAP.yok) return null;
   if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
+  if (HESAP.hata) return hesapHataKart();
   if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Atılım ve Premium</span><h2>AI öğretmen için giriş yap</h2>
     <p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularını bilen AI öğretmen paketlerle açılır. Önce giriş yap; paket kodun hesabına bağlanır.</p>${girisFormu(true)}<a class="btn ghost" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
   if (!HESAP.paket) return paketKart();
@@ -9428,6 +9457,7 @@ function tutorGirisKapisi() {
 }
 
 Object.assign(OZ_ACT, {
+  async hesapTekrarDene() { if (HESAP.busy) return; HESAP.busy = true; render(); let d = "hata"; try { d = await hesapBenDene(); } finally { HESAP.busy = false; } if (d === "ok") { render(); await hesapEsitle(); sosyalBasla(); } else if (d === "hata") toast(HESAP_DOGRULANAMADI); render(); },
   girisGeri() { HESAP.adim = "eposta"; HESAP.err = ""; render(); },
   async girisTekrar() { if (HESAP.busy || !HESAP.eposta) return; HESAP.busy = true; HESAP.err = ""; render(); const { r, j } = await hesapIstek("kod-gonder", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta }) }).catch(() => ({ r: { status: 0 }, j: {} })); HESAP.busy = false; if (r.ok) toast("Yeni kod gönderildi."); else HESAP.err = hesapHata(j, r); render(); },
   async cikis() { try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } HESAP.user = null; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
@@ -9813,6 +9843,7 @@ function sosGirisKart(ne) {
   if (IN_CLAUDE) return `<div class="card"><p>${ne} akeakademi.com'da hesabınla çalışır.</p></div>`;
   if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
   if (HESAP.yok) return `<div class="card"><p class="muted">${ne} şu an hazırlanıyor. Biraz sonra tekrar dene.</p></div>`;
+  if (HESAP.hata) return hesapHataKart();
   return `<div class="card stack"><h2>Önce giriş yap</h2><p class="muted">${ne} hesabınla çalışır; puanın, sıralaman ve sınıfın her cihazda aynı kalır. Giriş ücretsiz.</p><a class="btn pri" style="align-self:flex-start" href="#hesap">Giriş yap</a></div>`;
 }
 function takmaKart() {
@@ -11563,7 +11594,7 @@ Object.assign(OZ_ACT, {
   atlIntro() { atlIntro(true); }
 });
 /* ---------- site ayarları, Premium ve yasal metinler ---------- */
-const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
+const IN_CLAUDE = CLAUDE_PANELI;
 const AYAR = Object.assign({ adSoyad: "", adres: "", eposta: "", telefon: "", odemeAracisi: "", yapayZeka: "", guncelleme: "",
   fiyatOrta: "199", yillikOrta: "2189", fiyatPremium: "399", yillikPremium: "4389", aiOrta: "200", aiPremium: "500", cozumOrta: "20", cozumPremium: "60",
   linkOrtaAy: "", linkOrtaYil: "", linkPremiumAy: "", linkPremiumYil: "" }, window.AKE_AYAR || {});

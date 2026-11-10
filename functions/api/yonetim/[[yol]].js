@@ -9,6 +9,7 @@
 //   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez); kullanıcı/aktif paket yoksa 404
 //   Durum değiştiren (GET/HEAD/OPTIONS dışı) tüm istekler aynı kaynaktan (same-origin) gelmek zorundadır; aksi halde 403 "origin".
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
+import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -48,12 +49,21 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
   arr = arr.filter(o => !nmr(o) || rmz(o) >= 3);
   if (!arr.length) return { hata: "uretim" };
   const tut = arr; /* ikinci AI kontrolü kaldırıldı (token tasarrufu); sorular onay kuyruğunda elle kontrol edilir */
+  const v2 = bayrakAcik(env), say = { yazilan: 0, gecersiz: 0, kopya: 0, catisma: 0, idCakisma: 0 };   // AKE_SORU_V2=1: legacy json + kanonik kolonlar tek INSERT'te (lib/soru-yaz.js)
   for (const o of tut) {
+    if (v2) {
+      const aday = { s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
+      if (typeof o.p === "string" && o.p.trim()) aday.p = o.p.trim();
+      const r = await soruYazKanonik(env, aday);
+      if (r.durum === "yazildi" || r.durum === "kopya") say.yazilan++;
+      if (r.durum === "kopya") say.kopya++; else if (r.durum === "gecersiz") say.gecersiz++; else if (r.durum === "catisma") say.catisma++; else if (r.durum === "idCakisma") say.idCakisma++;
+      continue;
+    }
     const q = { id: "ok-" + rastgele(5), s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
     if (typeof o.p === "string" && o.p.trim()) q.p = o.p.trim();
     await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'onayli', ?, ?)").bind(q.id, s, t, d, JSON.stringify(q), Date.now(), Date.now()).run();
   }
-  return { uretilen: arr.length, gecen: tut.length };
+  return v2 ? { uretilen: arr.length, gecen: say.yazilan, gecersiz: say.gecersiz, kopya: say.kopya, catisma: say.catisma, idCakisma: say.idCakisma } : { uretilen: arr.length, gecen: tut.length };
 }
 
 /* Cross-site istek koruması (CSRF): durum değiştiren isteğin Origin'i bu isteğin kendi adresinin origin'i ile birebir aynı olmalı.
@@ -172,6 +182,10 @@ export async function onRequest({ request, env, params }) {
     await soruSema(env);
     let b = {}; try { b = await request.json(); } catch (e) { }
     const ids = [].concat(b.id || []).map(String).slice(0, 100), karar = b.karar === "onay" ? "onayli" : "red";
+    if (bayrakAcik(env) && karar === "onayli") {   // AKE_SORU_V2=1: kanonik alanlar doldurulmadan onay YOK; hepsi ya da hiçbiri (tek batch)
+      const r = await soruOnayla(env, ids);
+      return r.ok ? json(200, { ok: true, n: ids.length, onaylanan: r.onaylanan, kopya: r.kopya }) : json(409, { error: "dogrulama", message: "Hiçbir soru onaylanmadı: kanonik doğrulama başarısız.", hatalar: r.hatalar });
+    }
     for (const id of ids) await env.DB.prepare("UPDATE soru SET durum = ?, karar = ? WHERE id = ? AND durum = 'bekliyor'").bind(karar, Date.now(), id).run();
     return json(200, { ok: true, n: ids.length });
   }

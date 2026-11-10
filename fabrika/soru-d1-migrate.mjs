@@ -12,7 +12,7 @@
 //   node fabrika/soru-d1-migrate.mjs --remote --environment production --db-id <id> --db-name <ad>            # preflight + dry-run (salt okuma)
 //   ... --backup-out /gizli/yedek.json                                                                        # salt-okuma export (soru metni içerir: repo DIŞINDA)
 //   ... --backup-file /gizli/yedek.json                                                                       # dry-run + onay belirteci
-//   ... --backup-file F --apply --confirm <belirteç> --expect-pre-count <N> --freeze-confirmed                # APPLY
+//   ... --backup-file F --apply --confirm <belirteç> --expect-pre-count <N> --freeze-confirmed --recovery-manifest-out F   # APPLY
 //   --local-db <dosya.sqlite>  yerel prova (uzak API yok)   --manifest-out <yol>  --chunk <n>  --embedded-json <yol>  --json
 // Gizli bilgiler: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN (yalnız ortamdan; asla basılmaz), AKE_MIGRATE_PRODUCTION_DB_ID (üretim kimliği).
 // Çıkış kodu: 0 başarılı · 1 kapı/plan/doğrulama başarısız · 2 kullanım hatası · 3 HARD STOP (yanlış veritabanı/ortam).
@@ -47,18 +47,27 @@ const API = "https://api.cloudflare.com/client/v4";
 export function cloudflareSurucu({ hesap, dbId, token, fetchFn = globalThis.fetch }) {
   if (!hesap || !dbId || !token) throw new HardStop("CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN / --db-id eksik");
   const temiz = m => String(m).split(token).join("[gizli]");
-  const cagri = async (yol, yontem, govde) => {
+  /* beklenen: /query için beklenen sonuç sayısı (tek sorgu 1, batch = ifade sayısı); null = dizi beklenmez (kimlik/bookmark GET).
+     Üst düzey success TEK BAŞINA yetmez: result dizisi, uzunluk ve HER result[i].success === true doğrulanır (eksik/bozuk = hata). */
+  const cagri = async (yol, yontem, govde, beklenen = null) => {
     const r = await fetchFn(`${API}/accounts/${hesap}/d1/database/${dbId}${yol}`, { method: yontem, headers: { authorization: "Bearer " + token, "content-type": "application/json" }, body: govde ? JSON.stringify(govde) : undefined });
     let j; try { j = await r.json(); } catch (e) { throw new Error("Cloudflare yanıtı çözülemedi (HTTP " + r.status + ")"); }
-    if (!r.ok || !j.success) throw new Error(temiz("Cloudflare D1 hatası (HTTP " + r.status + "): " + ((j.errors || []).map(e => e.message).join("; ") || "bilinmiyor")));
+    if (!r.ok || !j || !j.success) throw new Error(temiz("Cloudflare D1 hatası (HTTP " + r.status + "): " + (((j && j.errors) || []).map(e => e.message).join("; ") || "bilinmiyor")));
+    if (beklenen !== null) {
+      if (!Array.isArray(j.result)) throw new Error("Cloudflare D1 yanıtı bozuk: result dizisi yok");
+      if (j.result.length !== beklenen) throw new Error(`Cloudflare D1 yanıtı bozuk: ${beklenen} sonuç beklendi, ${j.result.length} geldi`);
+      j.result.forEach((x, i) => { if (!x || typeof x !== "object" || x.success !== true) throw new Error(temiz(`Cloudflare D1 sorgu #${i + 1} başarısız` + (x && x.error ? ": " + x.error : ""))); });
+    }
     return j.result;
   };
   const st = (sql, a = []) => ({ _sql: sql, _a: a, bind: (...x) => st(sql, x),
-    first: async () => { const r = await cagri("/query", "POST", { sql, params: a }); return (r[0].results || [])[0] || null; },
-    all: async () => { const r = await cagri("/query", "POST", { sql, params: a }); return { results: r[0].results || [] }; },
-    run: async () => { const r = await cagri("/query", "POST", { sql, params: a }); return { meta: { changes: (r[0].meta || {}).changes } }; } });
+    first: async () => { const r = await cagri("/query", "POST", { sql, params: a }, 1); return (r[0].results || [])[0] || null; },
+    all: async () => { const r = await cagri("/query", "POST", { sql, params: a }, 1); return { results: r[0].results || [] }; },
+    run: async () => { const r = await cagri("/query", "POST", { sql, params: a }, 1); return { meta: { changes: (r[0].meta || {}).changes } }; } });
   return { tur: "remote", kimlik: async () => { const r = await cagri("", "GET"); return { id: r.uuid, name: r.name }; },
-    d1: { prepare: sql => st(sql), batch: async arr => cagri("/query", "POST", { batch: arr.map(s => ({ sql: s._sql, params: s._a })) }) } };
+    /* Time Travel: YALNIZ güncel bookmark okunur (GET). Restore bu araçta YOKTUR. Desteklenmiyorsa/alınamıyorsa null. */
+    bookmarkAl: async () => { try { const r = await cagri("/time_travel/bookmark", "GET"); return r && typeof r.bookmark === "string" && r.bookmark ? r.bookmark : null; } catch (e) { return null; } },
+    d1: { prepare: sql => st(sql), batch: async arr => cagri("/query", "POST", { batch: arr.map(s => ({ sql: s._sql, params: s._a })) }, arr.length) } };
 }
 /* yerel SQLite dosyası/bellek (staging provası ve testler). batch = tek işlem */
 export function sqliteSurucu(db, { id = "yerel", name = "yerel" } = {}) {
@@ -83,6 +92,17 @@ export async function kimlikDogrula({ surucu, ortam, beklenen, uretimId }) {
   } else if (uretimId && k.id === uretimId) throw new HardStop("YANLIŞ ORTAM: --environment " + ortam + " ama bu veritabanı ÜRETİM veritabanı");
   if (surucu.tur === "remote" && ortam === "local") throw new HardStop("uzak veritabanı için --environment local olamaz");
   return k;
+}
+
+/* ---------------- yapı koruması: soru tablosu VAR ve legacy temel kolonları tam olmalı; araç sıfırdan tablo KURMAZ ---------------- */
+export const LEGACY_KOLONLAR = ["id", "s", "t", "d", "json", "durum", "tarih", "karar"];
+export async function yapiDogrula(d1, { bootstrap = false } = {}) {
+  const varMi = !!(await d1.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'soru'").first());
+  if (!varMi) { if (bootstrap) return { bootstrap: true }; throw new HardStop("`soru` tablosu YOK: araç sıfırdan tablo kurmaz (yanlış/bozuk veritabanı olabilir)"); }
+  const kol = new Set((await d1.prepare("PRAGMA table_info(soru)").all()).results.map(r => r.name));
+  const eksik = LEGACY_KOLONLAR.filter(c => !kol.has(c));
+  if (eksik.length) throw new HardStop("`soru` tablosunda legacy temel kolon(lar) eksik: " + eksik.join(", "));
+  return { bootstrap: false, kolonlar: [...kol] };
 }
 
 /* ---------------- okuma ---------------- */
@@ -132,6 +152,22 @@ export function yedekOku(yol) {
   return { sha256: sha(buf), meta: j.meta };
 }
 
+/* ---------------- kurtarma manifesti: İLK YAZMADAN ÖNCE (şema ALTER dahil) yazılır; soru metni YOK; 0600; üzerine yazılmaz ---------------- */
+export function kurtarmaManifestiYaz({ yol, kimlik, ortam, ozet, plan, yedek, bookmark }) {
+  const y = repoDisi(yol, "--recovery-manifest-out"); if (fs.existsSync(y)) throw new Error("--recovery-manifest-out zaten var: üzerine yazılmaz");
+  const m = { surum: 1, durum: "planned", olusturma: new Date().toISOString(), veritabani_id: kimlik.id, veritabani_adi: kimlik.name, ortam,
+    on_sayim: ozet.mevcut_toplam, on_durum_hash: ozet.durum_hash, yedek_sha256: yedek.sha256, beklenen_final: ozet.beklenen_final, kaynak_sayilari: ozet.kaynaklar,
+    time_travel_bookmark: bookmark || null,
+    planlanan_ekleme_idleri: plan._ekle.map(e => e.id).sort(sirala), planlanan_backfill_idleri: plan._doldur.map(d => d.id).sort(sirala), planlanan_kopya_of_idleri: plan._kopyaGuncelle.map(k => k.id).sort(sirala) };
+  fs.writeFileSync(y, JSON.stringify(m, null, 1), { mode: 0o600, flag: "wx" });
+  return { yol: y, manifest: m };
+}
+/* atomik güncelleme: geçici dosya (0600) + rename; başarısızlıkta eski içerik bozulmaz */
+export function kurtarmaManifestiGuncelle(yol, ek) {
+  const y = path.resolve(yol), m = Object.assign(JSON.parse(fs.readFileSync(y, "utf8")), ek), tmp = y + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(m, null, 1), { mode: 0o600, flag: "w" }); fs.renameSync(tmp, y); return m;
+}
+
 /* ---------------- onay belirteci + apply kapıları ---------------- */
 export const onayBelirteci = ({ kimlikId, ortam, onSayim, beklenenFinal, yedekSha }) => sha(["ake-soru-migrate-v1", kimlikId, ortam, onSayim, beklenenFinal, yedekSha].join("|")).slice(0, 20);
 /* Apply YALNIZ tüm kapılar true ise. Her kapı adıyla raporlanır; biri yoksa apply RED. */
@@ -146,6 +182,8 @@ export function kapilariDegerlendir({ ozet, kimlikId, ortam, secenek, yedek }) {
   ekle("yedekten sonra veri değişmemiş (durum hash)", !!yedek && yedek.meta.durum_hash === ozet.durum_hash);
   ekle("yedek bu veritabanından", !!yedek && yedek.meta.veritabani_id === kimlikId && yedek.meta.ortam === ortam);
   ekle("admin yazma dondurması onaylandı (--freeze-confirmed)", secenek.freeze === true);
+  let kurtarmaOk = false; try { if (secenek.kurtarmaManifest) { const y = repoDisi(secenek.kurtarmaManifest, "--recovery-manifest-out"); kurtarmaOk = !fs.existsSync(y) && fs.existsSync(path.dirname(y)); } } catch (e) { }
+  ekle("kurtarma manifesti yolu (--recovery-manifest-out: repo dışı, yeni dosya, dizin var)", kurtarmaOk);
   ekle("ön sayım operatörce doğrulandı (--expect-pre-count)", Number.isInteger(secenek.beklenenOnSayim) && secenek.beklenenOnSayim === ozet.mevcut_toplam, String(secenek.beklenenOnSayim));
   const bel = yedek ? onayBelirteci({ kimlikId, ortam, onSayim: ozet.mevcut_toplam, beklenenFinal: ozet.beklenen_final, yedekSha: yedek.sha256 }) : null;
   ekle("onay belirteci (--confirm) eşleşiyor", !!bel && secenek.confirm === bel);
@@ -212,6 +250,7 @@ export async function dogrula({ d1, onceki, kaynaklar, plan }) {
 export async function calistir({ surucu, ortam, beklenen, uretimId, secenek = {}, kaynaklar, cikti = console.log }) {
   const sonuc = { cikis: 0 };
   const kimlik = await kimlikDogrula({ surucu, ortam, beklenen, uretimId });
+  await yapiDogrula(saltOkunur(surucu.d1), { bootstrap: secenek.bootstrap === true && surucu.tur === "local" });   // tablo/legacy kolon yoksa HARD STOP (yazma öncesi)
   cikti(`MOD: ${secenek.apply ? "APPLY istendi (kapılar denetlenecek)" : "SALT OKUMA / DRY-RUN"} · ortam: ${ortam} · veritabanı: ${kimlik.name} (${kimlik.id.slice(0, 8)}…)`);
   const pf = await preflight({ d1: saltOkunur(surucu.d1), kimlik, ortam, kaynaklar });   // preflight/dry-run: fiziksel salt-okuma; yazma yalnız uygula() içinde
   sonuc.preflight = pf.ozet; sonuc.plan = pf.plan;
@@ -226,17 +265,26 @@ export async function calistir({ surucu, ortam, beklenen, uretimId, secenek = {}
   let yedek = null; if (secenek.yedekDosya) { yedek = yedekOku(secenek.yedekDosya); cikti(`yedek: satır ${yedek.meta.satir_sayisi} · sha256 ${yedek.sha256}`); }
   const g = kapilariDegerlendir({ ozet: o, kimlikId: kimlik.id, ortam, secenek, yedek }); sonuc.kapilar = g;
   if (g.belirtec && !secenek.apply) cikti("ONAY BELİRTECİ (apply için --confirm): " + g.belirtec);
+  if (typeof surucu.bookmarkAl === "function") { const b = await surucu.bookmarkAl(); sonuc.bookmarkVar = !!b; cikti(`Time Travel bookmark (salt okuma GET): ${b ? "alınabildi" : "ALINAMADI/desteklenmiyor"}`); }
   if (!secenek.apply) {
     cikti(`DRY-RUN SONUCU: ${pf.plan.basarili ? "plan başarılı (apply için kapılar ayrıca gerekir)" : "PLAN BAŞARISIZ: çatışma/geçersiz/sapma var, apply reddedilir"}`);
     sonuc.cikis = pf.plan.basarili ? 0 : 1; return sonuc;
   }
   for (const x of g.kapilar) cikti(`  kapı ${x.ok ? "TAMAM" : "RED  "}: ${x.ad}${x.ek && !x.ok ? " (" + x.ek + ")" : ""}`);
   if (!g.izinli) { cikti("APPLY REDDEDİLDİ: hiçbir şey yazılmadı."); sonuc.cikis = 1; return sonuc; }
-  const u = await uygula({ d1: surucu.d1, plan: pf.plan, parca: secenek.parca, log: m => cikti("  " + m) }); sonuc.uygulama = u;
+  /* İLK YAZMADAN ÖNCE: Time Travel bookmark + kurtarma manifesti. Biri başarısız olursa hiçbir production yazması başlamaz. */
+  let bookmark = null; if (typeof surucu.bookmarkAl === "function") bookmark = await surucu.bookmarkAl();
+  if (ortam === "production" && !bookmark) throw new HardStop("Time Travel bookmark alınamadı (destek yok/erişim yok): bookmark'sız production apply YAPILMAZ. Ayrı, doğrulanmış manuel yedek şartını runbook'a göre karşıla.");
+  const km = kurtarmaManifestiYaz({ yol: secenek.kurtarmaManifest, kimlik, ortam, ozet: o, plan: pf.plan, yedek, bookmark }); sonuc.kurtarma = km;
+  cikti(`kurtarma manifesti yazıldı (0600, yalnız kimlik/sayı/hash; soru metni yok) · bookmark: ${bookmark ? "kaydedildi" : "yok (yalnız staging/local)"}`);
+  let u; try { u = await uygula({ d1: surucu.d1, plan: pf.plan, parca: secenek.parca, log: m => cikti("  " + m) }); }
+  catch (e) { try { kurtarmaManifestiGuncelle(km.yol, { durum: "basarisiz_kismi_olabilir", hata_zamani: new Date().toISOString(), hata: String(e.message).slice(0, 200) }); } catch (_) { } throw e; }
+  sonuc.uygulama = u;
   cikti(`UYGULANDI: eklenen ${u.eklenen} · doldurulan ${u.doldurulan} · kopya_of ${u.kopya_guncellenen} · ${u.parca} parça`);
   const v = await dogrula({ d1: saltOkunur(surucu.d1), onceki: { rows: pf.rows }, kaynaklar, plan: pf.plan }); sonuc.dogrulama = v;
   for (const x of v.kontroller) cikti(`  doğrulama ${x.ok ? "TAMAM" : "KALDI"}: ${x.ad}${x.ek ? " [" + x.ek + "]" : ""}`);
   cikti(`DOĞRULAMA: ${v.ok ? "BAŞARILI" : "BAŞARISIZ (otomatik rollback YOK; runbook'a bak)"}`);
+  try { kurtarmaManifestiGuncelle(km.yol, { durum: v.ok ? "completed" : "tamamlandi_dogrulama_basarisiz", tamamlanma: new Date().toISOString(), sonra: v.manifest }); } catch (e) { cikti("UYARI: kurtarma manifesti güncellenemedi (planned kaldı): " + String(e.message).slice(0, 80)); }
   if (secenek.manifestCikis) { const y = repoDisi(secenek.manifestCikis, "--manifest-out"); fs.writeFileSync(y, JSON.stringify({ olusturma: new Date().toISOString(), veritabani_id: kimlik.id, ortam, once: { satir_sayisi: pf.rows.length, durum_hash: o.durum_hash }, sonra: v.manifest, eklenen_idler: u.eklenen_idler }, null, 1), { mode: 0o600 }); cikti("manifest yazıldı (yalnız hash/sayı/kimlik)"); }
   cikti("AKE_SORU_V2 DEĞİŞTİRİLMEDİ. Bir sonraki adım: insan onayı → AKE_SORU_V2 açma ayrı bir manuel adımdır.");
   sonuc.cikis = v.ok ? 0 : 1; return sonuc;
@@ -246,13 +294,13 @@ export async function calistir({ surucu, ortam, beklenen, uretimId, secenek = {}
 const cli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (cli) {
   const a = process.argv.slice(2), bayrak = k => a.includes(k), deger = k => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : null; };
-  const yardim = "Kullanım: node fabrika/soru-d1-migrate.mjs (--remote | --local-db <dosya>) --environment production|staging|local --db-id <id> --db-name <ad> [--backup-out F] [--backup-file F] [--apply --confirm T --expect-pre-count N --freeze-confirmed] [--manifest-out F] [--chunk N] [--embedded-json F]\nBayraksız çalıştırma hiçbir yere bağlanmaz ve hiçbir şey yazmaz. Ayrıntı: docs/soru-bankasi-production-migration.md";
+  const yardim = "Kullanım: node fabrika/soru-d1-migrate.mjs (--remote | --local-db <dosya>) --environment production|staging|local --db-id <id> --db-name <ad> [--backup-out F] [--backup-file F] [--apply --confirm T --expect-pre-count N --freeze-confirmed --recovery-manifest-out F] [--manifest-out F] [--chunk N] [--embedded-json F]\nBayraksız çalıştırma hiçbir yere bağlanmaz ve hiçbir şey yazmaz. Ayrıntı: docs/soru-bankasi-production-migration.md";
   const token = process.env.CLOUDFLARE_API_TOKEN || "";
   const redakte = m => { m = String(m); return token ? m.split(token).join("[gizli]") : m; };
   (async () => {
     if (!bayrak("--remote") && !deger("--local-db")) { console.error(yardim); process.exit(2); }
     if (bayrak("--remote") && deger("--local-db")) { console.error("--remote ve --local-db birlikte verilemez"); process.exit(2); }
-    const secenek = { apply: bayrak("--apply"), confirm: deger("--confirm"), freeze: bayrak("--freeze-confirmed"), beklenenOnSayim: deger("--expect-pre-count") == null ? null : +deger("--expect-pre-count"), yedekCikis: deger("--backup-out"), yedekDosya: deger("--backup-file"), manifestCikis: deger("--manifest-out"), parca: +deger("--chunk") || VARSAYILAN_PARCA };
+    const secenek = { apply: bayrak("--apply"), confirm: deger("--confirm"), freeze: bayrak("--freeze-confirmed"), beklenenOnSayim: deger("--expect-pre-count") == null ? null : +deger("--expect-pre-count"), yedekCikis: deger("--backup-out"), yedekDosya: deger("--backup-file"), manifestCikis: deger("--manifest-out"), kurtarmaManifest: deger("--recovery-manifest-out"), bootstrap: bayrak("--bootstrap-table") && !bayrak("--remote"), parca: +deger("--chunk") || VARSAYILAN_PARCA };
     const beklenen = { id: deger("--db-id"), name: deger("--db-name") }, ortam = deger("--environment");
     let surucu;
     if (deger("--local-db")) { const f = deger("--local-db"); if (!fs.existsSync(f)) { console.error("yerel veritabanı dosyası yok: " + f); process.exit(2); } surucu = sqliteSurucu(new DatabaseSync(f), beklenen.id ? { id: beklenen.id, name: beklenen.name } : undefined); }

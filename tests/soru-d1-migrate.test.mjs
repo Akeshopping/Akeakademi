@@ -19,7 +19,7 @@ const kos = (T, secenek = {}, ek = {}) => { const c = sessiz(); return calistir(
 async function tamApply(T, ek = {}, parca) {
   const f = dosya("yedek"), y = await kos(T, { yedekCikis: f });
   const d = await kos(T, { yedekDosya: f }), belirtec = d.kapilar.belirtec, n = d.preflight.mevcut_toplam;
-  return kos(T, { apply: true, confirm: belirtec, beklenenOnSayim: n, freeze: true, yedekDosya: f, parca, ...ek });
+  return kos(T, { apply: true, confirm: belirtec, beklenenOnSayim: n, freeze: true, yedekDosya: f, kurtarmaManifest: dosya("kurtarma"), parca, ...ek });
 }
 
 test("1) yanlış DB kimliği / ortam → HARD STOP (hiçbir şey okunmaz/yazılmaz)", async () => {
@@ -44,8 +44,8 @@ test("2-3) varsayılan komut ve dry-run: yazma 0, şema değişmez, kanonik kolo
 test("4) apply onaysız/eksik kapılarla RED: yazma 0 (confirm yok, freeze yok, yanlış ön sayım, yanlış belirteç, yedek yok)", async () => {
   const T = yeni(legacyDb()), f = dosya("yedek"); await kos(T, { yedekCikis: f });
   const d = await kos(T, { yedekDosya: f }), b = d.kapilar.belirtec, n = d.preflight.mevcut_toplam, iz = izle(T.surucu);
-  const temel = { apply: true, confirm: b, beklenenOnSayim: n, freeze: true, yedekDosya: f };
-  for (const [ad, ek] of [["confirm yok", { confirm: null }], ["yanlış belirteç", { confirm: "0".repeat(20) }], ["freeze yok", { freeze: false }], ["ön sayım yok", { beklenenOnSayim: null }], ["ön sayım yanlış", { beklenenOnSayim: n + 1 }], ["yedek yok", { yedekDosya: null }]]) {
+  const temel = { apply: true, confirm: b, beklenenOnSayim: n, freeze: true, yedekDosya: f, kurtarmaManifest: dosya("kurtarma") };
+  for (const [ad, ek] of [["confirm yok", { confirm: null }], ["yanlış belirteç", { confirm: "0".repeat(20) }], ["freeze yok", { freeze: false }], ["ön sayım yok", { beklenenOnSayim: null }], ["ön sayım yanlış", { beklenenOnSayim: n + 1 }], ["yedek yok", { yedekDosya: null }], ["kurtarma manifesti yok", { kurtarmaManifest: null }]]) {
     const r = await kos(T, { ...temel, ...ek }); assert.equal(r.cikis, 1, ad); assert.ok(r.cikti.some(l => /APPLY REDDEDİLDİ/.test(l)), ad);
   }
   assert.equal(iz.yazma, 0); assert.equal(say(T.db), 89); assert.ok(!sutunlar(T.db).includes("h"));
@@ -114,7 +114,7 @@ test("16-17) yedek: sır içermez, repo dışı, 0600, üzerine yazmaz; loglar s
 test("yedekten sonra veri değişirse (admin yazdı) apply RED; yedek başka DB'den ise RED", async () => {
   const T = yeni(legacyDb()), f = dosya("yedek"); await kos(T, { yedekCikis: f }); const d = await kos(T, { yedekDosya: f });
   legacyEkle(T.db, soru("ok-sonradan", 5000));   // admin yazımı (dondurma ihlali)
-  const iz = izle(T.surucu), d2 = await kos(T, { yedekDosya: f }), r = await kos(T, { apply: true, confirm: d.kapilar.belirtec, beklenenOnSayim: 90, freeze: true, yedekDosya: f });
+  const iz = izle(T.surucu), d2 = await kos(T, { yedekDosya: f }), r = await kos(T, { apply: true, confirm: d.kapilar.belirtec, beklenenOnSayim: 90, freeze: true, yedekDosya: f, kurtarmaManifest: dosya("kurtarma") });
   assert.equal(r.cikis, 1); assert.equal(iz.yazma, 0); assert.ok(r.kapilar.kapilar.some(k => !k.ok && /durum hash|yedek satır sayısı/.test(k.ad)));
 });
 test("18) migration AKE_SORU_V2'yi / ortam değişkenlerini değiştirmez; yalnız soru tablosu + soru_sec indeksleri", async () => {
@@ -129,7 +129,7 @@ test("Cloudflare REST sürücüsü (sahte fetch): token yalnız Authorization'da
   const fetchFn = async (url, o) => { cagrilar.push({ url, o }); const g = o.body ? JSON.parse(o.body) : null;
     if (url.endsWith("/database/dbid")) return new Response(JSON.stringify({ success: true, result: { uuid: "dbid", name: "stg" } }), { status: 200 });
     if (g && g.sql && /FAIL/.test(g.sql)) return new Response(JSON.stringify({ success: false, errors: [{ message: "hata " + TOK }] }), { status: 400 });
-    return new Response(JSON.stringify({ success: true, result: (g.batch || [g]).map(() => ({ results: [{ n: 1 }], meta: { changes: 1 } })) }), { status: 200 }); };
+    return new Response(JSON.stringify({ success: true, result: (g.batch || [g]).map(() => ({ success: true, results: [{ n: 1 }], meta: { changes: 1 } })) }), { status: 200 }); };
   const s = cloudflareSurucu({ hesap: "hesap1", dbId: "dbid", token: TOK, fetchFn });
   assert.deepEqual(await s.kimlik(), { id: "dbid", name: "stg" });
   assert.deepEqual(await s.d1.prepare("SELECT 1 n").first(), { n: 1 }); await s.d1.batch([s.d1.prepare("UPDATE soru SET a = ?").bind(1), s.d1.prepare("UPDATE soru SET a = ?").bind(2)]);

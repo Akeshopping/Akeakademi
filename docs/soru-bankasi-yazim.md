@@ -21,16 +21,14 @@ Başka runtime INSERT/UPDATE yolu yoktur.
 - Mevcut 89 legacy satıra ve tabloya toplu tarama/backfill yapılmaz; onayda yalnız bekleyen satır doldurulur.
 
 ## Cutover sırası
-1. PR 3 main'e girer.
-2. Production `AKE_SORU_V2` **kapalı** kalır.
-3. Admin soru üretimi kısa süre durdurulur.
-4. Production canonical migration çalıştırılır.
-5. Migration count/hash doğrulanır.
-6. Migration sonrası delta legacy row olmadığı doğrulanır.
-7. `AKE_SORU_V2` açılır.
-8. Yeni admin yazımları dual-write olur.
-9. V2 API staging/live smoke yapılır.
-10. Ancak bundan sonra frontend cutover.
+(Ayrıntılı runbook: [`soru-bankasi-production-migration.md`](soru-bankasi-production-migration.md), PHASE A–M.)
+1. PR 3 (ve migration hattı PR'ı) main'e girer; production `AKE_SORU_V2` **kapalı**.
+2. `AKE_SORU_MIGRATION_LOCK=1` (admin soru yazımı kilitli) ve doğrulanır.
+3. Production canonical migration (yedek → dry-run → apply); count/hash/delta doğrulanır.
+4. Kilit **açık kalır**; insan onayı.
+5. `AKE_SORU_V2` açılır ve deploy edilir; V2 API smoke **kilit hâlâ açıkken** yapılır; canonical delta legacy row = 0 doğrulanır.
+6. Ancak bundan sonra migration kilidi kaldırılır, yeniden deploy, unlock doğrulanır (yeni admin yazımları dual-write olur).
+7. Ancak bundan sonra frontend cutover.
 
 **Not:** 1216 yalnızca şu anki baseline'dır (1127 statik/embedded + 89 legacy D1). Migration gününde beklenen toplam = 1127 statik/embedded + migration öncesi gerçek D1 satır sayısı − gerçek ID çakışması.
 

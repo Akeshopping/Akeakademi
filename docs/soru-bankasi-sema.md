@@ -22,7 +22,7 @@ Yeni sunucu API'si ASLA `SELECT json` ile soru döndürmez; yalnız açık sütu
 kalkana kadar a/x içerir. Göçle eklenen yeni satırlarda `json` NULL bırakılır.
 
 ### Göçle gelen satırların `durum` değeri: `banka`
-Legacy uçlar yalnız `durum = 'onayli'` (`/api/sorular`) ve `'bekliyor'`/`'onayli'` (yönetim paneli) okur. Göçle eklenen 927 satır
+Legacy uçlar yalnız `durum = 'onayli'` (`/api/sorular`) ve `'bekliyor'`/`'onayli'` (yönetim paneli) okur. Göçle eklenen 1127 satır
 `banka` durumunda olduğu için bu uçlara görünmez; böylece `/api/sorular` çıktısı ve istemci davranışı değişmez. Mevcut `ok-*`
 satırlarının `durum/tarih/karar` değerleri aynen korunur. Sonraki PR'lar seçimi `banka` (ve geçişte `onayli`) üzerinden yapar.
 

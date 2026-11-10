@@ -72,8 +72,12 @@ export async function onRequest({ request, env, params }) {
     if (!g || !g.hash || g.bitis < Date.now()) return fail(400, "kod_suresi", "Kodun süresi doldu. Yeni kod iste.");
     if ((g.deneme || 0) >= 5) return fail(429, "cok_deneme", "Çok fazla yanlış deneme. Yeni kod iste.");
     const hash = await sha256(eposta + ":" + kod + ":" + (env.AKE_GIZLI || "ake"));
-    if (hash !== g.hash) { await env.DB.prepare("UPDATE giris SET deneme = deneme + 1 WHERE eposta = ?").bind(eposta).run(); return fail(400, "kod_yanlis", "Kod yanlış."); }
-    await env.DB.prepare("UPDATE giris SET hash = NULL, deneme = 0 WHERE eposta = ?").bind(eposta).run();
+    const dogru = hash === g.hash;
+    const guncelle = dogru ? "SET hash = NULL, deneme = 0" : "SET deneme = COALESCE(deneme, 0) + 1";
+    const r = await env.DB.prepare("UPDATE giris " + guncelle + " WHERE eposta = ? AND hash = ? AND bitis = ? AND bitis >= ? AND COALESCE(deneme, 0) < 5")
+      .bind(eposta, g.hash, g.bitis, Date.now()).run();
+    if (r.meta?.changes !== 1) return fail(400, "kod_suresi", "Bu kod artık kullanılamıyor. Yeni kod iste.");
+    if (!dogru) return fail(400, "kod_yanlis", "Kod yanlış.");
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
     await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
     const u = { id: kid, eposta, ad: "" };
@@ -90,17 +94,22 @@ export async function onRequest({ request, env, params }) {
   if (ad === "google-donus" && m === "GET") {
     const hata = r => new Response(null, { status: 302, headers: { location: url.origin + "/#hesap?hata=" + r, "set-cookie": cerezYaz("ake_g", "", 0) } });
     const code = url.searchParams.get("code"), state = url.searchParams.get("state");
-    if (!code || !state || state !== cerez(request, "ake_g")) return hata("google");
-    const t = await fetch("https://oauth2.googleapis.com/token", { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" },
+    if (!env.GOOGLE_CLIENT_ID || !code || !state || state !== cerez(request, "ake_g")) return hata("google");
+    const t = await fetch("https://oauth2.googleapis.com/token", { method: "POST", redirect: "error", headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ code, client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET || "", redirect_uri: url.origin + "/api/hesap/google-donus", grant_type: "authorization_code" }) }).catch(() => null);
-    if (!t || !t.ok) { console.error("google token", t && t.status, t && (await t.text().catch(() => "")).slice(0, 200)); return hata("google"); }
+    if (!t || !t.ok) { console.error("google token", t && t.status); return hata("google"); }
     const tj = await t.json().catch(() => ({}));
     let p = {};
     try { let s = String(tj.id_token || "").split(".")[1].replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; p = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(s), c => c.charCodeAt(0)))); } catch (e) { return hata("google"); }
     /* Belirteç doğrudan Google'ın sunucusundan alındı; yine de temel alanlar kontrol edilir */
-    if (p.aud !== env.GOOGLE_CLIENT_ID || !/accounts\.google\.com$/.test(p.iss || "") || (p.exp || 0) * 1000 < Date.now() || !p.email || !p.email_verified) return hata("google");
-    const kid = await kullaniciBulVeyaAc(env, { eposta: p.email, ad: p.given_name || p.name || "", google: "g:" + p.sub });
-    await bekleyenKodlariBagla(env, kid, p.email).catch(() => { });
+    if (!p || p.aud !== env.GOOGLE_CLIENT_ID || !["https://accounts.google.com", "accounts.google.com"].includes(p.iss) ||
+        !Number.isFinite(p.exp) || p.exp * 1000 <= Date.now() || typeof p.sub !== "string" || !p.sub ||
+        typeof p.email !== "string" || !p.email.trim() || p.email_verified !== true) return hata("google");
+    const eposta = p.email.trim().toLowerCase();
+    const epostaDogrulanmis = eposta.endsWith("@gmail.com") || (typeof p.hd === "string" && !!p.hd);
+    const kid = await kullaniciBulVeyaAc(env, { eposta, ad: p.given_name || p.name || "", google: "g:" + p.sub, epostaDogrulanmis });
+    if (!kid) return hata("google");
+    if (epostaDogrulanmis) await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
     const c = await oturumAc(env, kid);
     const h = new Headers({ location: url.origin + "/#hesap?giris=ok" }); h.append("set-cookie", c); h.append("set-cookie", cerezYaz("ake_g", "", 0));
     return new Response(null, { status: 302, headers: h });
@@ -158,6 +167,7 @@ export async function onRequest({ request, env, params }) {
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM kullanim WHERE kid = ?").bind(u.id),
+      env.DB.prepare("DELETE FROM push WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM ucretsiz WHERE kid = ?").bind(u.id),
       env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM giris WHERE eposta = ?").bind(u.eposta || ""),

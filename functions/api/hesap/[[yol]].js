@@ -12,6 +12,8 @@
 //   POST kod-gonder {eposta}         e-postaya 6 haneli giriş kodu gönderir
 //   POST kod-dogrula {eposta, kod}    kodu doğrular, oturum açar (çerez)
 //   GET  ben                          oturumdaki kullanıcı, paket, bu ayki kullanım
+//   GET  kota                         ücretsiz kalan hak (günlük soru, aylık deneme)
+//   POST kota {tur, adet}             ücretsiz hak ayırır (tur: soru | deneme); biterse 402
 //   POST cikis                        oturumu kapatır
 //   GET  google / google-donus        Google ile giriş
 //   GET  veri                         hesaptaki çalışma verisi (alanlar)
@@ -21,6 +23,7 @@
 
 import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
+import { kotaDurum, kotaAl } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
@@ -74,7 +77,7 @@ export async function onRequest({ request, env, params }) {
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
     await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
     const u = { id: kid, eposta, ad: "" };
-    return json(200, { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid) }, { "set-cookie": c });
+    return json(200, { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid), ucretsiz: await kotaDurum(env, kid).catch(() => null) }, { "set-cookie": c });
   }
 
   /* ---------- Google ile giriş ---------- */
@@ -109,9 +112,15 @@ export async function onRequest({ request, env, params }) {
     const ayar = { google: !!env.GOOGLE_CLIENT_ID, eposta: !!env.RESEND_API_KEY };
     if (!u) return json(401, { error: "giris", ayar });
     const paket = await aktifPaket(env, u.id), k = await kullanimAl(env, u.id);
-    return json(200, { kullanici: kullaniciJson(env, u), paket, kullanim: k, limit: paket ? limitler(env, paket.plan) : null, ayar });
+    return json(200, { kullanici: kullaniciJson(env, u), paket, kullanim: k, limit: paket ? limitler(env, paket.plan) : null, ucretsiz: await kotaDurum(env, u.id).catch(() => null), ayar });
   }
   if (!u) return fail(401, "giris");
+  if (ad === "kota" && m === "GET") return json(200, await kotaDurum(env, u.id));
+  if (ad === "kota" && m === "POST") {
+    const b = await govde(request), r = await kotaAl(env, u.id, String(b.tur || ""), b.adet);
+    if (r.hata) return json(r.durum || 400, { error: r.hata, ...r });
+    return json(200, r);
+  }
   if (ad === "cikis" && m === "POST") {
     const t = cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
@@ -145,6 +154,7 @@ export async function onRequest({ request, env, params }) {
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM kullanim WHERE kid = ?").bind(u.id),
+      env.DB.prepare("DELETE FROM ucretsiz WHERE kid = ?").bind(u.id),
       env.DB.prepare("UPDATE kod SET kid = 'silindi' WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM giris WHERE eposta = ?").bind(u.eposta || ""),
       env.DB.prepare("DELETE FROM kullanici WHERE id = ?").bind(u.id)

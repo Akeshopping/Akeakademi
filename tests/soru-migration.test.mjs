@@ -170,9 +170,9 @@ test("kanonik özet: normalize (boşluk/Unicode), şık SIRASI özeti değiştir
   assert.equal(normalize("é"), "é");
 });
 
-test("canlı davranışı değiştirmez: yeni modül hiçbir functions/ dosyasından içe aktarılmaz; göç durumu 'banka' legacy uçlara görünmez", async () => {
+test("canlı davranışı değiştirmez: kanonik modülü yalnız bayrak-kapılı lib/soru-api.js içe aktarır, functions/ dosyaları doğrudan içe aktarmaz; göç durumu 'banka' legacy uçlara görünmez", async () => {
   const kok = path.resolve(path.dirname(new URL(import.meta.url).pathname), ".."), tara = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? tara(path.join(d, e.name)) : [path.join(d, e.name)]);
-  for (const f of [...tara(path.join(kok, "functions")), ...tara(path.join(kok, "lib")).filter(x => !x.endsWith("soru-kanonik.js"))]) assert.ok(!/soru-kanonik|soru-migrate/.test(fs.readFileSync(f, "utf8")), f + " yeni modülü içe aktarıyor");
+  for (const f of [...tara(path.join(kok, "functions")), ...tara(path.join(kok, "lib")).filter(x => !x.endsWith("soru-kanonik.js") && !x.endsWith("soru-api.js"))]) assert.ok(!/soru-kanonik|soru-migrate/.test(fs.readFileSync(f, "utf8")), f + " yeni modülü içe aktarıyor");
   assert.ok(!/soru-kanonik|soru-migrate/.test(fs.readFileSync(path.join(kok, "index.html"), "utf8")));
   assert.equal(DURUM_BANKA, "banka"); const sorular = fs.readFileSync(path.join(kok, "functions/api/sorular.js"), "utf8"); assert.ok(/durum = 'onayli'/.test(sorular), "legacy uç yalnız 'onayli' okur");
 });

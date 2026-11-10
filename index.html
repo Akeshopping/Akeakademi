@@ -623,6 +623,7 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
 .rz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
 .rz{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:12px 8px;border-radius:16px;border:1px solid var(--line);opacity:.5;filter:grayscale(1)}
 .rz.on{opacity:1;filter:none;background:var(--glass);border-color:var(--glass-line)}
+.rz:not(.on){opacity:1;border-style:dashed}
 .rz-m{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#254236,#b69a68);box-shadow:0 6px 16px -6px rgba(37,66,54,.6)}
 .rz:not(.on) .rz-m{background:var(--line2);color:var(--ink2);box-shadow:none}
 .rz b{font-size:13px} .rz small{font-size:11px;color:var(--ink2);line-height:1.3}
@@ -1232,6 +1233,16 @@ header.top .adm-in .btn{background:transparent!important;background-image:none!i
 header.top .adm-in .btn:hover{background:rgba(245,241,232,.08)!important}
 @media (prefers-reduced-motion:reduce){.yn-tabs button{transition:none}}
 :root[data-motion="off"] .yn-tabs button{transition:none}
+</style>
+<style id="koyu-duzeltme">
+/* Koyu tema: açık renge sabitlenmiş zeminler (beyaz üstüne açık yazı) düzeltildi */
+:root[data-theme="dark"] .btn:not(.pri):not(.acc):not(.ghost):not(:disabled){background:linear-gradient(180deg,rgba(52,50,45,.92),rgba(38,37,33,.86));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 1px rgba(197,165,114,.18),0 1px 2px rgba(0,0,0,.35)}
+:root[data-theme="dark"] .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):hover{background:linear-gradient(180deg,rgba(62,60,54,.95),rgba(46,45,40,.9));border-color:var(--ink3)}
+:root[data-theme="dark"] .btn.ghost:hover{background:rgba(245,241,232,.06)}
+:root[data-theme="dark"] .opt:hover:not([disabled]){background:#2a2925;border-color:var(--ink3)}
+:root[data-theme="dark"] .ob .in{background:#1b1a18;color:var(--ink)}
+:root[data-theme="dark"] .ob-chip.on{color:#171715}
+:root[data-theme="dark"] .sc3-ex-m{color:var(--ink2)}
 </style>
 </head>
 <body>
@@ -7402,15 +7413,17 @@ function planAd(p) { return p === "premium" ? "Premium" : p === "deneme" ? "7 g�
 /* Ücretsiz kullanım sınırı: günde 20 soru, ayda 1 deneme (canlı denemeler serbest) */
 function ucretsizMi() {
   if (HESAP.paket) return false;
-  if (WEBAI.plan && (!WEBAI.bitis || WEBAI.bitis >= new Date().toISOString().slice(0, 10))) return false;
+  if (WEBAI.plan && (!WEBAI.bitis || WEBAI.bitis >= dayKey())) return false;
   return true;
 }
 function ucretsizHak(tur) {
   let d = {}; try { d = JSON.parse(LS.get("ake.ucr") || "{}") || {}; } catch (e) { d = {}; }
-  const g = new Date().toISOString().slice(0, 10), ay = g.slice(0, 7);
+  const g = dayKey(), ay = g.slice(0, 7);
   if (d.g !== g) { d.g = g; d.n = 0; } if (d.ay !== ay) { d.ay = ay; d.d = 0; }
   return { d, g, ay, kalanSoru: Math.max(0, 20 - (d.n || 0)), kalanDeneme: Math.max(0, 1 - (d.d || 0)), kaydet() { LS.set("ake.ucr", JSON.stringify(d)); } };
 }
+/* Günlük soru hedefi: ücretsiz pakette günde 20 soru sınırını aşan hedef gösterilmez */
+function gunlukHedef() { const g = +S.profile.gunluk || 40; return ucretsizMi() ? Math.min(g, 20) : g; }
 function aiLimit() { return sunucuSayac() && HESAP.limit ? HESAP.limit.mesaj : ayarSayi(WEBAI.plan === "premium" ? "aiPremium" : "aiOrta"); }
 function aiCount() { ayArt("ake.aiay"); }
 /* gelişmiş çözüm: soru çözümünde güçlü model, aylık hak (mesaj hakkının içinde) */
@@ -7714,7 +7727,7 @@ function uyelikKart() {
   `;
 }
 function vHome() {
-  const p = S.profile, goal = +p.gunluk || 40, today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
+  const p = S.profile, goal = gunlukHedef(), today = S.daily[dayKey()] || { q: 0, c: 0 }, tot = totals(), last = S.exams[S.exams.length - 1];
   const ng = netGelisimKart(), prog = gunlukProgram(), done = prog.filter(x => x.done).length, weak = weakTopics(3), tasks = S.plan.tasks.filter(t => t.day === todayIdx());
   const dateStr = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
   return `<div class="view">${resumeBanner()}
@@ -7862,7 +7875,7 @@ function vStudio() {
   const seen = St.seen || (St.seen = {}), yeni = k => seen[k] ? "" : (seen[k] = 1, " sc3-new");
   const e = St.e, s = St.s, dersler = Object.keys(SUBJ).filter(k => SUBJ[k].e === e), tops = s ? topicsOf(s) : [];
   if (St.t && !tops.some(x => x.t === St.t)) St.t = "";
-  const t = St.t || "", o = stOpt(), goal = +S.profile.gunluk || 40, td = S.daily[dayKey()] || { q: 0, c: 0 }, yuz = Math.min(100, Math.round(td.q / goal * 100));
+  const t = St.t || "", o = stOpt(), goal = gunlukHedef(), td = S.daily[dayKey()] || { q: 0, c: 0 }, yuz = Math.min(100, Math.round(td.q / goal * 100));
   const ders = s ? dersOzet(s) : null, dn = s ? SUBJ[s].n.replace(/^AYT /, "") : "";
   const sec = (no, baslik, id, ek, ic) => `<section class="sc3-step${ek || ""}" id="${id}" aria-labelledby="${id}-h"><div class="sc3-sh"><span class="sc3-n" aria-hidden="true">${no}</span><h2 id="${id}-h">${baslik}</h2></div>${ic}</section>`;
   const sinav = `<div class="sc3-exams" role="group" aria-label="Sınav türü">${SC_EXAM.map(([k, ad]) => { const b = scExamBilgi(k), on = k === e; return `<button type="button" id="sc3-e-${k}" data-a="stE" data-k="${k}" class="sc3-ex${k === "YDT" ? " yd" : ""}${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-ex-t">${k}</span><span class="sc3-ex-s">${ad}</span><span class="sc3-ex-m">${b.ders} ders · ${fmtN(b.soru)} soru</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
@@ -8157,7 +8170,7 @@ function vRun() {
   return `<div class="run">
   <div class="runbar"><button class="btn sm ghost" data-a="runExit">${icon("back")} Çık</button><span class="ttl">${esc(R.title)}</span>
     <span class="timer" id="timer" title="${R.dur ? "Kalan süre" : "Geçen süre"}">${timerTxt}</span>${R.mode === "exam" ? `<button class="btn sm ghost" data-a="flag" aria-pressed="${!!R.flag[i]}">${icon("flag")} ${R.flag[i] ? "İşaretli" : "İşaretle"}</button>` : ""}<button class="btn sm pri" data-a="finishAsk">Bitir</button></div>
-  <div class="rprog" role="progressbar" aria-valuemin="1" aria-valuemax="${R.qs.length}" aria-valuenow="${i + 1}">${R.qs.map((_, j) => `<i class="${j === i ? "cur" : R.ans[j] != null ? "dn" : ""}"></i>`).join("")}</div>
+  <div class="rprog" role="progressbar" aria-label="Soru ilerlemesi" aria-valuemin="1" aria-valuemax="${R.qs.length}" aria-valuenow="${i + 1}">${R.qs.map((_, j) => `<i class="${j === i ? "cur" : R.ans[j] != null ? "dn" : ""}"></i>`).join("")}</div>
   <div class="rmain">
   <div class="qcard">
     <div class="qmeta"><span class="qno">Soru ${i + 1}/${R.qs.length}</span>${R.secs.length > 1 && sec.n !== subj ? `<span class="pill">${esc(sec.n)}</span>` : ""}<span class="pill form">${esc(subj)}</span>${sesBtn("sesSoru", "", "soru:" + q.id)}<span class="small muted">${esc(q.t)}${q.d ? " · " + DIFF[q.d] : ""}${q.src === "ai" ? " · AI" : ""}</span>
@@ -9049,7 +9062,7 @@ function isiHaritasi() {
 
 /* ===== 3 · Her sabah yenilenen günlük program ===== */
 function gunlukProgram() {
-  const bugun = dayKey(), goal = +S.profile.gunluk || 40, day = S.daily[bugun] || { q: 0, c: 0 };
+  const bugun = dayKey(), goal = gunlukHedef(), day = S.daily[bugun] || { q: 0, c: 0 };
   let G = null; try { G = JSON.parse(LS.get("ake.gp") || "null"); } catch (e) { G = null; }
   if (!G || G.d !== bugun) {
     const w = weakTopics(2).map(x => ({ s: x.s, t: x.t })), ds = alanDersleri(), di = new Date().getDate();
@@ -10294,7 +10307,7 @@ function vHakkimizda() {
       <div class="card sunk"><b class="num" style="font-size:28px">${fmtN(konu.size)}</b><div class="small muted">konu başlığı</div></div></div>
     <ul class="small" style="margin:0;padding-left:18px;line-height:1.7"><li>Her soru, ÖSYM'nin güncel sınav yapısına ve mevcut lise müfredatına göre yazılır; her birinin açıklamalı çözümü vardır.</li>
       <li>Sayısal soruların cevapları kodla bağımsız olarak yeniden hesaplanır; uyuşmayan soru siteye alınmaz.</li>
-      <li>Yapay zekâyla üretilen sorular iki ayrı çözümle kontrol edilir ve yönetici onayından geçmeden havuza girmez.</li>
+      <li>Yapay zekâyla üretilen sorular otomatik biçim kontrolünden geçer (5 farklı şık, tek doğru cevap, çözüm metni); bu sorular öğretmen kontrolünden geçmemiş olabilir, hata görürsen Bildir düğmesiyle haber ver.</li>
       <li>Bazı konularda henüz az soru var ve bunları her hafta çoğaltıyoruz. Yanlış ya da hatalı bir soru görürsen soru ekranındaki <b>Bildir</b> düğmesi doğrudan bize ulaşır.</li></ul></div>
   <div class="card stack"><h2>Verilerin</h2><p class="small muted">Hesabın yokken çalışma verilerin (çözdüğün sorular, netlerin, yanlış defterin) yalnızca bu cihazın tarayıcısında durur; tarayıcı verisini silersen ya da telefonu değiştirirsen kaybolur. Hesap açarsan her cihazda seninle olur. Ayrıntılar için <a href="#kvkk">KVKK Aydınlatma Metni</a>.</p></div>
   <div class="card stack"><h2>İletişim</h2>
@@ -11711,7 +11724,7 @@ function vLegal(k) {
   </div>`;
 }
 function siteFoot() {
-  return `<footer class="foot"><nav aria-label="Yasal metinler"><a href="#tanitim">Tanıtım</a><a href="#sss">SSS</a><a href="#hakkimizda">Hakkımızda</a>${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
+  return `<footer class="foot"><nav aria-label="Yasal metinler"><a href="#tanitim">Tanıtım</a><a href="#sss">SSS</a><a href="#hakkimizda">Hakkımızda</a>${LEGAL_ORDER.map(k => `<a href="#${k}">${LEGAL[k].t}</a>`).join("")}</nav><p>© ${new Date().getFullYear()} AKE Akademi${AYAR.eposta ? ` · <a style="text-decoration:underline" href="mailto:${esc(AYAR.eposta)}">${esc(AYAR.eposta)}</a>` : ""}</p></footer>`;
 }
 
 /* ===== Yönlendirme, olaylar, yapay zekâ işlemleri, açılış ===== */
@@ -11887,8 +11900,8 @@ const ACT = {
   discard() { RUN = null; saveRun(); UI.modal = null; UI.inRun = false; render(); },
   pick(d) { pickAnswer(+d.o); },
   clearAns() { RUN.ans[RUN.cur] = null; saveRun(); render(); },
-  next() { moveTo(RUN.cur + 1); },
-  prev() { moveTo(RUN.cur - 1); },
+  next() { if (!RUN) return; moveTo(RUN.cur + 1); },
+  prev() { if (!RUN) return; moveTo(RUN.cur - 1); },
   jump(d) { moveTo(+d.i); },
   flag() { RUN.flag[RUN.cur] = !RUN.flag[RUN.cur]; saveRun(); render(); },
   sheetToggle() { const wide = window.matchMedia("(min-width:900px)").matches; UI.sheetOpen = !(UI.sheetOpen == null ? wide : UI.sheetOpen); render(); },

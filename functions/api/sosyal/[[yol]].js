@@ -311,7 +311,7 @@ export async function onRequest({ request, env, params }) {
       let results;
       if (taze) results = onb.results;
       else {
-        const r0 = await env.DB.prepare("SELECT s.kid, COALESCE(t.ad, NULLIF(k.ad, ''), 'Öğrenci') AS takma, s.d, s.y, s.b, s.net, s.sure FROM canli_sonuc s LEFT JOIN takma t ON t.kid = s.kid LEFT JOIN kullanici k ON k.id = s.kid WHERE s.canli = ? ORDER BY s.net DESC, s.sure ASC LIMIT 100").bind(c.id).all();
+        const r0 = await env.DB.prepare("SELECT s.kid, COALESCE(t.ad, 'Öğrenci') AS takma, s.d, s.y, s.b, s.net, s.sure FROM canli_sonuc s LEFT JOIN takma t ON t.kid = s.kid WHERE s.canli = ? ORDER BY s.net DESC, s.sure ASC LIMIT 100").bind(c.id).all();
         results = r0.results; if (ONBELLEK.size > 50) ONBELLEK.clear(); ONBELLEK.set(c.id, { t: now, say, results });
       }
       let sira = null;

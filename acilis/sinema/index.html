@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#171715"><title>AKE Akademi açılışı</title>
 <link rel="stylesheet" href="../ortak/ortak.css">
-<script type="importmap">{"imports":{"three":"../vendor/three.module.min.js"}}</script>
 <style>html,body{overflow:hidden;background:#171715}.gecis{height:0!important}.ust{display:none}.marka-final{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(60% 55% at 50% 46%,#1f3a2f 0%,#171715 72%);opacity:0;transition:opacity .45s ease}
 .marka-final.on{opacity:1}
 .mf-in{display:flex;flex-direction:column;align-items:center;gap:18px;transform:scale(.94);opacity:0;transition:transform 1.6s cubic-bezier(.2,.7,.2,1),opacity 1s ease .25s}
@@ -17,4 +16,10 @@
 <header class="ust" aria-hidden="true"></header>
 <button type="button" class="atla">Animasyonu geç</button>
 <main><section class="acilis" aria-hidden="true" style="min-height:0"></section><section class="gecis" aria-hidden="true"></section><section class="calisma" id="calisma" hidden></section></main>
-<script type="module" src="../konseptler/4-esik-yasayan-bilgi-final/sahne.js"></script></body></html>
+<script type="module">
+if (parent !== window) document.querySelector(".atla").hidden = true;
+import("../konseptler/4-esik-yasayan-bilgi-final/sahne.js").catch(error => {
+  console.error("Açılış sahnesi yüklenemedi", error);
+  if (parent !== window) parent.postMessage({ ake: "acilis-hata" }, location.origin);
+});
+</script></body></html>

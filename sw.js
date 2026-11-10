@@ -43,7 +43,8 @@ self.addEventListener("fetch", e => {
       /* uygulama kabuğu "/" ; ayrı sayfalar (/sss/, /matematik-yks-sorulari/ ...) kendi adresiyle saklanır ve kabuğu ezmez.
          Ağ varken her zaman sayfanın kendisi gelir; yalnızca çevrimdışıyken, o sayfa hiç görülmediyse kabuğa dönülür. */
       const key = u.pathname === "/" ? "/" : u.pathname;
-      e.respondWith(agOnce(r, key, "/"));
+      /* Sinema çerçevesine kabuk dönerse kabuk kendi içinde yeni açılış başlatır. */
+      e.respondWith(agOnce(r, key, key === "/acilis/sinema/" ? null : "/"));
       if (key === "/") e.waitUntil(eskiTemizle());
       return;
     }

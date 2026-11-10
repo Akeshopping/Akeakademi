@@ -45,6 +45,20 @@ async function haftalikXp(env, kid, hafta) {
   const r = await env.DB.prepare("SELECT xp FROM xp WHERE kid = ? AND hafta = ?").bind(kid, hafta).first();
   return r ? r.xp || 0 : 0;
 }
+/* Öğretmen ekranında gösterilen çalışma özeti: yalnızca bilinen alanlar, sayılar sayı, metinler kısa düz metin olarak saklanır */
+const ozSayi = (v, ust) => { const n = Number(v); return Number.isFinite(n) ? Math.max(0, Math.min(ust || 1e6, n)) : 0; };
+const ozMetin = (v, n) => String(v == null ? "" : v).replace(/[<>"'`\\\u0000-\u001f]/g, "").trim().slice(0, n);
+function ozetTemiz(o) {
+  o = o && typeof o === "object" && !Array.isArray(o) ? o : {};
+  const dizi = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
+  return {
+    v: 1, h: ozSayi(o.h), hc: ozSayi(o.hc), fm: ozSayi(o.fm), top: ozSayi(o.top), tc: ozSayi(o.tc), seri: ozSayi(o.seri, 5000),
+    son: /^\d{4}-\d{2}-\d{2}$/.test(String(o.son || "")) ? String(o.son) : "", alan: ozMetin(o.alan, 20), hedef: ozMetin(o.hedef, 60),
+    zayif: dizi(o.zayif, 5).map(w => ({ s: ozMetin(w && w.s, 30), t: ozMetin(w && w.t, 50), p: ozSayi(w && w.p, 100), n: ozSayi(w && w.n) })),
+    den: dizi(o.den, 5).map(e => ({ ti: ozMetin(e && e.ti, 50), net: ozSayi(e && e.net, 200), n: ozSayi(e && e.n, 500), tarih: /^\d{4}-\d{2}-\d{2}$/.test(String(e && e.tarih || "")) ? String(e.tarih) : "" })),
+    tekrar: ozSayi(o.tekrar)
+  };
+}
 async function ozetTemizle(env, kid) {
   const kalan = await env.DB.prepare("SELECT 1 FROM sinif_uye WHERE kid = ? LIMIT 1").bind(kid).first();
   if (!kalan) await env.DB.prepare("DELETE FROM ozet WHERE kid = ?").bind(kid).run();
@@ -238,8 +252,9 @@ export async function onRequest({ request, env, params }) {
   if (ad === "ozet" && m === "POST") {
     const uye = await env.DB.prepare("SELECT 1 FROM sinif_uye WHERE kid = ? LIMIT 1").bind(u.id).first();
     if (!uye) return json(200, { kayit: false });
-    const b = await govde(request), s = JSON.stringify(b.ozet || {});
-    if (s.length > 8000) return fail(413, "buyuk");
+    const b = await govde(request);
+    if (JSON.stringify(b.ozet || {}).length > 8000) return fail(413, "buyuk");
+    const s = JSON.stringify(ozetTemiz(b.ozet));
     await env.DB.prepare("INSERT INTO ozet (kid, json, u) VALUES (?, ?, ?) ON CONFLICT (kid) DO UPDATE SET json = excluded.json, u = excluded.u").bind(u.id, s, now).run();
     return json(200, { kayit: true });
   }

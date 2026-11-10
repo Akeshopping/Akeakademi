@@ -7553,8 +7553,8 @@ const aiOn = () => !!AI.fn && !AI.off;
 function aiErr(e) {
   const code = e && e.code;
   if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) { AI.off = true; return "AI özellikleri bu ziyarette kullanılamıyor. Claude'a izin vermediysen sayfayı yeniden açıp izin verebilirsin."; }
-  return ({ rate_limited: "Kısa sürede çok istek gönderildi ya da Claude kullanım limitine ulaşıldı. Biraz sonra tekrar dene.",
-    session_expired: "Claude oturumun sona ermiş. Yeniden giriş yapıp tekrar dene.", refused: "Bu isteğe yanıt verilemedi. Soruyu farklı ifade etmeyi dene.",
+  return ({ rate_limited: "Kısa sürede çok istek gönderildi ya da AI kullanım limitine ulaşıldı. Biraz sonra tekrar dene.",
+    session_expired: "Oturumun sona ermiş. Yeniden giriş yapıp tekrar dene.", refused: "Bu isteğe yanıt verilemedi. Soruyu farklı ifade etmeyi dene.",
     invalid_json: "Yanıt beklenen biçimde gelmedi. Tekrar dene.", image_rejected: "Görsel kabul edilmedi. JPEG, PNG ya da WebP biçiminde, daha küçük bir dosya dene.",
     images_unavailable: "Bu görünümde görsel gönderilemiyor.", prompt_too_large: "Metin çok uzun. Daha kısa bir parça gönder.",
     empty_completion: "Boş yanıt geldi. Soruyu biraz değiştirip tekrar dene.", cancelled: "",
@@ -7944,7 +7944,7 @@ function vMistakes() {
   <div class="vhead"><span class="eyebrow">Hata en iyi öğretmen</span><h1>Tekrar</h1><p>Yanlış ya da boş bıraktığın her soru buraya düşer ve 1, 3 ve 7 gün sonra yeniden karşına çıkar. Üç tekrarda da doğru çözersen "öğrenildi" olur. Aynı mantıkta yeni sorularla pekiştirmek için "Benzerini çöz"e bas.</p></div>
   ${subTabs(TEKRAR_TABS, "yanlislar")}
   <div class="row" style="justify-content:space-between"><div class="seg">${[["open", `Tekrar edilecek (${open.length})`], ["done", `Öğrenilenler (${done.length})`]].map(([k, l]) => `<button data-a="mistTab" data-k="${k}" class="${M.tab === k ? "on" : ""}">${l}</button>`).join("")}</div>
-    <select class="in" style="max-width:220px" data-c="mistS">${subjOpts(M.s, true)}</select></div>
+    <select class="in" style="max-width:220px" data-c="mistS" aria-label="Ders">${subjOpts(M.s, true)}</select></div>
   ${M.tab === "open" && list.length ? `<div class="row">${dueN ? `<button class="btn pri" data-a="mistDue">Bugün tekrar zamanı gelen ${dueN} soruyu çöz</button>` : `<span class="small muted">Bugün tekrar edilecek yanlış yok.${sonraki ? " Sıradaki tekrar: " + esc(sonraki) + "." : ""}</span>`}<button class="btn ${dueN ? "ghost" : ""}" data-a="mistStart">${dueN ? "Hepsini şimdi çöz" : Math.min(list.length, 30) + " soruyu yine de çöz"}</button></div>` : ""}
   <div class="card">${list.length ? `<div class="list">${list.slice(0, 80).map(item).join("")}</div>`
     : `<div class="empty">${M.tab === "open" ? "Tekrar bekleyen soru yok. Deneme ya da test çözdükçe yanlışların burada toplanır." : "Henüz öğrenildi olarak işaretlenen soru yok."}</div>`}</div>
@@ -8180,7 +8180,7 @@ function paraIdea(q) {
   const k = "pe:" + q.id;
   return `<div class="stack" style="gap:8px;border-top:1px dashed var(--line);padding-top:12px"><b>Ana fikri kendi cümlenle yaz</b>
     <textarea class="in" id="pd-${esc(q.id)}" data-i="paraDraft" data-id="${esc(q.id)}" placeholder="Bu parçada yazar asıl olarak…">${esc(UI.paraDraft[q.id] || "")}</textarea>
-    <button class="btn sm" style="align-self:flex-start" data-a="paraEval"${UI.ai[k] && UI.ai[k].busy ? " disabled" : ""}>Claude değerlendirsin</button>${aiBox(k)}</div>`;
+    <button class="btn sm" style="align-self:flex-start" data-a="paraEval"${UI.ai[k] && UI.ai[k].busy ? " disabled" : ""}>AKE değerlendirsin</button>${aiBox(k)}</div>`;
 }
 
 function pickAnswer(o) {
@@ -9562,6 +9562,29 @@ async function ekSorularYukle() {
   } catch (e) { }
 }
 
+/* ===== Soru fabrikası: /sorular/liste.json içindeki dosyalar soru bankasına eklenir (yeni turlar yalnızca bu klasöre yüklenir) ===== */
+async function fabrikaYukle() {
+  try {
+    const r = await fetch("/sorular/liste.json", { cache: "no-cache" }); if (!r.ok) return;
+    const dosyalar = await r.json(); if (!Array.isArray(dosyalar)) return;
+    const idler = new Set(BANK.map(q => q.id)), metinler = new Set(BANK.map(q => q.s + "|" + String(q.q).trim()));
+    let eklenen = 0;
+    for (const f of dosyalar.slice(0, 200)) {
+      if (typeof f !== "string" || !/^[a-z0-9_-]+\.json$/i.test(f)) continue;
+      const rr = await fetch("/sorular/" + f, { cache: "no-cache" }).catch(() => null); if (!rr || !rr.ok) continue;
+      const a = await rr.json().catch(() => null); if (!Array.isArray(a)) continue;
+      a.forEach(q => {
+        if (!ekGecerli(q) || ![1, 2, 3].includes(q.d) || typeof q.x !== "string" || new Set(q.o.map(x => String(x).trim())).size !== 5) return;
+        const m = q.s + "|" + String(q.q).trim(); if (idler.has(q.id) || metinler.has(m)) return;
+        try { q.t = KONU_ESLE(q.s, q.t); } catch (e) { }
+        idler.add(q.id); metinler.add(m); BANK.push(q); eklenen++;
+      });
+    }
+    if (eklenen) render();
+  } catch (e) { }
+}
+fabrikaYukle();
+
 /* ===== Yönetim: AI ile soru üretimi ve onay ===== */
 const SORU = { veri: null, busy: {}, err: "", s: "" };
 async function soruYukle() {
@@ -9945,9 +9968,9 @@ function sinifIcerik(s, D) {
     ${zl.length ? `<div class="stack" style="gap:6px"><b class="small">Sınıfın en çok zorlandığı konular</b><div class="row" style="gap:6px">${zl.map(z => `<span class="pill bad">${esc(z.k)} · ${z.n} öğrenci · ort. %${Math.round(z.p / z.n)}</span>`).join("")}</div></div>` : ""}
     <div class="list">${sirali.map(o => { const z = o.ozet; const son = z && z.den && z.den.length ? z.den[z.den.length - 1] : null;
       return `<div class="li mli ogr"><div class="grow"><div class="t">${esc(o.ad)}${o.tamAd && o.tamAd !== o.ad ? ` <span class="small muted">${esc(o.tamAd)}</span>` : ""}</div>
-        ${z ? `<div class="s">7 günde <b>${fmtN(z.h)}</b> soru · %${z.h ? Math.round(100 * z.hc / z.h) : 0} doğru · ${fmtN(z.fm || 0)} dk odak · seri ${z.seri || 0} gün · son çalışma ${gunOnce(z.son)}</div>
+        ${z ? `<div class="s">7 günde <b>${fmtN(z.h)}</b> soru · %${z.h ? Math.round(100 * z.hc / z.h) : 0} doğru · ${fmtN(z.fm || 0)} dk odak · seri ${Math.max(0, Math.round(Number(z.seri) || 0))} gün · son çalışma ${gunOnce(z.son)}</div>
           ${son ? `<div class="s">Son deneme: ${esc(son.ti)} · <b>${nfx(son.net)}</b> net</div>` : ""}
-          ${z.zayif && z.zayif.length ? `<div class="s">Zayıf: ${z.zayif.slice(0, 3).map(w => `${esc(w.t)} %${w.p}`).join(", ")}</div>` : ""}` : `<div class="s">Henüz özet gelmedi; öğrenci siteye girip soru çözdüğünde görünür.</div>`}</div>
+          ${z.zayif && z.zayif.length ? `<div class="s">Zayıf: ${z.zayif.slice(0, 3).map(w => `${esc(w.t)} %${Math.round(Number(w.p) || 0)}`).join(", ")}</div>` : ""}` : `<div class="s">Henüz özet gelmedi; öğrenci siteye girip soru çözdüğünde görünür.</div>`}</div>
         <div class="li-act"><button class="btn sm ghost" data-a="sinifCikarAsk" data-id="${esc(s.id)}" data-k="${esc(o.kid)}" data-n="${esc(o.ad)}">Çıkar</button></div></div>`; }).join("")}</div>
     <div class="row" style="justify-content:space-between"><span class="xs muted">Özetler öğrenci çalıştıkça güncellenir.</span><button class="btn sm ghost" data-a="sinifSilAsk" data-id="${esc(s.id)}" data-n="${esc(s.ad)}">Sınıfı kapat</button></div>`;
 }
@@ -10939,7 +10962,9 @@ const ATL_CSS = `
 .atl *{box-sizing:border-box}
 .atl a{text-decoration:none}
 .atl-w{max-width:1200px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-.atl-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--top-bg);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line2)}
+.atl>main#main,.atl>main{padding-top:0}
+.atl-top .atl-b.giris{color:#171715}
+.atl-top{--ink:#f5f1e8;--ink2:#d0cabc;--ink3:#aaa497;--line:#3d3b35;--line2:#33312c;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--top-bg);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line2)}
 .atl-top .atl-w{display:flex;align-items:center;gap:18px;min-height:64px}
 .atl-top .brand{display:flex;align-items:center;gap:10px;color:var(--ink)}
 .atl-nav{display:flex;gap:4px;margin-left:12px}
@@ -11520,9 +11545,9 @@ function planlar() {
   return [
     { k: "ucretsiz", n: "Ücretsiz", tag: "her zaman", feats: ["Günde 20 soru, ayda 1 deneme", "Canlı denemeler ve Türkiye sıralaması", "Arkadaş ligi ve odak odası", "Yanlış defteri ve tekrar kartları", "AI öğretmen paketlerde"] },
     { k: "orta", n: "Atılım", tag: "yükseliş", ay: AYAR.fiyatOrta, yil: AYAR.yillikOrta, link: { ay: AYAR.linkOrtaAy, yil: AYAR.linkOrtaYil },
-      feats: ["Ücretsiz paketteki her şey", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
+      feats: ["Ücretsiz paketteki her şey", "Sınırsız soru ve deneme", `AI öğretmen (ayda ${tl(AYAR.aiOrta) || "sınırlı sayıda"} mesaj)`, ...(tl(AYAR.cozumOrta) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumOrta)} soru)`] : []), "Konuna özel AI ile yeni sorular", "AI konu özetleri"] },
     { k: "premium", n: "Premium", tag: "en kapsamlı", ay: AYAR.fiyatPremium, yil: AYAR.yillikPremium, link: { ay: AYAR.linkPremiumAy, yil: AYAR.linkPremiumYil },
-      feats: ["Atılım paketindeki her şey", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
+      feats: ["Atılım paketindeki her şey", "Sınırsız soru ve deneme", `AI öğretmen (ayda ${tl(AYAR.aiPremium) || "daha fazla"} mesaj)`, ...(tl(AYAR.cozumPremium) ? [`Soru çözümünde gelişmiş model (ayda ${tl(AYAR.cozumPremium)} soru)`] : []), "Deneme sonuçlarına AI yorumu", "AI ile kişisel haftalık çalışma planı"] }
   ];
 }
 function uyelikOzet() {
@@ -11972,7 +11997,7 @@ Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta
   },
   cardsExit() { UI.cards.deck = null; render(); },
   planAI() {
-    if (S.plan.tasks.length) { openModal("Plan yenilensin mi?", "<p>Mevcut haftalık planın, Claude'un hazırlayacağı planla değiştirilecek.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Yeni plan hazırla", a: "planAIgo", k: "pri" }]); return; }
+    if (S.plan.tasks.length) { openModal("Plan yenilensin mi?", "<p>Mevcut haftalık planın, AKE'nin hazırlayacağı planla değiştirilecek.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Yeni plan hazırla", a: "planAIgo", k: "pri" }]); return; }
     planAI();
   },
   planAIgo() { planAI(); },

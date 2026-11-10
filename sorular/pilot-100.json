@@ -1,0 +1,1610 @@
+[
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-001",
+    "s": "mat",
+    "t": "Basamak analizi",
+    "d": 2,
+    "q": "Bir arşiv dolabının üç basamaklı kodunun en soldaki rakamı en sağa alındığında elde edilen sayı, ilk sayıdan 90 eksik oluyor. İlk kodun son iki rakamı soldan sağa artan ardışık rakamlar ve üç rakamının toplamı 14’tür.\nBuna göre dolabın ilk kodu kaçtır?",
+    "o": [
+      "434",
+      "734",
+      "356",
+      "545",
+      "656"
+    ],
+    "a": 3,
+    "x": "İlk kodun rakamları a, b ve b + 1 olsun. Yer değiştirme öncesi ve sonrası sayıların farkı 99a − 99b − 9 olduğundan 99(a − b) − 9 = 90 ve a = b + 1 olur. Rakamlar toplamı 3b + 2 = 14 olduğundan b = 4 ve ilk kod 545’tir. Kontrol için 545 − 455 = 90’dır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-002",
+    "s": "mat",
+    "t": "EBOB-EKOK",
+    "d": 2,
+    "q": "Bir atölyede 108 cm, 144 cm ve 180 cm uzunluğunda üç şerit vardır. Şeritlerin tamamı artan parça kalmayacak biçimde, hepsi aynı uzunlukta olan parçalara ayrılacaktır. Atölyenin en az 24 parçaya ihtiyacı vardır.\nBuna göre her bir parçanın uzunluğu en fazla kaç cm olabilir?",
+    "o": [
+      "9",
+      "12",
+      "18",
+      "24",
+      "36"
+    ],
+    "a": 2,
+    "x": "Parça uzunluğu üç şerit uzunluğunu da tam bölmelidir. Toplam uzunluk 432 cm olduğundan en az 24 parça için parça uzunluğu en fazla 432/24 = 18 cm olabilir. 18 cm üç uzunluğu da böler ve 6 + 8 + 10 = 24 parça verir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-003",
+    "s": "mat",
+    "t": "Bölme ve bölünebilme",
+    "d": 3,
+    "q": "Bir atölyede üretilen rozetlerin sayısı 120’den fazla, 200’den azdır. Rozetler 6’şarlı, 8’erli ve 9’arlı gruplara ayrıldığında sırasıyla 4, 6 ve 7 rozet artıyor.\nRozetlerin tamamı, her biri en fazla 5 rozet alan kutulara yerleştirilirse en az kaç kutu kullanılır?",
+    "o": [
+      "24",
+      "27",
+      "28",
+      "30",
+      "29"
+    ],
+    "a": 4,
+    "x": "Rozet sayısına 2 eklenirse sonuç 6, 8 ve 9’un ortak katı olur. EKOK(6, 8, 9) = 72’dir. İstenen aralığa uyan tek durum 144 − 2 = 142 rozettir. 28 tam kutuda 140 rozet yer alır. Kalan 2 rozet için bir kutu daha gerektiğinden en az 29 kutu kullanılır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-004",
+    "s": "mat",
+    "t": "İş Problemleri",
+    "d": 2,
+    "q": "Bir siparişin tüm etiketlerini A makinesi tek başına 20 dakikada, B makinesi tek başına 30 dakikada basabilmektedir. A makinesi işe başladıktan 4 dakika sonra B makinesi de çalışmaya başlıyor. A makinesi, siparişin tamamlanmasına 4 dakika kala duruyor. Makineler çalıştıkları sürece hızları değişmiyor.\nBuna göre sipariş, A makinesinin işe başlamasından kaç dakika sonra tamamlanmıştır?",
+    "o": [
+      "12",
+      "16",
+      "18",
+      "20",
+      "24"
+    ],
+    "a": 1,
+    "x": "Toplam süre t dakika olsun. Her iki makine de t − 4 dakika çalışmıştır. İşin tamamı için (t − 4)/20 + (t − 4)/30 = 1 olur. Hızların toplamı 1/12 olduğundan t − 4 = 12 ve t = 16’dır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-005",
+    "s": "mat",
+    "t": "Yüzde Problemleri",
+    "d": 3,
+    "q": "Bir satıcı bir ürünün etiket fiyatını alış fiyatının %50 fazlası olarak belirliyor. Ürünü etiket fiyatı üzerinden %20 indirimle satıyor. Satış sitesi de müşterinin ödediği tutarın %10’unu komisyon olarak kesiyor. Başka masrafı olmayan satıcı bu satıştan 36 TL kâr ediyor.\nBuna göre ürünün alış fiyatı kaç TL’dir?",
+    "o": [
+      "180",
+      "360",
+      "450",
+      "540",
+      "600"
+    ],
+    "a": 2,
+    "x": "Alış fiyatı x TL olsun. Etiket 1,50x ve indirimli satış 0,80 · 1,50x = 1,20x TL’dir. Komisyondan sonra satıcıya 0,90 · 1,20x = 1,08x TL kalır. Kâr 0,08x = 36 olduğundan x = 450’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-006",
+    "s": "mat",
+    "t": "Kesir problemleri",
+    "d": 2,
+    "q": "Eş kapasiteli A ve B depolarının sırasıyla 3/4’ü ve 1/3’ü suyla doludur. A’dan B’ye, iki depodaki su miktarları eşit oluncaya kadar su aktarılıyor. Sonra B’den 6 litre su alındığında B’nin 5/12’si dolu kalıyor.\nBuna göre A’dan B’ye kaç litre su aktarılmıştır?",
+    "o": [
+      "10",
+      "12",
+      "16",
+      "20",
+      "24"
+    ],
+    "a": 0,
+    "x": "Eşitleme sonrası her deponun (3/4 + 1/3)/2 = 13/24’ü doludur. 6 litre, B’nin kapasitesinin 13/24 − 5/12 = 1/8’ine eşittir. Kapasite 48 litredir. B’ye eklenen miktar (13/24 − 1/3) · 48 = 10 litredir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-007",
+    "s": "mat",
+    "t": "Karışım problemleri",
+    "d": 3,
+    "q": "Bir kahveci, içerdikleri Arabica çekirdeği oranları kütlece %25 ve %10 olan A ve B harmanlarını kullanarak 300 gramlık homojen bir karışım hazırlıyor. Karışımın 60 gramını sattıktan sonra kalan karışıma 60 gram B harmanı ekliyor. Son karışımda Arabica çekirdeği oranı kütlece %16 oluyor.\nBuna göre ilk karışımda kaç gram A harmanı vardır?",
+    "o": [
+      "96",
+      "120",
+      "135",
+      "150",
+      "180"
+    ],
+    "a": 3,
+    "x": "Son karışım 300 gramdır ve 48 gram Arabica içerir. Eklenen 60 gram B’nin 6 gramı Arabica’dır. İlk karışımın %80’ine karşılık gelen 240 gramda 42 gram Arabica kalmıştır. İlk karışımda 42/0,80 = 52,5 gram Arabica vardır. İlk A miktarı x ise 0,25x + 0,10(300 − x) = 52,5 olur ve x = 150 bulunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-008",
+    "s": "mat",
+    "t": "Ortalama",
+    "d": 3,
+    "q": "Bir kursta A ve B gruplarının deneme sınavı puan ortalamaları sırasıyla 64 ve 76’dır. İki gruptaki tüm öğrencilerin ortalaması 70’tir. A grubundan puan ortalaması 58 olan 6 öğrenci ayrılınca A grubunda kalanların ortalaması 67 oluyor.\nBuna göre başlangıçta iki grupta toplam kaç öğrenci vardır?",
+    "o": [
+      "24",
+      "36",
+      "42",
+      "48",
+      "54"
+    ],
+    "a": 1,
+    "x": "70, 64 ile 76’nın tam ortasında olduğundan iki grubun başlangıçtaki öğrenci sayıları eşittir. Her grupta n öğrenci varsa 64n − 6 · 58 = 67(n − 6) olur. Buradan 3n = 54, n = 18 ve toplam 36 bulunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-009",
+    "s": "mat",
+    "t": "Hareket Problemleri",
+    "d": 3,
+    "q": "Aralarında 123 km olan A ve B noktalarından iki motosikletli, aynı yol üzerinden birbirlerine doğru ilerleyecektir. A’dan çıkan motosikletli saatte 36 km hızla yola çıkıyor. 40 dakika sonra B’den çıkan motosikletli saatte 54 km hızla hareket etmeye başlıyor. B’den kalkış anında A’dan çıkan motosikletli 10 dakika mola veriyor ve sonra ilk hızıyla devam ediyor.\nKarşılaştıklarında A’dan çıkan motosikletli toplam kaç km yol almıştır?",
+    "o": [
+      "45",
+      "48",
+      "51",
+      "54",
+      "60"
+    ],
+    "a": 4,
+    "x": "A’dan çıkan motosikletli ilk 40 dakikada 24 km alır. Moladaki 10 dakikada yalnız B’den çıkan motosikletli ilerler ve 9 km alır. Molanın sonunda arada 123 − 24 − 9 = 90 km vardır. Yaklaşma hızı 36 + 54 = 90 km/sa olduğundan bir saat sonra karşılaşırlar. A’dan çıkanın toplam yolu 24 + 36 = 60 km’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-010",
+    "s": "mat",
+    "t": "Yaş Problemleri",
+    "d": 2,
+    "q": "Altı yıl önce Melis’in yaşı ablasının yaşının 2/3’ü kadardı. Altı yıl sonra Melis’in yaşı ablasının yaşının 4/5’i kadar olacaktır.\nBuna göre Melis ile ablasının bugünkü yaşları toplamı kaçtır?",
+    "o": [
+      "36",
+      "40",
+      "42",
+      "46",
+      "48"
+    ],
+    "a": 2,
+    "x": "Bugünkü yaşlar x ve y olsun. 3(x − 6) = 2(y − 6) eşitliği 3x − 2y = 6’yı, 5(x + 6) = 4(y + 6) eşitliği 5x − 4y = −6’yı verir. Birinci denklemin iki katından ikinci denklem çıkarılınca x = 18, buradan y = 24 bulunur. Toplam 42’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-011",
+    "s": "mat",
+    "t": "Kümeler",
+    "d": 2,
+    "q": "48 öğrencinin katıldığı bir etkinlikte 7 öğrenci ne müzik ne de tiyatro atölyesini seçmiştir. 29 öğrenci bu iki atölyeden yalnızca birini seçmiştir. Müzik atölyesini seçenlerin sayısı, tiyatro atölyesini seçenlerin sayısından 5 fazladır.\nBuna göre yalnızca müzik atölyesini seçen kaç öğrenci vardır?",
+    "o": [
+      "17",
+      "12",
+      "22",
+      "24",
+      "29"
+    ],
+    "a": 0,
+    "x": "Her iki atölyeye katılanlar iki toplamda da yer aldığından 5 kişilik fark yalnızca müzik ile yalnızca tiyatro arasında da geçerlidir. Yalnız müzik x, yalnız tiyatro y ise x + y = 29 ve x − y = 5 olur. Buradan x = 17 bulunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-012",
+    "s": "mat",
+    "t": "Olasılık",
+    "d": 2,
+    "q": "Bir kutuda renkleri dışında özdeş 4 mavi, 3 yeşil ve 2 turuncu kalem vardır. Kutudan rastgele iki kalem, çekilen ilk kalem geri konulmadan seçiliyor.\nSeçilen iki kalemin farklı renklerde olma olasılığı kaçtır?",
+    "o": [
+      "5/18",
+      "2/3",
+      "7/9",
+      "13/18",
+      "5/6"
+    ],
+    "a": 3,
+    "x": "Dokuz kalemden 36 farklı ikili seçilebilir. Aynı renkli ikililerin sayısı mavi için 6, yeşil için 3, turuncu için 1 olmak üzere 10’dur. Farklı renkli ikili sayısı 26 ve olasılık 26/36 = 13/18’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-013",
+    "s": "mat",
+    "t": "Permütasyon ve Kombinasyon",
+    "d": 3,
+    "q": "Aylin, Bora, Ceren ve Deniz’e ait dört ayrı fotoğraf bir panoda soldan sağa yan yana dizilecektir.\n• Aylin’in fotoğrafı Bora’nın fotoğrafının solunda yer alacaktır.\n• Ceren ve Deniz’in fotoğrafları yan yana olacaktır.\n• Ceren’in fotoğrafı en solda olmayacaktır.\nBuna göre fotoğraflar kaç farklı biçimde dizilebilir?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "8",
+      "12"
+    ],
+    "a": 1,
+    "x": "Ceren ile Deniz bir blok sayılırsa üç birim 3! = 6 biçimde sıralanır. Bu sıralamaların yarısında Aylin, Bora’nın solundadır. Blok içindeki iki sıra da sayıldığında 6 düzen elde edilir. Yalnız Ceren–Deniz–Aylin–Bora dizilişinde Ceren en soldadır. Onu çıkarınca 5 düzen kalır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-014",
+    "s": "mat",
+    "t": "Sayısal mantık",
+    "d": 2,
+    "q": "Bora, Deniz, Eda ve Selim bir görüşme için saat 10.00, 11.00, 12.00 ve 13.00’ten birer farklı saat almıştır. Selim’in görüşmesi Deniz’inkinden tam bir saat sonradır. Eda’nın görüşmesi Deniz’inkinden öncedir. Bora’nın görüşmesi 13.00’te değildir.\nBuna göre aşağıdakilerden hangisi kesinlikle doğrudur?",
+    "o": [
+      "Deniz’in görüşmesi 11.00’dedir.",
+      "Eda’nın görüşmesi 10.00’dadır.",
+      "Bora’nın görüşmesi 12.00’dedir.",
+      "Selim’in görüşmesi 12.00’dedir.",
+      "Selim’in görüşmesi 13.00’tedir."
+    ],
+    "a": 4,
+    "x": "Deniz, Eda’dan sonra ve Selim’den önce olduğundan 11.00 veya 12.00’dedir. Deniz 11.00’de olursa Eda 10.00, Selim 12.00 ve Bora 13.00’te olur. Bu olanaksızdır. Dolayısıyla Deniz 12.00 ve Selim 13.00’tedir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-015",
+    "s": "mat",
+    "t": "Sayı problemleri",
+    "d": 3,
+    "q": "130 defter, her biri 5 veya 8 defter alan kutulara yerleştirilecektir. Tüm kutular tam doldurulacak ve iki kutu türünden de en az üçer tane kullanılacaktır.\nBuna göre en az kaç kutu kullanılır?",
+    "o": [
+      "17",
+      "18",
+      "20",
+      "22",
+      "23"
+    ],
+    "a": 2,
+    "x": "Beşlik kutu sayısı x, sekizlik kutu sayısı y ise 5x + 8y = 130’dur. 8y, 5’in katı olacağından y de 5’in katıdır. y ≥ 3 için adaylar 5, 10 ve 15’tir. y = 15 iken x = 2 olduğu için bu durum elenir. Kalan adaylarda kutu toplamları sırasıyla 23 ve 20’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-016",
+    "s": "mat",
+    "t": "Eşitsizlikler",
+    "d": 2,
+    "q": "Bir gönderi şirketinde A paketi 90 TL sabit ücret ve gönderi başına 6 TL ücret içeriyor. B paketi ise ilk üç gönderi dâhil 45 TL tutuyor ve üçüncü gönderiden sonraki her gönderi için 9 TL ücret alınıyor.\nGönderi sayısı en az kaç olduğunda A paketi B paketinden daha ucuzdur?",
+    "o": [
+      "25",
+      "24",
+      "23",
+      "21",
+      "16"
+    ],
+    "a": 0,
+    "x": "Üçten az gönderide de A daha pahalıdır. n ≥ 3 için A’nın ücreti 90 + 6n, B’nin ücreti 45 + 9(n − 3) = 18 + 9n’dir. 90 + 6n < 18 + 9n koşulu n > 24 verir. En küçük tam sayı 25’tir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-017",
+    "s": "mat",
+    "t": "Mutlak değer",
+    "d": 2,
+    "q": "Bir kontrol deneyinde tam sayı olan x değeri, birinci cihaz tarafından 7’ye uzaklığı en fazla 4 olduğunda kabul ediliyor. İkinci cihaz ise x değerini 10’a uzaklığı en fazla 2 olduğunda kabul ediyor.\nBirinci cihazın kabul edip ikinci cihazın reddettiği kaç farklı x değeri vardır?",
+    "o": [
+      "3",
+      "4",
+      "6",
+      "5",
+      "7"
+    ],
+    "a": 3,
+    "x": "Birinci cihazın kabul aralığı [3, 11], ikincininki [8, 12]’dir. Birincinin kabul edip ikincinin reddettiği tam sayılar 3, 4, 5, 6 ve 7’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-018",
+    "s": "mat",
+    "t": "Veri analizi",
+    "d": 3,
+    "q": "Bir sınıfta öğrencilerin bir soruyu çözme süreleri ve bu sürelerin frekansları şöyledir:\n• 3 dakika: 2 öğrenci\n• 4 dakika: x öğrenci\n• 6 dakika: 3 öğrenci\n• 12 dakika: 1 öğrenci\nÇözme sürelerinin aritmetik ortalaması 5,5 dakika olduğuna göre bu sürelerin ortancası kaç dakikadır?",
+    "o": [
+      "4",
+      "4,5",
+      "5",
+      "5,5",
+      "6"
+    ],
+    "a": 2,
+    "x": "Toplam süre 36 + 4x dakika ve öğrenci sayısı 6 + x’tir. 36 + 4x = 5,5(6 + x) eşitliğinden x = 2 bulunur. Sıralı dizide dördüncü değer 4, beşinci değer 6’dır. Ortanca (4 + 6)/2 = 5 dakikadır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-019",
+    "s": "mat",
+    "t": "İşlem",
+    "d": 2,
+    "q": "Bir cihazın ekranındaki sayı, düğmeye 1., 3. ve 5. basışlarda iki katına çıkarılıp 1 artırılıyor. Düğmeye 2. ve 4. basışlarda ise ekrandaki sayı 4 azaltılıyor. Beşinci basıştan hemen sonra ekranda 47 yazıyor.\nBuna göre ikinci basıştan hemen sonra ekranda hangi sayı yazıyordu?",
+    "o": [
+      "8",
+      "11",
+      "17",
+      "23",
+      "13"
+    ],
+    "a": 4,
+    "x": "Beşinci basışın tersinden, dördüncüden sonraki sayı (47 − 1)/2 = 23’tür. Dördüncü basıştan önce 23 + 4 = 27 yazıyordu. Üçüncü basışın tersini uyguladığımızda ikinci basış sonrasındaki sayı (27 − 1)/2 = 13’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-020",
+    "s": "mat",
+    "t": "Oran-Orantı",
+    "d": 2,
+    "q": "Bir yürüyüş haritasında 16 cm, gerçekte 6,4 km’ye karşılık geliyor. Haritanın bir fotokopisinde her uzunluk, aslına göre %25 artırılmıştır. Fotokopide iki kamp noktası arasındaki doğrusal uzaklık 18,5 cm ölçülüyor.\nBuna göre bu iki nokta arasındaki gerçek doğrusal uzaklık kaç km’dir?",
+    "o": [
+      "5,55",
+      "5,92",
+      "6,4",
+      "7,4",
+      "9,25"
+    ],
+    "a": 1,
+    "x": "Fotokopideki 18,5 cm, asıl haritada 18,5/1,25 = 14,8 cm’ye karşılık gelir. Asıl haritada bir cm gerçekte 6,4/16 = 0,4 km’dir. Uzaklık 14,8 · 0,4 = 5,92 km’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-021",
+    "s": "mat",
+    "t": "Üslü sayılar",
+    "d": 2,
+    "q": "Bir arşivdeki dosyalar 1’den 216’ya kadar ardışık doğal sayılarla numaralanmıştır. Görevli, numarası bir tam kare veya bir tam küp olan her dosyaya birer renkli etiket yapıştırıyor.\nBuna göre toplam kaç dosyaya etiket yapıştırılır?",
+    "o": [
+      "14",
+      "16",
+      "17",
+      "18",
+      "20"
+    ],
+    "a": 3,
+    "x": "14² ≤ 216 < 15² olduğundan 14 tam kare, 6³ = 216 olduğundan 6 tam küp vardır. İki grupta da yer alan sayılar altıncı kuvvetlerdir. Aralıkta bunlar 1 ve 64’tür. Toplam 14 + 6 − 2 = 18 dosya etiketlenir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-022",
+    "s": "mat",
+    "t": "Eşitsizlikler",
+    "d": 2,
+    "q": "a ve b gerçek sayıları için 0 < a < b < 1’dir.\nBuna göre ab, a, a/b ve b/a sayılarının küçükten büyüğe doğru sıralanışı aşağıdakilerden hangisidir?",
+    "o": [
+      "ab < a < a/b < b/a",
+      "ab < a/b < a < b/a",
+      "a < ab < a/b < b/a",
+      "ab < a < b/a < a/b",
+      "a/b < ab < a < b/a"
+    ],
+    "a": 0,
+    "x": "0 < b < 1 olduğundan ab < a ve a < a/b olur. a < b olduğundan a/b < 1 < b/a’dır. Bu ilişkiler birleştirilince ab < a < a/b < b/a elde edilir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-023",
+    "s": "mat",
+    "t": "Üslü sayılar",
+    "d": 2,
+    "q": "Bir arşivde 2⁵ klasör, her klasörde 2⁸ dosya ve her dosyada 2²² bayt veri vardır. Sıkıştırma sonucunda her dosyanın boyutu başlangıçtaki boyutunun dörtte birine iniyor. Klasörlerin kendi kapladığı alan ihmal ediliyor.\n1 GiB = 2³⁰ bayt olduğuna göre sıkıştırılmış dosyalar toplam kaç GiB yer kaplar?",
+    "o": [
+      "2",
+      "4",
+      "16",
+      "32",
+      "8"
+    ],
+    "a": 4,
+    "x": "Dosya sayısı 2⁵ · 2⁸ = 2¹³, her dosyanın sıkıştırılmış boyutu 2²²/2² = 2²⁰ bayttır. Toplam 2³³ bayt, 2³³/2³⁰ = 2³ = 8 GiB eder."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-024",
+    "s": "mat",
+    "t": "Köklü sayılar",
+    "d": 2,
+    "q": "Alanları 48 cm² olan beş kare etiket, üst kenarları aynı yatay doğru üzerinde olacak biçimde soldan sağa yapıştırılıyor. İlkinden sonraki her etiketin bir öncekiyle örtüşme genişliği, yatayda tam olarak bir kenar uzunluğunun dörtte biridir. Etiketlerin birleşimi bir dikdörtgen oluşturuyor.\nBuna göre bu dikdörtgenin çevresi kaç cm’dir?",
+    "o": [
+      "32√3",
+      "36√3",
+      "40√3",
+      "44√3",
+      "48√3"
+    ],
+    "a": 2,
+    "x": "Bir etiketin kenarı √48 = 4√3 cm’dir. İlk etiket tam genişliğini, kalan dördünün her biri kenarının 3/4’ü kadar yeni genişliği ekler. Dikdörtgenin kenarları 4√3 ve 4√3 + 4 · 3√3 = 16√3 cm’dir. Çevre 2(4√3 + 16√3) = 40√3 cm’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-TYT-MAT-025",
+    "s": "mat",
+    "t": "Denklem sistemleri",
+    "d": 3,
+    "q": "K, L ve M kapları içlerindeki malzemelerle birlikte ikişerli olarak tartılıyor.\n• K ile L’nin toplam kütlesi 21 kg’dır.\n• L ile M’nin toplam kütlesi 25 kg’dır.\n• K ile M’nin toplam kütlesi 28 kg’dır.\nHer boş kabın kütlesi 2 kg’dır. M kabındaki malzemenin kütlece yarısı çıkarılıyor.\nSon durumda üç kabın, içlerindeki malzemelerle birlikte, toplam kütlesi kaç kg’dır?",
+    "o": [
+      "28",
+      "29",
+      "31",
+      "30",
+      "35"
+    ],
+    "a": 3,
+    "x": "Üç ikili tartımın toplamında her kap iki kez yer alır. Başlangıç toplamı (21 + 25 + 28)/2 = 37 kg’dır. M’nin dolu kütlesi 37 − 21 = 16 kg, içindeki malzeme 14 kg’dır. Malzemenin yarısı 7 kg çıkarılınca 30 kg kalır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-001",
+    "s": "afizik",
+    "t": "Bir Boyutta Hareket",
+    "d": 2,
+    "q": "Doğrusal bir yolda hareket eden cismin hızı ilk 4 saniyede düzgün olarak 4 m/s’den −4 m/s’ye değişiyor. Cisim sonraki 2 saniye boyunca −4 m/s sabit hızla hareket ediyor.\nİlk 6 saniye için cismin yer değiştirmesi ve aldığı yol sırasıyla kaç metredir?",
+    "o": [
+      "−16 ve 16",
+      "−8 ve 8",
+      "−8 ve 16",
+      "0 ve 8",
+      "0 ve 16"
+    ],
+    "a": 2,
+    "x": "İlk 4 saniyede hız, 2. saniyede sıfır olur. Hız-zaman grafiğinin bu bölümündeki alanlar +4 ve −4 metredir. İlk 4 saniyenin yer değiştirmesi 0, alınan yolu 8 metredir. Son 2 saniye yer değiştirmeye −8, yola 8 metre ekler. Sonuç −8 ve 16 metredir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-002",
+    "s": "afizik",
+    "t": "İş, Güç ve Enerji",
+    "d": 3,
+    "q": "K ve L cisimleri, aynı yükseklikten başlayan iki düz eğik düzlemde durgun hâlden bırakılıyor. Her iki eğik düzlemin yüksekliği 3 m, yatay izdüşümlerinin uzunlukları sırasıyla 4 m ve 6 m’dir. Cisimlerin kütleleri eşit ve cisimlerle düzlemler arasındaki kinetik sürtünme katsayısı 1/4’tür. İki cisim de düzlemin alt ucuna kadar kayıyor.\nBuna göre K’nin alt uçtaki kinetik enerjisi, L’ninkinin kaç katıdır?",
+    "o": [
+      "2/3",
+      "3/4",
+      "1",
+      "4/3",
+      "3/2"
+    ],
+    "a": 3,
+    "x": "Eğik düzlemin uzunluğu ℓ, yatayla açısı θ ve yatay izdüşümü x ise sürtünme işinin büyüklüğü μmgℓ cos θ = μmgx olur. İş-enerji bağıntısıyla alt uçtaki kinetik enerji mg(h − μx)’tir. h − μx farkı K için 2 m, L için 1,5 m’dir. Kütleler eşit olduğundan enerji oranı 4/3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-003",
+    "s": "afizik",
+    "t": "Newton’un Hareket Yasaları",
+    "d": 3,
+    "q": "Yatay zemindeki 4 kg kütleli araba, ideal bir ip ve makara ile 2 kg kütleli asılı cisme bağlıdır. İpin arabaya bağlı parçası yataydır. Araba ile zemin arasındaki kinetik sürtünme katsayısı 0,20’dir. İlk deneyden sonra arabaya onunla birlikte kayacak biçimde 2 kg’lık yük sabitlenerek ikinci deney yapılıyor. İki deneyde de asılı cisim aşağı doğru hareket ederken ip gergin kalıyor.\ng = 10 m/s² olduğuna göre ikinci deneyde ipin gerilme kuvvetinin büyüklüğü ilk deneye göre nasıl değişir?",
+    "o": [
+      "4 N azalır.",
+      "2 N azalır.",
+      "Değişmez.",
+      "2 N artar.",
+      "4 N artar."
+    ],
+    "a": 3,
+    "x": "İlk deneyde sürtünme 8 N, sistem ivmesi (20 − 8)/6 = 2 m/s²’dir. Asılı cisim için T₁ = 20 − 2 · 2 = 16 N olur. İkinci deneyde sürtünme 12 N ve ivme (20 − 12)/8 = 1 m/s²’dir. T₂ = 20 − 2 · 1 = 18 N olduğundan gerilme 2 N artar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-004",
+    "s": "afizik",
+    "t": "Momentum",
+    "d": 2,
+    "q": "Yatay bir rayda dış itmenin ihmal edildiği iki deney yapılıyor. İlkinde m kütleli K, ikincisinde 2m kütleli L arabası, başlangıçta durmakta olan 3m kütleli bir hedef arabaya çarpıp kenetleniyor. K ve L’nin çarpışmadan hemen önceki momentumlarının büyüklükleri eşittir.\nBuna göre ilk deneyde kenetlenmiş sistemin kinetik enerjisinin ikinci deneydekine oranı kaçtır?",
+    "o": [
+      "4/5",
+      "5/4",
+      "1",
+      "25/16",
+      "2"
+    ],
+    "a": 1,
+    "x": "Her çarpışmadan sonra sistemin momentum büyüklüğü aynı p değerindedir. Toplam kütleler 4m ve 5m’dir. Kinetik enerji p²/(2M) olduğundan oran (5m)/(4m) = 5/4’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-005",
+    "s": "afizik",
+    "t": "Momentum",
+    "d": 3,
+    "q": "2 kg kütleli bir cismin ilk hızı −2 m/s’dir. Cisme aynı doğrultuda etkiyen net kuvvet ilk 2 saniyede +6 N, sonraki 4 saniyede −3 N değerinde sabit kalıyor.\nBuna göre,\nI. Cisim 6 saniye içinde iki kez yön değiştirir.\nII. 2. saniyedeki momentum büyüklüğü ilk momentum büyüklüğünün iki katıdır.\nIII. 6. saniyedeki kinetik enerji ilk kinetik enerjiden büyüktür.\nifadelerinden hangileri doğrudur?",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "Yalnız III",
+      "II ve III",
+      "I ve II"
+    ],
+    "a": 4,
+    "x": "Başlangıç momentumu −4 kg·m/s’dir. İlk aralık +12 kg·m/s itme vererek momentumu +8’e, ikinci aralık −12 kg·m/s itme vererek yeniden −4’e getirir. Momentum her aralıkta sürekli değişip sıfırdan geçtiği için yön iki kez değişir. 2. saniyedeki büyüklük 8 = 2 · 4’tür. İlk ve son kinetik enerjiler eşittir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-006",
+    "s": "afizik",
+    "t": "Momentum",
+    "d": 3,
+    "q": "Sürtünmesiz yatay rayda 2m kütleli K arabası, 9 m/s süratle ilerlerken durmakta olan m kütleli L arabasıyla tam esnek ve merkezî çarpışıyor.\nÇarpışmadan hemen sonra L’nin sürati kaç m/s’dir?",
+    "o": [
+      "12",
+      "3",
+      "6",
+      "9",
+      "18"
+    ],
+    "a": 0,
+    "x": "K’nin ilk hareket yönü pozitif alınırsa momentum korunumu 2vK + vL = 18 verir. Bir boyutlu tam esnek çarpışmada uzaklaşma göreli sürati, yaklaşma göreli süratine eşittir. Bu nedenle vL − vK = 9’dur. Denklemlerden vK = 3 m/s ve vL = 12 m/s bulunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-007",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Ağırlığı 80 N olan, 4 m uzunluğunda türdeş bir çubuk yatay konumda K ve L destekleri üzerinde duruyor. K desteği çubuğun sol ucunda, L desteği sol uçtan 3 m uzaktadır. Çubuğun sağ ucuna aşağı yönlü, büyüklüğü sıfırdan başlayarak yavaşça artırılan düşey bir kuvvet uygulanıyor.\nK desteğinin çubuğa uyguladığı kuvvetin ilk kez sıfır olması için sağ uca uygulanan kuvvet kaç N olmalıdır?",
+    "o": [
+      "20",
+      "40",
+      "80",
+      "120",
+      "160"
+    ],
+    "a": 2,
+    "x": "K’nin tepkisi sıfırken L noktasına göre net tork sıfır olmalıdır. Ağırlık, L’nin 1 m solundan etkir. Uygulanan kuvvet, L’nin 1 m sağından etkir. Kuvvet kolları eşit olduğundan uygulanan kuvvet 80 N’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-008",
+    "s": "afizik",
+    "t": "Kütle çekim ve elektrik",
+    "d": 3,
+    "q": "Aynı gezegenin çevresinde K ve L uyduları düzgün çembersel yörüngelerde dolanıyor. Yörünge yarıçapları sırasıyla r ve 4r’dir. Uyduların birbirlerine uyguladığı çekim kuvveti ihmal ediliyor.\nL’nin dolanma periyodunun K’ninkine oranı ile L’nin merkezcil ivme büyüklüğünün K’ninkine oranı sırasıyla nedir?",
+    "o": [
+      "4 ve 1/4",
+      "8 ve 1/16",
+      "8 ve 1/4",
+      "16 ve 1/16",
+      "2 ve 1/8"
+    ],
+    "a": 1,
+    "x": "Dairesel yörüngede a = GM/r²’dir. Ayrıca a = 4π²r/T² olduğundan T² yarıçapın küpüyle orantılıdır. Yarıçap 4 katına çıkınca periyot 4^(3/2) = 8 katına, ivme 1/4² = 1/16’sına değişir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-009",
+    "s": "afizik",
+    "t": "Çembersel hareket",
+    "d": 3,
+    "q": "Bir tabla düşey ekseni etrafında dönüyor. Tabla ve üzerindeki iki cisimden oluşan sisteme etki eden eksen doğrultusundaki dış tork ihmal ediliyor. Tablanın tek başına eylemsizlik momenti 2mr²’dir. Tabla üzerinde her biri m kütleli iki küçük cisim eksenden r uzaklıkta, eksenin zıt taraflarında duruyor. Tablaya bağlı, eylemsizlik momenti ihmal edilen bir düzenek cisimleri simetrik biçimde eksenden r/2 uzaklığa taşıyor. Cisimler tekrar tablaya göre durgun hâle geliyor.\nSon açısal süratin ilk açısal sürate oranı ile son dönme kinetik enerjisinin ilk dönme kinetik enerjisine oranı sırasıyla nedir?",
+    "o": [
+      "1 ve 1",
+      "5/8 ve 5/8",
+      "8/5 ve 1",
+      "4 ve 4",
+      "8/5 ve 8/5"
+    ],
+    "a": 4,
+    "x": "Toplam eylemsizlik momenti önce 4mr², sonra 2mr² + 2m(r/2)² = 5mr²/2’dir. Açısal momentum L sabit olduğundan açısal sürat I ile ters orantılıdır. Dönme kinetik enerjisi de sabit L için L²/(2I)’dir. İki oran da 4/(5/2) = 8/5’tir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-010",
+    "s": "afizik",
+    "t": "Çembersel hareket",
+    "d": 3,
+    "q": "Yatay bir döner tabla üzerindeki K ve L cisimlerinin eksene uzaklıkları r ve 2r’dir. Tabla ile cisimler arasındaki statik sürtünme katsayıları sırasıyla μ ve 3μ’dür. Deneylerde tablanın farklı sabit açısal süratleri karşılaştırılıyor.\nHangi cisim önce kayma sınırına ulaşır? Bu sınırda diğer cisme etki eden sürtünmenin, o cisme etki edebilecek en büyük statik sürtünmeye oranı nedir?",
+    "o": [
+      "K ve 2/3",
+      "K ve 1/3",
+      "K ve 3/2",
+      "L ve 1/2",
+      "L ve 2/3"
+    ],
+    "a": 0,
+    "x": "Kayma sınırında mω²r = μₛmg’dir. K için sınır ω² = μg/r, L için 3μg/(2r) olduğundan K önce sınıra gelir. Bu anda L’ye 2μmLg büyüklüğünde sürtünme gerekir. L’nin en büyük statik sürtünmesi 3μmLg olduğundan oran 2/3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-011",
+    "s": "afizik",
+    "t": "Çembersel hareket",
+    "d": 3,
+    "q": "m kütleli küçük bir cisim, uzunluğu r olan kütlesiz ve gergin bir ipin ucunda düşey düzlemde çembersel hareket yapıyor. Hava direnci ihmal ediliyor. Cisim yörüngenin en üst noktasındayken ip gerilmesinin büyüklüğü mg’dir.\nBuna göre yörüngenin en alt noktasında ip gerilmesinin büyüklüğü nedir?",
+    "o": [
+      "3mg",
+      "5mg",
+      "6mg",
+      "7mg",
+      "8mg"
+    ],
+    "a": 3,
+    "x": "En üstte ağırlık ve gerilme merkeze doğrudur. Dolayısıyla mvüst²/r = 2mg’dir. Üstten alta 2r inildiği için enerji korunumuyla valt² = vüst² + 4gr = 6gr bulunur. En altta T − mg = mvalt²/r = 6mg olduğundan T = 7mg’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-012",
+    "s": "afizik",
+    "t": "Basit Harmonik Hareket",
+    "d": 3,
+    "q": "Sürtünmesiz yatay düzlemde yaya bağlı bir cisim, genliği A ve periyodu T olan basit harmonik hareket yapıyor. t = 0 anında cisim x = +A konumunda durgun hâlden bırakılıyor. Hareket sırasındaki en büyük sürat vₘ’dir.\nCisim ilk kez x = −A/2 konumuna geldiğinde geçen süre ve cismin sürati sırasıyla nedir?",
+    "o": [
+      "T/6 ve (√3/2)vₘ",
+      "T/3 ve (√3/2)vₘ",
+      "T/3 ve vₘ/2",
+      "T/4 ve vₘ",
+      "T/2 ve 0"
+    ],
+    "a": 1,
+    "x": "x = A cos(2πt/T) olduğundan −A/2’ye ilk karşılık gelen faz 2π/3, süre T/3’tür. Enerjiden v²/vₘ² = 1 − x²/A² = 3/4 bulunur. Sürat (√3/2)vₘ’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-013",
+    "s": "afizik",
+    "t": "Basit Harmonik Hareket",
+    "d": 2,
+    "q": "Özdeş üç basit sarkaç K, L ve M asansörlerinde küçük genlikle salınıyor. K yukarı yönde sabit hızla gidiyor. L yukarı giderken, M ise aşağı giderken sabit ve eşit büyüklükteki ivmelerle yavaşlıyor. İvme büyüklüğü g’den küçüktür.\nSarkaçların periyotları TK, TL ve TM arasındaki ilişki nedir?",
+    "o": [
+      "TL < TK < TM",
+      "TK < TL = TM",
+      "TM < TK < TL",
+      "TK = TL = TM",
+      "TL = TM < TK"
+    ],
+    "a": 2,
+    "x": "K’de ivme yoktur ve etkin çekim ivmesi g’dir. L yukarı giderken yavaşladığı için ivmesi aşağı yönlü, etkin ivmesi g − a’dır. M aşağı giderken yavaşladığı için ivmesi yukarı yönlü, etkin ivmesi g + a’dır. Periyot etkin ivme arttıkça azalır. Bu yüzden TM < TK < TL’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-014",
+    "s": "afizik",
+    "t": "Basit Harmonik Hareket",
+    "d": 3,
+    "q": "Yatay yay düzeneklerinde basit harmonik hareket yapan K ve L cisimlerinin kütleleri sırasıyla 2m ve m, salınım genlikleri 2A ve A, periyotları 2T ve T’dir.\nK’nin en büyük süratinin L’ninkine oranı ve K’nin en büyük kinetik enerjisinin L’ninkine oranı sırasıyla nedir?",
+    "o": [
+      "1 ve 2",
+      "1 ve 1",
+      "2 ve 4",
+      "1/2 ve 1/2",
+      "2 ve 8"
+    ],
+    "a": 0,
+    "x": "En büyük sürat 2πA/T ile bulunur. K’de genlik ve periyot aynı oranda arttığından iki en büyük sürat eşittir. En büyük kinetik enerji mv²/2 olduğundan enerji oranı kütle oranı olan 2’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-015",
+    "s": "afizik",
+    "t": "Sığaçlar",
+    "d": 3,
+    "q": "Özdeş hava aralıklı iki paralel levha kondansatörü K ve L, aynı gerilimdeki ideal üreteçlerle yükleniyor. Ardından K’nin üreteçle bağlantısı kesiliyor, L’nin bağlantısı korunuyor. İki kondansatörde de levhalar arasındaki uzaklık iki katına çıkarılıyor. Levhaların kenar etkileri ve yük sızıntısı ihmal ediliyor.\nSon durumda K’nin yük büyüklüğünün L’ninkine oranı ve K’de depolanan enerjinin L’dekine oranı sırasıyla nedir?",
+    "o": [
+      "1 ve 1",
+      "1 ve 2",
+      "2 ve 2",
+      "1/2 ve 1/4",
+      "2 ve 4"
+    ],
+    "a": 4,
+    "x": "Uzaklık iki katına çıkınca iki sığa da C/2 olur. K’nin ilk yükü Q sabit kalır. L’nin gerilimi sabit olduğundan son yükü Q/2’dir. Son sığalar eşit olduğundan enerji oranı, U = Q²/(2C) uyarınca yük oranının karesi olan 4’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-016",
+    "s": "afizik",
+    "t": "Sığaçlar",
+    "d": 3,
+    "q": "C sığalı bir kondansatör, V gerilimine kadar yükleniyor ve üreteçten ayrılıyor. Daha sonra başlangıçta yüksüz 2C sığalı bir kondansatörle paralel bağlanıyor. Her levha diğer kondansatörün bir levhasına, küçük ama sıfır olmayan dirençli bir telle bağlanıyor. Dışarıyla yük alışverişi olmuyor.\nDengeye ulaşıldığında iki kondansatörde depolanan toplam elektriksel enerji, ilk kondansatörün başlangıçtaki enerjisinin kaç katıdır?",
+    "o": [
+      "1/9",
+      "2/9",
+      "1/3",
+      "2/3",
+      "1"
+    ],
+    "a": 2,
+    "x": "Ortak gerilim Vson = CV/(C + 2C) = V/3’tür. Son enerji (1/2)(3C)(V/3)² = CV²/6, ilk enerji CV²/2’dir. Oran 1/3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-017",
+    "s": "afizik",
+    "t": "Elektrik alan ve Coulomb kuvveti",
+    "d": 2,
+    "q": "Sabit tutulan +Q ve −Q noktasal yükleri aynı yatay doğru üzerinde, sırasıyla O noktasının solunda ve sağında O’ya eşit uzaklıktadır. Potansiyel için referans sonsuzdur.\nO noktasıyla ilgili,\nI. Elektriksel potansiyel sıfırdır.\nII. Bileşke elektrik alan sağa yönelmiştir.\nIII. O’ya bırakılan küçük pozitif deneme yüküne ilk anda etki eden elektriksel kuvvet sıfırdır.\nifadelerinden hangileri doğrudur?",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "I ve III",
+      "II ve III",
+      "I ve II"
+    ],
+    "a": 4,
+    "x": "Potansiyeller eşit büyüklükte ve zıt işaretlidir. Skaler toplamları sıfırdır. +Q’nun alanı O’da yükten uzağa, −Q’nun alanı ise yüke doğru, yani ikisi de sağa yönelir. Bileşke alan sıfır olmadığı için pozitif deneme yüküne kuvvet etkir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-018",
+    "s": "afizik",
+    "t": "Elektrik alan ve Coulomb kuvveti",
+    "d": 2,
+    "q": "K ve L parçacıkları, aynı düzgün elektrik alan içinde farklı deneylerde durgun hâlden bırakılıyor. K’nin yükü +q ve kütlesi m, L’nin yükü −2q ve kütlesi 2m’dir. Elektrik kuvveti dışındaki kuvvetler ihmal ediliyor. Her iki parçacık da eşit süre boyunca alan içinde kalıyor.\nL’nin son süratinin K’ninkine oranı ve L’nin son kinetik enerjisinin K’ninkine oranı sırasıyla nedir?",
+    "o": [
+      "1/2 ve 1/2",
+      "1 ve 2",
+      "1 ve 1",
+      "2 ve 4",
+      "2 ve 8"
+    ],
+    "a": 1,
+    "x": "İvme büyüklüğü |q|E/m’dir. Yük büyüklüğü ve kütle L’de birlikte iki katına çıktığından ivme büyüklükleri eşittir. Eşit süre sonunda süratler eşittir. Kinetik enerji mv²/2 olduğundan L’nin enerjisi K’ninkinin iki katıdır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-019",
+    "s": "afizik",
+    "t": "Elektromanyetik indüksiyon",
+    "d": 3,
+    "q": "Sabit alanlı bir iletken halka, düzlemine dik ve sayfa düzleminden içeri yönelmiş düzgün bir manyetik alandadır. Alan büyüklüğü ilk 2 saniyede 0’dan 3B’ye, sonraki 4 saniyede 3B’den B’ye doğrusal olarak değişiyor. Halkanın direnci sabittir ve özindüksiyon ihmal ediliyor.\nSayfaya bakan gözlemciye göre ilk aralıktaki akımın yönü ve ilk aralıktaki akım büyüklüğünün ikinci aralıktakine oranı nedir?",
+    "o": [
+      "Saat yönünün tersi ve 3",
+      "Saat yönü ve 3",
+      "Saat yönünün tersi ve 3/2",
+      "Saat yönü ve 1/3",
+      "Saat yönünün tersi ve 1/3"
+    ],
+    "a": 0,
+    "x": "İlk aralıkta sayfa içine doğru akı arttığı için indüksiyon akımı sayfa dışına doğru alan üretir. Bu, saat yönünün tersidir. Akı değişim hızı büyüklükleri alanla orantılı olarak 3B/2 ve 2B/4’tür. Direnç değişmediği için akım büyüklüklerinin oranı 3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-020",
+    "s": "afizik",
+    "t": "Elektromanyetik indüksiyon",
+    "d": 2,
+    "q": "İdeal bir transformatörün primer sarımı 600, sekonder sarımı 150 turdur. Primere etkin değeri 240 V olan alternatif gerilim uygulanıyor. Sekonder uçlarına 12 Ω’luk bir direnç bağlanıyor.\nPrimerden geçen akımın etkin değeri kaç A’dır?",
+    "o": [
+      "0,75",
+      "1",
+      "5",
+      "1,25",
+      "20"
+    ],
+    "a": 3,
+    "x": "Sarım oranından sekonder gerilimi 240 · 150/600 = 60 V’tur. Dirençten geçen akım 60/12 = 5 A, sekonder gücü 300 W’tır. İdeal transformatörde primer gücü de 300 W olduğundan primer akımı 300/240 = 1,25 A’dır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-021",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 3,
+    "q": "K ve L parçacıkları, aynı düzgün manyetik alana, alana dik doğrultuda ayrı ayrı giriyor. K’nin kütlesi m, yükü +q ve sürati v’dir. L’nin kütlesi 3m, yükü +2q ve sürati 2v/3’tür. Manyetik kuvvet dışında kuvvet etkimiyor. Görelilik etkileri ihmal ediliyor.\nL’nin yörünge yarıçapının K’ninkine oranı ve L’nin dolanma periyodunun K’ninkine oranı sırasıyla nedir?",
+    "o": [
+      "1 ve 1",
+      "3/2 ve 3/2",
+      "1 ve 3/2",
+      "2/3 ve 1",
+      "1 ve 2/3"
+    ],
+    "a": 2,
+    "x": "Manyetik kuvvet merkezcil olduğundan r = mv/(qB)’dir. L/K yarıçap oranı 3 · (2/3)/2 = 1 çıkar. T = 2πr/v bağıntısında yarıçaplar eşit olduğu için periyot oranı v/(2v/3) = 3/2’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-022",
+    "s": "afizik",
+    "t": "Dalga mekaniği",
+    "d": 3,
+    "q": "Bir çift yarık deneyinde dalga boyu λ, yarıklar arası uzaklık d, yarık düzlemi ile ekran arası uzaklık L’dir. İkinci deneyde bu üç büyüklük sırasıyla 4λ/3, 3d/2 ve 3L/2 yapılıyor. Küçük açı yaklaşımı geçerlidir.\nİkinci deneyde üçüncü aydınlık saçağın merkezî aydınlık saçağa uzaklığı, ilk deneyde ikinci aydınlık saçağın merkezî aydınlık saçağa uzaklığının kaç katıdır? Merkezî saçak sıra sayısına dâhil değildir.",
+    "o": [
+      "4/3",
+      "2",
+      "3/2",
+      "8/3",
+      "3"
+    ],
+    "a": 1,
+    "x": "Saçak aralığı λL/d ile bulunur. Ekran uzaklığı ve yarık aralığı aynı oranda arttığından yeni saçak aralığı eskisinin 4/3 katıdır. Sıra sayıları da kullanılırsa istenen oran (3/2) · (4/3) = 2’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-023",
+    "s": "afizik",
+    "t": "Modern fizik",
+    "d": 3,
+    "q": "Bir metal yüzeye foton enerjisi 3,0 eV olan ışık düşürüldüğünde fotoelektronları durduran gerilimin büyüklüğü 0,5 V ölçülüyor. Aynı metal için,\nI. Foton enerjisi 2,4 eV olan ışığın şiddeti artırılırsa fotoelektron elde edilebilir.\nII. Foton enerjisi 5,0 eV olan ışıkta durdurma geriliminin büyüklüğü 2,5 V olur.\nIII. Foton enerjisi 3,0 eV sabitken ışığın şiddeti artırıldığında çıkan elektronların en büyük kinetik enerjisi değişmez.\nifadelerinden hangileri doğrudur? Tek fotonlu fotoelektrik olay modeli geçerlidir.",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "I ve II",
+      "I ve III",
+      "II ve III"
+    ],
+    "a": 4,
+    "x": "Elektron için 0,5 V’luk durdurma gerilimi, 0,5 eV en büyük kinetik enerjiye karşılık gelir. Eşik enerji 3,0 − 0,5 = 2,5 eV’tur. 2,4 eV foton eşik altında kaldığı için I yanlıştır. 5,0 eV fotonda en büyük enerji 2,5 eV olur. Foton enerjisi sabitken ışık şiddeti en büyük kinetik enerjiyi değiştirmez."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-024",
+    "s": "afizik",
+    "t": "Modern fizik",
+    "d": 2,
+    "q": "Durgun hâlden başlayan K ve L parçacıklarının yük büyüklükleri eşit, kütleleri sırasıyla m ve 2m’dir. K, V; L ise 2V büyüklüğündeki potansiyel farkla hızlandırılıyor. Parçacıklar görelilik etkileri ihmal edilebilecek süratlere ulaşıyor.\nK’nin de Broglie dalga boyunun L’ninkine oranı kaçtır?",
+    "o": [
+      "2",
+      "1/2",
+      "1",
+      "√2",
+      "4"
+    ],
+    "a": 0,
+    "x": "Kinetik enerji qV kadar arttığından L’nin enerjisi K’ninkinin iki katıdır. p = √(2mEₖ) bağıntısında L’nin hem kütlesi hem enerjisi iki kat olduğundan momentumu iki kat olur. Dalga boyu h/p olduğundan λK/λL = pL/pK = 2’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-FIZ-025",
+    "s": "afizik",
+    "t": "Atom fiziği",
+    "d": 3,
+    "q": "Bir atom modelinin enerji düzeyleri −10 eV, −6 eV, −3 eV ve −1 eV’tur. Alt enerji düzeylerine doğrudan geçişlerin tümü mümkündür ve her geçişte bir foton yayılır.\n−1 eV düzeyinden başlayan doğrudan geçişlerde yayılan en uzun dalga boylu fotonun dalga boyu, −3 eV düzeyinden başlayan doğrudan geçişlerde yayılan en kısa dalga boylu fotonun dalga boyunun kaç katıdır?",
+    "o": [
+      "2/7",
+      "3/2",
+      "5/2",
+      "7/2",
+      "9/7"
+    ],
+    "a": 3,
+    "x": "Dalga boyu foton enerjisiyle ters orantılıdır. −1 eV düzeyinden en küçük enerji farkı −3 eV düzeyine geçişte 2 eV’tur. −3 eV düzeyinden en büyük fark −10 eV düzeyine geçişte 7 eV’tur. Oran (hc/2)/(hc/7) = 7/2’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-001",
+    "s": "akimya",
+    "t": "Tepkime Hızı",
+    "d": 3,
+    "q": "X ve Y maddeleri arasındaki tepkimenin hız bağıntısı v = k[X]ᵃ[Y]ᵇ biçimindedir. a ve b tepkime dereceleridir. Aynı sıcaklıkta ölçülen başlangıç verileri şöyledir.\n• Deney 1: [X] = 0,10 M, [Y] = 0,10 M, hız = 2,0 × 10⁻³ M/s\n• Deney 2: [X] = 0,20 M, [Y] = 0,10 M, hız = 4,0 × 10⁻³ M/s\n• Deney 3: [X] = 0,10 M, [Y] = 0,20 M, hız = 8,0 × 10⁻³ M/s\nAynı sıcaklıkta [X] = 0,20 M ve [Y] = 0,30 M olduğunda başlangıç hızı kaç M/s olur?",
+    "o": [
+      "1,2 × 10⁻²",
+      "1,8 × 10⁻²",
+      "2,8 × 10⁻²",
+      "3,6 × 10⁻²",
+      "7,2 × 10⁻²"
+    ],
+    "a": 3,
+    "x": "Deney 1 ve 2, hızın X derişimiyle doğru orantılı olduğunu gösterir. Deney 1 ve 3’te Y iki katına çıkınca hız dört katına çıkar. Hız bağıntısı k[X][Y]²’dir. Yeni koşulda Deney 1’e göre hız 2 · 3² = 18 katına çıkar ve 3,6 × 10⁻² M/s olur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-002",
+    "s": "akimya",
+    "t": "Tepkime Hızı",
+    "d": 2,
+    "q": "Sabit hacimli bir kapta 3A + 2B → C tepkimesi gerçekleşiyor. Çözelti hacmi 0,50 L’dir. Bir zaman aralığında A derişiminin 0,24 mol/L azaldığı ölçülüyor.\nAynı zaman aralığında kaç mol B harcanmıştır?",
+    "o": [
+      "0,04",
+      "0,06",
+      "0,08",
+      "0,12",
+      "0,16"
+    ],
+    "a": 2,
+    "x": "Harcanan A miktarı 0,24 · 0,50 = 0,12 moldür. Dengelenmiş denklemde 3 mol A’ya karşılık 2 mol B harcanır. Bu nedenle B miktarı 0,12 · 2/3 = 0,08 moldür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-003",
+    "s": "akimya",
+    "t": "Tepkime Hızı",
+    "d": 2,
+    "q": "Bir tepkimenin entalpi değişimi −30 kJ/mol, katalizörsüz ileri etkinleşme enerjisi 70 kJ/mol’dür. Bir katalizör, bu tepkimenin ileri yöndeki etkinleşme enerjisini 20 kJ/mol azaltıyor. Katalizörlü enerji profilinde ileri ve geri etkinleşme enerjileri aynı tepe noktasına göre tanımlanıyor. Başlangıç ve son hâller değişmiyor.\nKatalizör kullanıldığında geri etkinleşme enerjisi ile ileri tepkimenin entalpi değişimi sırasıyla kaç kJ/mol olur?",
+    "o": [
+      "50 ve −30",
+      "80 ve −30",
+      "100 ve −30",
+      "80 ve −50",
+      "20 ve −50"
+    ],
+    "a": 1,
+    "x": "Ürünler girenlerden 30 kJ/mol daha düşük enerjidedir. Katalizörle ileri engel 70 − 20 = 50 kJ/mol olduğundan aynı yolun geri engeli 50 + 30 = 80 kJ/mol’dür. Entalpi değişimi başlangıç ve son hâllere bağlıdır ve −30 kJ/mol kalır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-004",
+    "s": "akimya",
+    "t": "Tepkime Hızı",
+    "d": 3,
+    "q": "İdeal gazların bulunduğu bir kapta 2X(g) + Y(g) → Z(g) tepkimesinin hız bağıntısı v = k[X]²[Y]’dir. Başlangıç karışımıyla yapılan ayrı deneylerde sıcaklık sabit tutularak şu işlemler yapılıyor:\nİşlem 1. Kap hacmi yarıya indiriliyor.\nİşlem 2. Kap hacmi sabitken tepkimeye katılmayan helyum ekleniyor.\nHer işlem tamamlandıktan hemen sonraki birim hacim başına hız, ilgili işlemin öncesindeki hızın sırasıyla kaç katıdır? İşlemler sırasında tepkime ilerlemesi ihmal ediliyor.",
+    "o": [
+      "2 ve 1",
+      "4 ve 2",
+      "4 ve 1",
+      "8 ve 2",
+      "8 ve 1"
+    ],
+    "a": 4,
+    "x": "Hacim yarıya inince X ve Y’nin derişimi ikişer kat olur. Hız 2² · 2 = 8 katına çıkar. Sabit hacimde helyum eklemek X ve Y’nin mol sayısını ya da derişimini değiştirmediğinden verilen hız bağıntısına göre hız sabit kalır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-005",
+    "s": "akimya",
+    "t": "Tepkime Hızı",
+    "d": 3,
+    "q": "Bir tepkimenin hız bağıntısı v = k[A]²[B]’dir. Aynı sıcaklıkta 0,40 M A ve 0,20 M B stok çözeltileriyle iki deney hazırlanıyor.\n• Deney I: 100 mL A çözeltisi ile 100 mL B çözeltisi karıştırılıyor.\n• Deney II: 50 mL A çözeltisi ile 150 mL B çözeltisi karıştırılıyor.\nHacimlerin toplandığı kabul edilirse Deney I’in başlangıç hızının Deney II’ninkine oranı kaçtır?",
+    "o": [
+      "8/3",
+      "3/8",
+      "4/3",
+      "2",
+      "4"
+    ],
+    "a": 0,
+    "x": "Toplam hacimler 200 mL’dir. Deney I’de [A] = 0,20 M ve [B] = 0,10 M, Deney II’de [A] = 0,10 M ve [B] = 0,15 M’dir. Hız oranı (0,20/0,10)² · (0,10/0,15) = 8/3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-006",
+    "s": "akimya",
+    "t": "Kimyasal denge",
+    "d": 3,
+    "q": "2,0 L’lik bir kapta başlangıçta yalnız 1,20 mol N₂O₄(g) vardır. N₂O₄(g) ⇌ 2NO₂(g) dengesi kurulduğunda başlangıçtaki N₂O₄’ün %25’i ayrışmıştır. Daha sonra sıcaklık değişmeden kap hacmi 1,0 L’ye indiriliyor. Sıkıştırma sırasında tepkimenin ilerlemesi ihmal ediliyor.\nBu sıcaklıkta Kc’nin sayısal değeri ve sıkıştırmanın hemen ardından net tepkimenin yönü nedir?",
+    "o": [
+      "0,10 ve ürünler yönü",
+      "0,20 ve ürünler yönü",
+      "0,20 ve girenler yönü",
+      "0,40 ve girenler yönü",
+      "0,40 ve net tepkime yok"
+    ],
+    "a": 2,
+    "x": "0,30 mol N₂O₄ ayrışır. Dengede 0,90 mol N₂O₄ ve 0,60 mol NO₂ vardır. Kc = (0,60/2,0)²/(0,90/2,0) = 0,20’dir. Hacim yarıya inince derişimler iki katına çıkar ve Qc = 2Kc = 0,40 olur. Qc > Kc olduğundan net tepkime girenler yönündedir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-007",
+    "s": "akimya",
+    "t": "Kimyasal denge",
+    "d": 2,
+    "q": "Aynı sıcaklıkta 2A(g) + B(g) ⇌ 2C(g) tepkimesinin Kc değeri 9’dur.\nBu sıcaklıkta C(g) ⇌ A(g) + ½B(g) tepkimesinin Kc değeri kaçtır?",
+    "o": [
+      "1/9",
+      "1/3",
+      "3",
+      "9/2",
+      "81"
+    ],
+    "a": 1,
+    "x": "Yeni denklem öncekinin tersinin yarısıdır. Ters çevirme Kc’yi 1/9 yapar. Tüm katsayıları ikiye bölmek bu değerin karekökünü almayı gerektirir. Sonuç 1/3’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-008",
+    "s": "akimya",
+    "t": "Kimyasal denge",
+    "d": 3,
+    "q": "CaCO₃(k) ⇌ CaO(k) + CO₂(g) dengesi kurulduğunda kapta iki katı da bulunmaktadır. Bu sıcaklıkta CO₂’nin kısmi basıncı 0,30 atm’dir. Sıcaklık sabit tutularak kap hacmi iki katına çıkarılıyor ve yeni dengede iki katının da bir miktar kaldığı biliniyor.\nYeni dengede CO₂’nin kısmi basıncı ve CaCO₃ miktarının ilk dengeye göre değişimi nedir?",
+    "o": [
+      "0,15 atm ve değişmez",
+      "0,15 atm ve azalır",
+      "0,30 atm ve artar",
+      "0,60 atm ve azalır",
+      "0,30 atm ve azalır"
+    ],
+    "a": 4,
+    "x": "İki saf katı denge bağıntısına girmez. İki katı bulunduğu sürece sabit sıcaklıkta Kp = P(CO₂) = 0,30 atm’dir. Hacim iki kat olunca aynı basıncın yeniden oluşması için daha fazla CO₂ gerekir. İleri yönde ilerleme CaCO₃ miktarını azaltır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-009",
+    "s": "akimya",
+    "t": "Kimyasal denge",
+    "d": 2,
+    "q": "Kapalı bir kapta endotermik W(g) + X(g) ⇌ Y(g) + Z(g) tepkimesi dengededir. Kapta dört gaz da vardır ve gazlar ideal kabul edilir. Aşağıdaki işlemlerin her biri ilk dengeye ayrı ayrı uygulanabilir.\nHangi işlem hem denge sabitini hem de yeni dengedeki Y’nin mol sayısını artırır?",
+    "o": [
+      "Hacim sabitken sıcaklığı artırmak",
+      "Sıcaklık sabitken kabın hacmini artırmak",
+      "Sıcaklık ve hacim sabitken kaptan bir miktar Z almak",
+      "Sıcaklık ve hacim sabitken katalizör eklemek",
+      "Hacim sabitken sıcaklığı azaltmak"
+    ],
+    "a": 0,
+    "x": "İleri tepkime endotermik olduğundan sıcaklığın artırılması Kc’yi büyütür. Sabit hacimde sıcaklık değişiminden hemen sonra derişimler aynı olduğundan Qc < yeni Kc olur. Tepkime ürünler yönünde ilerler ve Y miktarı artar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-010",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 3,
+    "q": "Aynı sıcaklıkta bulunan ve hacimleri değişmeyen iki kap ideal gazlar içermektedir. K kabının hacmi 2V olup içinde 3n mol X ve n mol Y vardır. L kabının hacmi 3V olup içinde n mol X ve 3n mol Y vardır. Kaplar ihmal edilebilir hacimli bir muslukla bağlanıyor. Gazlar tepkime vermiyor ve sıcaklık değişmiyor.\nSon durumda Y’nin kısmi basıncı, K kabının başlangıçtaki toplam basıncının kaç katıdır?",
+    "o": [
+      "1/5",
+      "1/4",
+      "2/3",
+      "2/5",
+      "4/5"
+    ],
+    "a": 3,
+    "x": "K’nin ilk toplam basıncı 4nRT/(2V) = 2nRT/V’dir. Musluk açıldığında toplam 4n mol Y, 5V hacmin tamamına yayılır. Y’nin son kısmi basıncı 4nRT/(5V)’dir. İstenen oran 2/5’tir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-011",
+    "s": "akimya",
+    "t": "Asit-baz dengesi",
+    "d": 2,
+    "q": "25 °C’de 100 mL 0,20 M HCl çözeltisi ile 150 mL 0,15 M NaOH çözeltisi karıştırılıyor. Çözeltilerin hacimleri toplanabilir. Bu sıcaklıkta pH + pOH = 14’tür.\nOluşan çözeltinin pH değeri kaçtır?",
+    "o": [
+      "2",
+      "12",
+      "7",
+      "11",
+      "13"
+    ],
+    "a": 1,
+    "x": "HCl’den 0,0200 mol H⁺, NaOH’den 0,0225 mol OH⁻ gelir. Nötrleşme sonunda 0,0025 mol OH⁻ artar. Toplam hacim 0,250 L olduğundan [OH⁻] = 0,010 M ve pOH = 2’dir. Böylece pH = 12 olur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-012",
+    "s": "akimya",
+    "t": "Asit-baz dengesi",
+    "d": 3,
+    "q": "Sabit sıcaklıkta tek protonlu zayıf bir asidin sulu çözeltisine saf su ekleniyor. Seyreltme sonrası da suyun kendi iyonlaşmasının H₃O⁺ derişimine katkısı ihmal edilebiliyor.\nYeni dengeye ulaşıldığında,\nI. Asidin iyonlaşma yüzdesi artar.\nII. H₃O⁺ derişimi artar.\nIII. Asidin iyonlaşma denge sabiti değişmez.\nifadelerinden hangileri doğrudur?",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "I ve II",
+      "I ve III",
+      "II ve III"
+    ],
+    "a": 3,
+    "x": "Birim hacimdeki toplam asit derişimi C ve H₃O⁺ derişimi x ise Ka = x²/(C − x)’tir. C azalırken bu eşitliği sağlayan x de azalır. İyonlaşma kesri α için Ka = Cα²/(1 − α) olduğundan C’nin azalması α’nın artmasını gerektirir. Sabit sıcaklıkta Ka değişmez. I ve III doğrudur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-013",
+    "s": "akimya",
+    "t": "Asit-baz dengesi",
+    "d": 2,
+    "q": "Suda çözünmüş maddeleri aşağıdaki gibi olan üç çözelti hazırlanıyor.\n• K çözeltisi CH₃COOH ve CH₃COONa içeriyor.\n• L çözeltisi HCl ve NaCl içeriyor.\n• M çözeltisi KOH ve KCl içeriyor.\nBu çözeltilerden hangisi bir zayıf asit ve onun eşlenik bazından oluşan tampondur? Bu tampona ayrı ayrı az miktarda HCl ve NaOH eklendiğinde eklenen asidi ve bazı esas olarak tüketen türler sırasıyla nelerdir?",
+    "o": [
+      "K, CH₃COO⁻ ve CH₃COOH",
+      "K, CH₃COOH ve CH₃COO⁻",
+      "L, Cl⁻ ve HCl",
+      "M, K⁺ ve OH⁻",
+      "M, OH⁻ ve K⁺"
+    ],
+    "a": 0,
+    "x": "K çözeltisinde zayıf asit CH₃COOH ile onun eşlenik bazı CH₃COO⁻ birlikte bulunur. Eklenen H₃O⁺, CH₃COO⁻ ile tepkimeye girerek CH₃COOH oluşturur. Eklenen OH⁻ ise CH₃COOH ile tepkimeye girer ve CH₃COO⁻ oluşur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-014",
+    "s": "akimya",
+    "t": "Asit-baz dengesi",
+    "d": 2,
+    "q": "25 °C’de eşit derişimli K, L ve M çözeltilerinin çözünenleri sırasıyla KNO₃, NaF ve NH₄Cl’dir. HF zayıf asit, NH₃ zayıf bazdır. HNO₃ ve HCl kuvvetli asit, NaOH ve KOH kuvvetli bazdır.\nÇözeltilerin pH değerleri arasındaki ilişki nedir?",
+    "o": [
+      "pH(K) < pH(L) < pH(M)",
+      "pH(L) < pH(K) < pH(M)",
+      "pH(M) = pH(K) < pH(L)",
+      "pH(M) < pH(L) < pH(K)",
+      "pH(M) < pH(K) < pH(L)"
+    ],
+    "a": 4,
+    "x": "KNO₃’ün iyonlarının hidrolizi ihmal edilir ve K nötrdür. Zayıf asit HF’nin eşlenik bazı F⁻ suyla OH⁻ oluşturur, L baziktir. Zayıf baz NH₃’ün eşlenik asidi NH₄⁺ suyla H₃O⁺ oluşturur, M asidiktir. Sıralama M < K < L’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-015",
+    "s": "akimya",
+    "t": "Asit-baz dengesi",
+    "d": 3,
+    "q": "Bir sıcaklıkta suyun iyon çarpımı Kw = 1,0 × 10⁻¹²’dir. Aynı sıcaklıktaki saf suyun pH değeri ve pH’si 7 olan sulu bir çözeltinin asitlik-bazlık durumu sırasıyla nedir?",
+    "o": [
+      "6 ve asidik",
+      "6 ve nötr",
+      "6 ve bazik",
+      "7 ve nötr",
+      "12 ve asidik"
+    ],
+    "a": 2,
+    "x": "Saf suda [H₃O⁺] = [OH⁻] olduğundan her iki derişim √Kw = 10⁻⁶ M, pH = 6’dır. Aynı sıcaklıkta pH 7 için [H₃O⁺] = 10⁻⁷ M ve [OH⁻] = 10⁻⁵ M’dir. OH⁻ derişimi daha büyük olduğu için çözelti baziktir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-016",
+    "s": "akimya",
+    "t": "Çözünürlük dengesi",
+    "d": 2,
+    "q": "Az çözünen MX tuzu M⁺ ve X⁻ iyonları oluşturarak çözünür. Belirli bir sıcaklıkta Kçç = 1,0 × 10⁻¹⁰’dur. Bu sıcaklıkta MX, ayrı ayrı saf suya ve 0,010 M NaX çözeltisine eklenerek iki doygun çözelti hazırlanıyor. NaX suda tamamen iyonlarına ayrışır. NaX çözeltisinde MX’ten gelen X⁻, başlangıçtaki X⁻ derişiminin yanında ihmal edilebilir.\nMX’in NaX çözeltisindeki molar çözünürlüğünün saf sudakine oranı yaklaşık kaçtır?",
+    "o": [
+      "10⁻⁵",
+      "10⁻³",
+      "10⁻²",
+      "1",
+      "10³"
+    ],
+    "a": 1,
+    "x": "Saf suda s² = 10⁻¹⁰ olduğundan s = 10⁻⁵ M’dir. NaX çözeltisinde [X⁻] ≈ 10⁻² M’dir. s′ · 10⁻² = 10⁻¹⁰ olduğundan s′ ≈ 10⁻⁸ M ve s′/s ≈ 10⁻³’tür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-017",
+    "s": "akimya",
+    "t": "Çözünürlük dengesi",
+    "d": 3,
+    "q": "100 mL 2,0 × 10⁻⁴ M AgNO₃ çözeltisi ile 100 mL 1,0 × 10⁻⁴ M NaCl çözeltisi karıştırılıyor. Hacimler toplanabilir. Bu sıcaklıkta AgCl’nin Kçç değeri 2,0 × 10⁻¹⁰’dur.\nÇökelme henüz gerçekleşmeden hesaplanan iyon çarpımının Kçç’ye oranı ve bu oranın öngördüğü sonuç nedir?",
+    "o": [
+      "1/25 ve AgCl çökelmez.",
+      "1 ve sistem doygundur.",
+      "50 ve AgCl çökelir.",
+      "100 ve AgCl çökelir.",
+      "25 ve AgCl çökelir."
+    ],
+    "a": 4,
+    "x": "Karıştırma her iyonun derişimini yarıya düşürür. [Ag⁺] = 1,0 × 10⁻⁴ M, [Cl⁻] = 5,0 × 10⁻⁵ M olur. Q = 5,0 × 10⁻⁹ ve Q/Kçç = 25’tir. Q > Kçç olduğu için AgCl çökelir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-018",
+    "s": "akimya",
+    "t": "Çözünürlük dengesi",
+    "d": 3,
+    "q": "MX ve NY₂ katılarının saf sudaki molar çözünürlükleri aynı sıcaklıkta 1,0 × 10⁻⁴ mol/L’dir. Çözünme denklemleri şöyledir:\nMX(k) ⇌ M⁺(aq) + X⁻(aq)\nNY₂(k) ⇌ N²⁺(aq) + 2Y⁻(aq)\nMX’in Kçç değerinin NY₂’nin Kçç değerine sayısal oranı kaçtır?",
+    "o": [
+      "1",
+      "250",
+      "2500",
+      "5000",
+      "10000"
+    ],
+    "a": 2,
+    "x": "Ortak çözünürlük s ise MX için Kçç = s², NY₂ için Kçç = s(2s)² = 4s³’tür. Oran 1/(4s) = 1/(4 · 10⁻⁴) = 2500’dür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-019",
+    "s": "akimya",
+    "t": "Çözünürlük dengesi",
+    "d": 3,
+    "q": "25 °C’de bir çözeltide çökelme başlamadan önce Mg²⁺ derişimi 4,0 × 10⁻² M’dir. Hacim değişimi ihmal edilerek çözeltinin pH değeri yavaşça artırılıyor. Bu sıcaklıkta Mg(OH)₂ için Kçç = 4,0 × 10⁻¹² ve pH + pOH = 14’tür.\nMg(OH)₂ çökelmesinin başlayacağı pH sınırı kaçtır?",
+    "o": [
+      "9",
+      "4",
+      "5",
+      "10",
+      "12"
+    ],
+    "a": 0,
+    "x": "Eşikte [Mg²⁺][OH⁻]² = Kçç olur. [OH⁻]² = 10⁻¹⁰ ve [OH⁻] = 10⁻⁵ M bulunur. pOH = 5 ve pH = 9’dur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-020",
+    "s": "akimya",
+    "t": "Kimyasal tepkimelerde enerji",
+    "d": 2,
+    "q": "Aynı koşullarda aşağıdaki tepkime entalpileri verilmiştir:\nC(k, grafit) + O₂(g) → CO₂(g)     ΔH = −394 kJ\nCO(g) + ½O₂(g) → CO₂(g)     ΔH = −283 kJ\nBuna göre 2C(k, grafit) + O₂(g) → 2CO(g) tepkimesinin entalpi değişimi kaç kJ’dür?",
+    "o": [
+      "−677",
+      "−111",
+      "+111",
+      "−222",
+      "+222"
+    ],
+    "a": 3,
+    "x": "İkinci denklem ters çevrilip birinciyle toplanırsa C + ½O₂ → CO elde edilir. Bu tepkime için ΔH = −394 + 283 = −111 kJ’dir. Hedef denklem bunun iki katıdır. Dolayısıyla ΔH = −222 kJ’dür."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-021",
+    "s": "akimya",
+    "t": "Elektrokimya",
+    "d": 2,
+    "q": "Standart koşullarda bir Zn–Cu galvanik pili çalıştırılıyor. Cu²⁺/Cu standart indirgenme potansiyeli +0,34 V, Zn²⁺/Zn standart indirgenme potansiyeli −0,76 V’tur. Yarı hücreler tepkimeye katılmayan iyonlar içeren bir tuz köprüsüyle bağlıdır.\nPil akım verirken,\nI. Zn elektrot anot olarak görev yapar.\nII. Tuz köprüsündeki anyonlar Zn yarı hücresine yönelir.\nIII. Cu yarı hücresindeki Cu²⁺ miktarı artar.\nifadelerinden hangileri doğrudur?",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "I ve III",
+      "II ve III",
+      "I ve II"
+    ],
+    "a": 4,
+    "x": "Daha düşük indirgenme potansiyeline sahip Zn anotta yükseltgenerek Zn²⁺ oluşturur. Bu bölmedeki pozitif yük artışını dengelemek için köprüden anyonlar gelir. Cu²⁺ ise katotta elektron alarak Cu(k) hâline geçer ve çözeltideki miktarı azalır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-022",
+    "s": "akimya",
+    "t": "Elektrokimya",
+    "d": 3,
+    "q": "Seri bağlanan iki elektroliz hücresinin katotlarında sırasıyla Ag⁺ iyonlarından Ag ve Cu²⁺ iyonlarından Cu elde ediliyor. Hücrelerden aynı süre akım geçiriliyor ve katotlarda başka tepkime gerçekleşmiyor.\nKatotta biriken Ag kütlesinin Cu kütlesine oranı kaçtır? Mol kütleleri Ag için 108, Cu için 64 g/mol’dür.",
+    "o": [
+      "27/16",
+      "27/8",
+      "16/27",
+      "8/27",
+      "27/32"
+    ],
+    "a": 1,
+    "x": "Seri hücrelerden aynı miktarda yük geçer. Bir mol Ag için bir mol, bir mol Cu için iki mol elektron gerekir. Dolayısıyla biriken Ag’nin mol sayısı Cu’nun iki katıdır. Kütle oranı 2 · 108/64 = 27/8’dir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-023",
+    "s": "akimya",
+    "t": "Elektrokimya",
+    "d": 2,
+    "q": "Ergimiş bir tuzun elektrolizinde katotta gerçekleşen tek tepkime Al³⁺ + 3e⁻ → Al’dir. Hücreden 25 dakika boyunca sabit 3,86 A akım geçiriliyor.\nKatotta kaç gram Al oluşur? Bir mol elektronun yükü 96 500 C, Al’nin mol kütlesi 27 g/mol’dür.",
+    "o": [
+      "0,54",
+      "0,27",
+      "0,81",
+      "1,08",
+      "1,62"
+    ],
+    "a": 0,
+    "x": "Süre 1500 saniyedir. Geçen yük 3,86 · 1500 = 5790 C, elektron miktarı 5790/96 500 = 0,060 moldür. Üç mol elektron bir mol Al verdiğinden 0,020 mol, yani 0,54 g Al elde edilir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-024",
+    "s": "akimya",
+    "t": "Redoks",
+    "d": 3,
+    "q": "Asidik sulu ortamda MnO₄⁻ iyonları Mn²⁺ iyonlarına indirgenirken Fe²⁺ iyonları Fe³⁺ iyonlarına yükseltgeniyor. Bu süreçte oksijen atomları suya geçiyor.\nBir mol MnO₄⁻ tamamen indirgenirken harcanan Fe²⁺ ve H⁺ miktarları sırasıyla kaç moldür?",
+    "o": [
+      "1 ve 4",
+      "4 ve 8",
+      "5 ve 8",
+      "5 ve 4",
+      "8 ve 5"
+    ],
+    "a": 2,
+    "x": "Mn’nin yükseltgenme basamağı +7’den +2’ye indiği için bir Mn başına 5 elektron alınır. Her Fe²⁺ bir elektron verdiğinden 5 mol Fe²⁺ harcanır. Dört oksijen atomu 4H₂O oluşturur ve bunun için 8H⁺ gerekir. Net denklem MnO₄⁻ + 8H⁺ + 5Fe²⁺ → Mn²⁺ + 4H₂O + 5Fe³⁺ biçimindedir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-AYT-KIM-025",
+    "s": "akimya",
+    "t": "Elektrokimya",
+    "d": 3,
+    "q": "X²⁺/X, Y²⁺/Y ve Z²⁺/Z yarı hücrelerinin standart indirgenme potansiyelleri sırasıyla −0,40 V, +0,10 V ve +0,35 V’tur. İki farklı yarı hücre seçilerek standart koşullarda kendiliğinden çalışan bir pil kurulacaktır.\nX elektrodunun kütlesi azalacak biçimde kurulabilecek en yüksek standart gerilimli pil için katot ve pil gerilimi nedir?",
+    "o": [
+      "Y ve 0,50 V",
+      "Z ve 0,35 V",
+      "Y ve 0,75 V",
+      "Z ve 0,75 V",
+      "Z ve 0,25 V"
+    ],
+    "a": 3,
+    "x": "X elektrodunun kütlesi azalıyorsa X yükseltgenir ve anottur. Y katot olduğunda E° = 0,10 − (−0,40) = 0,50 V, Z katot olduğunda E° = 0,35 − (−0,40) = 0,75 V olur. En yüksek gerilimi Z katotken elde ederiz."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-001",
+    "s": "ingilizce",
+    "t": "Vocabulary",
+    "d": 2,
+    "q": "The workshop reported recycling twice as much material as the collection service had recorded. The auditors examined the ---- to see whether some shipments had been logged twice.",
+    "o": [
+      "concession",
+      "discrepancy",
+      "adjustment",
+      "distribution",
+      "substitution"
+    ],
+    "a": 1,
+    "x": "Atölyenin bildirdiği miktar, kayıtlı miktarın iki katıdır. Denetçiler iki kayıt arasındaki bu uyuşmazlığı inceler. Discrepancy, karşılaştırılan iki değer veya kayıt arasındaki tutarsızlık anlamındadır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-002",
+    "s": "ingilizce",
+    "t": "Vocabulary",
+    "d": 2,
+    "q": "A committee may have reliable evidence for a proposal, but releasing only the results that favour it can ---- public confidence in the fairness of the process.",
+    "o": [
+      "sustain",
+      "acquire",
+      "transfer",
+      "consolidate",
+      "undermine"
+    ],
+    "a": 4,
+    "x": "İlk bölüm güvenilir kanıt bulunabileceğini söyler. But ile başlayan ikinci bölümde yalnız lehte sonuçların açıklanması, sürecin adilliğine duyulan güveni zedeleyebilir. Undermine bu etkiyi karşılar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-003",
+    "s": "ingilizce",
+    "t": "Vocabulary",
+    "d": 2,
+    "q": "To check whether their judgements agreed without either person influencing the other, the two assistants classified the same set of photographs ----.",
+    "o": [
+      "jointly",
+      "alternately",
+      "selectively",
+      "independently",
+      "publicly"
+    ],
+    "a": 3,
+    "x": "İki asistan birbirlerinin kararını etkilemeden aynı fotoğrafları sınıflandırıyor. Independently, her birinin diğerinden bağımsız çalıştığını anlatır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-004",
+    "s": "ingilizce",
+    "t": "Tenses",
+    "d": 2,
+    "q": "When workers ---- to dismantle the footbridge last May, they found that local historians ---- every section of its ironwork the previous winter.",
+    "o": [
+      "have begun / photograph",
+      "were beginning / would photograph",
+      "began / had photographed",
+      "had begun / are photographing",
+      "begin / have photographed"
+    ],
+    "a": 2,
+    "x": "Last May belirli bir geçmiş anı gösterir ve began kullanılır. Tarihçilerin fotoğrafları önceki kış çekmesi, işçilerin bulduğu andan öncedir. Bu ilişki had photographed ile kurulur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-005",
+    "s": "ingilizce",
+    "t": "Prepositions",
+    "d": 2,
+    "q": "By focusing ---- the number of visitors who entered the building, the survey drew attention away ---- how long people actually stayed.",
+    "o": [
+      "on / from",
+      "at / with",
+      "to / into",
+      "over / across",
+      "from / at"
+    ],
+    "a": 0,
+    "x": "Bir niceliğe odaklanmak focus on ile ifade edilir. Dikkati bir noktadan uzaklaştırmak draw attention away from kalıbıyla anlatılır. Bu iki kullanım A’da birlikte bulunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-006",
+    "s": "ingilizce",
+    "t": "Relative Clauses",
+    "d": 3,
+    "q": "Several proposals were submitted, ---- would have required the council to buy land that it did not own.",
+    "o": [
+      "in which two",
+      "both of them",
+      "whose two",
+      "two of which",
+      "two of whom"
+    ],
+    "a": 3,
+    "x": "Sunulan önerilerden ikisine dönmek için two of which kullanılır. Which, proposals sözcüğüne gönderme yapar ve açıklayıcı yan tümceyi ana cümleye bağlar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-007",
+    "s": "ingilizce",
+    "t": "Conjunctions",
+    "d": 2,
+    "q": "Which option best completes blank (1) in the passage?",
+    "o": [
+      "Because",
+      "Unless",
+      "Although",
+      "Until",
+      "Whether"
+    ],
+    "a": 0,
+    "x": "Gözeneklerin yağmur suyunun bir bölümünü emmesi, aynı anda drenaja ulaşan suyun azalmasının nedenidir. Because bu nedeni bildirir.",
+    "p": "When a city repaves a street, its engineers usually compare surfaces by cost and durability. In one coastal town, however, they also measured how quickly rainwater ran off each surface. (1) ---- rainwater seeps into gaps in a porous surface, less of it reaches storm drains all at once. The team expected this feature to (2) ---- pressure on the drainage network during short storms. To test the idea, they installed sensors (3) ---- could record the water leaving two streets that were similar in length and slope. The porous street produced a lower peak flow (4) ---- the total volume of water recorded over the following day was almost the same at both outlets. The result suggested that the surface delayed the movement of water. This distinction matters because drains can fail when a large volume arrives in a short interval, even if they could (5) ---- the same volume over several hours."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-008",
+    "s": "ingilizce",
+    "t": "Vocabulary",
+    "d": 2,
+    "q": "Which option best completes blank (2) in the passage?",
+    "o": [
+      "sustain",
+      "intensify",
+      "ease",
+      "measure",
+      "conceal"
+    ],
+    "a": 2,
+    "x": "Daha az suyun aynı anda drenaja ulaşmasının, sistem üzerindeki yükü hafifletmesi beklenir. Ease pressure, bu anlamı karşılayan doğal bir kullanımdır.",
+    "p": "When a city repaves a street, its engineers usually compare surfaces by cost and durability. In one coastal town, however, they also measured how quickly rainwater ran off each surface. (1) ---- rainwater seeps into gaps in a porous surface, less of it reaches storm drains all at once. The team expected this feature to (2) ---- pressure on the drainage network during short storms. To test the idea, they installed sensors (3) ---- could record the water leaving two streets that were similar in length and slope. The porous street produced a lower peak flow (4) ---- the total volume of water recorded over the following day was almost the same at both outlets. The result suggested that the surface delayed the movement of water. This distinction matters because drains can fail when a large volume arrives in a short interval, even if they could (5) ---- the same volume over several hours."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-009",
+    "s": "ingilizce",
+    "t": "Relative Clauses",
+    "d": 2,
+    "q": "Which option best completes blank (3) in the passage?",
+    "o": [
+      "where",
+      "that",
+      "whose",
+      "what",
+      "whom"
+    ],
+    "a": 1,
+    "x": "Could record fiilinin öznesi sensors’a gönderme yapan bir ilgi zamiri olmalıdır. That, aracı tanımlayan bu yan tümcede özne görevini üstlenir.",
+    "p": "When a city repaves a street, its engineers usually compare surfaces by cost and durability. In one coastal town, however, they also measured how quickly rainwater ran off each surface. (1) ---- rainwater seeps into gaps in a porous surface, less of it reaches storm drains all at once. The team expected this feature to (2) ---- pressure on the drainage network during short storms. To test the idea, they installed sensors (3) ---- could record the water leaving two streets that were similar in length and slope. The porous street produced a lower peak flow (4) ---- the total volume of water recorded over the following day was almost the same at both outlets. The result suggested that the surface delayed the movement of water. This distinction matters because drains can fail when a large volume arrives in a short interval, even if they could (5) ---- the same volume over several hours."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-010",
+    "s": "ingilizce",
+    "t": "Conjunctions",
+    "d": 2,
+    "q": "Which option best completes blank (4) in the passage?",
+    "o": [
+      "unless",
+      "once",
+      "provided that",
+      "so that",
+      "although"
+    ],
+    "a": 4,
+    "x": "Zirve akış daha düşükken gün boyunca geçen toplam su hacmi neredeyse aynıdır. Although bu karşıtlığı anlatır. Sonraki cümle, farkı suyun gecikmesiyle açıklar.",
+    "p": "When a city repaves a street, its engineers usually compare surfaces by cost and durability. In one coastal town, however, they also measured how quickly rainwater ran off each surface. (1) ---- rainwater seeps into gaps in a porous surface, less of it reaches storm drains all at once. The team expected this feature to (2) ---- pressure on the drainage network during short storms. To test the idea, they installed sensors (3) ---- could record the water leaving two streets that were similar in length and slope. The porous street produced a lower peak flow (4) ---- the total volume of water recorded over the following day was almost the same at both outlets. The result suggested that the surface delayed the movement of water. This distinction matters because drains can fail when a large volume arrives in a short interval, even if they could (5) ---- the same volume over several hours."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-011",
+    "s": "ingilizce",
+    "t": "Vocabulary",
+    "d": 2,
+    "q": "Which option best completes blank (5) in the passage?",
+    "o": [
+      "predict",
+      "generate",
+      "measure",
+      "handle",
+      "classify"
+    ],
+    "a": 3,
+    "x": "Metin, drenajın kısa sürede gelen suyla başa çıkamayabileceğini ancak aynı hacmi birkaç saate yayıldığında taşıyabileceğini söyler. Handle bu kapasiteyi ifade eder.",
+    "p": "When a city repaves a street, its engineers usually compare surfaces by cost and durability. In one coastal town, however, they also measured how quickly rainwater ran off each surface. (1) ---- rainwater seeps into gaps in a porous surface, less of it reaches storm drains all at once. The team expected this feature to (2) ---- pressure on the drainage network during short storms. To test the idea, they installed sensors (3) ---- could record the water leaving two streets that were similar in length and slope. The porous street produced a lower peak flow (4) ---- the total volume of water recorded over the following day was almost the same at both outlets. The result suggested that the surface delayed the movement of water. This distinction matters because drains can fail when a large volume arrives in a short interval, even if they could (5) ---- the same volume over several hours."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-012",
+    "s": "ingilizce",
+    "t": "Conjunctions",
+    "d": 2,
+    "q": "Although the data from the two weather stations were collected at the same times each day, ----.",
+    "o": [
+      "both stations were equipped with instruments of the same type",
+      "one sensor was in the shade during the afternoon while the other remained in direct sunlight",
+      "the researchers began keeping records at both stations on the same date",
+      "the published report listed the same dates for both sets of readings",
+      "both teams followed a common procedure when collecting their data"
+    ],
+    "a": 1,
+    "x": "İlk bölümde ölçüm saatlerinin eşit olduğu söylenir. B seçeneği aynı saatlerde sensörlerin farklı ışık koşullarında bulunabileceğini belirtir. Although böylece ortak zamana rağmen çevresel farkı gösterir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-013",
+    "s": "ingilizce",
+    "t": "Conjunctions",
+    "d": 2,
+    "q": "----, the editors could not determine whether two reports described the same event.",
+    "o": [
+      "Because both reports omitted the place and date",
+      "Although both reports omitted the place and date",
+      "Once the witnesses had confirmed that they were describing separate events",
+      "Given that the reports referred to different, independently documented incidents",
+      "Since the photographs placed both accounts at the same event"
+    ],
+    "a": 0,
+    "x": "Olayın yeri ve tarihi bilinmediğinde iki raporun aynı olayı anlatıp anlatmadığı belirlenemeyebilir. A bu bilgi eksikliğini sonucun nedeni olarak kurar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-014",
+    "s": "ingilizce",
+    "t": "Conjunctions",
+    "d": 2,
+    "q": "As part of an effort to help visitors keep a record of their own visit, the designers left an empty area beside every entry in the exhibition catalogue so that ----.",
+    "o": [
+      "the catalogue could include more entries without adding pages",
+      "the order of the entries could determine the route every visitor followed",
+      "the objects could be identified solely from their positions in the gallery",
+      "the guides could collect the same set of answers from all visitors",
+      "visitors could note the details they wished to look up later"
+    ],
+    "a": 4,
+    "x": "Kataloğun her ziyaretçi için kendi gezisinin kaydına dönüşmesi amaçlanır. E seçeneğinde boş alan, ziyaretçinin daha sonra bakmak istediği ayrıntıları not etmesine yarar. Böylece tasarım kararı, ilk bölümde belirtilen amaca bağlanır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-015",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 3,
+    "q": "What is the main purpose of the passage?",
+    "o": [
+      "To describe how a larger venue enabled volunteers to specialise in different repairs",
+      "To compare the reasons why visitors preferred one type of session over another",
+      "To explain why the café began to track visitors’ later repair attempts as well as completed repairs",
+      "To show that allowing visitors to use the tools shortened queues at the café",
+      "To argue that repair cafés should deal only with faults visitors cannot fix themselves"
+    ],
+    "a": 2,
+    "x": "İlk ölçüt tamamlanan onarımları sayar fakat ziyaretçilerin kendi başına onarım denemesini yakalayamaz. Son bölüm bu yüzden ikinci göstergenin eklendiğini açıklar. Metnin bütününü C karşılar.",
+    "p": "A repair café initially judged its success by the number of household objects volunteers returned to working order each month. After a move to a larger venue, that number rose. Yet calls to former visitors suggested that many still felt unable to deal with a minor fault on their own. To keep queues short, volunteers had often worked while owners waited at a separate table.\n\nIn a later trial, visitors could choose either a quick repair or a session in which a volunteer talked them through each step and let them use the tools. The second option took longer. Six weeks later, people who had chosen it were more likely to report attempting a similar repair. Since visitors had chosen their own sessions, the organisers could not tell whether the instruction itself explained the difference. They did, however, begin to count both successful repairs and subsequent attempts by visitors. The first figure told them how much work the café had completed. The second addressed a goal that the original count had left out."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-016",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 3,
+    "q": "Why could the organisers not be certain that the guided sessions caused the difference in later repair attempts?",
+    "o": [
+      "Visitors were asked about their later attempts at different points in the trial.",
+      "Those who selected a guided session may already have been more willing to try repairs.",
+      "The organisers had only counted guided repairs at the original venue.",
+      "Volunteers were not allowed to demonstrate the use of tools during the trial.",
+      "Both types of session took longer after the café moved."
+    ],
+    "a": 1,
+    "x": "Metin ziyaretçilerin oturum türünü kendilerinin seçtiğini söyler. Rehberli oturumu seçenler baştan daha istekli olabilir. Daha çok deneme bildirmeleri bu nedenle tek başına eğitimin etkisini kanıtlamaz.",
+    "p": "A repair café initially judged its success by the number of household objects volunteers returned to working order each month. After a move to a larger venue, that number rose. Yet calls to former visitors suggested that many still felt unable to deal with a minor fault on their own. To keep queues short, volunteers had often worked while owners waited at a separate table.\n\nIn a later trial, visitors could choose either a quick repair or a session in which a volunteer talked them through each step and let them use the tools. The second option took longer. Six weeks later, people who had chosen it were more likely to report attempting a similar repair. Since visitors had chosen their own sessions, the organisers could not tell whether the instruction itself explained the difference. They did, however, begin to count both successful repairs and subsequent attempts by visitors. The first figure told them how much work the café had completed. The second addressed a goal that the original count had left out."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-017",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 2,
+    "q": "Why had volunteers often worked while the owners waited at a separate table?",
+    "o": [
+      "They wanted the owners to compare different tools before the repairs began.",
+      "They planned to record which visitors would later try to fix another object.",
+      "There was too little space for the owners in the larger venue.",
+      "They wanted to avoid keeping people in the queue for too long.",
+      "They expected the owners to explain the faults to each other."
+    ],
+    "a": 3,
+    "x": "İlk paragrafta ayrı masada bekleme uygulamasının amacı To keep queues short ifadesiyle verilir. D bunu sıra bekleyenlerin uzun süre tutulmaması biçiminde ifade eder.",
+    "p": "A repair café initially judged its success by the number of household objects volunteers returned to working order each month. After a move to a larger venue, that number rose. Yet calls to former visitors suggested that many still felt unable to deal with a minor fault on their own. To keep queues short, volunteers had often worked while owners waited at a separate table.\n\nIn a later trial, visitors could choose either a quick repair or a session in which a volunteer talked them through each step and let them use the tools. The second option took longer. Six weeks later, people who had chosen it were more likely to report attempting a similar repair. Since visitors had chosen their own sessions, the organisers could not tell whether the instruction itself explained the difference. They did, however, begin to count both successful repairs and subsequent attempts by visitors. The first figure told them how much work the café had completed. The second addressed a goal that the original count had left out."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-018",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "Nora — The last survey asked how often people used the cycle lane, but it never asked why they avoided it.\nEmre — ----\nNora — Exactly. Those residents might have used it if the junctions had felt safer.",
+    "o": [
+      "That would make it easier to compare how regular cyclists use different routes.",
+      "At least we now know that most residents felt safe at the junctions.",
+      "If the junctions are safer, there is no need to count how often the lane is used.",
+      "Then the survey probably gathered more information about non-users than about regular cyclists.",
+      "Then it may have missed the concerns of people who wanted to cycle but felt unsafe along the route."
+    ],
+    "a": 4,
+    "x": "İlk replikte, bisiklet yolunun neden kullanılmadığının sorulmadığı belirtilir. Son replikte güvenlik kaygısı olan potansiyel kullanıcılar kastedilir. E, iki replik arasındaki eksik bağlantıyı kurar."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-019",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "You have agreed to lead a discussion on Friday. A colleague offers to take your place, provided you send the readings by Wednesday. You can meet that deadline. You want to accept the offer and confirm that your colleague will receive the readings on time.\nWhat would you say?",
+    "o": [
+      "Thanks for offering to lead the discussion. I’ll make sure you have the readings by Wednesday.",
+      "I appreciate the offer, but I think I’ll lead it myself and send you the readings on Wednesday.",
+      "Thanks for stepping in. I’ll bring the readings along on Friday in case you need them.",
+      "I’ll send the readings by Wednesday. Could you let me know by then whether you’re willing to lead?",
+      "I appreciate your help, but could you send me the readings before Wednesday so that I can prepare?"
+    ],
+    "a": 0,
+    "x": "A, teklifi kabul eder ve okuma metinlerini çarşambaya kadar göndereceğini doğrular. Durumdaki iki iletişim amacı da karşılanır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-020",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 3,
+    "q": "Which option is closest in meaning to the sentence below?\nThe trial showed that commuters would use a later bus if one were available, but it gave no indication of how often they would do so.",
+    "o": [
+      "The trial found that commuters who normally took the later bus used it less often than expected.",
+      "The trial established how often later buses ran, but not how many commuters used them.",
+      "The trial indicated demand for a later bus service without establishing how frequently commuters would use it.",
+      "The trial showed that a later service would be viable only if commuters agreed to use it regularly.",
+      "The trial established when the last bus should leave, even though demand for it remained unclear."
+    ],
+    "a": 2,
+    "x": "İlk cümle, daha geç bir sefer olursa kullanılacağını fakat kullanım sıklığının belirlenmediğini söyler. C’de talep ve sıklık arasındaki aynı ayrım korunur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-021",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 3,
+    "q": "Which option is closest in meaning to the sentence below?\nOnly after the town began publishing readings for each district separately did residents realise how much water use varied across the town.",
+    "o": [
+      "Publishing district-level readings reduced the differences in water use that residents had already noticed.",
+      "Residents who had already noticed the differences persuaded the town to publish separate district figures.",
+      "The town published a single figure after residents discovered that water use differed between districts.",
+      "Residents had not realised the extent of the differences in water use until the town began releasing separate figures for each district.",
+      "The district figures identified the areas that used the most water without revealing how large the differences were."
+    ],
+    "a": 3,
+    "x": "Only after yapısı, farkın büyüklüğünün mahalle verileri ayrı yayımlanmaya başlayınca anlaşıldığını belirtir. D bu zaman ilişkisini had not realised ... until yapısıyla korur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-022",
+    "s": "ingilizce",
+    "t": "Translation",
+    "d": 3,
+    "q": "Aşağıdakilerden hangisi İngilizce cümlenin anlamını Türkçeye doğru aktarır?\nAlthough the new database makes it easier to locate archived recordings, it cannot replace the contextual information provided by the people who made them.",
+    "o": [
+      "Yeni veri tabanı, arşivlenmiş kayıtları yapan kişileri bulmayı kolaylaştırsa da kayıtların bağlamını açıklamak için bu kişilere ulaşılamaz.",
+      "Yeni veri tabanı arşivlenmiş kayıtları bulmayı kolaylaştırsa da kayıtları yapan kişilerin verdiği bağlamsal bilgilerin yerini tutamaz.",
+      "Yeni veri tabanı arşivlenmiş kayıtları bulmayı kolaylaştırır çünkü kayıtları yapan kişilerin verdiği bağlamsal bilgileri içerir.",
+      "Kayıtları yapan kişilerin verdiği bağlamsal bilgiler, yeni veri tabanının arşivlenmiş kayıtları bulmayı kolaylaştırmasının yerini tutamaz.",
+      "Yeni veri tabanı, arşivlenmiş kayıtları ancak onları yapan kişilerin verdiği bağlamsal bilgiler erişilebilir olduğunda bulmayı kolaylaştırır."
+    ],
+    "a": 1,
+    "x": "İlk yan cümle kayıtların bulunmasını kolaylaştırır. Ana cümle, veri tabanının kayıtları yapanların verdiği bağlamsal bilgilerin yerine geçemeyeceğini söyler. B, iki yargıyı ve aralarındaki karşıtlığı korur."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-023",
+    "s": "ingilizce",
+    "t": "Translation",
+    "d": 3,
+    "q": "Which option accurately translates the Turkish sentence below?\nBir yöntemin daha az zaman alması, elde edilen sonuçların daha güvenilir olduğu anlamına gelmez.",
+    "o": [
+      "A method that produces more reliable results will not necessarily take less time.",
+      "A method may take less time because the results it produces are more reliable.",
+      "A method can produce reliable results only if it takes less time than other methods.",
+      "The fact that a method takes less time means that its results are no less reliable.",
+      "The fact that a method takes less time does not mean that the results it produces are more reliable."
+    ],
+    "a": 4,
+    "x": "Türkçe cümle, süre kısalığının daha güvenilir sonuç anlamına gelmediğini söyler. E seçeneği bu çıkarımın geçerli olmadığını, iki karşılaştırmayı da koruyarak aktarır."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-024",
+    "s": "ingilizce",
+    "t": "Reading",
+    "d": 3,
+    "q": "Which sentence best completes the paragraph?\nSome exhibitions provide a short caption beside an object and a longer account that visitors can access on their phones. ----. A visitor who wants to identify the object can stop after the first line, while someone interested in its history can read further. The design therefore allows visitors to decide how much detail they need.",
+    "o": [
+      "In the older system, objects of different ages were sometimes given labels in different colours",
+      "The two versions are intended for separate groups, and each visitor is assigned one of them at the entrance",
+      "Both versions begin with the same identifying information, but the longer one goes on to explain the object’s use and history",
+      "The longer text becomes available only if the printed caption is too damaged to be read",
+      "The captions avoid giving the names of the objects so that visitors can try to identify them independently"
+    ],
+    "a": 2,
+    "x": "C’deki Both versions, ilk cümledeki kısa ve uzun açıklamaya dönmektedir. İki metindeki ortak tanıtım bilgisi, sonraki cümlede ziyaretçinin ilk satırla yetinebilmesini açıklar. Uzun anlatı da ayrıntı isteyen ziyaretçiye karşılık gelir."
+  },
+  {
+    "id": "AKE-YKS-PILOT-01-YDT-ENG-025",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 2,
+    "q": "Which numbered sentence interrupts the flow of the paragraph?\n(I) The city nursery began supplying the same tree species to schools as well as to street projects. (II) A study of walking routes distinguished between the shade available at noon and the shade available during the evening commute. (III) At noon, shade was concentrated immediately below the trees. (IV) Later, longer shadows reached across the pavement and, in places, the opposite side of the street. (V) A route exposed at lunchtime could therefore be shaded when people walked home.",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 0,
+    "x": "II, gölgenin iki farklı zamanda incelenmesini tanıtır. III ve IV iki zamanın gözlemlerini, V bunlardan çıkan sonucu verir. I ise ağaç fidanlarının hangi kurumlara sağlandığını anlatır ve bu zaman karşılaştırmasına bağlanmaz."
+  }
+]

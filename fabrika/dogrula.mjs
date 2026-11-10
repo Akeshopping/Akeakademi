@@ -41,9 +41,17 @@ for (const f of dosyalar) {
     if (dog > Math.max(...dig) * 1.6 && dog > 25) u("doğru şık diğerlerinden çok uzun");
     // tekrar / benzerlik
     const g = golge((q.p || "") + " " + q.q);
+    const pasaj = norm(q.p || "");
+    const kokGolgesi = pasaj ? golge(q.q) : null;
     for (const m of mevcut) if (m.s === q.s && jac(g, m.g) >= 0.8) { u("sitede var olan soruya çok benziyor: " + m.q.slice(0, 90)); break; }
-    for (const y of yeni) if (y.s === q.s && jac(g, y.g) >= 0.8) { h(`${y.id} ile çok benziyor (tekrar)`); break; }
-    yeni.push({ id: q.id, s: q.s, g, d: q.d, a: q.a, t: q.t });
+    for (const y of yeni) {
+      if (y.s !== q.s) continue;
+      // Ortak pasajda tekrar olup olmadığını soru kökleri belirler.
+      const ayniPasaj = pasaj && pasaj === y.pasaj;
+      const oran = ayniPasaj ? jac(kokGolgesi, y.kokGolgesi) : jac(g, y.g);
+      if (oran >= 0.8) { h(`${y.id} ile çok benziyor (tekrar)`); break; }
+    }
+    yeni.push({ id: q.id, s: q.s, g, pasaj, kokGolgesi, d: q.d, a: q.a, t: q.t });
   }
 }
 

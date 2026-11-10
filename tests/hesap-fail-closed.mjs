@@ -123,4 +123,19 @@ for (const m of ["500", "404"]) { const s = await sayfa({ ben: m, ls: LS_PREMIUM
 { const sen = { ben: "ag-hatasi", ls: LS_PREMIUM }; const s = await sayfa(sen); const r0 = await baslat(s.p, 2); sen.ben = "ucretsiz";
   await s.p.evaluate(async () => { await OZ_ACT.hesapTekrarDene(); }); const d = await durum(s.p); const r1 = await baslat(s.p, 2);
   t("11 Hata sonrası 'Tekrar dene' → hesap doğrulandı, ücretsiz kota POST'uyla soru başladı", r0.run === 0 && d.mi === true && r1.run === 2 && s.kota.length === 1, JSON.stringify({ r0: r0.run, d, r1: r1.run, kota: s.kota })); await s.c.close(); }
+/* 12) stale-Premium: sayfa açıkken sunucu Premium'u doğruladı, SONRA hesap API'si bozuldu → bellekteki eski paket yetki vermez */
+const yenile = p => p.evaluate(async () => { await hesapBenDene(); return { hata: HESAP.hata, paket: !!HESAP.paket, mi: ucretsizMi() }; });
+for (const [ad, mod, off] of [["ağ hatası", "ag-hatasi", false], ["500", "500", false], ["zaman aşımı", "asili", false], ["çevrimdışı", "ag-hatasi", true]]) {
+  const sen = { ben: "ucretli" }; const s = await sayfa(sen);
+  const once = await durum(s.p), r0 = await baslat(s.p, 5);
+  sen.ben = mod; if (off) await s.c.setOffline(true);
+  const h = await yenile(s.p); sen.kotaAg = true;
+  const r1 = await baslat(s.p, 5), r2 = await baslat(s.p, 3, "exam");
+  t(`12 Premium doğrulandı → ${ad} → önce normal (sınırsız), sonra hata`, once.mi === false && r0.run === 5 && h.hata === true, JSON.stringify({ once, r0: r0.run, h }));
+  t(`12 Premium doğrulandı → ${ad} → eski paket yetki vermez (ucretsizMi true), practice/exam başlamaz, mesaj var`, h.mi === true && r1.run === 0 && r2.run === 0 && MESAJ.test(r1.metin + r2.metin), JSON.stringify({ h, a: r1.run, b: r2.run }));
+  t(`12 Premium doğrulandı → ${ad} → üyelik arayüzü bozulmadı (paket belleğte, hata yok)`, h.paket === true && s.hatalar.length === 0, s.hatalar.join("|") + JSON.stringify(h)); await s.c.close(); }
+/* 12e) hata geçince "Tekrar dene" ile sunucu Premium'u yeniden doğrular → normal sınırsız davranış geri gelir */
+{ const sen = { ben: "ucretli" }; const s = await sayfa(sen); sen.ben = "500"; const h = await yenile(s.p); const rEngel = await baslat(s.p, 5);
+  sen.ben = "ucretli"; sen.kotaAg = false; await s.p.evaluate(async () => { await OZ_ACT.hesapTekrarDene(); }); const d = await durum(s.p); const rOk = await baslat(s.p, 25), rEx = await baslat(s.p, 5, "exam");
+  t("12e Hata → Tekrar dene → sunucu Premium yeniden doğrulandı → 25 soru + deneme engelsiz, kota POST yok", h.hata === true && rEngel.run === 0 && d.mi === false && rOk.run === 25 && rEx.run === 5 && s.kota.length === 0, JSON.stringify({ h, e: rEngel.run, d, a: rOk.run, b: rEx.run, kota: s.kota })); await s.c.close(); }
 console.log(`\n${gecen} geçti, ${kalan} kaldı`); await b.close(); srv.close(); process.exit(kalan ? 1 : 0);

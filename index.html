@@ -7423,6 +7423,7 @@ function ucretsizMi() {
   /* Hesap sunucusu varken karar sunucudadır: yalnızca giriş yapmış ve sunucudan geçerli paket gelmiş kullanıcı ücretli sayılır.
      Cihazdaki eski Premium/Atılım kaydı (WEBAI) bunu geçersiz kılamaz. Hesap henüz yüklenmediyse ücretsiz sayılır;
      kotaAl bu durumda hakkı vermeden bekletir (yerel Premium'a güvenip geçiş verilmez). */
+  if (HESAP.hata) return true; /* sunucu doğrulanamıyor: bellekteki eski paket de yetki vermez; kotaAl kapısı bağlantı mesajıyla engeller */
   if (sunucuKota()) return !(HESAP.hazir && HESAP.user && HESAP.paket);
   /* Yerel yedek yalnızca geliştirme önizlemesi (localhost) ve Claude paneli için; üretimde buraya düşülmez */
   if (HESAP.paket) return false;

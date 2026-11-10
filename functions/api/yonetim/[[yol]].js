@@ -95,6 +95,8 @@ export async function onRequest({ request, env, params }) {
   const u = await oturum(request, env);
   if (!u || !yoneticiMi(env, u)) return fail(403, "yetki");
   const ad = [].concat(params.yol || [])[0] || "", m = request.method, origin = new URL(request.url).origin;
+  /* Soru göçü sırasında yazma kilidi (varsayılan KAPALI; AKE_SORU_V2'den bağımsız): yalnız soru yazan iki uç 503 verir, okuma/ödeme/hesap etkilenmez. */
+  if (env.AKE_SORU_MIGRATION_LOCK === "1" && m === "POST" && (ad === "soru-uret" || ad === "soru-karar")) return fail(503, "bakim", "Soru yazımı geçici olarak durduruldu (bakım). Biraz sonra tekrar dene.", { "retry-after": "300" });
 
   if (ad === "durum" && m === "GET") {
     /* inceleme bekleyenler: doğrulanamayan ödeme/tutar/para, kod üretim hatası, yarım kalmış (5 dk+) kod üretimi, takılmış (10 dk+) e-posta gönderimi */

@@ -47,20 +47,20 @@ test("3) legacy D1 satırları (ok-*) yeni sütunlara doldurulur; kimlik/durum/t
   assert.deepEqual(db.prepare("SELECT id, json, durum, tarih, karar FROM soru ORDER BY id").all(), jsonOnce, "legacy json/durum/tarih/karar aynen");
 });
 
-test("4-6) 927 kaynak + 89 mevcut = 1016; ikinci göç yine 1016 ve hepsi no-op; mevcutlar kaynak sayısına karışmaz", async () => {
+test("4-6) 1127 kaynak + 89 mevcut = 1216; ikinci göç yine 1216 ve hepsi no-op; mevcutlar kaynak sayısına karışmaz", async () => {
   const db = await yeniDb({ legacy: 89 }); await soruKanonikSema(d1Yerel(db));
-  const g = Array.from({ length: 728 }, (_, i) => sentetik("g-" + i, i)), r01 = Array.from({ length: 99 }, (_, i) => sentetik("r01-" + i, i)), pl = Array.from({ length: 100 }, (_, i) => sentetik("AKE-YKS-PILOT-" + i, i));
-  const K = () => [kaynak("embedded", "gomulu", g), kaynak("r01", "statik", r01), kaynak("pilot-100", "statik", pl)];
-  const p1 = await plan(db, K(), { beklenen: { embedded: 728, r01: 99, "pilot-100": 100 } });
+  const g = Array.from({ length: 728 }, (_, i) => sentetik("g-" + i, i)), r01 = Array.from({ length: 99 }, (_, i) => sentetik("r01-" + i, i)), pl = Array.from({ length: 100 }, (_, i) => sentetik("AKE-YKS-PILOT-" + i, i)), y2 = Array.from({ length: 200 }, (_, i) => sentetik("AKE-YKS-02-" + i, i));
+  const K = () => [kaynak("embedded", "gomulu", g), kaynak("r01", "statik", r01), kaynak("pilot-100", "statik", pl), kaynak("ake-yks-02-200", "statik", y2)];
+  const p1 = await plan(db, K(), { beklenen: { embedded: 728, r01: 99, "pilot-100": 100, "ake-yks-02-200": 200 } });
   assert.equal(p1.basarili, true, JSON.stringify(p1.sapma.concat(p1.catisma, p1.gecersiz)));
-  assert.deepEqual(p1.sayim.kaynaklar, { embedded: 728, r01: 99, "pilot-100": 100 }); assert.equal(p1.sayim.existing_d1, 89);
-  assert.equal(p1.sayim.expected_total, 1016); assert.equal(p1.sayim.new_insert, 927); assert.equal(p1.sayim.backfill, 89); assert.equal(p1.sayim.final_total, 1016);
-  await uygula(db, p1); assert.equal(say(db), 1016);
-  assert.equal(say(db, "durum = 'banka'"), 927, "göçle gelenler dormant 'banka' durumunda (legacy /api/sorular onayli filtreler)");
+  assert.deepEqual(p1.sayim.kaynaklar, { embedded: 728, r01: 99, "pilot-100": 100, "ake-yks-02-200": 200 }); assert.equal(p1.sayim.existing_d1, 89);
+  assert.equal(p1.sayim.expected_total, 1216); assert.equal(p1.sayim.new_insert, 1127); assert.equal(p1.sayim.backfill, 89); assert.equal(p1.sayim.final_total, 1216);
+  await uygula(db, p1); assert.equal(say(db), 1216);
+  assert.equal(say(db, "durum = 'banka'"), 1127, "göçle gelenler dormant 'banka' durumunda (legacy /api/sorular onayli filtreler)");
   assert.equal(say(db, "durum = 'onayli'"), 89, "legacy onaylı sorular aynen");
-  const p2 = await plan(db, K(), { beklenen: { embedded: 728, r01: 99, "pilot-100": 100 } });
-  assert.equal(p2.basarili, true); assert.equal(p2.sayim.new_insert, 0); assert.equal(p2.sayim.backfill, 0); assert.equal(p2.sayim.idempotent_noop, 1016); assert.equal(p2.sayim.final_total, 1016);
-  await uygula(db, p2); assert.equal(say(db), 1016, "ikinci uygulama sayıyı artırmaz");
+  const p2 = await plan(db, K(), { beklenen: { embedded: 728, r01: 99, "pilot-100": 100, "ake-yks-02-200": 200 } });
+  assert.equal(p2.basarili, true); assert.equal(p2.sayim.new_insert, 0); assert.equal(p2.sayim.backfill, 0); assert.equal(p2.sayim.idempotent_noop, 1216); assert.equal(p2.sayim.final_total, 1216);
+  await uygula(db, p2); assert.equal(say(db), 1216, "ikinci uygulama sayıyı artırmaz");
 });
 
 test("7) aynı kimlik + aynı özet → no-op (eksik sütun varsa güvenle doldurulur, mevcut değer değişmez)", async () => {

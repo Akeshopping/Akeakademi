@@ -1,6 +1,6 @@
 // AKE Akademi · korumalı soru bankası · göç aracı (PR 1/6, karanlık altyapı)
 //
-// Amaç: mevcut çözülebilir soruları (gömülü 728 + r01 99 + pilot-100 100 + D1'deki ok-* satırları) `soru` tablosunun
+// Amaç: mevcut çözülebilir soruları (gömülü 728 + r01 99 + pilot-100 100 + ake-yks-02-200 200 + D1'deki ok-* satırları) `soru` tablosunun
 // kanonik sütunlarına, kimlikleri koruyarak, yinelenebilir (idempotent) biçimde taşımak.
 //
 // GÜVENLİ VARSAYILAN = DRY RUN. Uzak/üretim D1'e ASLA kendiliğinden bağlanmaz (ağ, wrangler, Cloudflare API yok).
@@ -26,8 +26,8 @@ import { DERSLER } from "./lib.mjs";
 import { KAYNAK_ONCELIK, DURUM_BANKA, YENI_SUTUNLAR, soruKanonikSema, kanonikHash, cevapHash, kokAnahtari, govdeOf, dogrulaSoru, rkUret } from "../lib/soru-kanonik.js";
 
 const KOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-/* PR 1 taban çizgisi: bu sayılar sabitlenmiştir. 927 = 728 + 99 + 100; D1'deki ok-* soruları bunun DIŞINDADIR. */
-export const BEKLENEN = { embedded: 728, r01: 99, "pilot-100": 100 };
+/* PR 1 taban çizgisi: bu sayılar sabitlenmiştir. 1127 = 728 + 99 + 100 + 200; D1'deki ok-* soruları bunun DIŞINDADIR. */
+export const BEKLENEN = { embedded: 728, r01: 99, "pilot-100": 100, "ake-yks-02-200": 200 };
 export const PILOT = "pilot-100", PILOT_BEKLENEN = 100;
 const SUTUN_ADLARI = YENI_SUTUNLAR.map(x => x[0]);
 const DOLU_SUTUNLAR = ["kaynak", "rk", "h", "govde", "a", "x"];

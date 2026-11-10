@@ -11277,7 +11277,7 @@ function vTanitim() {
   <section class="atl-end" aria-labelledby="atl-son"><div class="atl-w atl-rv"><div class="atl-eb">Bugün</div><h2 id="atl-son">İlk soruyu bugün çöz. Gerisi gelir.</h2><p class="atl-lead" style="margin:14px auto 0">Hesap açmadan başlayabilirsin. Hesap açarsan ilerlemen telefon, tablet ve bilgisayar arasında eşitlenir.</p><div class="atl-cta"><a class="atl-b p lg" href="#bugun">Ücretsiz başla</a><a class="atl-b lg" href="#hesap">Hesap aç</a></div></div></section>
   </main>
   <footer class="atl-ft"><div class="atl-w">
-    <nav aria-label="Alt bağlantılar"><a href="#hakkimizda">Hakkımızda</a><a href="#sss">SSS</a><a href="#premium">Paketler</a><a href="#yasal">Yasal metinler</a><a href="#bugun">Uygulamaya geç</a></nav>
+    <nav aria-label="Alt bağlantılar"><a href="#hakkimizda">Hakkımızda</a><a href="#sss">SSS</a><a href="/matematik-yks-sorulari/">YKS matematik soruları</a><a href="#premium">Paketler</a><a href="#yasal">Yasal metinler</a><a href="#bugun">Uygulamaya geç</a></nav>
     <div class="ctl"><button type="button" data-a="atlTema">${tema[1]}</button><button type="button" data-a="atlHareket" aria-pressed="${hareketOff}">Animasyonlar: ${hareketOff ? "kapalı" : "açık"}</button>${hareketOff ? "" : `<button type="button" data-a="atlIntro">Açılışı izle</button>`}</div>
     <p>© ${new Date().getFullYear()} AKE Akademi · Sorular özgün olarak hazırlanır; ÖSYM ile bağlantısı yoktur. “ÖSYM tarzı” ifadesi yalnızca soru biçimini anlatır.</p>
   </div></footer>
@@ -12154,7 +12154,9 @@ document.addEventListener("keydown", e => {
   else if (e.key === "Enter" && !/button|a/i.test(e.target.tagName)) { if (RUN.cur < RUN.qs.length - 1) moveTo(RUN.cur + 1); }
   else if ((e.key === "i" || e.key === "I" || e.key === "İ") && RUN.mode === "exam") ACT.flag();
 });
-window.addEventListener("hashchange", () => { sesDurdur(); UI.menu = false; UI.inRun = false; memPage(route()); render(); window.scrollTo(0, 0); });
+function bankaDersParam() { const d = hashParam("ders"); if (route() === "banka" && SUBJ[d] && UI.bank.s !== d) UI.bank = Object.assign(UI.bank, { s: d, t: "", d: 0, st: "", src: "", q: "", lim: 40 }); }
+window.addEventListener("hashchange", () => { sesDurdur(); UI.menu = false; UI.inRun = false; bankaDersParam(); memPage(route()); render(); window.scrollTo(0, 0); });
+bankaDersParam();
 ["mouseover", "focusin"].forEach(ev => APP.addEventListener(ev, e => tipShow(e.target)));
 ["mouseout", "focusout"].forEach(ev => APP.addEventListener(ev, e => tipHide(e.target)));
 

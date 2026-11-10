@@ -1,4 +1,0 @@
-Toplam 99 soru · ders: {"mat":45,"geo":24,"amat":30} · zorluk(1/2/3): 29/39/31 · doğru şık konumu: {"B":20,"D":20,"C":20,"A":20,"E":19}
-HATA: 0 · UYARI: 2
-  uyarı f1-geo-006 · yeni konu adı: Üçgenler
-  uyarı f1-geo-007 · yeni konu adı: Üçgenler

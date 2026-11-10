@@ -1,0 +1,6 @@
+# yerel göç denemeleri ve üretilen artıklar (soru içeriği repoya girmesin)
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+soru-cikti/
+fabrika/rapor/son-dogrulama.json

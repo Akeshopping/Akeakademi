@@ -10819,40 +10819,78 @@ Object.assign(OZ_ACT, {
 });
 
 /* ===== Telefon/tablet bildirimleri (Web Push): giriş yapmış öğrenciler, seçtikleri saatlerde kısa hatırlatma alır ===== */
-var PUSHU = { dur: "", slots: ["sabah", "aksam"], aktif: false, busy: false, msg: "", yuklendi: false };
+var PUSHU = { dur: "", slots: ["sabah", "aksam"], aktif: false, busy: false, msg: "", yuklendi: false, as: {}, hata: null, cihaz: null, test: "" };
 const PUSH_SLOT = [["sabah", "Sabah (09:00)"], ["ogle", "Öğleden sonra (15:00)"], ["aksam", "Akşam (20:30)"]];
+/* Bildirimleri aç akışının aşamaları: kartta ayrı ayrı görünür; takılan aşama süre sınırıyla hataya döner. */
+const PUSH_ASAMA = [["izin", "Bildirim izni"], ["sw", "Servis çalışanı"], ["abone", "Tarayıcı aboneliği"], ["kayit", "Sunucuya kayıt"], ["dogrula", "Kayıt doğrulama"]];
+const PUSH_HATA = { izin: "Bildirim izni verilmedi.", sw: "Servis çalışanı hazır olmadı.", abone: "Tarayıcı bildirim aboneliğini oluşturamadı.", kayit: "Sunucu kaydı kabul etmedi.", dogrula: "Kayıt sunucuda doğrulanamadı." };
 const pushDestek = () => !IN_CLAUDE && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 const pushIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const pushStandalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+const pushSure = (p, ms) => new Promise((res, rej) => { const t = setTimeout(() => rej({ ad: "ZamanAsimi" }), ms); Promise.resolve(p).then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); }); });
+const pushJson = async r => { try { return await r.json(); } catch (e) { return {}; } };
+const pushTemiz = (v, re) => (typeof v === "string" && re.test(v)) ? v : "";
+function pushSifirla() { PUSHU.as = {}; PUSHU.hata = null; PUSHU.test = ""; }
 async function pushReg() { try { return await navigator.serviceWorker.ready; } catch (e) { return null; } }
 async function pushDurumYukle() {
   PUSHU.yuklendi = true;
   if (!pushDestek()) return;
   const reg = await pushReg(); const sub = reg && await reg.pushManager.getSubscription().catch(() => null);
   PUSHU.aktif = !!sub && Notification.permission === "granted";
-  if (PUSHU.aktif && HESAP.user) { try { const r = await fetch("/api/bildirim/durum", { credentials: "same-origin" }); const j = await r.json(); const me = (j.cihazlar || []).find(c => sub && c.endpoint === sub.endpoint); if (me) PUSHU.slots = me.slots; else PUSHU.aktif = false; } catch (e) { } }
+  if (PUSHU.aktif && HESAP.user) { try { const r = await fetch("/api/bildirim/durum", { credentials: "same-origin" }); const j = await r.json(); PUSHU.cihaz = (j.cihazlar || []).length; const me = (j.cihazlar || []).find(c => sub && c.endpoint === sub.endpoint); if (me) PUSHU.slots = me.slots; else PUSHU.aktif = false; } catch (e) { } }
   render();
 }
 const u8 = b => { b = b.replace(/-/g, "+").replace(/_/g, "/"); const s = atob(b + "=".repeat((4 - b.length % 4) % 4)); return Uint8Array.from(s, c => c.charCodeAt(0)); };
 async function pushAc() {
-  PUSHU.busy = true; PUSHU.msg = ""; render();
+  if (PUSHU.busy) return;
+  PUSHU.msg = ""; pushSifirla();
+  if (!PUSHU.slots.length) { PUSHU.msg = "En az bir saat seç."; render(); return; }
+  PUSHU.busy = true; render();
+  const as = PUSHU.as; let asama = "izin";
+  const gec = a => { asama = a; as[a] = "..."; render(); };
   try {
-    if (!PUSHU.slots.length) throw new Error("En az bir saat seç.");
-    const izin = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
-    if (izin !== "granted") throw new Error("Bildirim izni verilmedi. Tarayıcı ayarlarından izin verebilirsin.");
-    const reg = await pushReg(); if (!reg) throw new Error("Tarayıcın bildirimleri başlatamadı.");
-    const k = await (await fetch("/api/bildirim/anahtar")).json();
-    let sub = await reg.pushManager.getSubscription();
-    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(k.anahtar) });
-    const r = await fetch("/api/bildirim/abone", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ sub: sub.toJSON(), slots: PUSHU.slots }) });
-    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.message || "Kaydedilemedi.");
-    PUSHU.aktif = true; PUSHU.msg = "Bildirimler açıldı."; bildirimSesi("basari");
-  } catch (e) { PUSHU.msg = e.message || "Bildirimler açılamadı."; }
+    gec("izin");
+    const izin = Notification.permission === "granted" ? "granted" : await pushSure(Notification.requestPermission(), 60000);
+    if (izin !== "granted") throw { ad: izin === "denied" ? "NotAllowedError" : "IzinVerilmedi" };
+    as.izin = "ok";
+    gec("sw");
+    const reg = await pushSure(navigator.serviceWorker.ready, 8000); if (!reg) throw { kod: "sw_yok" };
+    as.sw = "ok";
+    gec("abone");
+    const ar = await pushSure(fetch("/api/bildirim/anahtar"), 10000), k = await pushJson(ar);
+    if (!ar.ok || !k.anahtar) throw { durum: ar.status, kod: k.error || "anahtar_yok" };
+    let sub = await pushSure(reg.pushManager.getSubscription(), 8000);
+    if (!sub) sub = await pushSure(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(k.anahtar) }), 20000);
+    as.abone = "ok";
+    gec("kayit");
+    const r = await pushSure(fetch("/api/bildirim/abone", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ sub: sub.toJSON(), slots: PUSHU.slots }) }), 15000);
+    if (!r.ok) { const j = await pushJson(r); throw { durum: r.status, kod: j.error }; }
+    as.kayit = "ok";
+    gec("dogrula");
+    const d = await pushSure(fetch("/api/bildirim/durum", { credentials: "same-origin" }), 10000), dj = await pushJson(d);
+    if (!d.ok) throw { durum: d.status, kod: dj.error };
+    const liste = dj.cihazlar || []; PUSHU.cihaz = liste.length;
+    if (!liste.find(c => c.endpoint === sub.endpoint)) throw { kod: "kayit_yok" };
+    as.dogrula = "ok"; PUSHU.aktif = true; PUSHU.msg = "Bildirimler açıldı."; bildirimSesi("basari");
+  } catch (e) {
+    e = e || {}; as[asama] = "hata";
+    PUSHU.hata = { asama, durum: +e.durum || 0, kod: pushTemiz(e.kod, /^[a-z0-9_]{1,40}$/), ad: pushTemiz(e.ad || e.name, /^[A-Za-z]{1,40}$/) };
+  }
   PUSHU.busy = false; render();
 }
 async function pushKapat() {
+  if (PUSHU.busy) return;
   PUSHU.busy = true; render();
-  try { const reg = await pushReg(), sub = reg && await reg.pushManager.getSubscription(); if (sub) { await fetch("/api/bildirim/iptal", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => { }); await sub.unsubscribe().catch(() => { }); } PUSHU.aktif = false; PUSHU.msg = "Bildirimler kapatıldı."; } catch (e) { PUSHU.msg = "Kapatılamadı."; }
+  try { const reg = await pushReg(), sub = reg && await reg.pushManager.getSubscription(); if (sub) { await fetch("/api/bildirim/iptal", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => { }); await sub.unsubscribe().catch(() => { }); } PUSHU.aktif = false; pushSifirla(); PUSHU.cihaz = null; PUSHU.msg = "Bildirimler kapatıldı."; } catch (e) { PUSHU.msg = "Bildirimler kapatılamadı."; }
+  PUSHU.busy = false; render();
+}
+async function pushTestGonder() {
+  if (PUSHU.busy) return;
+  PUSHU.busy = true; PUSHU.test = ""; render();
+  try {
+    const r = await pushSure(fetch("/api/bildirim/test", { method: "POST", credentials: "same-origin" }), 20000), j = await pushJson(r);
+    PUSHU.test = r.ok ? `Deneme gönderimi: gönderilen ${+j.gonderilen || 0}, cihaz ${+j.cihaz || 0}.` : `Deneme gönderilemedi · HTTP ${r.status}${pushTemiz(j.error, /^[a-z0-9_]{1,40}$/) ? " · kod: " + j.error : ""}`;
+  } catch (e) { PUSHU.test = "Deneme gönderilemedi · " + (e && e.ad === "ZamanAsimi" ? "zaman aşımı" : (pushTemiz(e && e.name, /^[A-Za-z]{1,40}$/) || "bağlantı hatası")); }
   PUSHU.busy = false; render();
 }
 function pushKart() {
@@ -10865,11 +10903,15 @@ function pushKart() {
   else if (Notification.permission === "denied") govde = `<p class="small muted">Bildirim izni engellenmiş. Tarayıcı ayarlarından bu site için bildirimlere izin ver, sonra tekrar dene.</p>`;
   else govde = `<div class="stack">${PUSH_SLOT.map(([k, l]) => `<label class="check small"><input type="checkbox" data-c="pushSlot" data-k="${k}"${PUSHU.slots.includes(k) ? " checked" : ""}${PUSHU.busy ? " disabled" : ""}> ${l}</label>`).join("")}</div>
     <div class="row">${PUSHU.aktif ? `<button class="btn" data-a="pushKaydet"${PUSHU.busy ? " disabled" : ""}>Saatleri kaydet</button><button class="btn ghost" data-a="pushKapat"${PUSHU.busy ? " disabled" : ""}>Kapat</button>` : `<button class="btn pri" data-a="pushAc"${PUSHU.busy ? " disabled" : ""}>${PUSHU.busy ? "Açılıyor…" : "Bildirimleri aç"}</button>`}</div>`;
+  const as = PUSHU.as || {}, h = PUSHU.hata;
+  const asamalar = Object.keys(as).length ? `<ul class="small stack" id="pushAsamalar" aria-live="polite">${PUSH_ASAMA.map(([k, l]) => `<li data-asama="${k}" data-durum="${as[k] || "bekliyor"}">${l}: ${as[k] === "ok" ? "tamam ✓" : as[k] === "hata" ? "hata ✗" : as[k] === "..." ? "sürüyor…" : "bekliyor"}</li>`).join("")}</ul>` : "";
+  const hata = h ? `<p class="small" id="pushHata" role="alert" style="color:var(--bad)">${esc(PUSH_HATA[h.asama] || "Bildirimler açılamadı.")} Ayrıntı: aşama ${esc(h.asama)}${h.durum ? " · HTTP " + h.durum : ""}${h.kod ? " · kod: " + esc(h.kod) : ""}${h.ad ? " · tarayıcı: " + esc(h.ad) : ""}</p>` : "";
+  const deneme = (HESAP.user && PUSHU.aktif && PUSHU.cihaz >= 1) ? `<div class="row"><button class="btn" data-a="pushTest"${PUSHU.busy ? " disabled" : ""}>Deneme bildirimi gönder</button></div><p class="small muted">Sunucuda kayıtlı cihaz: ${PUSHU.cihaz}</p>${PUSHU.test ? `<p class="small" id="pushTestSonuc">${esc(PUSHU.test)}</p>` : ""}` : "";
   return `<div class="card stack" id="bildirimler"><h2>Telefon ve tablet bildirimleri</h2>
     <p class="small muted">Seçtiğin saatlerde günde en fazla 3 kısa hatırlatma gelir: günün sorusu, yanlış tekrarı, çalışma önerisi. İstediğin zaman kapatabilirsin. Yalnızca giriş yaptığın hesapla çalışır.</p>
-    ${govde}${PUSHU.msg ? `<p class="small" style="color:var(--ok)">${esc(PUSHU.msg)}</p>` : ""}</div>`;
+    ${govde}${asamalar}${hata}${PUSHU.msg ? `<p class="small" style="color:var(--ok)">${esc(PUSHU.msg)}</p>` : ""}${deneme}</div>`;
 }
-Object.assign(OZ_ACT, { pushAc() { pushAc(); }, pushKaydet() { pushAc(); }, pushKapat() { pushKapat(); } });
+Object.assign(OZ_ACT, { pushAc() { pushAc(); }, pushKaydet() { pushAc(); }, pushKapat() { pushKapat(); }, pushTest() { pushTestGonder(); } });
 Object.assign(OZ_CHG, { pushSlot(el) { const k = el.dataset.k; PUSHU.slots = el.checked ? [...new Set([...PUSHU.slots, k])] : PUSHU.slots.filter(x => x !== k); } });
 /* ===== Sana özel koç: çözdüğün sorulardan zayıf konularını kod ile analiz eder, sana özel çözümlü örnek ve test hazırlar (yapay zekâ kullanmaz, ücretsizdir) ===== */
 var KOC = { ex: null, key: "" };

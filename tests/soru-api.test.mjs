@@ -231,3 +231,10 @@ test("kapsam: soru-api yalnız functions/api/soru/[[yol]].js tarafından içe ak
   for (const f of tara("functions")) { const var_ = /soru-api|soru-kanonik/.test(oku(f, "utf8")); assert.equal(var_, f.endsWith(join("soru", "[[yol]].js")), f); }
   for (const f of ["index.html", "sw.js", "functions/api/sorular.js"]) assert.ok(!/api\/soru\/|soru-api/.test(oku(f, "utf8")), f + " yeni API'ye bağlanmış");
 });
+
+test("doküman: güncel göç toplamı 1.216 ve yönetim write-path cutover blocker notu mevcut; kota yardımcısı 'yalnız okur' diye anlatılmıyor", async () => {
+  const { readFileSync: oku } = await import("node:fs"), d = oku("docs/soru-bankasi-api.md", "utf8"), k = oku("lib/kota.js", "utf8");
+  assert.ok(/1\.216/.test(d) && !/1\.016|\b1016\b/.test(d));
+  assert.ok(/CUTOVER BLOCKER/.test(d) && /soru-uret/.test(d) && /ZORUNDADIR/.test(d));
+  assert.ok(!/yalnız okur|yalnız okuma/.test(d + k) && /saf okuma/.test(d) && /hazirla\(\)/.test(k));
+});

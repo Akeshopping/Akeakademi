@@ -1,0 +1,3222 @@
+[
+  {
+    "id": "AKE-YKS-02-MAT-ABC-001",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 1,
+    "q": "Bir oyunda 72 kart, her kutuya eşit sayıda gelecek biçimde kutulara konuluyor. Bir kutudaki kart sayısı 6’nın katı olmalı ve 4’ün katı olmamalıdır. Buna göre bir kutuda kaç farklı kart sayısı olabilir?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "6"
+    ],
+    "a": 1,
+    "x": "Kutudaki sayı 72’yi tam bölmelidir. 6’nın katı olan bölenler arasından 4’e bölünenleri çıkarınca 6 ve 18 kalır. Dolayısıyla 2 farklı kart sayısı olabilir.\n\nDiğer seçenekler\n“1” — Uygun bölenlerden birini eksik sayar.\n“3” — Bir 4 katını da uygun sayar.\n“4” — 4’e de bölünen iki kutu boyutunu uygun sayar.\n“6” — 72’yi bölme koşulunu hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-002",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 1,
+    "q": "Bir kilidin kodu olan N sayısının asal çarpanlara ayrılmış biçimi 2^a · 3²’dir. N’nin 1 ve kendisi dâhil 18 pozitif böleni vardır. Buna göre a kaçtır?",
+    "o": [
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "a": 1,
+    "x": "Bir bölen yazılırken 2’nin üssü 0’dan a’ya kadar seçilebilir. 3’ün üssü için üç seçenek vardır. 3(a + 1) = 18 eşitliğinden a = 5 bulunur.\n\nDiğer seçenekler\n“4” — Bu üs 3 · 5 = 15 bölen verir.\n“6” — Bu değer a + 1’dir.\n“7” — Bu üs 3 · 8 = 24 bölen verir.\n“8” — Bu üs için 2’nin dokuz farklı üssü kullanılabilir."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-003",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 1,
+    "q": "Bir okulun kitaplık sayımı için kullanılan 252 numaralı etiketin üç farklı asal çarpanı vardır. Etiketin üzerine bu üç asal çarpanın her biri bir kez yazılırsa yazılan sayıların toplamı kaç olur?",
+    "o": [
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "a": 4,
+    "x": "252 = 2² · 3² · 7 olduğundan farklı asal çarpanlar 2, 3 ve 7’dir. Üsler sayıları tekrar yazmayı gerektirmez. Toplam 12 olur.\n\nDiğer seçenekler\n“8” — 3’ü tekrar eder, 7’yi dışarıda bırakır.\n“9” — 2’yi ve 7’yi sayıp 3’ü atlar.\n“10” — 3 ile 7’yi sayıp 2’yi atlar.\n“11” — Asal olmayan 4’ü 2 yerine alıp 3’ü dışarıda bırakır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-004",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 2,
+    "q": "El işi atölyesindeki 720 boncuk, eşit sayıda boncuk içeren paketlere ayrılacaktır. Paket başına düşen boncuk sayısı tek olmalıdır. Uygun bütün paket boyutları birer kez listelenirse listedeki sayıların toplamı kaç olur?",
+    "o": [
+      "48",
+      "65",
+      "78",
+      "90",
+      "156"
+    ],
+    "a": 2,
+    "x": "720 = 2⁴ · 3² · 5 olduğundan tek paket boyutları 45’in pozitif bölenleridir. Bunlar 1, 3, 5, 9, 15 ve 45 olduğuna göre toplamları 78’dir.\n\nDiğer seçenekler\n“48” — Yalnız 45 ve 3’ü toplar.\n“65” — 1, 3 ve 9’u toplamın dışında bırakır.\n“90” — 45’i iki kez sayıp diğer tek bölenleri atlar.\n“156” — Tek bölenlerin toplamını ikiyle çarpar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-005",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 2,
+    "q": "Bir üretim hattı 2⁵ · 3³ · 5² düğmeyi, her kutuda aynı sayıda düğme olacak biçimde kutuluyor. Her kutudaki düğme sayısı bir doğal sayının karesi olmak zorundadır. Bir kutudaki düğme sayısı kaç farklı değer alabilir?",
+    "o": [
+      "8",
+      "12",
+      "16",
+      "18",
+      "24"
+    ],
+    "a": 1,
+    "x": "Karekökün tam sayı olması için bütün üsler çift seçilir. 2 için 0, 2, 4, diğer iki asal için 0 ve 2 kullanılabilir. Bu nedenle 3 · 2 · 2 = 12 seçenek vardır.\n\nDiğer seçenekler\n“8” — 2’nin geçerli üslerinden birini dışarıda bırakır.\n“16” — 2’nin üs seçeneklerine 6’yı da katar.\n“18” — 3’ün üssü için iki yerine üç seçenek sayar.\n“24” — 3’ün üssünün tek değerlerini de kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-006",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 2,
+    "q": "Üzerinde 180 yazan bir sayaç, pozitif bir tam sayı ile çarpıldığında gösterdiği sonuç bir tam küp olmalıdır. Sayaç en küçük hangi çarpanla bu koşulu sağlar?",
+    "o": [
+      "30",
+      "60",
+      "90",
+      "150",
+      "180"
+    ],
+    "a": 3,
+    "x": "180 = 2² · 3² · 5’tir. Tam küp için asal üslerini en yakın 3 katına yükseltmek gerekir. Çarpan 2 · 3 · 5² = 150 ve elde edilen tam küp 27000 olur.\n\nDiğer seçenekler\n“30” — 5’e yalnız bir tane daha 5 ekler.\n“60” — 2’nin üssünü gereğinden fazla artırır.\n“90” — 3’ün üssünü gereğinden fazla artırırken 5’i eksik bırakır.\n“180” — 180’i yeniden çarpmak üsleri üçün katı yapmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-007",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 2,
+    "q": "Bir sergide 180 fotoğraf, r satır ve c sütundan oluşan bir panoya boşluk bırakmadan yerleştirilecektir. r ve c’nin ikisi de 3’ün katı, r < c ve c en fazla 30’dur. Bu koşullara uyan kaç farklı (r, c) ikilisi vardır?",
+    "o": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "a": 1,
+    "x": "r = 3u ve c = 3v yazılırsa uv = 20 ve u < v ≤ 10 olur. (2, 10) ve (4, 5) uygundur. Bunlardan (6, 30) ve (12, 15) elde edilir, dolayısıyla 2 pano düzeni vardır.\n\nDiğer seçenekler\n“1” — Uygun çarpan çiftlerinden birini atlar.\n“3” — v = 20 olan çifti de kullanır.\n“4” — Ters çevrilmiş çiftleri yeni düzen olarak sayar.\n“5” — r < c ile c ≤ 30 koşullarını birlikte uygulamaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-008",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 3,
+    "q": "Bir şifre sayısı 2 ve 3 asal çarpanlarının ikisini de içeriyor, başka asal çarpan içermiyor. Sayı tam karedir ve tam olarak 12 çift pozitif böleni vardır. Buna göre şifre sayısı kaçtır?",
+    "o": [
+      "36",
+      "72",
+      "108",
+      "144",
+      "324"
+    ],
+    "a": 3,
+    "x": "Sayı 2^a · 3^b biçimindedir ve a ile b pozitif çifttir. Çift bölenler için 2’nin üssü 1’den a’ya, 3’ün üssü 0’dan b’ye seçilir. a(b + 1) = 12 eşitliğinde b + 1 tek ve en az 3’tür. Bu nedenle b + 1 = 3 ve a = 4 olup sayı 144’tür.\n\nDiğer seçenekler\n“36” — Yalnızca 6 çift böleni vardır.\n“72” — 2’nin üssü tek olduğundan tam kare değildir.\n“108” — 3’ün üssü tek olduğundan tam kare değildir.\n“324” — 10 çift böleni vardır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-009",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 2,
+    "q": "İki ayrı kasada 180 ve 252 vida vardır. Bir paket boyutu, kasa içindeki vidaları artıksız bölebiliyorsa o kasaya uygundur. İki kasadan yalnız birine uygun kaç pozitif tam sayı paket boyutu vardır?",
+    "o": [
+      "9",
+      "16",
+      "18",
+      "27",
+      "36"
+    ],
+    "a": 2,
+    "x": "Her kasanın vida sayısının 18 pozitif böleni vardır. Ortak bölenler 36’nın bölenleri olup 9 tanedir. Yalnız bir kasaya uygun boyut sayısı 2 · (18 − 9) = 18 olur.\n\nDiğer seçenekler\n“9” — Ortak boyutları sayar.\n“16” — Ortak olmayan bölenlerden ikisini dışarıda bırakır.\n“27” — Ortak boyutların bir kopyasını toplamda bırakır.\n“36” — Ortak boyutları iki kez sayar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-ABC-010",
+    "s": "mat",
+    "t": "Asal çarpanlar ve bölenler",
+    "d": 3,
+    "q": "Bir depodaki 360 parça, k kutuya eşit olarak dağıtılıyor. Bir kutuya düşen parça sayısı tek ve k’nin tam olarak sekiz pozitif böleni vardır. Koşulları sağlayan bütün k değerlerinin toplamı kaçtır?",
+    "o": [
+      "32",
+      "48",
+      "56",
+      "64",
+      "72"
+    ],
+    "a": 3,
+    "x": "360 = 2³ · 3² · 5 olduğu için tek bölüm elde etmek üzere k’de 2³ bulunmalıdır. k = 2³ · 3^a · 5^b için 4(a + 1)(b + 1) = 8 olur. (a, b) = (1, 0) veya (0, 1) ile k değerleri 24 ve 40 ve toplam 64 bulunur.\n\nDiğer seçenekler\n“32” — 2³ yerine 2² kullanır.\n“48” — 40 yerine 24’ü iki kez toplar.\n“56” — 24 yerine 16’yı 40’a ekler.\n“72” — Tek bir geçersiz kutu sayısını toplam olarak alır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-001",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 1,
+    "q": "Bir bisiklet istasyonunda saat başına kaydedilen kiralama sayıları bir çizgi grafiğinde sırasıyla 7, 11, 10 ve 18 olarak gösterilmiştir. Ardışık iki ölçüm arasındaki en büyük artış kaç kiralamadır?",
+    "o": [
+      "1",
+      "4",
+      "7",
+      "8",
+      "11"
+    ],
+    "a": 3,
+    "x": "Ardışık değişimler +4, −1 ve +8’dir. En büyük artış üçüncü ölçümden dördüncü ölçüme geçerken gerçekleşir.\n\nDiğer seçenekler\n“1” — Azalışın büyüklüğünü artış sayar.\n“4” — Yalnız ilk artışı kullanır.\n“7” — İlk ölçümün değerini artış sanır.\n“11” — İlk ve son ölçüm farkını tek aralık gibi ele alır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-002",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 1,
+    "q": "Bir kütüphanenin dört gün boyunca ödünç verdiği kitapların sütun grafiğindeki değerleri pazartesiden perşembeye 12, 18, 22 ve 20’dir. Salı günü verilen kitaplar bu dört günlük toplamın yüzde kaçıdır?",
+    "o": [
+      "18",
+      "25",
+      "30",
+      "100/3",
+      "36"
+    ],
+    "a": 1,
+    "x": "Dört günlük toplam 72 kitaptır. Salı gününün bu toplam içindeki payı 18/72 olup yüzde 25’tir.\n\nDiğer seçenekler\n“18” — Salı günü verilen kitap sayısını yüzde olarak yazar.\n“30” — Pazartesiyi toplamın dışında tutar.\n“100/3” — Salıyı payda dışına çıkarıp 18’i 54’e böler.\n“36” — Çarşambayı toplamın dışında tutar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-003",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 1,
+    "q": "İki mağazanın hafta içi ilk dört güne ait satışları ikili sütun grafiğinde aşağıdaki gibidir.\nGünler: Pazartesi, Salı, Çarşamba, Perşembe\nK mağazası: 24, 19, 23, 26\nL mağazası: 20, 25, 18, 24\nK’nın satışı L’nin satışını en fazla hangi gün aşmıştır?",
+    "o": [
+      "Çarşamba",
+      "Salı",
+      "Pazartesi",
+      "Pazartesi ve Perşembe",
+      "Perşembe"
+    ],
+    "a": 0,
+    "x": "Gün sırasına göre K − L farkları 4, −6, 5 ve 2’tır. En büyük pozitif fark çarşamba günü oluşur.\n\nDiğer seçenekler\n“Salı” — Bu gün K, L’den az satış yapmıştır.\n“Pazartesi” — Bu günün farkı 4’tür.\n“Pazartesi ve Perşembe” — Bu iki günün farkları eşit değildir.\n“Perşembe” — Bu günün farkı 2’dir."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-004",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 2,
+    "q": "İki su deposundaki miktarlar aynı çizgi grafiğinde gösterilmiştir. İlk iki saatte A deposu 24 L’den 36 L’ye, B deposu 48 L’den 40 L’ye değişiyor. İkinci saatten dördüncü saate kadar A deposu 44 L’ye çıkarken B deposu 32 L’ye iniyor. Her aralıkta değişim doğrusaldır. Miktarlar başlangıçtan kaç saat sonra eşit olur?",
+    "o": [
+      "2,5",
+      "2,75",
+      "3",
+      "3,25",
+      "3,5"
+    ],
+    "a": 0,
+    "x": "İlk iki saatte B daha doludur. İkinci saatte fark 4 L’dir. Ardından A saatte 4 L artar ve B saatte 4 L azalır. Fark yarım saatte kapandığı için eşitlik 2,5. saatte sağlanır.\n\nDiğer seçenekler\n“2,75” — Bu anda A deposu 2 L daha doludur.\n“3” — Bu anda A deposu 4 L daha doludur.\n“3,25” — Bu anda A deposu 6 L daha doludur.\n“3,5” — Bu anda A deposu 8 L daha doludur."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-005",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 2,
+    "q": "Bir müzenin çizgi grafiği, yıl başından itibaren biriken ziyaretçi sayısını bin kişi olarak gösteriyor. Ocak, şubat, mart ve nisan sonundaki değerler sırasıyla 18, 42, 69 ve 90’dır. Mart ve nisan aylarında gelen ziyaretçilerin toplamı, şubatta gelenlerin kaç katıdır?",
+    "o": [
+      "1,5",
+      "1,75",
+      "2",
+      "2,25",
+      "2,5"
+    ],
+    "a": 2,
+    "x": "Grafik birikimli olduğundan şubat ayının artışı 24 bin, mart ve nisanın toplam artışı 48 bindir. İstenen oran 48/24 = 2’dir.\n\nDiğer seçenekler\n“1,5” — Mart veya nisan artışından bir kısmı eksik alır.\n“1,75” — Şubat artışını 24 bin yerine daha büyük kabul eder.\n“2,25” — Mart ve nisan artışına 6 bin fazla ekler.\n“2,5” — Şubat artışını birikimli değerler arasındaki farktan bulmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-006",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 2,
+    "q": "Üç sınıfa ait sütun grafiklerinin birinde öğrenci sayıları, diğerinde aynı sınavın sınıf ortalamaları gösteriliyor. A sınıfında 10 öğrenci ve ortalama 70, B’de 15 öğrenci ve ortalama 80, C’de 25 öğrenci ve ortalama 90 vardır. Bütün öğrencilerin sınav ortalaması kaçtır?",
+    "o": [
+      "80",
+      "81",
+      "82",
+      "83",
+      "85"
+    ],
+    "a": 3,
+    "x": "Sınıf ortalamaları öğrenci sayılarıyla çarpılır. Toplam puan 4150, toplam öğrenci sayısı 50’dir. Ağırlıklı ortalama 4150/50 = 83 bulunur.\n\nDiğer seçenekler\n“80” — Üç sınıf ortalamasını eşit ağırlıkla kullanır.\n“81” — Büyük sınıfın ağırlığını eksik yansıtır.\n“82” — Puan toplamı 50 puan eksik alınırsa çıkar.\n“85” — Küçük sınıfların ortalamayı düşürücü etkisini eksik alır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-007",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 2,
+    "q": "İki kulübün üye dağılımı ayrı daire grafiklerinde gösterilmiştir. 240 üyeli A kulübünde tiyatro dilimi 75°, 300 üyeli B kulübünde tiyatro dilimi 96°’dir. B kulübündeki tiyatro üyesi sayısının A kulübündekine oranı kaçtır?",
+    "o": [
+      "5/4",
+      "32/25",
+      "3/2",
+      "8/5",
+      "2"
+    ],
+    "a": 3,
+    "x": "Merkez açısının 360° içindeki payı, ilgili kulübün toplamıyla çarpılır. Tiyatro üyesi sayıları A’da 50, B’de 80’dir. İstenen oran 80/50 = 8/5’tir.\n\nDiğer seçenekler\n“5/4” — Kulüplerin toplam üye sayılarını oranlar.\n“32/25” — Yalnız merkez açılarını oranlar.\n“3/2” — Üye sayılarından birini yanlış yuvarlar.\n“2” — B’deki üye sayısını A’dakinin iki katı sanır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-008",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 3,
+    "q": "Bir okuma salonundaki kişi sayısı 08.00, 09.00, 10.00 ve 11.00’de sırasıyla 20, 44, 32 ve 20’dir. Saatler arasındaki değişim, grafikte doğru parçalarıyla gösteriliyor. Bu üç saat içinde salonda kişi sayısı en az 32 olan toplam süre kaç dakikadır?",
+    "o": [
+      "60",
+      "75",
+      "90",
+      "105",
+      "120"
+    ],
+    "a": 2,
+    "x": "İlk saatte 20’den 44’e çıkışın ortasında 32’ye ulaşılır, yani 08.30’da eşik aşılır. Kişi sayısı 10.00’a kadar en az 32 kalır. Bu aralık 90 dakikadır.\n\nDiğer seçenekler\n“60” — 08.30 ile 09.00 arasındaki süreyi atlar.\n“75” — İlk aralıktaki eşiği 08.45 kabul eder.\n“105” — 32 eşiğine düşüşü 10.15’e kaydırır.\n“120” — Eşiğin aşıldığı ilk saatin tamamını katar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-009",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 2,
+    "q": "Düz bir parkurda hareket eden koşucunun başlangıç noktasına uzaklığı 0, 15, 30, 50 ve 60. dakikalarda sırasıyla 0, 3, 3, 1 ve 0 km’dir. Grafik bu noktalar arasında doğrusal olup koşucu başlangıç noktasının aynı tarafında kalıyor. Koşucunun 60 dakikadaki ortalama sürati kaç m/dk’dır?",
+    "o": [
+      "50",
+      "75",
+      "100",
+      "125",
+      "150"
+    ],
+    "a": 2,
+    "x": "Koşucu 3 km uzaklaşıp durakladıktan sonra 3 km geri gelir. Toplam yol 6 km’dir. Duraklama da toplam süreye dâhil olduğundan ortalama sürat 100 m/dk’dır.\n\nDiğer seçenekler\n“50” — Yalnız gidiş yolunu hesaba katar.\n“75” — Dönüş yolunu eksik sayar.\n“125” — Toplam zamanı olduğundan kısa alır.\n“150” — Gidiş ve dönüş yollarına fazladan mesafe ekler."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-GRF-010",
+    "s": "mat",
+    "t": "Grafik yorumlama",
+    "d": 3,
+    "q": "Bir sinemada üç güne ait öğrenci biletlerinin payı, her gün için ayrı daire grafiğinde gösteriliyor. Öğrenci dilimi ilk gün 144°, ikinci gün 90°, üçüncü gün 120°’dir. İlk gün 60, ikinci gün 96 bilet satılmıştır. Üç günün toplamında biletlerin %32’si öğrenci biletidir. Üçüncü gün kaç bilet satılmıştır?",
+    "o": [
+      "96",
+      "120",
+      "144",
+      "156",
+      "180"
+    ],
+    "a": 2,
+    "x": "İlk iki günde öğrenci biletleri sırasıyla 24 ve 24’tür. Üçüncü gün T bilet satılırsa öğrenci biletleri T/3 olur. 24 + 24 + T/3 = 0,32(156 + T) eşitliğini çözersek T = 144 çıkar.\n\nDiğer seçenekler\n“96” — İkinci günün toplamını üçüncü güne de uygular.\n“120” — Bu değerle toplam öğrenci oranı %32’nin altında kalır.\n“156” — İlk iki günün toplamını üçüncü günün sayısı sanır.\n“180” — Bu değerle toplam öğrenci oranı %32’yi geçer."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-001",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 1,
+    "q": "Bir kupa, atölyeye 32 TL’ye mal oluyor. Kutulama için kupa başına 4 TL daha harcanıyor. Atölye, kutulanmış her kupanın toplam maliyeti üzerinden %25 kâr etmek istiyor. Bir kupanın satış fiyatı kaç TL olmalıdır?",
+    "o": [
+      "40",
+      "44",
+      "45",
+      "48",
+      "50"
+    ],
+    "a": 2,
+    "x": "Kutulama dâhil maliyet 36 TL’dir. Bu maliyetin %125’i 45 TL olduğundan kupa bu fiyata satılmalıdır.\n\nDiğer seçenekler\n“40” — Kutulama maliyetini hesaba katmaz.\n“44” — Kârı yalnızca kupanın üretim maliyeti üzerinden hesaplar.\n“48” — %25 yerine daha yüksek bir oran kullanır.\n“50” — Kutulama payını gereğinden fazla ekler."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-002",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 1,
+    "q": "Maliyeti 180 TL olan bir masa lambasının etiket fiyatı 270 TL’dir. Mağaza, etiket fiyatı üzerinden %20 indirim yapıyor. Bu satışta maliyet üzerinden yüzde kaç kâr elde edilir?",
+    "o": [
+      "12",
+      "16",
+      "20",
+      "24",
+      "30"
+    ],
+    "a": 2,
+    "x": "İndirimli fiyat 216 TL, kâr 36 TL’dir. Kârın maliyete oranı 36/180 = %20 olur.\n\nDiğer seçenekler\n“12” — Kâr tutarını maliyet yerine daha büyük bir değere böler.\n“16” — Fiyat farkı olarak 36 TL’den azını alır.\n“24” — Gerçek kâr oranını olduğundan yüksek hesaplar.\n“30” — İndirimin etkisini eksik uygular."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-003",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 1,
+    "q": "Bir çantanın etiket fiyatı, maliyetinin %40 fazlası olarak belirlenmiştir. Satıcının çantayı tam maliyetine satabilmesi için etiket fiyatının kaçta kaçı kadar indirim yapması gerekir?",
+    "o": [
+      "1/5",
+      "1/4",
+      "2/7",
+      "1/3",
+      "2/5"
+    ],
+    "a": 2,
+    "x": "Maliyet 1 birim alınırsa etiket 1,4 birimdir. Fiyat 0,4 birim azaltılmalıdır. İndirim etiket fiyatına göre 0,4/1,4 = 2/7 olur.\n\nDiğer seçenekler\n“1/5” — Gerekli indirim tutarının altında kalır.\n“1/4” — Etiketi dört eşit parça sayıp birini çıkarır.\n“1/3” — Bu oranda indirim maliyetin altına indirir.\n“2/5” — Maliyet üzerinden hesaplanan artış oranını etikete uygular."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-004",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 2,
+    "q": "Bir çiçekçi 40 saksıyı tanesi 40 TL’den alıyor. Bunların 30’unu tanesi 50 TL’den, beşini tanesi 44 TL’den satıyor. Kalan beş saksıdan gelir elde edemiyor. Bu işlemde toplam maliyet üzerinden yüzde kaç kâr etmiştir?",
+    "o": [
+      "4,5",
+      "5",
+      "7,5",
+      "10",
+      "12,5"
+    ],
+    "a": 2,
+    "x": "Maliyet, satılamayan saksılarla birlikte 1600 TL’dir. Satış geliri 1720 TL olduğundan 120 TL kâr vardır. Bu kâr toplam maliyetin %7,5’idir.\n\nDiğer seçenekler\n“4,5” — Satış gelirinin bir kısmını eksik sayar.\n“5” — Beş indirimli satışın kâra katkısını doğru yansıtmaz.\n“10” — Satılmayan ürünlerin maliyetini eksik yansıtır.\n“12,5” — Kârı hesaplarken maliyetten gereğinden çok düşer."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-005",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 2,
+    "q": "Etiketi 300 TL olan bir montun fiyatına önce %10, ardından düşen fiyat üzerinden %20 indirim uygulanıyor. Satıcı bu satıştan maliyet üzerinden %8 kâr ettiğine göre montun maliyeti kaç TL’dir?",
+    "o": [
+      "192",
+      "200",
+      "207",
+      "216",
+      "240"
+    ],
+    "a": 1,
+    "x": "İkinci indirim 270 TL’ye uygulanır ve satış fiyatı 216 TL olur. Bu fiyat maliyetin 1,08 katıdır. Maliyet 216/1,08 = 200 TL’dir.\n\nDiğer seçenekler\n“192” — 192 TL maliyet, bu satışta %12,5 kâr demektir.\n“207” — 207 TL maliyet olsaydı kâr 9 TL’de kalırdı.\n“216” — Son satış fiyatını maliyetle eşit kabul eder.\n“240” — Yalnız %20 indirimi uygular ve çıkan fiyatı maliyet sayar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-006",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 2,
+    "q": "Aynı dükkânda iki aksesuarın her biri 320 TL’ye satılıyor. Biri kendi maliyetine göre %25 kârla, diğeri %20 zararla satılmıştır. Bu iki satışta toplam zarar kaç TL’dir?",
+    "o": [
+      "0",
+      "16",
+      "24",
+      "32",
+      "40"
+    ],
+    "a": 1,
+    "x": "Kârla satılanın maliyeti 256 TL, zararla satılanın maliyeti 400 TL’dir. Toplam gelir 640 TL’dir. Maliyet toplamından gelir çıkarılınca 16 TL zarar bulunur.\n\nDiğer seçenekler\n“0” — Satış fiyatları eşit diye kâr ve zararı dengelenmiş sayar.\n“24” — Kârla satılan malın maliyetini 264 TL alır.\n“32” — İki satışın net zararını iki kez sayar.\n“40” — Zarar eden maldaki kaybı yarıya indirir ve diğer malın kârını hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-007",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 2,
+    "q": "Bir kırtasiye tanesi 50 TL’ye aldığı beş aynı defterin dördünü 80’er TL’ye, beşincisini 80 TL’nin yarısına satıyor. Beş defterin toplam maliyetine göre kâr oranı yüzde kaçtır?",
+    "o": [
+      "28",
+      "36",
+      "40",
+      "44",
+      "60"
+    ],
+    "a": 3,
+    "x": "Dört defterden 320 TL, son defterden 40 TL gelir. 360 TL gelirden 250 TL maliyet çıkarıldığında kalan kârın maliyete oranı %44 olur.\n\nDiğer seçenekler\n“28” — Yarı fiyatlı defterin gelirini tümüyle dışarıda bırakır.\n“36” — Kampanyalı defterin fiyatını 40 TL yerine 20 TL alır.\n“40” — Kâr tutarını 10 TL eksik alır.\n“60” — Beş defteri de 80 TL’ye satılmış gibi hesaplar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-008",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 3,
+    "q": "Bir dükkân, maliyetleri eşit olan ürünleri maliyetin %20 fazlasıyla etiketliyor. Bazı ürünler etiketinden, geri kalanların tamamı etiketin yarısından satılıyor. Bütün ürünler satıldığında toplam maliyet üzerinden %5 kâr sağlanıyor. Ürünlerin kaçta kaçı yarı fiyatla satılmıştır?",
+    "o": [
+      "1/6",
+      "1/5",
+      "1/4",
+      "3/10",
+      "1/3"
+    ],
+    "a": 2,
+    "x": "Bir ürünün maliyeti 1 birim olsun. Normal satış 1,20, kampanyalı satış 0,60 birimdir. Kampanyalı oran t ise ürün başına ortalama gelir 1,20 − 0,60t olur. Bunun 1,05’e eşitlenmesiyle t = 1/4 bulunur.\n\nDiğer seçenekler\n“1/6” — Ortalama gelir 1,05 birimden fazla kalır.\n“1/5” — Gerekli gelir düşüşünü tam karşılamaz.\n“3/10” — Ortalama geliri 1,05 birimin altına indirir.\n“1/3” — Satış başına gelir düşüşü 0,15 birimden büyük olur."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-009",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 3,
+    "q": "Bir satıcı 24 tişörtü 75’er TL’ye, 16 tişörtü 90’ar TL’ye alıyor. Nakliye için ayrıca 180 TL ödüyor. Taşınırken zarar gören dört tişört satılamıyor. Kalan 36 tişörtün tamamı eşit fiyatla satılacaktır. Satıcı tüm harcamaları üzerinden %20 kâr etmek için bir tişörtü kaç TL’ye satmalıdır?",
+    "o": [
+      "108",
+      "112",
+      "114",
+      "118",
+      "120"
+    ],
+    "a": 2,
+    "x": "Tişörtlerin tamamı ve nakliye için 3420 TL harcanmıştır. Hedef gelir bunun %120’si olan 4104 TL’dir. Gelir 36 satılabilir ürüne bölününce birim fiyat 114 TL olur.\n\nDiğer seçenekler\n“108” — Nakliye maliyetini hesaba katmaz.\n“112” — Satılması gereken fiyatı aşağı yuvarlar.\n“118” — Hedef toplam gelirin üzerinde bir fiyat verir.\n“120” — Satılamayan tişörtlerin maliyetini iki kez karşılamaya çalışır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-KZP-010",
+    "s": "mat",
+    "t": "Kâr-zarar problemleri",
+    "d": 3,
+    "q": "Bir mağaza, her birini 80 TL’ye aldığı 25 lambanın tamamını satacaktır. Normal satış fiyatı 120 TL, kampanyalı fiyat 70 TL’dir. Mağaza toplam maliyet üzerinden en az %15 kâr etmek istiyor. En çok kaç lamba kampanyalı fiyattan satılabilir?",
+    "o": [
+      "10",
+      "12",
+      "14",
+      "15",
+      "16"
+    ],
+    "a": 2,
+    "x": "Hedef gelir en az 2300 TL’dir. Normal fiyatla toplam 3000 TL gelir olur. Her kampanyalı lamba bu geliri 50 TL azaltır. 3000 − 50n ≥ 2300 eşitsizliğinden n en çok 14 olur.\n\nDiğer seçenekler\n“10” — Kâr koşulunu sağlasa da ulaşılabilen en büyük sayı değildir.\n“12” — İzin verilen iki kampanyalı satışı kullanmaz.\n“15” — Gelir hedefin 50 TL altına düşer.\n“16” — Gelir hedefin 100 TL altına düşer."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-001",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 1,
+    "q": "Bir doğrusal ölçekte bir işaret, sıfırın 3/8 birim solundadır. İşaret 5/6 birim sağa kaydırılıyor. Son konumun gösterdiği sayı kaçtır?",
+    "o": [
+      "5/24",
+      "7/24",
+      "11/24",
+      "13/24",
+      "17/24"
+    ],
+    "a": 2,
+    "x": "İlk konum −3/8 ve sağa hareket +5/6’dır. Paydalar 24’te eşitlenince (−9 + 20)/24 = 11/24 elde edilir.\n\nDiğer seçenekler\n“5/24” — Paylar ortak paydaya doğru çevrilmez.\n“7/24” — Sağa hareketin uzunluğunu eksik alır.\n“13/24” — Başlangıçtaki negatif konumu olduğundan küçük çıkarır.\n“17/24” — İlk konumu doğru miktarda çıkarmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-002",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 1,
+    "q": "Paydası 48 olan pozitif bir kesir, sayı doğrusunda 5/8 ile 2/3’ün kesin olarak arasındadır. Bu kesrin payı kaçtır?",
+    "o": [
+      "30",
+      "31",
+      "32",
+      "33",
+      "34"
+    ],
+    "a": 1,
+    "x": "Sınırlar 30/48 ve 32/48’dir. Arada paydası 48 olan tek kesir 31/48’dir.\n\nDiğer seçenekler\n“30” — Alt sınıra eşittir.\n“32” — Üst sınıra eşittir.\n“33” — Üst sınırı 1/48 aşar.\n“34” — Üst sınırı 2/48 aşar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-003",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 1,
+    "q": "Tam kapasitesi 120 L olan bir depodaki suyun 1/3’ü sabah kullanılıyor. Depo başlangıçta doludur. Öğleden sonra kalan suyun 1/4’ü kullanılıyor. Depoda kaç litre su kalır?",
+    "o": [
+      "50",
+      "55",
+      "60",
+      "70",
+      "80"
+    ],
+    "a": 2,
+    "x": "Sabahın sonunda 80 L su kalır. İkinci kullanım bu miktarın 1/4’ü olduğundan kalan su 80 · 3/4 = 60 L olur.\n\nDiğer seçenekler\n“50” — Öğleden sonra kullanılan miktarı başlangıçtaki 120 L üzerinden bulur.\n“55” — İkinci kullanımda 20 L yerine 25 L çıkarır.\n“70” — Öğleden sonra yalnızca 10 L kullanılmış gibi hesaplar.\n“80” — İkinci kullanımı yok sayar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-004",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 2,
+    "q": "Bir ölçü kabı kapasitesinin 3/4’ü kadar sütle doludur. Kaba sıvı eklenmeden, tam kap kapasitesinin 2/5’i kadar süt başka bir kaba aktarılıyor. İlk ölçü kabında kapasitesinin kaçta kaçı kadar süt kalır?",
+    "o": [
+      "3/10",
+      "7/20",
+      "2/5",
+      "9/20",
+      "1/2"
+    ],
+    "a": 1,
+    "x": "İki kesir de tam kap kapasitesine göre verilmiştir. Kalan pay 3/4 − 2/5 = 15/20 − 8/20 = 7/20’dir.\n\nDiğer seçenekler\n“3/10” — Sütün 2/5’inin kaldığını varsayar.\n“2/5” — Aktarılan kısmı kalan miktar sanır.\n“9/20” — Aktarılanı tam kapasite yerine kaptaki sütün 2/5’i alır.\n“1/2” — Paydaları eşitlemeden kalan miktarı tahmin eder."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-005",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 2,
+    "q": "Bir tamirci 7/2 m kabloyu 3/8 m’lik eşit parçalara ayırıyor. Yalnızca tam boy parçalar kullanılabildiğine göre kesim sonunda kaç metre kablo artar?",
+    "o": [
+      "1/16",
+      "1/8",
+      "3/16",
+      "1/4",
+      "5/16"
+    ],
+    "a": 1,
+    "x": "7/2 m, 28/8 m’dir. 28 sekizlik birimden 9 tane üçer birimlik parça kesilir. Geriye 1/8 m, yani 1/8 m kalır.\n\nDiğer seçenekler\n“1/16” — Kalan uzunluğu ikiye böler.\n“3/16” — Parça boyunun yarısını kalan sanır.\n“1/4” — Bir sekizlik birim yerine iki birim kaldığını düşünür.\n“5/16” — Bölmeden sonra kalan uzunluğu olduğundan büyük alır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-006",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 2,
+    "q": "Bir kartta yazan x sayısından 1/3 çıkarıldığında sonuç 2/3’ün yarısına eşit oluyor. Başka bir karttaki y sayısı ise x’in 3/4’ü kadardır. Buna göre x + y kaçtır?",
+    "o": [
+      "5/6",
+      "1",
+      "13/12",
+      "7/6",
+      "5/4"
+    ],
+    "a": 3,
+    "x": "İlk eşitlik x − 1/3 = 1/3’tür ve x = 2/3 olur. İkinci kartta y = 2/3 · 3/4 = 1/2 yazar. Toplam 7/6’dir.\n\nDiğer seçenekler\n“5/6” — İkinci karttaki değeri eksik hesaplar.\n“1” — İkinci kartta da 1/3 yazdığını varsayar.\n“13/12” — y’yi 1/2 yerine 5/12 alır.\n“5/4” — y’yi 1/2’den büyük hesaplar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-007",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 2,
+    "q": "Bir ölçek üzerinde A ve B noktaları sırasıyla −2/3 ve 3/4 sayılarına karşılık geliyor. C noktası A’dan B’ye doğru ilerlerken toplam aralığın 3/5’i kadar yol alındığında ulaşılan noktadır. C’nin gösterdiği sayı kaçtır?",
+    "o": [
+      "−1/10",
+      "1/12",
+      "11/60",
+      "3/4",
+      "17/20"
+    ],
+    "a": 2,
+    "x": "A ile B arasındaki uzaklık 17/12’dir. Bu uzaklığın 3/5’i 17/20 olur. A’dan sağa gidildiğinden C = −2/3 + 17/20 = 11/60 bulunur.\n\nDiğer seçenekler\n“−1/10” — 3/5 yerine 2/5 oranını kullanır.\n“1/12” — Uzaklığı veya başlangıç konumunu eksik hesaplar.\n“3/4” — B noktasını sonuç olarak alır.\n“17/20” — Alınan yolu konum olarak yazar."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-008",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 3,
+    "q": "Bir atölyede, ilk gün kumaşın 2/5’i kullanılıyor. İkinci gün ise elde kalan kumaşın 1/3’ü ile 3 m daha kullanılıyor. İkinci günün sonunda 9 m kumaş kaldığına göre başlangıçta kaç metre kumaş vardı?",
+    "o": [
+      "24",
+      "27",
+      "30",
+      "33",
+      "36"
+    ],
+    "a": 2,
+    "x": "İlk günden sonra kalan kumaşın 2/3’ü, son 3 m çıkarılmadan önce 12 m’dir. İlk günün sonundaki miktar 18 m’dir. Bu miktar başlangıcın 3/5’i olduğu için başlangıçta 30 m kumaş vardı.\n\nDiğer seçenekler\n“24” — Son 3 m’lik kullanımı ters işlemde doğru hesaba katmaz.\n“27” — İlk günden sonra kalan kumaşı eksik hesaplar.\n“33” — 9 m ile 3 m’nin toplamını gereğinden büyük alır.\n“36” — 2/3 ile 3/5 oranlarının ikisini birlikte doğru kullanmaz."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-009",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 3,
+    "q": "Bir oyunda pozitif bir x sayısı önce 2/3 ile çarpılıyor ve çarpıma 1/4 ekleniyor. Diğer oyuncu aynı x sayısını 5/6 ile çarpıp çarpımdan 1/8 çıkarıyor. İki oyuncu aynı sonucu elde ettiğine göre bu ortak sonuç kaçtır?",
+    "o": [
+      "3/2",
+      "13/8",
+      "7/4",
+      "15/8",
+      "2"
+    ],
+    "a": 2,
+    "x": "Eşitlik (5/6 − 2/3)x = 1/4 + 1/8 biçimine getirilir. Buradan x = 9/4 olur. İlk oyuncunun sonucu 2/3 · 9/4 + 1/4 = 7/4’tür.\n\nDiğer seçenekler\n“3/2” — İlk oyuncunun eklediği 1/4’ü hesaba katmaz.\n“13/8” — İlk oyuncunun artışını 1/8 olarak uygular.\n“15/8” — Doğru sonuca 1/8 daha ekler.\n“2” — İlk oyuncunun artışını 1/2 alır."
+  },
+  {
+    "id": "AKE-YKS-02-MAT-RAS-010",
+    "s": "mat",
+    "t": "Rasyonel sayılar",
+    "d": 3,
+    "q": "Bir kavanozda eş büyüklükte kırmızı, mavi ve yeşil bilyeler vardır. Kırmızılar tüm bilyelerin 2/7’sidir. Maviler, kırmızı olmayanların 3/5’idir. Kavanozdan yalnızca 4 mavi bilye çıkarılınca maviler kalan bilyelerin 1/3’ü oluyor. Başlangıçta kavanozda kaç bilye vardı?",
+    "o": [
+      "21",
+      "28",
+      "35",
+      "42",
+      "49"
+    ],
+    "a": 1,
+    "x": "Başlangıçta mavilerin payı 5/7 · 3/5 = 3/7’dir. Toplam N ise (3N/7 − 4)/(N − 4) = 1/3 olur. Buradan N = 28 bulunur. Başlangıçtaki 12 mavi bilyenin 4’ü çıkarıldığında oran 8/24 = 1/3’tür.\n\nDiğer seçenekler\n“21” — Bu başlangıçta çıkarma sonrası mavi oranı 5/17 olur.\n“35” — Bu başlangıçta çıkarma sonrası mavi oranı 11/31 olur.\n“42” — Bu başlangıçta çıkarma sonrası mavi oranı 14/38 olur.\n“49” — Bu başlangıçta çıkarma sonrası mavi oranı 17/45 olur."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-001",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 1,
+    "q": "“Çocuklar akşam evime uğrayıp kitaplıktaki kalemleri aldı.” cümlesinde geçen aşağıdaki sözcüklerden hangisinin yapısında yapım eki vardır?",
+    "o": [
+      "kitaplıktaki",
+      "kalemleri",
+      "akşam",
+      "çocuklar",
+      "evime"
+    ],
+    "a": 0,
+    "x": "Kitap sözcüğüne gelen -lık eki, kitapların konulduğu eşyayı karşılayan kitaplık sözcüğünü türetir. Seçeneğin yapım eki içerdiğini göstermek için -lık ekini belirlemek yeterlidir.\n\nDiğer seçenekler\n“kalemleri” — Kalem sözcüğü çoğul ve belirtme eki almıştır.\n“akşam” — Bu kullanımda yapım eki almamıştır.\n“çocuklar” — Çocuk sözcüğüne çoğul eki gelmiştir.\n“evime” — Ev sözcüğü iyelik ve yönelme eki almıştır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-002",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 1,
+    "q": "“Kapıda ayakkabılarını çıkaran konuklar, duvarlara asılan eski resimleri bir süre izledi.” cümlesindeki aşağıdaki sözcüklerden hangisi birleşik yapılıdır?",
+    "o": [
+      "kapıda",
+      "konuklar",
+      "duvarlara",
+      "resimleri",
+      "ayakkabılarını"
+    ],
+    "a": 4,
+    "x": "Ayak ve kap sözcükleri bir araya gelerek ayakkabı adını oluşturur. Sonradan gelen çoğul, iyelik ve belirtme ekleri bu birleşik yapıyı değiştirmez.\n\nDiğer seçenekler\n“kapıda” — Kapı sözcüğünde bulunma eki vardır.\n“konuklar” — Konuk sözcüğüne çoğul eki gelmiştir.\n“duvarlara” — Duvar sözcüğüne çoğul ve yönelme ekleri eklenmiştir.\n“resimleri” — Resim sözcüğü iki ayrı sözcüğün birleşmesiyle oluşmamıştır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-003",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 1,
+    "q": "Aşağıdaki cümlelerden hangisinde tırnak içindeki sözcüğün kökü fiildir?",
+    "o": [
+      "Saçak, akşama kadar bir “gölgelik” sağladı.",
+      "Çantada ince bir “kitapçık” vardı.",
+      "Sundurmanın altında “tuzluk” bırakılmıştı.",
+      "Penceredeki “perdelik” kumaş biraz ağırdı.",
+      "Kâğıdın kenarında soluk bir “çizgi” kalmıştı."
+    ],
+    "a": 4,
+    "x": "Çizgi, çiz- fiiline -gi yapım eki getirilerek türetilmiştir. Seçenekteki sözcüğün kökü bir eylem bildirir.\n\nDiğer seçenekler\n“Saçak, akşama kadar bir “gölgelik” sağladı.” — Gölge bir ad köküdür.\n“Çantada ince bir “kitapçık” vardı.” — Kitap bir ad köküdür.\n“Sundurmanın altında “tuzluk” bırakılmıştı.” — Tuz bir ad köküdür.\n“Penceredeki “perdelik” kumaş biraz ağırdı.” — Perde bir ad köküdür."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-004",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 2,
+    "q": "Bir editör, “sessizlik” sözcüğündeki iki yapım ekinin önce bir özellik, sonra bu özelliğin durumunu bildiren bir ad oluşturduğunu açıklıyor. Aşağıdaki sözcüklerden hangisi aynı sırayla türetilmiştir?",
+    "o": [
+      "tatsızlık",
+      "gözlükçü",
+      "okullarımız",
+      "kısalık",
+      "yazıcı"
+    ],
+    "a": 0,
+    "x": "Ses → sessiz → sessizlik dizisinde önce -siz, ardından -lik gelir. Tat → tatsız → tatsızlık dizisi aynı aşamalardan geçer.\n\nDiğer seçenekler\n“gözlükçü” — Gözlük, ardından o nesneyle uğraşan kişi adı türetilir.\n“okullarımız” — Okul sözcüğündeki bu ekler çoğul ve iyelik bildirir.\n“kısalık” — Kısa sözcüğüne tek yapım eki getirilir.\n“yazıcı” — Yaz- fiilinden bir ad türetilmiştir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-005",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 2,
+    "q": "“Defterlerimizden birini masada unuttuk.” cümlesindeki “defterlerimizden” sözcüğüne getirilen eklerin görevleri sırasıyla aşağıdakilerin hangisinde doğru verilmiştir?",
+    "o": [
+      "Birinci çoğul kişi iyelik, çoğul, ayrılma",
+      "Çoğul, belirtme, ayrılma",
+      "Çoğul, ikinci çoğul kişi iyelik, bulunma",
+      "Çoğul, üçüncü çoğul kişi iyelik, yönelme",
+      "Çoğul, birinci çoğul kişi iyelik, ayrılma"
+    ],
+    "a": 4,
+    "x": "Defter-ler-imiz-den ayrımında -ler sayıyı, -imiz sahip olan “biz”i, -den ayrılmayı bildirir. Bu görevler sözcükte verilen sırayla görülür.\n\nDiğer seçenekler\n“Birinci çoğul kişi iyelik, çoğul, ayrılma” — Çoğul eki iyelikten önce gelir.\n“Çoğul, belirtme, ayrılma” — -imiz belirtme eki değildir.\n“Çoğul, ikinci çoğul kişi iyelik, bulunma” — -imiz bizim, -den ise ayrılma anlamı taşır.\n“Çoğul, üçüncü çoğul kişi iyelik, yönelme” — Üçüncü kişi iyeliği ve yönelme yoktur."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-006",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 2,
+    "q": "“Sergiyi düzenleyen fırıncı, çocuklara ekmeğin yapımını anlattı.” cümlesindeki “fırıncı” sözcüğünün yapım eki bir uğraş bildirir. Aşağıdaki sözcüklerden hangisinde aynı ek, kişinin tutumunu belirtir?",
+    "o": [
+      "inatçı",
+      "saatçi",
+      "kayıkçı",
+      "çiçekçi",
+      "boyacı"
+    ],
+    "a": 0,
+    "x": "İnatçı, inat etme eğilimi olan kişiyi anlatır. -çı eki burada bir meslek adı yerine kişisel özellik bildiren sözcük oluşturur.\n\nDiğer seçenekler\n“saatçi” — Saat işiyle uğraşan kişiyi bildirir.\n“kayıkçı” — Kayıkla çalışan kişiyi bildirir.\n“çiçekçi” — Çiçek satan ya da yetiştiren kişiyi bildirir.\n“boyacı” — Boya işiyle uğraşan kişiyi bildirir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-007",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 2,
+    "q": "“Usta, ürünlerin tuzlama işlemini bugün bitirecek.” cümlesindeki “tuzlama” sözcüğü oluşurken kökün sözcük türü hangi sırayla değişmiştir?",
+    "o": [
+      "Fiil → sıfat → ad",
+      "Ad → sıfat → ad",
+      "Fiil → ad → sıfat",
+      "Sıfat → ad → fiil",
+      "Ad → fiil → ad"
+    ],
+    "a": 4,
+    "x": "Tuz bir addır. -la ekiyle tuzla- fiili, -ma ekiyle de eylemin adını bildiren tuzlama oluşur. Sıra ad, fiil ve addır.\n\nDiğer seçenekler\n“Fiil → sıfat → ad” — İlk aşama fiilden sıfat türetme değildir.\n“Ad → sıfat → ad” — Tuzla- sözcüğü bir eylem bildirir.\n“Fiil → ad → sıfat” — Başlangıç sözcüğü tuz bir fiil değildir.\n“Sıfat → ad → fiil” — Başlangıç sıfat değildir ve sonuç ad olarak kullanılır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-008",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 2,
+    "q": "Bir dil bilgisi çalışmasında, yapım ekiyle türedikten sonra sırasıyla iyelik ve bulunma eki alan bir sözcük aranıyor. Aşağıdakilerden hangisi bu çalışmada kullanılabilir?",
+    "o": [
+      "kitaplığımda",
+      "kitaplıklarımız",
+      "çantamızda",
+      "defterlikte",
+      "masalarımızdan"
+    ],
+    "a": 0,
+    "x": "Kitap-lık-ım-da biçiminde önce eşya adı türetilmiştir. -ım birinci tekil kişi iyeliğini, -da bulunmayı bildirir. Eklerin birleşmesiyle k ünsüzü ğ’ye dönüşmüştür.\n\nDiğer seçenekler\n“kitaplıklarımız” — İyelikten sonra bulunma eki yoktur.\n“çantamızda” — Çanta köküne yapım eki gelmemiştir.\n“defterlikte” — Yapım ve bulunma eki var, iyelik yoktur.\n“masalarımızdan” — Bulunma yerine ayrılma eki vardır ve masa türememiştir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-009",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 3,
+    "q": "(1) Rehber, mağaranın girişinde yeni bir “çizim” gösterdi.\n(2) Duvardaki “çizgim” silinmeden yanına bir işaret koydum.\nBu cümlelerde tırnak içindeki sözcüklerin sonundaki eklerle ilgili aşağıdakilerden hangisi doğrudur?",
+    "o": [
+      "İlk ek yapım, ikinci ek iyelik ekidir.",
+      "İki ek de fiilden ad türetir.",
+      "İlk ek belirtme, ikinci ek iyelik ekidir.",
+      "İki ek de iyelik bildirir.",
+      "İlk ek iyelik, ikinci ek yapım ekidir."
+    ],
+    "a": 0,
+    "x": "Birinci cümlede çiz-im, çizme sonucu ortaya çıkan ürünün adıdır. İkinci cümlede çiz-gi-m sözcüğünün sonundaki -m, çizginin konuşana ait olduğunu bildirir.\n\nDiğer seçenekler\n“İki ek de fiilden ad türetir.” — Çizgim’deki son ek yeni ad türetmez.\n“İlk ek belirtme, ikinci ek iyelik ekidir.” — Çizim, gösterdi eyleminin belirtme eki almayan nesnesidir.\n“İki ek de iyelik bildirir.” — Çizim burada sahiplik bildirmez.\n“İlk ek iyelik, ikinci ek yapım ekidir.” — Eklerin görevleri ters verilmiştir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-YAP-010",
+    "s": "turkce",
+    "t": "Sözcükte Yapı",
+    "d": 3,
+    "q": "Bazı birleşik fiiller oluşturulurken ilk sözcüğün bir ünlüsü düşebilir. Aşağıdaki cümlelerin hangisindeki tırnak içi birleşik fiil bu yolla oluşmuştur?",
+    "o": [
+      "Davetimizi sevinçle “kabul etti”.",
+      "Bu gecikmeyi kolayca “affetti”.",
+      "Öneriyi ilk görüşmede “reddetti”.",
+      "Gürültüyü ancak gece “hissettik”.",
+      "Küçük anahtar kalabalıkta “kayboldu”."
+    ],
+    "a": 4,
+    "x": "Kayıp ve ol- birleşirken kayıp sözcüğündeki ikinci ünlü düşer. Ardından p ünsüzü b’ye dönüşür ve kaybol- biçimi oluşur.\n\nDiğer seçenekler\n“Davetimizi sevinçle “kabul etti”.” — Kabul ve et- arasında ses değişmesi yoktur.\n“Bu gecikmeyi kolayca “affetti”.” — Af ile et- birleşirken f sesi türemiştir.\n“Öneriyi ilk görüşmede “reddetti”.” — Ret ile et- birleşirken ünsüz türemesi ve ötümlüleşme görülür.\n“Gürültüyü ancak gece “hissettik”.” — His ile et- birleşirken s sesi türemiştir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-001",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 1,
+    "q": "“Tamirci, odanın penceresini açıp kırık kolu inceledi.” cümlesindeki “odanın penceresi” söz öbeğinin yapısı aşağıdakilerden hangisidir?",
+    "o": [
+      "İkileme",
+      "Zincirleme isim tamlaması",
+      "Sıfat tamlaması",
+      "Belirtisiz isim tamlaması",
+      "Belirtili isim tamlaması"
+    ],
+    "a": 4,
+    "x": "Oda-nın tamlayan eki, pencere-si iyelik eki almıştır. İki adın bu biçimde birbirine bağlanması belirtili isim tamlaması oluşturur.\n\nDiğer seçenekler\n“İkileme” — Anlamı pekiştiren bir sözcük yinelemesi yoktur.\n“Zincirleme isim tamlaması” — İç içe ikinci bir isim tamlaması yoktur.\n“Sıfat tamlaması” — Odanın sözcüğü sıfat değildir.\n“Belirtisiz isim tamlaması” — Tamlayan -nın ekini almıştır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-002",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 1,
+    "q": "“Usta, atölye kapısını onarırken yere uzun bir örtü serdi.” cümlesindeki “atölye kapısı” öbeği hangi tür tamlamadır?",
+    "o": [
+      "Belirtisiz isim tamlaması",
+      "Sıfat tamlaması",
+      "Belirtili isim tamlaması",
+      "Zincirleme isim tamlaması",
+      "Sayı sıfatı ile kurulan tamlama"
+    ],
+    "a": 0,
+    "x": "Atölye sözcüğü tamlayan eki almaz. Kapı-sı ise iyelik ekiyle bağlanır. Bu biçim belirtisiz isim tamlamasıdır.\n\nDiğer seçenekler\n“Sıfat tamlaması” — Atölye burada bir sıfat olarak kullanılmamıştır.\n“Belirtili isim tamlaması” — İlk ad tamlayan eki almamıştır.\n“Zincirleme isim tamlaması” — Öbeğin içinde başka bir tamlama yoktur.\n“Sayı sıfatı ile kurulan tamlama” — Öbekte kapının sayısını gösteren bir sözcük yoktur."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-003",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 1,
+    "q": "“Görevli iki küçük çantayı üst rafa kaldırdı.” cümlesinde “iki küçük çanta” sözündeki ilk iki sözcüğün çantaya ilişkin bildirdiği özellikler sırasıyla hangileridir?",
+    "o": [
+      "Sayı ve boyut",
+      "Sayı ve aitlik",
+      "Boyut ve renk",
+      "Boyut ve sıra",
+      "Sıra ve boyut"
+    ],
+    "a": 0,
+    "x": "İki sözcüğü çantaların sayısını, küçük sözcüğü boyutunu bildirir. Her ikisi de çanta adını belirten veya niteleyen sıfatlardır.\n\nDiğer seçenekler\n“Sayı ve aitlik” — Küçük sözcüğü kime ait olduğunu göstermez.\n“Boyut ve renk” — İlk sözcük boyutu, ikinci sözcük rengi bildirmez.\n“Boyut ve sıra” — Bu iki görev sözcüklerin işlevleriyle uyuşmaz.\n“Sıra ve boyut” — İki, “ikinci” gibi sıra bildiren bir sıfat değildir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-004",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 2,
+    "q": "“Kitabın kapağının rengi, iç sayfalardaki desenle uyumluydu.” cümlesinde “kitabın kapağının rengi” öbeğinin zincirleme tamlama olmasını sağlayan ilişki aşağıdakilerden hangisidir?",
+    "o": [
+      "Kapağın rengi öbeğinin kitabın tamlayanı olması",
+      "Üç adın da çoğul eki alması",
+      "Kitabın ve kapağının aynı tamlanana ayrı ayrı bağlanması",
+      "Rengi sözcüğünün bir sıfatla nitelenmesi",
+      "Kitabın kapağı öbeğinin renk adının tamlayanı olması"
+    ],
+    "a": 4,
+    "x": "Önce kitabın kapağı tamlaması kurulur. Bu bütün, [kitabın kapağı]-nın biçiminde tamlayan eki alarak rengi sözcüğüne bağlanır.\n\nDiğer seçenekler\n“Kapağın rengi öbeğinin kitabın tamlayanı olması” — Kitap, birinci tamlamada tamlayandır.\n“Üç adın da çoğul eki alması” — Öbekte çoğul eki yoktur.\n“Kitabın ve kapağının aynı tamlanana ayrı ayrı bağlanması” — Kitabın sözcüğü doğrudan kapağına bağlanır.\n“Rengi sözcüğünün bir sıfatla nitelenmesi” — Renk adını niteleyen bir sıfat yoktur."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-005",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 2,
+    "q": "“Belediyenin kütüphanesi” ve “belediye kütüphanesi” söz öbekleri karşılaştırıldığında aşağıdakilerden hangisi söylenebilir?",
+    "o": [
+      "Tamlayan eki yalnız birinci öbekte vardır.",
+      "Yalnız ikinci öbekte tamlanan iyelik eki almıştır.",
+      "Birinci öbekte ikinci sözcük tamlanandır, ikincide tamlayandır.",
+      "Her iki öbekte de ilk sözcük bir niteleme sıfatıdır.",
+      "İki öbekte de ilk sözcük tamlayan eki almıştır."
+    ],
+    "a": 0,
+    "x": "Birinci öbekte belediye-nin ve kütüphane-si ekleri vardır. İkinci öbekte tamlayan belediye ek almadan kullanılır, kütüphane-si ise iyelik ekini korur.\n\nDiğer seçenekler\n“Yalnız ikinci öbekte tamlanan iyelik eki almıştır.” — Kütüphanesi iki öbekte de iyelik eki taşır.\n“Birinci öbekte ikinci sözcük tamlanandır, ikincide tamlayandır.” — İkinci sözcük her iki öbekte de tamlanandır.\n“Her iki öbekte de ilk sözcük bir niteleme sıfatıdır.” — Belediye, iki öbekte de isim olarak tamlayan görevindedir.\n“İki öbekte de ilk sözcük tamlayan eki almıştır.” — İkinci öbeğin tamlayanı ek almamıştır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-006",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 2,
+    "q": "Aşağıdaki cümlelerin hangisinde belirtili isim tamlamasının tamlayanı ile tamlananı arasına bir sıfat girmiştir?",
+    "o": [
+      "Depo kapısı akşam kapandı.",
+      "Eski deponun kapısı kapandı.",
+      "Kapının kolu boyandı.",
+      "Yeni depo kapısı takıldı.",
+      "Deponun ağır kapısı güçlükle açıldı."
+    ],
+    "a": 4,
+    "x": "Deponun kapısı belirtili isim tamlamasıdır. Ağır sıfatı, tamlanan kapıdan önce ve tamlayan deponundan sonra yer alır.\n\nDiğer seçenekler\n“Depo kapısı akşam kapandı.” — Depo kapısı belirtisiz isim tamlamasıdır ve iki sözcük bitişik sıradadır.\n“Eski deponun kapısı kapandı.” — Eski sıfatı tamlayandan önce gelir.\n“Kapının kolu boyandı.” — Tamlayan ile tamlanan arasında bir sözcük yoktur.\n“Yeni depo kapısı takıldı.” — Yeni sözcüğü tamlayan ile tamlanan arasında değildir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-007",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 2,
+    "q": "“Bahçenin ve avlunun kapısı sabah boyandı.” cümlesinde kapısı sözcüğünün tamlayanlarla ilişkisi aşağıdakilerden hangisidir?",
+    "o": [
+      "İki tamlayan da kapısı sözcüğüne bağlanır.",
+      "Bahçenin sözcüğü, avlunun tamlananı olarak kullanılır.",
+      "Kapısı sözcüğü yalnızca avlunun sözcüğüne bağlanır.",
+      "Bahçenin tamlananı kapısıdır, avlunun tamlananı sabah sözcüğüdür.",
+      "Kapısı ve sabah sözcükleri aynı tamlayana bağlanır."
+    ],
+    "a": 0,
+    "x": "Bağlaçla sıralanan bahçenin ve avlunun ögeleri aynı tamlanana bağlanmıştır. Bahçenin kapısı ve avlunun kapısı ilişkileri, kapısı sözcüğü tekrar edilmeden kurulmuştur.\n\nDiğer seçenekler\n“Bahçenin sözcüğü, avlunun tamlananı olarak kullanılır.” — Avlunun sözcüğü tamlayandır, bahçenin onun tamlananı değildir.\n“Kapısı sözcüğü yalnızca avlunun sözcüğüne bağlanır.” — Bahçenin sözcüğü de kapısı ögesine bağlanır.\n“Bahçenin tamlananı kapısıdır, avlunun tamlananı sabah sözcüğüdür.” — Sabah zaman bildiren bir ögedir.\n“Kapısı ve sabah sözcükleri aynı tamlayana bağlanır.” — Sabah sözcüğü kapısı ile ortak tamlanan değildir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-008",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 3,
+    "q": "“Serginin açılışının saati değiştirildi.” cümlesinde iki tamlamanın iç içe geçtiği öbeği çözümleyen aşağıdaki eşleştirmelerden hangisi doğrudur?",
+    "o": [
+      "İç tamlama “açılışın saati”, dış tamlayan “serginin”",
+      "İç tamlama “açılışın saati”, dış tamlanan “serginin”",
+      "İç tamlama “serginin saati”, dış tamlanan “açılışının”",
+      "İç tamlama “serginin açılışı”, dış tamlayan “saati”",
+      "İç tamlama “serginin açılışı”, dış tamlanan “saati”"
+    ],
+    "a": 4,
+    "x": "İlk ilişki sergi ile onun açılışı arasındadır. Serginin açılışı bütünü dış yapıda tamlayan durumuna girer. Bu dış yapının tamlananı saati sözcüğüdür.\n\nDiğer seçenekler\n“İç tamlama “açılışın saati”, dış tamlayan “serginin”” — Serginin sözcüğü açılışa bağlanır.\n“İç tamlama “açılışın saati”, dış tamlanan “serginin”” — Serginin öbeğin ilk tamlayanıdır.\n“İç tamlama “serginin saati”, dış tamlanan “açılışının”” — Saati ile sergi arasında doğrudan tamlama kurulmamıştır.\n“İç tamlama “serginin açılışı”, dış tamlayan “saati”” — Saati tamlayan yerine tamlanan görevindedir."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-009",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 3,
+    "q": "Aşağıdaki cümlelerin hangisinde isim tamlamasının tamlayanı, cümlede daha önce adı geçen bir kişinin yerini tutan sözcüktür?",
+    "o": [
+      "Zeynep, arkadaşının önerisini dinledi.",
+      "Zeynep bu öneriyi deftere yazdı.",
+      "Zeynep, sınıfın önerisini panoya astı.",
+      "Zeynep, öneri kutusunu masaya taşıdı.",
+      "Zeynep konuştu, biz onun önerisini yazdık."
+    ],
+    "a": 4,
+    "x": "Onun önerisi tamlamasında onun, Zeynep’in yerini tutan kişi zamiridir. Bu zamir tamlayan olarak kullanılmıştır.\n\nDiğer seçenekler\n“Zeynep, arkadaşının önerisini dinledi.” — Arkadaş, varlığı adlandıran bir isimdir.\n“Zeynep bu öneriyi deftere yazdı.” — Bu öneri öbeğinde bu, öneriyi işaret eden bir sıfattır.\n“Zeynep, sınıfın önerisini panoya astı.” — Sınıf, kişi zamiri değildir.\n“Zeynep, öneri kutusunu masaya taşıdı.” — Öneri kutusu öbeğinde tamlayan bir addır."
+  },
+  {
+    "id": "AKE-YKS-02-TUR-TAM-010",
+    "s": "turkce",
+    "t": "Tamlamalar",
+    "d": 3,
+    "q": "Aşağıdakilerin hangisinde dıştaki belirtili isim tamlamasının tamlananı, kendi içinde bir belirtisiz isim tamlamasıdır?",
+    "o": [
+      "odanın çalışma masası",
+      "çalışma odasının masası",
+      "masanın üzerinin tozu",
+      "odanın geniş masası",
+      "geniş çalışma masası"
+    ],
+    "a": 0,
+    "x": "Çalışma masası tek başına bir belirtisiz isim tamlamasıdır. Odanın çalışma masası sözünde odanın tamlayanına bağlanan bölümün tamamı çalışma masasıdır.\n\nDiğer seçenekler\n“çalışma odasının masası” — Çalışma odası, dış öbeğin tamlayanı içinde yer alır.\n“masanın üzerinin tozu” — Dıştaki tamlanan yalnızca tozu sözcüğüdür.\n“odanın geniş masası” — Geniş masa bir sıfat tamlamasıdır.\n“geniş çalışma masası” — Öbeğin dışında belirtili tamlama kuran bir tamlayan bulunmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-001",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 1,
+    "q": "P(x) = x³ − 2x + 5 polinomu, x + 1 polinomuna bölünüyor. Bu bölme işlemindeki kalan kaçtır?",
+    "o": [
+      "2",
+      "4",
+      "5",
+      "6",
+      "8"
+    ],
+    "a": 3,
+    "x": "x + 1’in kökü −1’dir. Bölme kalanı P(−1) = −1 + 2 + 5 = 6 olur.\n\nDiğer seçenekler\n“2” — −2x teriminin −1’deki işaretini yanlış alır.\n“4” — Birinci dereceden terimi atlar.\n“5” — Yalnız sabit terimi kullanır.\n“8” — x³ teriminin değerini +1 alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-002",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 1,
+    "q": "P(x) = (x² − 3x + 4)(2x + 1) olarak veriliyor. P(x) polinomunda x² teriminin katsayısı kaçtır?",
+    "o": [
+      "−7",
+      "−5",
+      "−3",
+      "1",
+      "2"
+    ],
+    "a": 1,
+    "x": "x² terimi, x² · 1 ve (−3x) · 2x çarpımlarından gelir. Katsayıların toplamı 1 − 6 = −5’tir.\n\nDiğer seçenekler\n“−7” — x² · 1 çarpımının işaretini eksi alır.\n“−3” — 2x’in katsayısını hesaba katmaz.\n“1” — Yalnız x² · 1 çarpımını kullanır.\n“2” — x³ teriminin katsayısını verir."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-003",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 1,
+    "q": "P(x) = (a − 2)x⁴ + (b + 1)x³ + 3x + 4 polinomunun derecesi 1’dir. Buna göre a − b kaçtır?",
+    "o": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "a": 3,
+    "x": "Dördüncü ve üçüncü dereceli terimlerin katsayıları sıfır olmalıdır. a = 2 ve b = −1 bulunur. Fark 3’tür.\n\nDiğer seçenekler\n“0” — İki katsayının sıfır olmasıyla a ve b’nin sıfır olmasını karıştırır.\n“1” — a ile b’yi çıkarma yerine toplar.\n“2” — b’nin katkısını atlar.\n“4” — b’nin mutlak değerini gereğinden büyük alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-004",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 2,
+    "q": "P(1) = 4 ve P(−2) = −5 olduğu biliniyor. P(x) polinomunun (x − 1)(x + 2) ile bölümünden kalan R(x) olduğuna göre R(2) kaçtır?",
+    "o": [
+      "3",
+      "5",
+      "7",
+      "8",
+      "10"
+    ],
+    "a": 2,
+    "x": "Kalanın derecesi en çok 1’dir. R(x) = ax + b yazılırsa R(1) = 4 ve R(−2) = −5 olur. Bu iki koşul R(x) = 3x + 1 verir. Dolayısıyla R(2) = 7’dir.\n\nDiğer seçenekler\n“3” — R’nin x katsayısını R(2) olarak alır.\n“5” — x = 2 değerini doğru yerine koymaz.\n“8” — Sabit terimin etkisini olduğundan fazla alır.\n“10” — R(−2) değerinin işaretini çevirmekle yetinir."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-005",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 2,
+    "q": "P(x) = 2x³ + ax² + bx + c ve Q(x) = 4x⁵ + 6x⁴ + x³ − 1 polinomları veriliyor. P(x)² − xQ(x) polinomunun derecesi en fazla 4 olduğuna göre a kaçtır?",
+    "o": [
+      "3/4",
+      "1",
+      "3/2",
+      "2",
+      "3"
+    ],
+    "a": 2,
+    "x": "x⁶ katsayıları zaten birbirini yok eder. P(x)²’de x⁵ katsayısı 2 · 2 · a = 4a, xQ(x)’te 6’dır. 4a − 6 = 0 koşulundan a = 3/2 bulunur.\n\nDiğer seçenekler\n“3/4” — Çapraz çarpımın katsayısını iki kez daha sayar.\n“1” — 4a katsayısını 6’ya eşitlemez.\n“2” — 4a’yı x⁵ yerine x⁶ katsayısına eşitler.\n“3” — Çapraz çarpımın iki kez geldiğini hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-006",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 2,
+    "q": "P(x) = x³ + bx² + cx + d polinomu için P(x + 1) − P(x) = 3x² + 7x + 8 ve P(0) = 4’tür. Buna göre P(−1) kaçtır?",
+    "o": [
+      "−4",
+      "−2",
+      "0",
+      "2",
+      "4"
+    ],
+    "a": 2,
+    "x": "Farkın x katsayısı 3 + 2b, sabit terimi 1 + b + c’dir. Bunlar 7 ve 8’e eşitlenince b = 2, c = 5 bulunur. d = 4 ile P(−1) = −1 + 2 − 5 + 4 = 0 olur.\n\nDiğer seçenekler\n“−4” — d sabitini son değerlendirmede eklemez.\n“−2” — x² terimini hesaba katmaz.\n“2” — x³ teriminin işaretini yanlış alır.\n“4” — P(0) değerini P(−1) olarak alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-007",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 2,
+    "q": "Başkatsayısı 1 olan üçüncü dereceden P(x) polinomu için P(−2) = P(1) = 0 ve P(0) = 6’dır. P(2) değeri kaçtır?",
+    "o": [
+      "−6",
+      "−4",
+      "0",
+      "4",
+      "8"
+    ],
+    "a": 1,
+    "x": "Polinom (x + 2)(x − 1)(x − k) biçimindedir. P(0) = 2k = 6 olduğundan k = 3 olur. x = 2 için 4 · 1 · (−1) = −4 bulunur.\n\nDiğer seçenekler\n“−6” — P(0) değerinin eksi işaretlisini alır.\n“0” — 2’yi −2 ile karıştırarak kök kabul eder.\n“4” — Son çarpanın eksi işaretini kaybeder.\n“8” — Son çarpanı −1 yerine +2 alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-008",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 3,
+    "q": "P(x), başkatsayısı 1 olan çift bir dördüncü derece polinomudur. P(x)’in x² − 1 ile bölümünden kalan 7, x² − 4 ile bölümünden kalan 16’dır. P(0) kaçtır?",
+    "o": [
+      "4",
+      "6",
+      "7",
+      "8",
+      "10"
+    ],
+    "a": 3,
+    "x": "P çift olduğundan x⁴ + ax² + b biçimindedir. Kalanlar için sırasıyla x² = 1 ve x² = 4 yazılır. 1 + a + b = 7 ve 16 + 4a + b = 16 eşitliklerinden a = −2, b = 8 bulunur. P(0) sabit terimdir.\n\nDiğer seçenekler\n“4” — x² − 4 böleninin sabitinin mutlak değerini alır.\n“6” — a’yı sıfır kabul ederek birinci eşitliği kullanır.\n“7” — P(1) değerini sabit terim sanır.\n“10” — İki kalan koşulunu aynı anda sağlamaz."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-009",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 3,
+    "q": "Derecesi en çok 3 olan P(x) polinomu için her gerçek x’te P(x) + P(−x) = 4x² + 6 ve P(1) = 9’dur. P(x)’in x² + 1 ile bölümünden kalan sabit olduğuna göre P(−2) kaçtır?",
+    "o": [
+      "−17",
+      "−13",
+      "−9",
+      "−5",
+      "3"
+    ],
+    "a": 2,
+    "x": "Çift dereceli terimler 2x² + 3’tür. Tek dereceli terimler ax³ + bx olsun. Bölme kalanı (b − a)x + 1 olduğundan b = a’dır. P(1) = 9, a = 2 ve b = 2 verir. x = −2 yazıldığında P(−2) = −9 bulunur.\n\nDiğer seçenekler\n“−17” — 2x² teriminin katkısını atlar.\n“−13” — bx teriminin katkısını iki kez çıkarır.\n“−5” — bx terimini atlar.\n“3” — Yalnız sabit terimi alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-POL-010",
+    "s": "amat",
+    "t": "Polinomlar",
+    "d": 2,
+    "q": "P(x) = x⁵ − 2x³ + 5x² − 3 polinomu x² + 1’e bölündüğünde kalan R(x) oluyor. R(x)’in katsayıları toplamı kaçtır?",
+    "o": [
+      "−9",
+      "−8",
+      "−7",
+      "−5",
+      "−3"
+    ],
+    "a": 3,
+    "x": "x² + 1’e göre kalan hesabında x² yerine −1 kullanılabilir. Buna göre x⁵ → x, x³ → −x ve 5x² → −5 olur. Kalan 3x − 8’dir. Katsayılar toplamı R(1) = −5’tir.\n\nDiğer seçenekler\n“−9” — x³’ün kalanı −x yerine x alınırsa çıkar.\n“−8” — Yalnız kalan polinomun sabit terimidir.\n“−7” — x⁵’in x katkısını alıp −2x³’ün katkısını atlar.\n“−3” — x² terimini doğru işlemeden yalnız başlangıç sabitini alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-001",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 1,
+    "q": "Başkatsayısı 1 olan ikinci dereceden bir denklemin kökleri −2 ve 7’dir. Denklem x² + bx + c = 0 biçiminde yazıldığında b kaçtır?",
+    "o": [
+      "−9",
+      "−7",
+      "−5",
+      "5",
+      "14"
+    ],
+    "a": 2,
+    "x": "Denklem (x + 2)(x − 7) = 0 biçimindedir. Çarpım açılınca x’in katsayısı 2 − 7 = −5 olur.\n\nDiğer seçenekler\n“−9” — −2’yi pozitif 2 sayarak kökler toplamının tersini alır.\n“−7” — −2 kökünün katkısını atlar.\n“5” — Kökler toplamını işaret değiştirmeden yazar.\n“14” — Sabit terimin mutlak değerini kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-002",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 1,
+    "q": "x² − 10x + k = 0 denkleminin iki kökü birbirine eşittir. Buna göre k kaçtır?",
+    "o": [
+      "10",
+      "25",
+      "40",
+      "50",
+      "100"
+    ],
+    "a": 1,
+    "x": "Kökler eşitse diskriminant sıfırdır. 100 − 4k = 0 eşitliğinden k = 25 bulunur.\n\nDiğer seçenekler\n“10” — x’in katsayısının mutlak değerini kullanır.\n“40” — Bu k değeri diskriminantı −60 yapar.\n“50” — 4ac terimindeki 4’ü 2 alır.\n“100” — 4 katsayısını hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-003",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 1,
+    "q": "x² + (m − 4)x − 9 = 0 denkleminin köklerinden biri diğerinin toplama işlemine göre tersidir. Buna göre m kaçtır?",
+    "o": [
+      "−4",
+      "0",
+      "2",
+      "4",
+      "9"
+    ],
+    "a": 3,
+    "x": "Birbirinin toplama işlemine göre tersi olan köklerin toplamı 0’dır. Bu toplam 4 − m olduğuna göre m = 4 bulunur.\n\nDiğer seçenekler\n“−4” — m − 4 ifadesinin işaretini yanlış çözer.\n“0” — Kökler toplamını doğrudan m sanır.\n“2” — Bir kökün yarısını parametre olarak alır.\n“9” — Sabit terimin mutlak değerini kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-004",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 2,
+    "q": "x² − 7x + 10 = 0 denkleminin kökleri p ve q’dur. p² + q² kaçtır?",
+    "o": [
+      "19",
+      "25",
+      "29",
+      "39",
+      "49"
+    ],
+    "a": 2,
+    "x": "p + q = 7 ve pq = 10’dur. Kareler toplamı (p + q)² − 2pq = 49 − 20 = 29 bulunur.\n\nDiğer seçenekler\n“19” — Çarpım katkısını üç kez çıkarır.\n“25” — Yalnız büyük kökün karesini alır.\n“39” — pq’yu bir kez çıkarır.\n“49” — Kökler toplamının karesini doğrudan kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-005",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 2,
+    "q": "Çevresi 40 m ve alanı 84 m² olan dikdörtgen bir bahçenin uzun ve kısa kenarları arasındaki fark kaç metredir?",
+    "o": [
+      "4",
+      "6",
+      "8",
+      "10",
+      "14"
+    ],
+    "a": 2,
+    "x": "İki farklı kenarın toplamı 20 m’dir. Kenarlardan biri x ise x(20 − x) = 84 olur. Kökler 6 ve 14 olduğundan kenar farkı 8 metredir.\n\nDiğer seçenekler\n“4” — Bulunan farkın yarısını alır.\n“6” — Yalnız kısa kenarı verir.\n“10” — Fark yerine çevrenin dörtte birini alır.\n“14” — Yalnız uzun kenarı verir."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-006",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 2,
+    "q": "x² − (k + 3)x + 4 = 0 denkleminin birbirinden farklı iki pozitif gerçek kökü vardır. k’nin alabileceği en küçük tam sayı kaçtır?",
+    "o": [
+      "−8",
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "a": 3,
+    "x": "Köklerin çarpımı 4 olduğundan gerçek kökler aynı işaretlidir. İkisinin pozitif olması için k + 3 > 0 gerekir. Ayrık kökler için (k + 3)² > 16 olduğundan k + 3 > 4 elde edilir. En küçük tam sayı k = 2’dir.\n\nDiğer seçenekler\n“−8” — Kökler gerçek olsa da toplamları negatiftir.\n“0” — Diskriminant negatiftir.\n“1” — Diskriminant sıfırdır ve kökler eşittir.\n“3” — Koşulları sağlar ancak en küçük değer değildir."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-007",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 2,
+    "q": "α, x² − 5x + 1 = 0 denkleminin herhangi bir köküdür. α² + 1/α² ifadesinin değeri kaçtır?",
+    "o": [
+      "20",
+      "23",
+      "25",
+      "27",
+      "50"
+    ],
+    "a": 1,
+    "x": "α sıfır olamaz. Denklem α’ya bölünürse α + 1/α = 5 olur. Bu eşitliğin karesinde çapraz terim 2’dir. İstenen toplam 25 − 2 = 23 olur.\n\nDiğer seçenekler\n“20” — Kareden çapraz terim olarak 5 çıkarır.\n“25” — Çapraz terim olan 2’yi çıkarmaz.\n“27” — Çapraz terimi çıkarmak yerine ekler.\n“50” — İki ayrı kareyi de toplamın karesi olan 25’e eşit sayar."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-008",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 3,
+    "q": "x² − (m + 2)x + 2m = 0 ve x² − (m + 1)x + (m − 1) = 0 denklemlerinin ortak bir gerçek kökü vardır. Buna göre m kaçtır?",
+    "o": [
+      "−1",
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "a": 2,
+    "x": "İlk denklem (x − 2)(x − m) = 0 biçiminde çarpanlara ayrılır. İkinci denklemde x = m yazılınca sol taraf −1 olur, dolayısıyla ortak kök 2’dir. x = 2 için 1 − m = 0 eşitliğinden m = 1 bulunur.\n\nDiğer seçenekler\n“−1” — x = 2’de ikinci polinom 2 olur.\n“0” — x = 2’de ikinci polinom 1 olur.\n“2” — Ortak kökü parametre sanır.\n“3” — x = 2’de ikinci polinom −2 olur."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-009",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 3,
+    "q": "a ve b, x² − 3x − 2 = 0 denkleminin kökleridir. Kökleri a/(a − 1) ve b/(b − 1) olan ikinci dereceden denklem aşağıdakilerden hangisi olabilir?",
+    "o": [
+      "4t² + 7t + 2 = 0",
+      "4t² − 7t − 2 = 0",
+      "4t² − 5t + 2 = 0",
+      "4t² − 7t + 1 = 0",
+      "4t² − 7t + 2 = 0"
+    ],
+    "a": 4,
+    "x": "a + b = 3, ab = −2 ve (a − 1)(b − 1) = −4’tür. Yeni köklerin toplamı [2ab − (a + b)]/(−4) = 7/4, çarpımı ab/(−4) = 1/2 olur. Buna göre t² − (7/4)t + 1/2 = 0 denklemi elde edilir.\n\nDiğer seçenekler\n“4t² + 7t + 2 = 0” — Kökler toplamını negatif alır.\n“4t² − 7t − 2 = 0” — Kökler çarpımının işaretini yanlış alır.\n“4t² − 5t + 2 = 0” — Kökler toplamı 5/4 çıkar.\n“4t² − 7t + 1 = 0” — Kökler çarpımı 1/4 çıkar."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-IKD-010",
+    "s": "amat",
+    "t": "İkinci dereceden denklemler",
+    "d": 3,
+    "q": "x² − (m + 2)x + 2m − 3 = 0 denkleminin iki gerçek kökü de pozitiftir. Büyük kök küçük kökten 4 fazla olduğuna göre m kaçtır?",
+    "o": [
+      "−2",
+      "0",
+      "2",
+      "4",
+      "6"
+    ],
+    "a": 3,
+    "x": "Başkatsayı 1 olduğu için kökler farkının karesi diskriminanta eşittir. (m + 2)² − 4(2m − 3) = 16 eşitliği m = 0 veya m = 4 verir. m = 0’da köklerin çarpımı negatiftir. m = 4 için kökler 1 ve 5’tir.\n\nDiğer seçenekler\n“−2” — Kökler farkının karesi 16 olmaz.\n“0” — Köklerden biri negatiftir.\n“2” — Diskriminant 12 olur.\n“6” — Diskriminant 28 olur."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-001",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 1,
+    "q": "Bir çekilişte 1’den 20’ye kadar numaralanmış eş kartlardan biri rastgele alınıyor. Numarası 4’ün veya 6’nın katı olan bir kartın gelme olasılığı kaçtır?",
+    "o": [
+      "1/5",
+      "3/10",
+      "7/20",
+      "2/5",
+      "1/2"
+    ],
+    "a": 2,
+    "x": "Uygun numaralar 4, 6, 8, 12, 16, 18 ve 20’dir. 12 iki koşulu da sağladığı için bir kez sayılır. 7/20 olasılığı elde edilir.\n\nDiğer seçenekler\n“1/5” — Uygun kartların bir bölümünü sayar.\n“3/10” — 12’yi ortak olduğu için tümüyle dışarıda bırakır.\n“2/5” — 12’yi iki kez sayar.\n“1/2” — Uygun kart sayısını 10 alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-002",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 1,
+    "q": "Bir kutuda beş beyaz ve üç siyah eş büyüklükte taş vardır. Geri koymadan rastgele iki taş seçiliyor. İkisinin de beyaz olma olasılığı kaçtır?",
+    "o": [
+      "5/16",
+      "5/14",
+      "25/64",
+      "15/28",
+      "5/8"
+    ],
+    "a": 1,
+    "x": "Toplam C(8, 2) = 28 çiftin C(5, 2) = 10 tanesi iki beyaz taştan oluşur. Olasılık 10/28 = 5/14’tür.\n\nDiğer seçenekler\n“5/16” — İkinci seçimde dört beyaz kalmasına rağmen toplamı sekiz bırakır.\n“25/64” — Her seçimde beyaz gelme olasılığını 5/8 kabul eder.\n“15/28” — Bir beyaz ve bir siyah gelme olasılığıdır.\n“5/8” — Yalnız ilk seçimi hesaba katar."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-003",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 1,
+    "q": "Bir torbadaki eş büyüklükte üç kırmızı ve iki mavi boncuktan biri rastgele alınıp rengi kaydediliyor. Boncuk torbaya geri konulup çekim tekrarlanıyor. Kaydedilen iki rengin farklı olma olasılığı kaçtır?",
+    "o": [
+      "6/25",
+      "2/5",
+      "12/25",
+      "13/25",
+      "3/5"
+    ],
+    "a": 2,
+    "x": "Önce kırmızı sonra mavi veya önce mavi sonra kırmızı gelebilir. Geri koyma nedeniyle her sıranın olasılığı 3/5 · 2/5’tir. İki ayrık durumun toplamı 12/25’tir.\n\nDiğer seçenekler\n“6/25” — Olası sıralardan yalnız birini kullanır.\n“2/5” — Tek çekimde mavi gelme olasılığını kullanır.\n“13/25” — İki rengin aynı olma olasılığını verir.\n“3/5” — Tek çekimde kırmızı gelme olasılığını kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-004",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 2,
+    "q": "Bir okul etkinliğinde tiyatro kulübünden dört, resim kulübünden üç aday vardır. Her aday yalnız bir kulüptendir. Rastgele seçilen iki adaydan en az birinin resim kulübünde olduğu biliniyor. İkisinin de resim kulübünde olma olasılığı kaçtır?",
+    "o": [
+      "1/7",
+      "1/5",
+      "2/7",
+      "1/3",
+      "2/5"
+    ],
+    "a": 1,
+    "x": "İki tiyatro adayının seçildiği çiftler koşulu sağlamaz. Geriye 15 eş olasılıklı çift kalır. Bunların 3 tanesi iki resim adayından oluşur ve olasılık 1/5’tir.\n\nDiğer seçenekler\n“1/7” — Bilinen koşulu yok sayıp bütün çiftlere böler.\n“2/7” — Uygun çifti 21’de 6 olarak alır.\n“1/3” — Koşulu sağlayan çiftlerin bir kısmını dışarıda bırakır.\n“2/5” — Yalnız bir resim adayı olan çiftleri yanlış sayar."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-005",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 2,
+    "q": "Birbirinden ayırt edilebilen iki düzgün zar aynı anda atılıyor. Üst yüzlerdeki sayıların çarpımının çift olduğu biliniyor. Sayıların toplamının 7 olma olasılığı kaçtır?",
+    "o": [
+      "1/6",
+      "1/5",
+      "2/9",
+      "1/4",
+      "2/7"
+    ],
+    "a": 2,
+    "x": "36 sıralı sonuçtan iki sayının da tek olduğu 9 sonuç çıkarılır. Kalan 27 sonuç içinde toplamı 7 olan 6 sonuç vardır. Olasılık 6/27 = 2/9’dur.\n\nDiğer seçenekler\n“1/6” — Toplamı 7 olan sonuçları koşulsuz 36’ya böler.\n“1/5” — Koşulu sağlayan sonuç sayısını 30 alır.\n“1/4” — Toplam örneklemden gereğinden fazla durum çıkarır.\n“2/7” — İki zarın sıra farkını hesaba katmadan sayar."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-006",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 2,
+    "q": "Bir sıradaki numaralı altı koltuğa altı arkadaş rastgele oturuyor. Arda ile İpek’in arasında tam bir kişi oturma olasılığı kaçtır?",
+    "o": [
+      "2/15",
+      "1/5",
+      "4/15",
+      "1/3",
+      "2/5"
+    ],
+    "a": 2,
+    "x": "Arda ve İpek için 30 sıralı yerleşim vardır. Aralarında bir koltuk bırakan dört koltuk çifti, kişiler yer değiştirince 8 yerleşim verir. Olasılık 8/30 = 4/15’tir.\n\nDiğer seçenekler\n“2/15” — Her uygun çiftte kişilerin yalnız bir sırasını sayar.\n“1/5” — Dört yerine üç uygun koltuk çifti alır.\n“1/3” — Aralarında kimse yokmuş gibi komşu koltukları sayar.\n“2/5” — Uygun yerleşimleri toplamın gereğinden büyük bir parçası alır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-007",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 2,
+    "q": "Bir oyuncunun her oyunu kazanma olasılığı 2/3’tür ve oyun sonuçları bağımsızdır. İki galibiyete ilk ulaşan taraf karşılaşmayı bitirir. Bu oyuncunun karşılaşmayı tam üçüncü oyunda kazanma olasılığı kaçtır?",
+    "o": [
+      "4/27",
+      "8/27",
+      "1/3",
+      "4/9",
+      "2/3"
+    ],
+    "a": 1,
+    "x": "Üçüncü oyunun oynanması için ilk iki oyun birer galibiyetle biter. İstenen diziler kazanma-kaybetme-kazanma ve kaybetme-kazanma-kazanmadır. Her biri 4/27 olasılıklı olduğundan toplam 8/27’dir.\n\nDiğer seçenekler\n“4/27” — Uygun iki sıralamadan yalnız birini sayar.\n“1/3” — Yalnız tek oyun kaybetme olasılığını kullanır.\n“4/9” — Üç oyuna uzama olasılığını, üçüncü oyunun sonucundan bağımsız alır.\n“2/3” — Sadece son oyunu kazanma olasılığını kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-008",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 3,
+    "q": "Eş olasılıklı 1, 2 ve 3 numaralı kartlardan biri çekiliyor. 1 gelirse A kutusundan, 2 veya 3 gelirse B kutusundan rastgele bir top alınıyor. A’da üç mavi ve iki beyaz, B’de dört mavi ve iki beyaz top vardır. Alınan topun mavi olduğu bilindiğine göre A kutusundan alınmış olma olasılığı kaçtır?",
+    "o": [
+      "1/5",
+      "3/10",
+      "9/29",
+      "1/3",
+      "9/20"
+    ],
+    "a": 2,
+    "x": "A yoluyla mavi gelme olasılığı 1/5, B yoluyla mavi gelme olasılığı 4/9’dur. Mavi olduğu bilindiği için A yolunun olasılığı bu iki yolun toplamına bölünür. Sonuç 9/29’dur.\n\nDiğer seçenekler\n“1/5” — A ve mavi olaylarının kesişimini, koşullu olasılık yerine kullanır.\n“3/10” — Mavi çıkan iki yolu doğru ağırlıklarla karşılaştırmaz.\n“1/3” — Topun rengine ilişkin bilgiyi hesaba katmaz.\n“9/20” — A yolunun olasılığını yalnız B yolununkine böler."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-009",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 3,
+    "q": "A, B, C, D ve E harflerinin her biri bir kez kullanılarak rastgele bir beş harfli dizi oluşturuluyor. C’nin en sonda bulunması ve ilk iki hanede A ile B harflerinden tam birinin yer alması olasılığı kaçtır?",
+    "o": [
+      "1/10",
+      "2/15",
+      "1/5",
+      "4/15",
+      "2/3"
+    ],
+    "a": 1,
+    "x": "C’nin sonda olma olasılığı 1/5’tir. Kalan dört harften ilk ikiye gelecek çiftler altı tanedir. Dördü A ve B’den tam birini içerir. İki koşul birlikte 1/5 · 4/6 = 2/15 olasılıkla sağlanır.\n\nDiğer seçenekler\n“1/10” — C sondayken ilk iki haneye ilişkin olasılığı 1/2 alır.\n“1/5” — Yalnız C’nin sonda bulunmasını hesaba katar.\n“4/15” — C’nin son sırada olma olasılığını iki katına çıkarır.\n“2/3” — C’nin sonda olması şartını hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AMAT-OLA-010",
+    "s": "amat",
+    "t": "Olasılık",
+    "d": 3,
+    "q": "1’den 9’a kadar numaralandırılmış eş kartlardan üçü geri koymadan rastgele seçiliyor. Seçilen numaraların toplamının tek olduğu biliniyor. Üç kartın tam olarak birinin numarasının tek olma olasılığı kaçtır?",
+    "o": [
+      "5/14",
+      "1/2",
+      "2/3",
+      "3/4",
+      "5/6"
+    ],
+    "a": 3,
+    "x": "Toplamın tek olması için ya bir tek ve iki çift ya da üç tek seçilir. İlk tür 5 · C(4, 2) = 30, ikinci tür C(5, 3) = 10 seçim verir. Koşulu sağlayan 40 seçimden 30 tanesi istenir. Olasılık 3/4’tür.\n\nDiğer seçenekler\n“5/14” — 30 uygun seçimi koşulsuz 84’e böler.\n“1/2” — İki tür seçimin aynı sayıda olduğunu varsayar.\n“2/3” — Üç tek numaralı seçimi olduğundan fazla sayar.\n“5/6” — Üç tek numaralı seçimi olduğundan az sayar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-001",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 1,
+    "q": "K ve L bilyeleri aynı yükseklikten aynı anda harekete başlıyor. K’nin ilk hızı sıfırdır, L’nin ise sıfırdan farklı ilk hızı yataydır. Hava direnci ihmal edilip iki bilye de aynı yatay zemine düştüğünde hangi büyüklükleri birbirine eşittir?",
+    "o": [
+      "Yere çarparken düşey hız bileşenlerinin büyüklükleri",
+      "Yere çarpma süratleri",
+      "Yere çarparken yatay hız bileşenlerinin büyüklükleri",
+      "Yatay yer değiştirmeleri",
+      "Aldıkları toplam yol"
+    ],
+    "a": 0,
+    "x": "İki bilye aynı yükseklikten düşey ilk hızları sıfır olarak harekete başlar. Aynı düşey ivme ve süre nedeniyle zemine ulaştıklarında düşey hız bileşenlerinin büyüklükleri eşittir.\n\nDiğer seçenekler\n“Yere çarpma süratleri” — L’nin düşey hızına ek olarak yatay bileşeni vardır.\n“Yere çarparken yatay hız bileşenlerinin büyüklükleri” — L ilk yatay hızını korurken K’nin yatay hızı sıfırdır.\n“Yatay yer değiştirmeleri” — K’nin yatay yer değiştirmesi sıfırdır.\n“Aldıkları toplam yol” — L’nin yolu eğrisel, K’ninki düşeydir."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-002",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 1,
+    "q": "Bir top yerden 20 m/s hızla düşey yukarı atılıyor. Hava direnci önemsiz ve yer çekimi ivmesinin büyüklüğü 10 m/s² olduğuna göre top yerden en fazla kaç metre yükselir?",
+    "o": [
+      "10",
+      "20",
+      "25",
+      "40",
+      "80"
+    ],
+    "a": 1,
+    "x": "En üst noktada düşey hız sıfır olur. 0 = 20² − 2 · 10 · h bağıntısından h = 20 m bulunur.\n\nDiğer seçenekler\n“10” — Yükselirken ortalama sürati 10 m/s alıp süreyi 1 s kabul eder.\n“25” — Başlangıç sürati ve ivmeyle elde edilen durma konumunu aşar.\n“40” — h hesabında 2 çarpanını kullanmaz.\n“80” — Çıkış boyunca sürati sabit kabul edip tüm uçuş süresini kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-003",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 1,
+    "q": "Yatay bir zeminin 45 m üzerindeki balkondan bir cisim 8 m/s yatay hızla atılıyor. Hava direnci ihmal ediliyor. Yer çekimi ivmesinin büyüklüğü 10 m/s² olduğuna göre cisim zemine ulaşana kadar yatayda kaç metre ilerler?",
+    "o": [
+      "8",
+      "16",
+      "20",
+      "22",
+      "24"
+    ],
+    "a": 4,
+    "x": "Düşey hareket için 45 = 5t² olduğundan uçuş süresi 3 s’dir. Yatay hız sabit kalır ve alınan yatay yol 8 · 3 = 24 m olur.\n\nDiğer seçenekler\n“8” — Süreyi 1 s kabul eder.\n“16” — Süreyi 2 s alır.\n“20” — 45 = 5t² koşulunu sağlamayan 2,5 s kullanır.\n“22” — Uçuş süresini 3 s’den kısa alır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-004",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 2,
+    "q": "Yatay zeminden atılan bir topun yatay ve düşey ilk hız bileşenleri sırasıyla 12 m/s ve yukarı yönlü 16 m/s’dir. Top yere dönmeden sürati iki kez 13 m/s oluyor. Hava direnci ihmal edilirse ve g = 10 m/s² ise bu iki an arasında kaç saniye vardır?",
+    "o": [
+      "0,5",
+      "1",
+      "1,1",
+      "1,6",
+      "2,1"
+    ],
+    "a": 1,
+    "x": "Yatay bileşen 12 m/s kalır. Sürat 13 m/s iken düşey bileşen +5 veya −5 m/s olur. Yer çekimi bu bileşeni saniyede 10 m/s azalttığı için +5’ten −5’e geçiş 1 s sürer.\n\nDiğer seçenekler\n“0,5” — İlk geçişten tepeye kadar geçen süredir.\n“1,1” — İlk kez 13 m/s’ye ulaşılan andır.\n“1,6” — Atıştan tepe noktasına kadar geçen süredir.\n“2,1” — İkinci kez 13 m/s’ye ulaşılan andır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-005",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 2,
+    "q": "K ve L topları aynı yatay zeminden eşit ilk süratlerle sırasıyla yatayla 30° ve 60° açı yapacak biçimde fırlatılıyor. Hava direnci önemsizdir.\nI. K ve L’nin yatay menzilleri eşittir.\nII. L’nin havada kalma süresi K’ninkinden uzundur.\nIII. K ve L’nin en büyük yükseklikleri eşittir.\nBu yargılardan hangileri doğrudur?",
+    "o": [
+      "Yalnız I",
+      "Yalnız II",
+      "I ve II",
+      "I ve III",
+      "II ve III"
+    ],
+    "a": 2,
+    "x": "Aynı seviyeye dönen atışta menzil sin(2θ) ile orantılıdır. sin60° = sin120° olduğundan I doğrudur. L’nin düşey ilk hızı daha büyük olduğu için hem uçuş süresi hem yüksekliği daha büyüktür. II doğru, III yanlıştır.\n\nDiğer seçenekler\n“Yalnız I” — Uçuş süreleriyle ilgili doğru yargıyı dışarıda bırakır.\n“Yalnız II” — Menzillerin eşitliğini dışarıda bırakır.\n“I ve III” — En büyük yükseklikleri eşit kabul eder ve II’yi atlar.\n“II ve III” — Yükseklikleri eşit kabul eder ve I’i atlar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-006",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 2,
+    "q": "Üst balkondan bir top 45 m yükseklikten 6 m/s yatay hızla atılıyor. Bir saniye sonra, aynı düşey doğrultudaki alt balkondan ikinci bir top 20 m yükseklikten aynı yönde 12 m/s yatay hızla atılıyor. Hava direnci önemsiz, g = 10 m/s² olduğuna göre topların yere düştükleri noktalar arası yatay uzaklık kaç metredir?",
+    "o": [
+      "0",
+      "6",
+      "12",
+      "18",
+      "24"
+    ],
+    "a": 1,
+    "x": "Topların ayrı ayrı uçuş süreleri 3 s ve 2 s’dir. İkinci top bir saniye sonra atıldığı için ikisi aynı anda yere ulaşır. Yatay yollar 18 m ve 24 m olduğundan düşme noktaları arasında 6 m vardır.\n\nDiğer seçenekler\n“0” — Aynı anda yere inmelerini aynı noktaya inme sanır.\n“12” — Bir saniyelik atış farkını, ikinci topun uçuş süresi olarak alır.\n“18” — İlk topun aldığı yatay yoldur.\n“24” — İkinci topun aldığı yatay yoldur."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-007",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 2,
+    "q": "Yerden eğik atılan bir top, bir duvarın üst kenarıyla aynı yüksekliğe atıldıktan 0,5 s ve 2,5 s sonra ulaşıyor. Hava direnci ihmal ediliyor, g = 10 m/s². Topun düşey ilk hız bileşeninin büyüklüğü kaç m/s’dir?",
+    "o": [
+      "5",
+      "10",
+      "12,5",
+      "15",
+      "20"
+    ],
+    "a": 3,
+    "x": "Aynı yüksekliğe çıkış ve iniş anları tepe anına göre simetriktir. Bu yüzden top 1,5 s sonra en yüksek noktaya çıkar. Düşey hızı bu sürede sıfıra indiğinden ilk düşey hız 15 m/s’dir.\n\nDiğer seçenekler\n“5” — İlk yüksekliğe varış anını tepe anı kabul eder.\n“10” — İki geçiş arasındaki sürenin yarısını, başlangıçtan tepeye geçen süre sanır.\n“12,5” — İkinci geçiş süresini ikiye böler.\n“20” — İki geçiş arasındaki farkı doğrudan g ile çarpar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-008",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 3,
+    "q": "A cismi yerden 30 m yüksekteki bir terastan doğuya 10 m/s yatay hızla atılıyor. Aynı anda terasın düşey izdüşümünden 40 m doğudaki bir noktadan B cismi, batıya 10 m/s yatay ve yukarı 15 m/s düşey hız bileşenleriyle atılıyor. Hava direnci önemsiz ve g = 10 m/s² olduğuna göre cisimler yerden kaç metre yüksekte buluşur?",
+    "o": [
+      "10",
+      "15",
+      "20",
+      "25",
+      "30"
+    ],
+    "a": 0,
+    "x": "Yatayda birbirlerine saniyede 20 m yaklaştıkları için 2 s sonra aynı yatay konuma gelirler. O anda A’nın yüksekliği 30 − 5 · 2² = 10 m, B’ninki 15 · 2 − 5 · 2² = 10 m’dir.\n\nDiğer seçenekler\n“15” — B’nin düşey ilk hızını yükseklik yerine kullanır.\n“20” — A’nın düşeyde aldığı yoldur.\n“25” — A’nın 2 saniyedeki düşüşünü 5 m alır.\n“30” — Teras yüksekliğini düşüş olmadan kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-009",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 3,
+    "q": "Yatay zemindeki başlangıç noktasından eğik atılan bir cismin yüksekliği, başlangıçtan yatayda 10 m ve 30 m uzaklıktayken 15 m’dir. Hava direnci ihmal edilmektedir. Bu cismin yerden ulaşabileceği en büyük yükseklik kaç metredir?",
+    "o": [
+      "15",
+      "16",
+      "17,5",
+      "19",
+      "20"
+    ],
+    "a": 4,
+    "x": "Sabit yatay hız ve sabit düşey ivme nedeniyle yükseklik y = ax − bx² biçimindedir. Verilen iki noktadan a = 2 ve b = 0,05 bulunur. Aynı yüksekliğe karşılık gelen yatay konumların ortası 20 m’dir. y(20) = 20 m olur.\n\nDiğer seçenekler\n“15” — İki ölçülen yüksekliği tepe yüksekliği kabul eder.\n“16” — Parabol koşullarını sağlayan katsayıları kullanmaz.\n“17,5” — Tepeye kadar 2,5 m daha çıkıldığını varsayar.\n“19” — 20 m yatay konumda 2x − 0,05x² değerini yanlış hesaplar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-ATI-010",
+    "s": "afizik",
+    "t": "Atışlar",
+    "d": 3,
+    "q": "Yerle arasında 15 m yükseklik farkı bulunan bir platformdan bir top atılıyor. İlk hızın yatay bileşeni 15 m/s, düşey bileşeni yukarı yönde 10 m/s’dir. Hava direnci ihmal edilip g = 10 m/s² alındığında top yere hangi süratle çarpar?",
+    "o": [
+      "15",
+      "20",
+      "25",
+      "30",
+      "35"
+    ],
+    "a": 2,
+    "x": "Topun yüksekliği 15 + 10t − 5t² olup yere 3 s’de ulaşır. Düşey hız o anda aşağı yönde 20 m/s, yatay hız 15 m/s’dir. Bileşenlerden sürat √(15² + 20²) = 25 m/s bulunur.\n\nDiğer seçenekler\n“15” — Yalnız yatay hız bileşenidir.\n“20” — Yalnız düşey hız bileşeninin büyüklüğüdür.\n“30” — Çarpana kadar düşey hızdaki değişimin büyüklüğüdür.\n“35” — Dik iki bileşeni skaler olarak toplar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-001",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 1,
+    "q": "Bir kapıya K ve L noktalarından, kapının düzlemine dik ve aynı yönde eşit kuvvetler ayrı ayrı uygulanıyor. K menteşe eksenine L’den iki kat uzaktadır. K’de uygulanan kuvvetin menteşe eksenine göre torku, L’de uygulananın kaç katıdır?",
+    "o": [
+      "1/4",
+      "1/2",
+      "1",
+      "2",
+      "4"
+    ],
+    "a": 3,
+    "x": "Dik kuvvet için torkun büyüklüğü kuvvet ile menteşeye uzaklığın çarpımıdır. Kuvvetler eşit, K’nin kuvvet kolu iki kat olduğundan tork oranı 2’dir.\n\nDiğer seçenekler\n“1/4” — Kuvvet koluyla ters kare ilişkisi kurar.\n“1/2” — Kuvvet kolunun oranını ters alır.\n“1” — Menteşeye uzaklık farkını yok sayar.\n“4” — Kuvvet kolu oranının karesini alır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-002",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 1,
+    "q": "Bir somun anahtarında kuvvetin uygulandığı nokta dönme ekseninden 30 cm uzaktadır. Anahtara bu uzaklığı belirleyen kola dik 20 N kuvvet uygulanıyor. Kuvvetin eksene göre torkunun büyüklüğü kaç N·m’dir?",
+    "o": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "a": 4,
+    "x": "Kuvvet kolu 0,30 m’dir. Kuvvet dik uygulandığı için tork 20 · 0,30 = 6 N·m olur.\n\nDiğer seçenekler\n“2” — Kol uzunluğunu 0,10 m alır.\n“3” — Verilen kuvvetin yarısını kullanır.\n“4” — Kol uzunluğunu 0,20 m alır.\n“5” — Kuvveti 20 N ve kolu 0,30 m olarak birlikte kullanmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-003",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 1,
+    "q": "Yatay bir çubuğun O noktasında sabit dönme ekseni vardır. Çubuğun sağ ucuna eşit büyüklükte kuvvetler farklı yönlerde, birer birer uygulanıyor. Hangi kuvvetin O’ya göre torku sıfırdır?",
+    "o": [
+      "Çubuk boyunca O’ya yönelmiş kuvvet",
+      "Çubuğa dik aşağı yönlü kuvvet",
+      "Sol aşağı 30° yönlü kuvvet",
+      "Sağ yukarı 45° yönlü kuvvet",
+      "Çubuğa dik yukarı yönlü kuvvet"
+    ],
+    "a": 0,
+    "x": "Kuvvetin etki doğrusu eksenden geçerse eksene dik uzaklık sıfırdır. Çubuk boyunca O’ya yöneltilen kuvvet bu durumu sağlar.\n\nDiğer seçenekler\n“Çubuğa dik aşağı yönlü kuvvet” — Uzaklık vardır ve kuvvet çubuğa diktir.\n“Sol aşağı 30° yönlü kuvvet” — Aşağı yönlü bileşen tork oluşturur.\n“Sağ yukarı 45° yönlü kuvvet” — Düşey bileşen tork oluşturur.\n“Çubuğa dik yukarı yönlü kuvvet” — Çubuğa dik kuvvetin moment kolu sıfır değildir."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-004",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Uzunluğu 6 m ve ağırlığı 60 N olan türdeş yatay bir çubuk, sol uçtan 2 m uzaktaki sürtünmesiz pim çevresinde dönebilir. Çubuğu dengede tutmak için sağ ucuna düşey yukarı bir F kuvveti uygulanıyor. Pimin çubuğa uyguladığı düşey kuvvetin büyüklüğü kaç N’dur?",
+    "o": [
+      "15",
+      "30",
+      "40",
+      "45",
+      "60"
+    ],
+    "a": 3,
+    "x": "Çubuğun ağırlığı pimin 1 m sağında, F ise 4 m sağında etkir. Tork dengesinden F = 15 N bulunur. Düşey kuvvetler de dengelendiğinde pim tepkisi 60 − 15 = 45 N olur.\n\nDiğer seçenekler\n“15” — Sağ uca uygulanan F kuvvetidir.\n“30” — Çubuğun ağırlığını iki düşey kuvvete eşit paylaştırır.\n“40” — Tork dengesinden gelen F’yi 20 N varsayar.\n“60” — Sağ uçtaki yukarı kuvveti yok sayar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-005",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Uzunluğu 4 m ve kütlesi 8 kg olan türdeş bir kalasın sol ucuna 4 kg, sağ ucuna 12 kg kütleli yükler bağlanıyor. Yatay denge için tek destek kalasın sol ucundan kaç metre uzağa yerleştirilmelidir?",
+    "o": [
+      "2",
+      "9/4",
+      "5/2",
+      "8/3",
+      "3"
+    ],
+    "a": 3,
+    "x": "Tek destek, tüm sistemin kütle merkezine konmalıdır. Sol uca göre ağırlıklı konum (4 · 0 + 8 · 2 + 12 · 4)/(4 + 8 + 12) = 8/3 m’dir.\n\nDiğer seçenekler\n“2” — Sağ ve sol yükleri hesaba katmadan kalasın ortasını alır.\n“9/4” — Sağ yükün etkisini eksik alır.\n“5/2” — Denge için gereken konumu sola doğru yuvarlar.\n“3” — Kalasın kendi kütlesini yok sayıp yalnız uç yüklerini kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-006",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Ağırlığı 100 N ve uzunluğu 4 m olan türdeş bir levha sol ucundan duvara menteşelenmiştir ve yataydır. Sağ uçta ayrıca 50 N ağırlığında bir yük asılıdır. Sağ uca bağlanan gergi ipi sola ve yukarı doğru yatayla 30° açı yapıyor. Sistem dengede olduğuna göre ipin gerilmesi kaç N’dur?",
+    "o": [
+      "75",
+      "100",
+      "150",
+      "200",
+      "300"
+    ],
+    "a": 3,
+    "x": "Menteşeye göre ipin yalnız düşey bileşeni tork oluşturur. Bu bileşenin 4 m’lik koluyla ürettiği tork, 100 · 2 + 50 · 4’e eşit olmalıdır. Düşey bileşen 100 N, gerilme 100/sin30° = 200 N olur.\n\nDiğer seçenekler\n“75” — Toplam ağırlığı ikiye bölerek moment kollarını yok sayar.\n“100” — Gerilmenin yalnız düşey bileşenini verir.\n“150” — Toplam ağırlığı ip gerilmesine eşitler.\n“300” — İpin düşey bileşenini 150 N alır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-007",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Bir düzenekte O noktasının 2 m sağındaki bir noktaya 12 N yukarı, 3 m sağındaki bir noktaya 8 N aşağı yönlü kuvvet uygulanıyor. Yalnız bu iki kuvvetin bileşkesi ve O’ya göre toplam torku için hangisi doğrudur?",
+    "o": [
+      "Bileşke 20 N yukarı, toplam tork sıfırdan farklıdır.",
+      "Kuvvet bileşkesi sıfır, toplam tork sıfırdır.",
+      "Bileşke 4 N aşağı, toplam tork sıfırdır.",
+      "Bileşke 4 N yukarı, toplam tork 48 N·m’dir.",
+      "Bileşke 4 N yukarı, toplam tork sıfırdır."
+    ],
+    "a": 4,
+    "x": "Kuvvetler zıt yönlüdür ve bileşke yukarı yönde 4 N’dur. Torklar zıt dönme yönlerinde olup her birinin büyüklüğü 24 N·m’dir. Toplam tork sıfırdır.\n\nDiğer seçenekler\n“Bileşke 20 N yukarı, toplam tork sıfırdan farklıdır.” — Kuvvetler aynı yönde olmadığından toplanmaz.\n“Kuvvet bileşkesi sıfır, toplam tork sıfırdır.” — 12 N ve 8 N kuvvetleri birbirini tam götürmez.\n“Bileşke 4 N aşağı, toplam tork sıfırdır.” — Bileşke büyük kuvvetin yönüne doğrudur.\n“Bileşke 4 N yukarı, toplam tork 48 N·m’dir.” — Torkların büyüklükleri zıt işaretli toplanmalıdır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-008",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 2,
+    "q": "Uzunluğu 6 m, ağırlığı 60 N olan türdeş yatay bir kirişin sol ucundan 1 m ve 5 m uzaklıktaki iki destek sırasıyla 60 N ve 80 N yukarı tepki uyguluyor. Kirişe ayrıca 80 N ağırlığında bir yük konmuştur. Yük sol uçtan kaç metre uzaktadır?",
+    "o": [
+      "2,5",
+      "3",
+      "3,25",
+      "3,5",
+      "4"
+    ],
+    "a": 3,
+    "x": "Sol desteğe göre sağ desteğin torku 80 · 4’tür. Kirişin ağırlığı sol desteğin 2 m sağında etkir. Yükün sol uçtan uzaklığı x ise 80 · 4 = 60 · 2 + 80(x − 1) eşitliğinden x = 3,5 m bulunur.\n\nDiğer seçenekler\n“2,5” — Sol desteğe göre uzaklığı, sol uca göre uzaklık sanır.\n“3” — Yükü kirişin kütle merkezinde kabul eder.\n“3,25” — Yükün moment kolunu gereğinden kısa alır.\n“4” — Tepki kuvvetlerinin verilen değerleriyle tork dengesini sağlamaz."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-009",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 3,
+    "q": "Uzunluğu 5 m ve kütlesi 20 kg olan türdeş bir kalas, sol ucundan 1 m ve 4 m uzaklıkta iki desteğe oturuyor. 40 kg kütleli bir kişi kalasın üzerinde sağa doğru yavaşça yürüyor. Sol destekle temasın kesilmek üzere olduğu anda kişi sol uçtan kaç metre uzaktadır?",
+    "o": [
+      "4",
+      "4,25",
+      "4,5",
+      "4,75",
+      "5"
+    ],
+    "a": 3,
+    "x": "Temas kesilme sınırında sol tepki sıfırdır. Sağ desteğe göre kalasın ağırlığı 1,5 m sol kolla etkir. Kişi sağda x − 4 m kolla denge kurar. 20 · 1,5 = 40(x − 4) eşitliği x = 4,75 m verir.\n\nDiğer seçenekler\n“4” — Kişi desteğin üzerinde durduğunda henüz sağa doğru tork oluşturmaz.\n“4,25” — Kişinin momenti kalasın momentinden küçüktür.\n“4,5” — Sol destek hâlâ yük taşır.\n“5” — Kişi bu konuma gelmeden devrilme sınırı aşılır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-TOR-010",
+    "s": "afizik",
+    "t": "Tork ve denge",
+    "d": 3,
+    "q": "Bir kirişin iki ucu arasındaki uzaklık 5 m’dir. Uç desteklerdeki tartılar kiriş ve üzerindeki yük dururken sırasıyla 70 N ve 50 N gösteriyor. Yük 2 m sağa taşınıp yeniden durduğunda tartılar sırasıyla 50 N ve 70 N gösteriyor. Kirişin ağırlığı kaç N’dur?",
+    "o": [
+      "40",
+      "50",
+      "60",
+      "70",
+      "100"
+    ],
+    "a": 3,
+    "x": "Sol uca göre sağ tepkinin momenti 20 · 5 artar. Kiriş sabit kaldığı için bu artış yükün ağırlığı ile 2 m’nin çarpımına eşittir. Yük 50 N, toplam 120 N olduğundan kiriş 70 N’dur.\n\nDiğer seçenekler\n“40” — Tepki değişimini toplam ağırlıktan iki kez gereksiz çıkarır.\n“50” — Yükün ağırlığıdır.\n“60” — Toplam ağırlığı yük ile kiriş arasında eşit paylaştırır.\n“100” — Sağ tepkinin momentindeki artışı, ağırlık olarak kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-001",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 1,
+    "q": "Sayfaya dik uzun bir telden sayfanın dışına, okuyucuya doğru akım geçiyor. Sayfa üzerinde telin tam üstündeki K noktasında, yalnız telin oluşturduğu manyetik alan hangi yöndedir?",
+    "o": [
+      "Sayfa üzerinde sola",
+      "Sayfa üzerinde sağa",
+      "Sayfa üzerinde yukarı",
+      "Sayfanın dışına",
+      "Sayfanın içine"
+    ],
+    "a": 0,
+    "x": "Sağ elin başparmağı akım yönünü gösterdiğinde diğer parmaklar, sayfaya bakıldığında saat yönünün tersine dolanır. Çemberin üst noktasındaki teğet sola doğrudur.\n\nDiğer seçenekler\n“Sayfa üzerinde sağa” — Akım sayfanın içine doğru olsaydı üst noktada alan sağa dönerdi.\n“Sayfa üzerinde yukarı” — Alan telden dışarı doğru radyal değildir.\n“Sayfanın dışına” — Bu yön akımın yönüdür.\n“Sayfanın içine” — Alan telin çevresinde sayfa düzlemine teğettir."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-002",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 1,
+    "q": "0,50 T büyüklüğündeki düzgün bir manyetik alanda 0,40 m uzunluğunda düz bir tel parçasından 3 A akım geçiyor. Tel alan çizgilerine dik olduğuna göre tele etki eden manyetik kuvvetin büyüklüğü kaç N’dur?",
+    "o": [
+      "0,30",
+      "0,6",
+      "0,80",
+      "1,20",
+      "1,50"
+    ],
+    "a": 1,
+    "x": "Tel alana dik olduğundan sin90° = 1’dir. Kuvvet BIL = 0,50 · 3 · 0,40 = 0,6 N olur.\n\nDiğer seçenekler\n“0,30” — Dik konuma rağmen kuvvetin yarısını alır.\n“0,80” — BIL çarpımını sağlamayan bir değer verir.\n“1,20” — 0,50 T çarpanını kullanmadan IL’yi alır.\n“1,50” — Tel uzunluğunu 1 m kabul edip BI’yi hesaplar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-003",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 1,
+    "q": "Bir elektron, düzgün bir manyetik alanın çizgilerine paralel yönde hareket ediyor. Ortamda elektrik alan ve başka kuvvetler ihmal ediliyor. Elektronun hareketi için hangi ifade doğrudur?",
+    "o": [
+      "Hızı alan çizgilerine dik yöne döner.",
+      "Sürati düzenli olarak azalır.",
+      "Alan çizgileri çevresinde çembersel hareket yapar.",
+      "Sürati düzenli olarak artar.",
+      "Hız vektörü başlangıçtaki gibi kalır."
+    ],
+    "a": 4,
+    "x": "Hız ve alan paralel olduğunda qvB sinθ ifadesindeki sinθ sıfırdır. Kuvvet oluşmadığı için hızın büyüklüğü ve yönü değişmez.\n\nDiğer seçenekler\n“Hızı alan çizgilerine dik yöne döner.” — Başlangıçtaki doğrultuyu değiştirecek kuvvet yoktur.\n“Sürati düzenli olarak azalır.” — Elektronun kinetik enerjisini azaltacak bir etki yoktur.\n“Alan çizgileri çevresinde çembersel hareket yapar.” — Çembersel hareket için alana dik hız bileşeni gerekir.\n“Sürati düzenli olarak artar.” — Manyetik kuvvet hareket yönünde bir hız artışı oluşturmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-004",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 2,
+    "q": "Bir parçacık, hızı düzgün bir manyetik alana dikken F manyetik kuvvetini görüyor. İkinci deneyde hız vektörü ve yük büyüklüğü aynı kalıyor. Yalnız yükün işareti ve alanın yönü ters çevriliyor. Yeni kuvvetin yönü ve büyüklüğü nasıl değişir?",
+    "o": [
+      "Yönü ve büyüklüğü aynı kalır.",
+      "Yönü tersine döner, büyüklüğü aynı kalır.",
+      "Yönü tersine döner, büyüklüğü yarıya iner.",
+      "Yönü değişmez, büyüklüğü iki katına çıkar.",
+      "Büyüklüğü sıfır olur."
+    ],
+    "a": 0,
+    "x": "F = q(v × B) ifadesinde q’nun ve B’nin işaretleri birlikte değişir. İki eksi işareti birbirini götürür, kuvvet vektörü aynı kalır.\n\nDiğer seçenekler\n“Yönü tersine döner, büyüklüğü aynı kalır.” — Bu durum yalnız q ya da yalnız B ters çevrilirse oluşur.\n“Yönü tersine döner, büyüklüğü yarıya iner.” — Hem yön hem büyüklük için ters çevirme sayısı yanlış yorumlanır.\n“Yönü değişmez, büyüklüğü iki katına çıkar.” — Her iki büyüklük de değişmeden verilmiştir.\n“Büyüklüğü sıfır olur.” — Hız, yeni alana da diktir."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-005",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 2,
+    "q": "Sayfaya dik iki uzun telden biri diğerinin tam solundadır. Sol telden sayfanın dışına doğru 2I, sağ telden sayfanın içine doğru I akımı geçiyor. Tellerin tam ortasında sağ telin tek başına oluşturduğu alanın büyüklüğü B’dir. İki telin bileşke alanının büyüklüğü kaç B olur?",
+    "o": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "a": 3,
+    "x": "Noktanın iki tele uzaklığı eşittir. Sol telin alanı 2B, sağ telin alanı B’dir. Sağ el kuralına göre orta noktada ikisi de yukarı yönlüdür. Büyüklükler toplanınca 3B elde edilir.\n\nDiğer seçenekler\n“0” — Alanlar aynı büyüklükte ve ters yönlü değildir.\n“1” — Alan büyüklüklerinin farkını alır.\n“2” — Yalnız sol telin katkısını kullanır.\n“4” — İki telin de 2I akım taşıdığını varsayar."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-006",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 2,
+    "q": "Bir hız seçicide doğuya giden bir parçacık, düşey aşağı yönlü 0,30 T büyüklüğünde manyetik alandan ve güneye yönelmiş 1200 N/C büyüklüğünde elektrik alandan geçiyor. Parçacık yüklüdür ve diğer kuvvetler ihmal edilmektedir. Parçacık doğrultusunu değiştirmiyorsa sürati kaç m/s’dir?",
+    "o": [
+      "360",
+      "1200",
+      "2400",
+      "4000",
+      "6000"
+    ],
+    "a": 3,
+    "x": "Pozitif yük için manyetik kuvvet kuzeye, elektrik kuvveti güneye yönelir. Negatif yükte ikisi birlikte ters döner. Sapmama koşulu |q|E = |q|vB olduğundan v = E/B = 4000 m/s’dir.\n\nDiğer seçenekler\n“360” — E’yi B’ye bölmek yerine çarpar.\n“1200” — Manyetik alan değerini hesaba katmaz.\n“2400” — Elektrik alanı 0,30 yerine 0,50 T’ye böler.\n“6000” — Alanı 0,20 T kabul eder."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-007",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 2,
+    "q": "K ve L parçacıklarının kütleleri eşittir. Yükleri sırasıyla +q ve +2q, kinetik enerjileri K₀ ve 4K₀’dır. Aynı düzgün manyetik alana dik girdiklerinde L’nin yörünge yarıçapının K’ninkine oranı kaçtır?",
+    "o": [
+      "1/4",
+      "1/2",
+      "1",
+      "2",
+      "4"
+    ],
+    "a": 2,
+    "x": "Kütleler eşit olduğundan L’nin sürati K’ninkinin 2 katıdır. r = mv/(|q|B) bağıntısında L’nin hem sürati hem yük büyüklüğü iki kat olduğundan oran 1’dir.\n\nDiğer seçenekler\n“1/4” — Enerji oranını yarıçapı ters orantılı biçimde değiştiriyormuş gibi kullanır.\n“1/2” — Yalnız yükteki artışı hesaba katar.\n“2” — Yalnız süratteki artışı hesaba katar.\n“4” — Kinetik enerji ile yarıçapı doğrudan orantılı alır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-008",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 3,
+    "q": "Sayfaya dik iki uzun tel x eksenini x = 0 cm ve x = 40 cm noktalarında kesiyor. İlk telden sayfanın dışına doğru 3I, ikinci telden sayfanın içine doğru I akımı geçiyor. Tellerin oluşturduğu toplam manyetik alan x ekseninin hangi x değerinde sıfırdır (cm cinsinden)?",
+    "o": [
+      "−60",
+      "−20",
+      "10",
+      "30",
+      "60"
+    ],
+    "a": 4,
+    "x": "Teller arasında alan yönleri aynıdır. İlk telin solunda 3I akımı hem daha büyük hem daha yakındır. İkinci telin sağında alanlar zıt yönlüdür ve 3/x = 1/(x − 40) koşulunda büyüklükleri eşittir. x = 60 cm olur.\n\nDiğer seçenekler\n“−60” — Büyük akımlı telin solunda iki alan eşitlenemez.\n“−20” — Küçük akımlı tel bu noktaya daha da uzaktır.\n“10” — Teller arasında alanlar aynı yönlüdür.\n“30” — Bu nokta da teller arasındadır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-009",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 3,
+    "q": "K ve L iyonlarının kütleleri sırasıyla m ve 2m, yük büyüklükleri q ve 3q’dur. İyonlar aynı düzgün manyetik alana sırasıyla v ve 3v süratleriyle dik giriyor. L’nin K’ye göre yörünge yarıçapı oranı ile yarım tur süresi oranı sırasıyla hangileridir?",
+    "o": [
+      "6 ve 2/3",
+      "3 ve 1",
+      "2/3 ve 2",
+      "2 ve 2",
+      "2 ve 2/3"
+    ],
+    "a": 4,
+    "x": "Yarıçap mv/(|q|B) olduğundan r_L/r_K = 2 · 3/3 = 2 olur. Yarım tur süresi πr/v’dir. L’nin sürati üç kat olduğu için süre oranı 2/3 = 2/3’tür.\n\nDiğer seçenekler\n“6 ve 2/3” — Yarıçap hesabında L’nin üç kat yükünü hesaba katmaz.\n“3 ve 1” — Sürat, kütle ve yük değişimlerinin bileşik etkisini kullanmaz.\n“2/3 ve 2” — İki oranı yer değiştirir.\n“2 ve 2” — Yarıçap doğru olsa da süre oranında hız farkını dışarıda bırakır."
+  },
+  {
+    "id": "AKE-YKS-02-AFIZ-MAN-010",
+    "s": "afizik",
+    "t": "Manyetizma",
+    "d": 3,
+    "q": "Bir akım halkasının alanı S, tur sayısı N ve akımı I’dir. Düzgün B alanıyla halkanın yüzeyine dik doğrultu arasındaki açı 30°’dir. İkinci düzende S aynı kalırken tur sayısı 2N, akım I/2, alan 1,5B ve bu açı 90° oluyor. İkinci düzende manyetik tork ilkine göre kaç kat olur?",
+    "o": [
+      "1",
+      "3/2",
+      "2",
+      "3",
+      "6"
+    ],
+    "a": 3,
+    "x": "Tork NIBS sinθ ile orantılıdır. Tur sayısıyla akımdaki değişimler birbirini dengeler. Alan oranı 1,5 ve sinüs oranı sin90°/sin30° = 2 olduğundan tork 3 katına çıkar.\n\nDiğer seçenekler\n“1” — Alan ve açı değişikliklerini hesaba katmaz.\n“3/2” — Yalnız alanın büyüklüğündeki değişimi kullanır.\n“2” — Yalnız açının etkisini kullanır.\n“6” — Tur sayısı iki katına çıktığında akımın yarıya indiğini atlar."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-001",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 1,
+    "q": "Bir öğrenci 0,20 mol glikozu suda çözüp çözeltinin hacmini 400 mL’ye tamamlıyor. Glikoz çözeltisinin molar derişimi kaç mol/L’dir?",
+    "o": [
+      "0,5",
+      "0,60",
+      "0,80",
+      "1,00",
+      "2,00"
+    ],
+    "a": 0,
+    "x": "Çözeltinin hacmi 0,400 L’dir. Molarite çözünenin mol sayısının çözelti hacmine bölünmesiyle 0,20/0,400 = 0,5 mol/L bulunur.\n\nDiğer seçenekler\n“0,60” — Verilen hacimde 0,24 mol glikoza karşılık gelir.\n“0,80” — Hacmi 0,25 L kabul eder.\n“1,00” — 400 mL’deki glikozu 0,40 mol alır.\n“2,00” — Hacmi 0,10 L alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-002",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 1,
+    "q": "12 g potasyum klorürün tamamı 108 g suda çözülüyor. Hazırlanan çözeltinin kütlece yüzde derişimi kaçtır?",
+    "o": [
+      "8",
+      "10",
+      "100/9",
+      "12",
+      "20"
+    ],
+    "a": 1,
+    "x": "Toplam çözelti kütlesi 120 g’dır. Çözünenin çözeltideki kütle payı 12/120 olduğundan yüzde derişim %10’dur.\n\nDiğer seçenekler\n“8” — 12 g tuz için toplam kütleyi 150 g varsayar.\n“100/9” — Çözelti yerine yalnız su kütlesine böler.\n“12” — 12 g tuzu 100 g çözeltide varmış gibi alır.\n“20” — Toplam kütleyi olduğundan küçük alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-003",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 1,
+    "q": "Bir kapta homojen bir glikoz çözeltisi vardır. Çözeltinin bir bölümü pipetle başka bir kaba aktarılıyor. Aktarma sırasında sıcaklık değişmiyor ve su kaybı olmuyor. İlk kapta kalan çözeltinin molaritesi ve çözünen glikoz miktarı nasıl değişir?",
+    "o": [
+      "Molarite artar, glikoz miktarı azalır.",
+      "Molarite azalır, glikoz miktarı değişmez.",
+      "İkisi de değişmez.",
+      "Molarite azalır, glikoz miktarı azalır.",
+      "Molarite değişmez, glikoz miktarı azalır."
+    ],
+    "a": 4,
+    "x": "Homojen çözeltiden bir bölüm alınırken glikoz mol sayısı ve çözelti hacmi aynı oranda azalır. Bu yüzden mol sayısı düşer, n/V oranı sabit kalır.\n\nDiğer seçenekler\n“Molarite artar, glikoz miktarı azalır.” — Çözücü tek başına uzaklaştırılmamıştır.\n“Molarite azalır, glikoz miktarı değişmez.” — Alınan homojen örnek de glikoz içerir.\n“İkisi de değişmez.” — Kalan hacim daha küçük olduğundan toplam glikoz miktarı da daha azdır.\n“Molarite azalır, glikoz miktarı azalır.” — Molariteyi düşürecek bir seyreltme yoktur."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-004",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 2,
+    "q": "Bir laboratuvarda 150 mL 0,80 M NaCl çözeltisine saf su eklenerek 0,30 M çözelti hazırlanıyor. Hacimler toplanabilir kabul edilirse kaç mL su eklenmiştir?",
+    "o": [
+      "100",
+      "150",
+      "200",
+      "250",
+      "400"
+    ],
+    "a": 3,
+    "x": "Seyreltmede çözünenin mol sayısı değişmez. 0,80 · 150 = 0,30 · V eşitliği son hacmi 400 mL verir. Eklenen su 400 − 150 = 250 mL’dir.\n\nDiğer seçenekler\n“100” — Son hacmi 250 mL’de bırakır.\n“150” — Eklenen suyu başlangıç hacmine eşit alır.\n“200” — Son hacmi 350 mL’de bırakır.\n“400” — Son çözelti hacmini, eklenecek su hacmi olarak kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-005",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 2,
+    "q": "Aynı sıcaklıktaki 250 mL 0,20 M ve 150 mL 0,60 M glikoz çözeltileri karıştırılıyor. Hacimler toplanabilir kabul edilirse karışımın glikoz derişimi kaç mol/L olur?",
+    "o": [
+      "0,20",
+      "0,25",
+      "0,30",
+      "0,35",
+      "0,40"
+    ],
+    "a": 3,
+    "x": "İki kaptaki glikoz mol sayıları toplanınca 0,14 mol elde edilir. 0,400 L toplam hacimde derişim 0,14/0,400 = 0,35 mol/L’dir.\n\nDiğer seçenekler\n“0,20” — Yalnız daha seyreltik çözeltinin derişimini alır.\n“0,25” — Toplam glikoz miktarını 0,10 mol kabul eder.\n“0,30” — İkinci kaptan gelen glikozu eksik sayar.\n“0,40” — İki molaritenin aritmetik ortalamasını alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-006",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 2,
+    "q": "Aynı tuzu içeren, kütlece %20’lik 150 g çözeltiyle %5’lik 100 g çözelti karıştırılıyor. Tuzun tamamı çözünmüş kalırsa oluşan çözeltinin kütlece yüzde derişimi kaç olur?",
+    "o": [
+      "12,5",
+      "14",
+      "15",
+      "17",
+      "25"
+    ],
+    "a": 1,
+    "x": "İlk çözelti 30 g, ikinci çözelti 5 g tuz içerir. Toplam 35 g tuz 250 g çözeltiye dağıldığından kütlece yüzde derişim %14 olur.\n\nDiğer seçenekler\n“12,5” — Farklı kütleleri eşit ağırlıkla ortalar.\n“15” — Karışımdaki toplam tuzu 37,5 g kabul eder.\n“17” — Karışımdaki toplam tuzu 42,5 g kabul eder.\n“25” — İki yüzdeyi doğrudan toplar."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-007",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 2,
+    "q": "200 mL 0,10 M MgCl₂ çözeltisiyle 300 mL 0,15 M NaCl çözeltisi karıştırılıyor. Tuzların tam ayrıştığı, çökelme olmadığı ve hacimlerin toplanabildiği kabul ediliyor. Karışımda Cl⁻ iyonu derişimi kaç mol/L’dir?",
+    "o": [
+      "0,08",
+      "0,09",
+      "0,13",
+      "0,17",
+      "0,25"
+    ],
+    "a": 3,
+    "x": "MgCl₂’den iki klorür geldiği için ilk kap 0,04 mol, NaCl’den ise 0,045 mol Cl⁻ gelir. Toplam klorür miktarı 0,500 L’ye bölündüğünde derişim 0,17 mol/L olur.\n\nDiğer seçenekler\n“0,08” — Yalnız MgCl₂’nin sağladığı klorürü sayar.\n“0,09” — Yalnız NaCl’nin sağladığı klorürü sayar.\n“0,13” — MgCl₂ başına bir klorür iyonu sayar.\n“0,25” — İki başlangıç molaritesini doğrudan toplar."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-008",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 2,
+    "q": "Aynı miktarda suyla hazırlanan aşağıdaki ideal seyreltik çözeltilerde iyonik bileşikler tam ayrışıyor. Çözeltilerden hangisinin donmaya başladığı sıcaklık en yüksektir?",
+    "o": [
+      "0,20 molal glikoz",
+      "0,15 molal KBr",
+      "0,12 molal NaCl",
+      "0,09 molal CaCl₂",
+      "0,32 molal sakkaroz"
+    ],
+    "a": 0,
+    "x": "Donma noktası alçalması çözünmüş taneciklerin etkin molalitesiyle artar. Glikoz için bu değer 0,2 mol/kg ile en küçüktür. Dolayısıyla glikoz çözeltisinin donma noktası en yüksektir.\n\nDiğer seçenekler\n“0,15 molal KBr” — İki iyon verdiği için tanecik molalitesi 0,3 olur.\n“0,12 molal NaCl” — İki iyon verdiği için tanecik molalitesi 0,24 olur.\n“0,09 molal CaCl₂” — Üç iyon verdiği için tanecik molalitesi 0,27 olur.\n“0,32 molal sakkaroz” — Ayrışmasa da molalitesi 0,32 ile daha büyüktür."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-009",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 3,
+    "q": "Kütlesi 400 g olan %20’lik bir tuz çözeltisinden, çözelti iyice karıştırıldıktan sonra 100 g alınıyor. Kalan çözeltiye 100 g saf su ekleniyor. Daha sonra yalnız su buharlaştırılarak başlangıçtaki kütlece yüzde derişime dönülüyor. Kaç gram su buharlaşmıştır?",
+    "o": [
+      "40",
+      "60",
+      "80",
+      "100",
+      "120"
+    ],
+    "a": 3,
+    "x": "Örnek alındığında kapta 60 g tuz kalır. Saf su eklemek tuz kütlesini değiştirmez. Yeniden %20’lik çözelti için toplam kütle 300 g olmalıdır. 400 g’dan 300 g’a inmek için 100 g su buharlaşır.\n\nDiğer seçenekler\n“40” — Başlangıçtaki tuz miktarının yarısını su kaybı sanır.\n“60” — Kalan tuz miktarını su kaybı olarak alır.\n“80” — Başlangıçtaki tuz miktarını su kaybı olarak alır.\n“120” — Bu kadar su buharlaşırsa son derişim %20’yi aşar."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-COZ-010",
+    "s": "akimya",
+    "t": "Çözeltiler",
+    "d": 3,
+    "q": "Bir deneyde 400 mL 0,30 M glikoz çözeltisi hazırlanacaktır. Önce 0,20 M glikoz çözeltisinden 200 mL alınır. Ardından 0,50 M glikoz çözeltisi ve saf su eklenir. Hacimler toplanabilir kabul edilirse kaç mL saf su gerekir?",
+    "o": [
+      "20",
+      "40",
+      "60",
+      "80",
+      "160"
+    ],
+    "a": 1,
+    "x": "Hedef çözelti 0,120 mol glikoz, ilk eklenen 200 mL ise 0,040 mol glikoz içerir. Kalan 0,080 mol glikoz için 0,50 M çözeltiden 160 mL alınır. Hacmi 400 mL’ye tamamlamak için 40 mL saf su gerekir.\n\nDiğer seçenekler\n“20” — Saf suyu 20 mL alırsa 400 mL’de glikoz derişimi hedefin üzerine çıkar.\n“60” — 60 mL saf su, gereken 0,50 M çözeltiye yeterli hacim bırakmaz.\n“80” — 0,080 mol değerini mL’ye dönüştürmeden alır.\n“160” — Yoğun çözeltinin hacmini saf suyun hacmiyle karıştırır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-001",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 1,
+    "q": "Sürtünmesiz bir piston altındaki ideal gaz, sıcaklığı değişmeden genleşiyor. Piston gaz kaçırmıyor. İlk duruma göre son durumda gazın özkütlesi ve taneciklerinin ortalama kinetik enerjisi nasıl değişir?",
+    "o": [
+      "Özkütle artar, ortalama enerji değişmez.",
+      "Özkütle azalır, ortalama enerji azalır.",
+      "Özkütle ve ortalama enerji artar.",
+      "Özkütle değişmez, ortalama enerji artar.",
+      "Özkütle azalır, ortalama enerji değişmez."
+    ],
+    "a": 4,
+    "x": "Kütle sabitken hacim arttığı için özkütle azalır. Ortalama kinetik enerji mutlak sıcaklığa bağlıdır ve sıcaklık değişmemiştir.\n\nDiğer seçenekler\n“Özkütle artar, ortalama enerji değişmez.” — Genleşme aynı kütleyi daha büyük hacme dağıtır.\n“Özkütle azalır, ortalama enerji azalır.” — Sabit sıcaklıkta ortalama kinetik enerji korunur.\n“Özkütle ve ortalama enerji artar.” — Sabit sıcaklık ve genleşme bu iki artışa yol açmaz.\n“Özkütle değişmez, ortalama enerji artar.” — Hacim artarken özkütle sabit kalmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-002",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 1,
+    "q": "Sabit basınç altında 27 °C’de 2 L hacim kaplayan ideal gazın sıcaklığı, gaz kaçırılmadan 127 °C’ye çıkarılıyor. Yeni hacim kaç litredir? (Mutlak sıcaklık için T = t + 273 alınız.)",
+    "o": [
+      "3/2",
+      "2",
+      "5/2",
+      "8/3",
+      "4"
+    ],
+    "a": 3,
+    "x": "Hacim, sabit basınçta mutlak sıcaklıkla doğru orantılıdır. Sıcaklık 300 K’den 400 K’ye çıktığı için yeni hacim 2 · 400/300 = 8/3 L olur.\n\nDiğer seçenekler\n“3/2” — Sıcaklık oranını ters alır.\n“2” — Isınmaya rağmen hacmi sabit bırakır.\n“5/2” — Sıcaklık artışının hacme etkisini olduğundan küçük alır.\n“4” — Mutlak sıcaklık iki katına çıkmış gibi hesaplar."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-003",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 1,
+    "q": "Eşit hacimli iki kapta aynı sıcaklık ve basınçta saf helyum ve saf karbondioksit vardır. Gazlar ideal davranıyor. Bu iki örneğin hangi özelliği kesinlikle aynıdır?",
+    "o": [
+      "Mol sayısı",
+      "Kütlesi",
+      "Birim kütlesindeki tanecik sayısı",
+      "Taneciklerinin ortalama sürati",
+      "Özkütlesi"
+    ],
+    "a": 0,
+    "x": "P, V ve T eşitse PV = nRT eşitliği her iki gaz için aynı n değerini verir. Gazların mol kütlelerinin farklı olması bu sonucu değiştirmez.\n\nDiğer seçenekler\n“Kütlesi” — Eşit mol sayıları farklı mol kütleleriyle farklı kütle verir.\n“Birim kütlesindeki tanecik sayısı” — Bir gramdaki tanecik sayısı mol kütlesine bağlıdır.\n“Taneciklerinin ortalama sürati” — Aynı sıcaklıkta daha ağır taneciklerin ortalama sürati daha düşüktür.\n“Özkütlesi” — Hacimler eşitken kütleler farklıdır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-004",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 2,
+    "q": "Bir kapta birbirleriyle tepkimeye girmeyen 3 mol helyum ile 2 mol neon vardır. Karışımın basıncı 6 atm’dir. İdeal davranış kabul edilirse helyumun kısmi basıncı kaç atm’dir?",
+    "o": [
+      "2",
+      "2,4",
+      "3",
+      "3,6",
+      "6"
+    ],
+    "a": 3,
+    "x": "Helyumun mol kesri 3/5’tir. Kısmi basıncı, toplam basıncın bu kesirle çarpımı olan 6 · 3/5 = 3,6 atm’dir.\n\nDiğer seçenekler\n“2” — Mol sayısını toplam basınca uygun biçimde oranlamaz.\n“2,4” — Neonun kısmi basıncıdır.\n“3” — Helyumun mol sayısını basınç olarak kullanır.\n“6” — Toplam basıncı helyuma ait kabul eder."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-005",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 2,
+    "q": "Sabit hacimli bir kapta 300 K’de 2,4 atm basınç yapan ideal gazın başlangıçtaki mol miktarının üçte biri kaptan çıkarılıyor. Kap yeniden kapatılıp kalan gaz 450 K’ye getiriliyor. Son basınç kaç atm’dir?",
+    "o": [
+      "1,6",
+      "2,4",
+      "3,0",
+      "3,6",
+      "4,8"
+    ],
+    "a": 1,
+    "x": "Sabit hacimde basınç nT ile orantılıdır. Mol miktarı 2/3 katına, sıcaklık 3/2 katına geldiğinden bu iki çarpan birbirini dengeler. Basınç 2,4 atm olur.\n\nDiğer seçenekler\n“1,6” — Yalnız mol azalmasını hesaba katar.\n“3,0” — İki değişimin ortak çarpanı 1 yerine 1,25 alınmıştır.\n“3,6” — Yalnız sıcaklık artışını kullanır.\n“4,8” — Gaz miktarı ve mutlak sıcaklık değişimlerini yanlış birleştirir."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-006",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 2,
+    "q": "Suyla tepkimeye girmeyen X gazı su üzerinde toplanıyor. Gaz ve su buharından oluşan karışımın toplam basıncı 780 mmHg, o sıcaklıkta suyun buhar basıncı 20 mmHg’dir. Karışımda X’in kısmi basıncı kaç mmHg’dir?",
+    "o": [
+      "20",
+      "760",
+      "780",
+      "800",
+      "820"
+    ],
+    "a": 1,
+    "x": "Toplam basınç, X ile su buharının kısmi basınçları toplamıdır. X’in katkısı 780 − 20 = 760 mmHg’dir.\n\nDiğer seçenekler\n“20” — Bu değer su buharına aittir.\n“780” — Su buharının toplam basınca katkısını hesaba katmaz.\n“800” — Su buharının basıncını toplamdan çıkarmak yerine ekler.\n“820” — Su buharı basıncını toplam basınca iki kez ekler."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-007",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 2,
+    "q": "Kütlesi 22 g olan saf ideal gaz, 0 °C ve 2 atm’de 5,6 L hacim kaplıyor. İdeal gazın 0 °C ve 1 atm’de molar hacmi 22,4 L olduğuna göre bu gazın mol kütlesi kaç g/mol’dür?",
+    "o": [
+      "11",
+      "22",
+      "33",
+      "44",
+      "88"
+    ],
+    "a": 3,
+    "x": "Aynı sıcaklıkta basınç 1 atm’ye düşürülürse hacim 11,2 L olur. Bu, 22,4 L’nin yarısıdır ve 0,5 mol gaz demektir. Mol kütlesi 22/0,5 = 44 g/mol’dür.\n\nDiğer seçenekler\n“11” — Numune kütlesini ikiye bölüp mol kütlesi sanır.\n“22” — Numunenin 1 mol olduğunu kabul eder.\n“33” — Verilen basınç ve hacimle 0,50 mol sonucu elde edilmelidir.\n“88” — İlk 5,6 L hacmi 1 atm’deki hacim gibi kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-008",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 2,
+    "q": "Toplam hacmi 10 L olan bir kabın iki bölümü gaz geçirmeyen sürtünmesiz pistonla ayrılmıştır. Sol bölümde 2 mol He, sağda 3 mol Ne vardır. İki bölümün sıcaklıkları eşit ve sabittir. Sola 1 mol He eklenip denge kurulduğunda sol bölümün hacmi başlangıca göre kaç litre artar?",
+    "o": [
+      "1",
+      "1,5",
+      "2",
+      "2,5",
+      "3"
+    ],
+    "a": 0,
+    "x": "Dengedeki basınçlar ve sıcaklıklar eşit olduğundan hacimler mol sayılarıyla orantılıdır. Sol taraf ilk durumda 4 L, gaz eklenince 5 L olur. Artış 1 L’dir.\n\nDiğer seçenekler\n“1,5” — Son durumda sol tarafı 5,5 L kabul eder.\n“2” — Sol hacmi mol sayısına tek başına orantılayıp sağ basıncın değişmesini hesaba katmaz.\n“2,5” — Kabın yarısı yerine 6,5 L’yi sol tarafa ayırır.\n“3” — Eklenen mol miktarının etkisini olduğundan büyük alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-009",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 3,
+    "q": "Bir muslukla birbirine bağlanan sabit hacimli iki kap aynı ideal gazı içeriyor. 3 L’lik K kabı 300 K’de 8 atm, 6 L’lik L kabı 400 K’de 2 atm basınçtadır. Musluk açılıyor ve iki kabın sıcaklıkları ayrı ayrı sabit tutuluyor. Mekanik denge kurulduğunda ortak basınç kaç atm olur?",
+    "o": [
+      "4",
+      "4,4",
+      "5",
+      "5,6",
+      "6"
+    ],
+    "a": 1,
+    "x": "Toplam mol sayısı değişmez. PV/(RT) kullanılırsa P(3/300 + 6/400) = 8 · 3/300 + 2 · 6/400 eşitliği elde edilir. Buradan P = 4,4 atm bulunur.\n\nDiğer seçenekler\n“4” — Yalnız hacimlere göre ortalama alıp sıcaklık farkını yok sayar.\n“5” — İki basıncın aritmetik ortalamasıdır.\n“5,6” — İki kabın V/T ağırlıklarını ters kullanır.\n“6” — 8 atm’lik kabın payını gereğinden büyük alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-GAZ-010",
+    "s": "akimya",
+    "t": "Gazlar",
+    "d": 3,
+    "q": "Aynı sıcaklık ve basınçta X gazının bir küçük delikten molce efüzyon hızı, N₂ gazınınkinin 2/3’üdür. N₂’nin mol kütlesi 28 g/mol olduğuna göre, gazlar ideal kabul edildiğinde X’in mol kütlesi kaç g/mol’dür?",
+    "o": [
+      "28",
+      "42",
+      "56",
+      "63",
+      "84"
+    ],
+    "a": 3,
+    "x": "Graham yasasına göre hız mol kütlesinin kareköküyle ters orantılıdır. 2/3 = √(28/M_X) olduğundan M_X = 28 · (3/2)² = 63 g/mol çıkar.\n\nDiğer seçenekler\n“28” — Hızları farklı olmasına rağmen mol kütlelerini eşit kabul eder.\n“42” — Hız oranının tersini alır ama karesini almaz.\n“56” — X’in mol kütlesini N₂’nin tam iki katı alır.\n“84” — 3/2 oranının karesi yerine 3 çarpanını kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-001",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 1,
+    "q": "Sabit basınçta gerçekleşen bir tepkime için ΔH = −85 kJ olarak verilmiştir. Denklemde yazan miktarlarda tepkime gerçekleştiğinde aşağıdakilerden hangisi doğrudur?",
+    "o": [
+      "Sistem çevreden 85 kJ ısı alır.",
+      "Ürünlerin entalpisi girenlerinkinden 85 kJ büyüktür.",
+      "Girenler ve ürünler aynı entalpiye sahiptir.",
+      "ΔH yalnız aktivasyon enerjisini gösterir.",
+      "Sistem çevreye 85 kJ ısı verir."
+    ],
+    "a": 4,
+    "x": "ΔH, ürün entalpilerinden giren entalpileri çıkarılarak bulunur. Negatif olduğundan ürünler daha düşük entalpilidir ve sabit basınçta sistem çevreye ısı verir.\n\nDiğer seçenekler\n“Sistem çevreden 85 kJ ısı alır.” — Isı alınması pozitif ΔH’ye karşılık gelir.\n“Ürünlerin entalpisi girenlerinkinden 85 kJ büyüktür.” — Negatif ΔH ürünlerin daha düşük entalpide olduğunu gösterir.\n“Girenler ve ürünler aynı entalpiye sahiptir.” — Eşit entalpiler ΔH = 0 sonucunu verirdi.\n“ΔH yalnız aktivasyon enerjisini gösterir.” — Aktivasyon enerjisi enerji engelini, ΔH başlangıç ve son arasındaki farkı verir."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-002",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 1,
+    "q": "N₂(g) + 3H₂(g) → 2NH₃(g) tepkimesi için ΔH = −92 kJ’dür. Aynı koşullarda 1 mol NH₃(g)’ün N₂(g) ve H₂(g)’ye ayrışmasının entalpi değişimi kaç kJ’dür?",
+    "o": [
+      "−92",
+      "−46",
+      "0",
+      "46",
+      "92"
+    ],
+    "a": 3,
+    "x": "Ayrışma, verilen tepkimenin ters yönüdür ve işareti +92 kJ olur. Bu değer 2 mol amonyağa karşılık geldiği için 1 mol için ΔH = +46 kJ’dür.\n\nDiğer seçenekler\n“−92” — Ne yönü ne mol miktarını değiştirir.\n“−46” — Mol miktarını yarıya indirir ama tepkime yönünü değiştirmez.\n“0” — Ters yöndeki tepkimeyi ısı değişimsiz sayar.\n“92” — Ters yönü kullanıp 2 mol için verilen değeri 1 mole uygular."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-003",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 1,
+    "q": "Sabit basınçtaki iyi yalıtılmış bir kapta, suyla aynı sıcaklıktaki bir tuz suya ekleniyor ve çözündükçe ölçülen sıcaklık düşüyor. Başka bir fiziksel değişim olmadığına göre çözünmenin entalpi değişimi ve ısı alışverişi hakkında hangisi doğrudur?",
+    "o": [
+      "ΔH pozitiftir, çözünme suyun ısıl enerjisinden yararlanır.",
+      "ΔH pozitiftir, çözünme suya ısı verir.",
+      "ΔH negatiftir, çözünme ısı verir.",
+      "ΔH sıfırdır, suyun soğuması ısıyla ilgili değildir.",
+      "ΔH negatiftir, çözünme suyun ısıl enerjisini alır."
+    ],
+    "a": 0,
+    "x": "Yalıtım nedeniyle dışarıdan ısı gelmez. Suyun sıcaklığının düşmesi, çözünme için ısıl enerjinin kullanıldığını gösterir. Bu nedenle süreç endotermiktir ve ΔH pozitiftir.\n\nDiğer seçenekler\n“ΔH pozitiftir, çözünme suya ısı verir.” — Isı suya verilseydi suyun sıcaklığı yükselirdi.\n“ΔH negatiftir, çözünme ısı verir.” — Isı veren çözünme suyu soğutmaz.\n“ΔH sıfırdır, suyun soğuması ısıyla ilgili değildir.” — Sıcaklık düşüşü ısıl enerji aktarımına işaret eder.\n“ΔH negatiftir, çözünme suyun ısıl enerjisini alır.” — Isı alan çözünmenin entalpi değişimi pozitiftir."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-004",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 2,
+    "q": "Aynı koşullarda aşağıdaki iki tepkimenin entalpi değişimleri verilmiştir.\nC(k) + O₂(g) → CO₂(g)    ΔH = −394 kJ\nCO(g) + 1/2 O₂(g) → CO₂(g)    ΔH = −283 kJ\nC(k) + 1/2 O₂(g) → CO(g) tepkimesinin ΔH değeri kaç kJ’dür?",
+    "o": [
+      "−677",
+      "−394",
+      "−283",
+      "−111",
+      "111"
+    ],
+    "a": 3,
+    "x": "İkinci denklem ters çevrilip ilk denklemle toplanır. CO₂ iki taraftan sadeleşir ve O₂’nin yarısı kalır. ΔH = −394 + 283 = −111 kJ’dür.\n\nDiğer seçenekler\n“−677” — İkinci denklemi ters çevirmeden entalpi değişimlerini toplar.\n“−394” — Yalnız ilk tepkimeyi kullanır.\n“−283” — Yalnız CO’nun yükseltgenmesine ait ısıyı kullanır.\n“111” — Hess toplamının işaretini ters alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-005",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 2,
+    "q": "N₂(g) + O₂(g) → 2NO(g) tepkimesi için ortalama bağ enerjileri N≡N için 945, O=O için 498 ve NO’daki bağ için 631 kJ/mol’dür. Bu değerlere göre tepkimenin tahmini entalpi değişimi kaç kJ’dür?",
+    "o": [
+      "−181",
+      "90,5",
+      "181",
+      "812",
+      "1443"
+    ],
+    "a": 2,
+    "x": "Bir N≡N ve bir O=O bağını kırmak 1443 kJ gerektirir. İki NO bağı oluşurken 1262 kJ açığa çıkar. Net değişim 1443 − 1262 = +181 kJ’dür.\n\nDiğer seçenekler\n“−181” — Kırılan ve oluşan bağların enerji farkını ters alır.\n“90,5” — Tepkimeyi denklemdeki 2 mol NO yerine 1 mol NO için verir.\n“812” — İki NO bağı yerine yalnız bir NO bağı oluştuğunu varsayar.\n“1443” — Bağ oluşumu sırasında açığa çıkan enerjiyi hesaba katmaz."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-006",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 2,
+    "q": "Standart oluşum entalpileri CH₄(g) için −75, CO₂(g) için −394 ve H₂O(g) için −242 kJ/mol’dür. CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(g) tepkimesinin standart entalpi değişimi kaç kJ’dür?",
+    "o": [
+      "−953",
+      "−878",
+      "−803",
+      "−561",
+      "803"
+    ],
+    "a": 2,
+    "x": "Standart koşullarda O₂(g)’nin oluşum entalpisi sıfırdır. Ürünlerin oluşum entalpileri toplamı −878 kJ’dür. Bundan girenlerin −75 kJ değeri çıkarılırsa ΔH = −803 kJ olur.\n\nDiğer seçenekler\n“−953” — −75 kJ değerini çıkarmak yerine toplar.\n“−878” — Metanın oluşum entalpisini hesaba katmaz.\n“−561” — Ürünlerde iki yerine bir mol su sayar.\n“803” — Ürünler eksi girenler yerine ters farkı alır."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-007",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 2,
+    "q": "Tek basamaklı bir tepkimenin ileri aktivasyon enerjisi 105 kJ/mol, geri aktivasyon enerjisi 45 kJ/mol’dür. Bir katalizör, enerji profilindeki tepeyi 20 kJ/mol düşürürken girenlerin ve ürünlerin enerji düzeyini değiştirmiyor. Katalizörlü profilde geri aktivasyon enerjisi kaç kJ/mol olur?",
+    "o": [
+      "20",
+      "25",
+      "45",
+      "60",
+      "85"
+    ],
+    "a": 1,
+    "x": "Geri aktivasyon enerjisi tepe ile ürünlerin enerji düzeyi arasındaki farktır. Ürün düzeyi sabit ve tepe 20 kJ/mol daha aşağıda olduğundan yeni fark 45 − 20 = 25 kJ/mol’dür.\n\nDiğer seçenekler\n“20” — Tepenin ne kadar düştüğünü verir.\n“45” — Katalizörsüz geri aktivasyon enerjisidir.\n“60” — İlk ileri ve geri engeller arasındaki farktır.\n“85” — Katalizörlü ileri aktivasyon enerjisidir."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-008",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 3,
+    "q": "Metanın bir molü tamamen yandığında su buharı oluşursa 802 kJ, sıvı su oluşursa 890 kJ ısı açığa çıkıyor. Her mol metandan 2 mol su oluşur. 1,5 mol metan tamamen yakılıp oluşan suyun 2 molü yoğuşturulursa aynı koşullarda toplam kaç kJ ısı açığa çıkar?",
+    "o": [
+      "1203",
+      "1247",
+      "1291",
+      "1335",
+      "1379"
+    ],
+    "a": 2,
+    "x": "Su başlangıçta buhar sayılırsa yanmadan 1203 kJ açığa çıkar. Buhar ve sıvı durumlar arasındaki 88 kJ fark, 2 mol su içindir. Yoğuşma mol başına 44 kJ verir. 2 mol yoğuşma eklenince toplam 1291 kJ olur.\n\nDiğer seçenekler\n“1203” — Hiç su yoğuşmadığını kabul eder.\n“1247” — Yalnız 1 mol suyun yoğuşma ısısını ekler.\n“1335” — Oluşan 3 mol suyun tümünü sıvı alır.\n“1379” — 4 mol su yoğuşmuş gibi ısı ekler."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-009",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 3,
+    "q": "Yalnız metan ve etan içeren 12,4 g gaz karışımı tamamen yakıldığında 668 kJ ısı açığa çıkıyor. Bu koşullarda 1 mol metan 890 kJ, 1 mol etan 1560 kJ ısı verir. Mol kütleleri metan için 16, etan için 30 g/mol’dür. Başlangıç karışımında kaç gram metan bulunur?",
+    "o": [
+      "3,2",
+      "4,8",
+      "6,0",
+      "6,4",
+      "8,0"
+    ],
+    "a": 3,
+    "x": "Metan m mol, etan e mol ise kütle eşitliği 16m + 30e = 12,4, ısı eşitliği 890m + 1560e = 668 olur. Çözüm m = 0,4 mol verir. Metan kütlesi 0,4 · 16 = 6,4 g’dır.\n\nDiğer seçenekler\n“3,2” — Metan miktarını 0,20 mol kabul eder.\n“4,8” — 0,30 mol metan iki ölçümü aynı anda sağlamaz.\n“6,0” — Çözümdeki etan kütlesini verir.\n“8,0” — Metan miktarını 0,50 mol kabul eder."
+  },
+  {
+    "id": "AKE-YKS-02-AKIM-ISI-010",
+    "s": "akimya",
+    "t": "Tepkime ısıları",
+    "d": 3,
+    "q": "A, B, C, D ve E maddeleri için aynı koşullarda şu tepkimeler verilmiştir.\nA → B + D    ΔH = +90 kJ\nC + D → B    ΔH = −50 kJ\nC → E    ΔH = −20 kJ\nA + E → 2B tepkimesinin entalpi değişimi kaç kJ’dür?",
+    "o": [
+      "20",
+      "40",
+      "60",
+      "90",
+      "160"
+    ],
+    "a": 2,
+    "x": "İlk iki denklem toplanınca D sadeleşir ve A + C → 2B için ΔH = 40 kJ bulunur. E’yi giren yapmak için C → E ters çevrilir. +20 kJ daha eklendiğinde istenen değişim +60 kJ’dür.\n\nDiğer seçenekler\n“20” — C → E denklemini ters çevirmeden −20 kJ ekler.\n“40” — A + C → 2B tepkimesinde kalır.\n“90” — Yalnız ilk tepkimenin entalpisini alır.\n“160” — −50 kJ değerini +50 kJ olarak kullanır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-001",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 1,
+    "q": "The hill trail remained closed for another week ---- the fallen trees had already been removed.",
+    "o": [
+      "even though",
+      "only if",
+      "because",
+      "so that",
+      "until"
+    ],
+    "a": 0,
+    "x": "Devrilen ağaçlar temizlendiğinde yolun açılması beklenir. Buna rağmen kapanışın sürmesi beklentiye aykırıdır. Bu karşıtlığı even though kurar.\n\nDiğer seçenekler\n“only if” — Ağaçların kaldırılmasını kapanış için zorunlu koşul yapar.\n“because” — Temizlenmeyi kapanışın gerekçesi yapar.\n“so that” — Yolun kapatılmasını ağaçların zaten kaldırılmış olması amacına bağlar.\n“until” — Önceden tamamlanmış işi kapanışın bitiş sınırı yapar."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-002",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 1,
+    "q": "The garden volunteers chose early morning shifts ---- temperatures are lower then and less water evaporates during watering.",
+    "o": [
+      "even if",
+      "unless",
+      "so that",
+      "whereas",
+      "because"
+    ],
+    "a": 4,
+    "x": "Sabahın serin olması ve daha az su kaybedilmesi vardiya tercihinin nedenidir. Because bu nedeni tanıtır.\n\nDiğer seçenekler\n“even if” — Sıcaklıkların düşük olmasını etkisiz bir varsayım gibi sunar.\n“unless” — Serinliğin gerçekleşmemesini koşul yapar.\n“so that” — Düşük sıcaklığı vardiya seçiminin oluşturacağı bir sonuç yapar.\n“whereas” — İki olguyu karşılaştırır ama seçim gerekçesini kurmaz."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-003",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 1,
+    "q": "The remote sensor could only store a few hours of readings. ----, the team added a memory card before leaving it in the field for a week.",
+    "o": [
+      "Therefore",
+      "Instead",
+      "Meanwhile",
+      "Otherwise",
+      "Similarly"
+    ],
+    "a": 0,
+    "x": "Kayıt alanının yetersizliği ek belleği gerekli kılar. Therefore, ilk cümledeki nedenden ikinci cümledeki sonucu çıkarır.\n\nDiğer seçenekler\n“Instead” — Daha önce önerilen bir eylemin yerini alan seçeneği gösterir.\n“Meanwhile” — Zaman bakımından eş zamanlılık bildirir.\n“Otherwise” — Bir eylem yapılmadığında ne olacağını bildirir.\n“Similarly” — İki benzer örnek arasında ilişki kurar."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-004",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 2,
+    "q": "There is one condition for taking an original map out of the reading room. You may take it upstairs ---- a member of staff accompanies you.",
+    "o": [
+      "now that",
+      "whereas",
+      "as though",
+      "even if",
+      "provided that"
+    ],
+    "a": 4,
+    "x": "İlk cümle tek bir izin koşulu bulunduğunu söyler. Provided that, haritanın çıkarılmasını personelin eşlik etmesi koşuluna bağlar.\n\nDiğer seçenekler\n“now that” — Koşulu önceden gerçekleşmiş bir olgu gibi sunar.\n“whereas” — Kuralın koşulu yerine iki ayrı durum arasında karşıtlık kurar.\n“as though” — Eşlik etme durumunu görünüş veya varsayımsal benzerlik olarak verir.\n“even if” — Personel eşlik etse de etmese de izin varmış anlamına gelir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-005",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 2,
+    "q": "The interviews recorded in quiet offices could be transcribed automatically. ----, the interviews conducted in busy markets had to be transcribed by hand.",
+    "o": [
+      "By contrast",
+      "As a result",
+      "Similarly",
+      "In particular",
+      "In other words"
+    ],
+    "a": 0,
+    "x": "Sakin ofis kayıtları otomatik, pazar kayıtları elle çözümlenmiştir. İki grubun işlenme biçimi arasındaki karşıtlığı by contrast belirtir.\n\nDiğer seçenekler\n“As a result” — İlk grubun otomatik işlenmesi, ikinci grubun elle işlenmesine neden olmaz.\n“Similarly” — İki kayıt grubu aynı şekilde işlenmemiştir.\n“In particular” — Pazar kayıtları ilk grubun özel bir örneği değildir.\n“In other words” — İkinci cümle ilk yargının başka sözlerle ifadesi değildir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-006",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 2,
+    "q": "Researchers could not compare the century-old coastal records ---- the readings from different stations had been converted to the same scale.",
+    "o": [
+      "now that",
+      "as long as",
+      "once",
+      "since",
+      "until"
+    ],
+    "a": 4,
+    "x": "Kayıtlar ortak ölçeğe çevrilene dek karşılaştırma yapılamaz. Until bu zaman sınırını kurar.\n\nDiğer seçenekler\n“now that” — Dönüşümü karşılaştırılamamanın güncel gerekçesi yapar.\n“as long as” — Ortak ölçeğe dönüştürme, karşılaştırmayı engelleyen devamlı koşul değildir.\n“once” — Dönüşüm sonrasında da karşılaştırma yapılamadığını düşündürür.\n“since” — Dönüşümü karşılaştırılamamanın nedeni yapar."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-007",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 2,
+    "q": "The repair team placed a numbered marker beside each damaged tile ---- later crews could match every photograph to its exact location.",
+    "o": [
+      "so that",
+      "unless",
+      "now that",
+      "even though",
+      "as if"
+    ],
+    "a": 0,
+    "x": "İşaretlerin konulma amacı, daha sonra gelen ekiplerin fotoğrafları yerleriyle eşleştirebilmesidir. So that bu amacı belirtir.\n\nDiğer seçenekler\n“unless” — Eşleştirme yapılabilmesini işaret koymamanın koşulu yapar.\n“now that” — Daha sonraki ekiplerin olanağını zaten gerçekleşmiş bir gerekçe gibi sunar.\n“even though” — Amaçlanan yararı bir engel ya da karşıtlık gibi sunar.\n“as if” — Eşleştirmeyi yalnız görünüş veya varsayım gibi verir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-008",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 2,
+    "q": "The village had no workshop large enough to house the restored boat. ---- building an entirely new structure, the volunteers extended an unused railway shed.",
+    "o": [
+      "Regardless of",
+      "In addition to",
+      "Owing to",
+      "Along with",
+      "Instead of"
+    ],
+    "a": 4,
+    "x": "Gönüllüler, yeni bina seçeneğinin yerine kullanılmayan kulübeyi büyütmüştür. Instead of gerçekleşmeyen seçeneği tanıtır.\n\nDiğer seçenekler\n“Regardless of” — Yeni bina yapılıp yapılmamasının etkisiz olduğunu söyler.\n“In addition to” — Her iki yapım işinin de gerçekleştiğini düşündürür.\n“Owing to” — Yeni bina yapımını kulübenin büyütülmesinin nedeni olarak verir.\n“Along with” — İki işin birlikte yapıldığını düşündürür."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-009",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 3,
+    "q": "The new material is cheaper per unit. ----, its useful life is only half as long. ----, judging savings by purchase price alone would be misleading.",
+    "o": [
+      "However / Therefore",
+      "Moreover / Otherwise",
+      "For instance / Meanwhile",
+      "Similarly / Even so",
+      "Consequently / In particular"
+    ],
+    "a": 0,
+    "x": "Kısa kullanım ömrü düşük satın alma fiyatının sağladığı avantajı sınırlar. İlk boşluğa however gelir. Yalnız fiyatla değerlendirmenin yanıltıcı olması bu iki bilginin sonucudur, bu nedenle ikinci boşluk therefore olur.\n\nDiğer seçenekler\n“Moreover / Otherwise” — Son cümle, koşulun gerçekleşmemesi hâlinde oluşacak bir durum değildir.\n“For instance / Meanwhile” — Kısa ömür, düşük fiyatın örneği değildir ve son cümle zaman ilişkisi kurmaz.\n“Similarly / Even so” — İlk iki olgu paralel değildir ve son yargı onlara rağmen söylenmez.\n“Consequently / In particular” — Kısa ömür düşük fiyatın kanıtlanmış bir sonucu değildir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-LIN-010",
+    "s": "ingilizce",
+    "t": "Linkers",
+    "d": 3,
+    "q": "---- the two wetlands support similar numbers of bird species, the kinds of birds found in each are quite different. ----, replacing one wetland with an area of equal size would not necessarily preserve the same species.",
+    "o": [
+      "Unless / In fact",
+      "As long as / Likewise",
+      "Now that / For instance",
+      "Since / Nevertheless",
+      "Although / Consequently"
+    ],
+    "a": 4,
+    "x": "Tür sayılarının benzerliği türlerin kimliğinin de aynı olacağı beklentisini doğurabilir. İlk boşluk although ile bu beklentiyi sınırlar. Son cümle, tür bileşiminin farklı olmasından çıkan sonucu consequently ile belirtir.\n\nDiğer seçenekler\n“Unless / In fact” — Bilinen benzerliği olumsuz bir koşula dönüştürür.\n“As long as / Likewise” — Tür sayılarını çeşitlilik farkının zorunlu koşulu gibi kullanır.\n“Now that / For instance” — Tür sayısı benzerliğini yeni gerçekleşmiş neden, son yargıyı örnek gibi verir.\n“Since / Nevertheless” — Benzer tür sayılarını farklı tür bileşiminin nedeni yapar."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-001",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 1,
+    "q": "Strong winds were forecast for Saturday, so the organizers decided to ---- the outdoor concert until the following weekend.",
+    "o": [
+      "put off",
+      "set out",
+      "take over",
+      "bring in",
+      "turn up"
+    ],
+    "a": 0,
+    "x": "Konser, hava koşulları nedeniyle daha sonraki tarihe ertelenmiştir. Put off “ertelemek” demektir ve until ile belirtilen yeni tarihe uyar.\n\nDiğer seçenekler\n“set out” — Yola çıkma ya da bir planı ortaya koyma anlamındadır.\n“take over” — Görev ya da kontrolü devralmayı ifade eder.\n“bring in” — Bir şeyi getirme, katma veya içeri alma anlamı taşır.\n“turn up” — Ortaya çıkmak veya bir ayarı yükseltmek anlamına gelir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-002",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 1,
+    "q": "The workshop had to stop printing labels when it ---- paper and could not get more until the following morning.",
+    "o": [
+      "went along with",
+      "came up with",
+      "got away with",
+      "looked up to",
+      "ran out of"
+    ],
+    "a": 4,
+    "x": "Kâğıt bittiği ve yenisi hemen alınamadığı için baskı durur. Run out of, kullanılabilir bir şeyin tükenmesini anlatır.\n\nDiğer seçenekler\n“went along with” — Bir öneriye katılmayı veya eşlik etmeyi bildirir.\n“came up with” — Bir fikir veya çözüm bulmayı anlatır.\n“got away with” — Bir davranışın olumsuz sonucundan kurtulmak demektir.\n“looked up to” — Birine saygı duymak anlamındadır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-003",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 1,
+    "q": "While the greenhouse manager was away, a volunteer agreed to ---- the seedlings by watering them and checking the temperature every morning.",
+    "o": [
+      "turn down",
+      "get over",
+      "look into",
+      "come by",
+      "look after"
+    ],
+    "a": 4,
+    "x": "Sulamak ve sıcaklığı denetlemek bakım görevleridir. Look after, bitkilere bakmak ve onları gözetmek anlamını karşılar.\n\nDiğer seçenekler\n“turn down” — Bir öneriyi reddetmek veya bir ayarı kısmak demektir.\n“get over” — Bir hastalığı veya güçlüğü atlatmayı anlatır.\n“look into” — Bir sorunu ya da konuyu araştırmayı ifade eder.\n“come by” — Bir yere uğramak veya bir şeyi edinmek anlamına gelir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-004",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 2,
+    "q": "While sorting a drawer that had not been opened for years, the librarian ---- a handwritten list she had not known existed.",
+    "o": [
+      "came across",
+      "looked after",
+      "made for",
+      "gave away",
+      "left out"
+    ],
+    "a": 0,
+    "x": "Liste özel olarak aranmamış, çekmece düzenlenirken beklenmedik biçimde bulunmuştur. Come across bu tür rastlantısal karşılaşmayı anlatır.\n\nDiğer seçenekler\n“looked after” — Bulmak yerine bakımını üstlenmeyi ifade eder.\n“made for” — Bir yöne gitmeyi veya bir sonuca katkıda bulunmayı anlatır.\n“gave away” — Bir şeyi vermek veya bir sırrı açığa çıkarmak anlamındadır.\n“left out” — Bir şeyi dışarıda bırakmak demektir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-005",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 2,
+    "q": "Repeated readings from two independent instruments allowed the engineers to ---- a faulty sensor as the source of the discrepancy.",
+    "o": [
+      "rule out",
+      "put up with",
+      "turn into",
+      "take after",
+      "pass on"
+    ],
+    "a": 0,
+    "x": "Bağımsız ölçümler sayesinde bir olasılık nedenler arasından çıkarılmıştır. Rule out burada bir ihtimali elemek anlamına gelir.\n\nDiğer seçenekler\n“put up with” — Bir soruna katlanmak, nedenini elemekten farklıdır.\n“turn into” — Bir şeyin başka bir şeye dönüşmesini belirtir.\n“take after” — Birine benzemek demektir.\n“pass on” — Bilgiyi veya bir nesneyi başkasına aktarmayı anlatır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-006",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 2,
+    "q": "Before recommending the new cooling system, the technicians had to ---- a series of controlled tests under different operating conditions.",
+    "o": [
+      "turn against",
+      "break down",
+      "call off",
+      "look up",
+      "carry out"
+    ],
+    "a": 4,
+    "x": "Öneriden önce kontrollü deneylerin gerçekleştirilmesi gerekir. Carry out, bir planı, işlemi veya deneyi uygulamak anlamındadır.\n\nDiğer seçenekler\n“turn against” — Birine ya da bir görüşe karşı dönmeyi belirtir.\n“break down” — Bir şeyi parçalara ayırmak ya da arızalanmak anlamı taşır.\n“call off” — Deneylerin yapılması yerine iptal edilmesini anlatır.\n“look up” — Bir bilgiyi arayıp bulma anlamındadır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-007",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 2,
+    "q": "Two mislabeled samples were enough to ---- the difference between the sets of results. Once the labels were corrected, the results agreed.",
+    "o": [
+      "hold on to",
+      "account for",
+      "get through",
+      "rely on",
+      "stand for"
+    ],
+    "a": 1,
+    "x": "Etiketler düzeltilince fark ortadan kalkmıştır. Account for, iki sonuç arasındaki farkı açıklamak anlamını karşılar.\n\nDiğer seçenekler\n“hold on to” — Bir şeyi bırakmayıp elde tutmayı anlatır.\n“get through” — Bir süreci tamamlamak veya bir engeli aşmak anlamındadır.\n“rely on” — Bir şeye dayanmak veya güvenmek anlamına gelir.\n“stand for” — Bir şeyin simgesi ya da kısaltması olmak demektir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-008",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 2,
+    "q": "At first, visitors stopped to examine the interactive screen, but the novelty soon ---- and most people began to walk past it.",
+    "o": [
+      "came through",
+      "caught on",
+      "fell behind",
+      "took off",
+      "wore off"
+    ],
+    "a": 4,
+    "x": "İlk yenilik duygusu zamanla etkisini yitirdiği için ziyaretçiler durmamaya başlamıştır. Wear off, bir etkinin giderek kaybolmasını ifade eder.\n\nDiğer seçenekler\n“came through” — Güçlüğü atlatmak veya haberin ulaşması anlamına gelir.\n“caught on” — Yaygınlaşmak ya da bir şeyi kavramak anlamındadır.\n“fell behind” — Bir hız veya başarı düzeyinin gerisine düşmeyi anlatır.\n“took off” — Başarı kazanmak veya havalanmak anlamı taşır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-009",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 3,
+    "q": "The library will ---- its old membership cards branch by branch. Once the final branch has switched systems, the cards will no longer be accepted anywhere.",
+    "o": [
+      "phase out",
+      "build up",
+      "hold back",
+      "check up on",
+      "roll out"
+    ],
+    "a": 0,
+    "x": "Kartlar önce şube şube kullanımdan kaldırılır ve sonunda hiçbir şubede kabul edilmez. Phase out, bir uygulamayı aşamalı olarak sona erdirmektir.\n\nDiğer seçenekler\n“build up” — Aşamalı biriktirme ya da güçlendirme bildirir.\n“hold back” — Bir şeyi tutmak veya ilerlemesini engellemek anlamındadır.\n“check up on” — Bir kişi veya durum hakkında denetim yapmayı ifade eder.\n“roll out” — Yeni bir hizmeti aşamalı olarak devreye sokmayı anlatır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-PHV-010",
+    "s": "ingilizce",
+    "t": "Phrasal Verbs",
+    "d": 3,
+    "q": "The initial analysis suggested that using shorter labels would reduce mistakes. The results from three later trials ---- that prediction, with fewer errors recorded each time.",
+    "o": [
+      "turned down",
+      "bore out",
+      "passed over",
+      "fell back on",
+      "held back"
+    ],
+    "a": 1,
+    "x": "Sonraki deneylerin her birinde daha az hata görülmüş, yani ilk öngörü desteklenmiştir. Bear out bir iddia ya da beklentiyi doğrulamak demektir. Bore out geçmiş zaman biçimidir.\n\nDiğer seçenekler\n“turned down” — Bir öneriyi reddetmek anlamı taşır.\n“passed over” — Bir kişiyi veya ayrıntıyı atlamak anlamındadır.\n“fell back on” — Başka seçenek kalmadığında bir şeye başvurmayı ifade eder.\n“held back” — Engelleme veya tutma anlamı verir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-001",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 1,
+    "q": "The tin is almost empty, but there is still ---- paint left, enough to mark the final line on the floor.",
+    "o": [
+      "a little",
+      "several",
+      "a few",
+      "fewer",
+      "many"
+    ],
+    "a": 0,
+    "x": "Paint burada sayılamayan bir madde adıdır. Son çizgiye yetecek az miktarı a little anlatır.\n\nDiğer seçenekler\n“several” — Birkaç ayrı nesne bildirir.\n“a few” — Sayılabilen çoğul adlarla kullanılır.\n“fewer” — Karşılaştırma bildirir ve sayılabilir çoğul ad ister.\n“many” — Çok sayıda nesneyi belirtir ve paint ile uymaz."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-002",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 1,
+    "q": "Of the sixty name badges prepared for the conference, only ---- were printed with the wrong date. The organizers found three in total.",
+    "o": [
+      "a little",
+      "much",
+      "little",
+      "a great deal",
+      "a few"
+    ],
+    "a": 4,
+    "x": "Birkaç yaka kartından, yani sayılabilen az sayıda nesneden söz edilir. A few, az sayıda kartın bulunduğunu söyler.\n\nDiğer seçenekler\n“a little” — Az miktar bildirir, birkaç kartın yerine kullanılamaz.\n“much” — Sayılamayan bir ad için büyük miktar belirtir.\n“little” — Sayılamayan bir maddenin azlığını bildirir.\n“a great deal” — Büyük bir miktar belirtir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-003",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 1,
+    "q": "We brought two lamps to the campsite, but ---- worked after the heavy rain. We had to borrow a lamp from a neighbour.",
+    "o": [
+      "either",
+      "neither",
+      "one",
+      "both",
+      "each"
+    ],
+    "a": 1,
+    "x": "İki lambadan hiçbiri çalışmamıştır. Neither iki seçenek için birlikte olumsuzluk bildirir.\n\nDiğer seçenekler\n“either” — Lambalardan herhangi birinin çalıştığı anlamına gelir.\n“one” — İkisinden birinin çalıştığını söyler.\n“both” — İki lambanın da çalıştığını söyler.\n“each” — Her birinin çalıştığını bildirir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-004",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 2,
+    "q": "Compared with the printed guide, the revised version uses ---- pages and ---- ink, while keeping all the diagrams.",
+    "o": [
+      "fewer / less",
+      "fewer / few",
+      "less / fewer",
+      "fewest / little",
+      "many / much"
+    ],
+    "a": 0,
+    "x": "Pages sayılabilir çoğul bir ad olduğu için karşılaştırma fewer ile yapılır. Ink sayılamayan bir ad olduğundan miktar karşılaştırması less ile kurulur.\n\nDiğer seçenekler\n“fewer / few” — Few sayılamayan ink için uygun değildir.\n“less / fewer” — Sayılabilir ad ve madde adı için kullanılan belirteçleri ters yerleştirir.\n“fewest / little” — İlk boşluk üstünlük, ikinci boşluk miktar verir. İkisi de karşılaştırmanın yapısını tamamlamaz.\n“many / much” — İki boşlukta da önceki sürüme göre azalmayı belirtmez."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-005",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 2,
+    "q": "The archive contained ---- correspondence and ---- photographs, so the curator had to rely mainly on recorded interviews.",
+    "o": [
+      "many / a little",
+      "several / much",
+      "few / little",
+      "much / several",
+      "little / few"
+    ],
+    "a": 4,
+    "x": "Correspondence burada sayılamayan yazışma malzemesini, photographs sayılabilen fotoğrafları anlatır. Kayıtların yetersizliğini iki boşlukta da olumsuz anlamlı little ve few karşılar.\n\nDiğer seçenekler\n“many / a little” — Many, correspondence ile ve a little, photographs ile uymaz.\n“several / much” — Sayı ve miktar belirteçleri yanlış adlarla kullanılır.\n“few / little” — Belirteçleri uygun ad türlerinin tersine getirir.\n“much / several” — İki kaynağın yetersizliğini vermek yerine bol yazışma bulunduğunu söyler."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-006",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 2,
+    "q": "Every participant was given a different code. The coordinator prepared thirty envelopes, ---- containing its own code.",
+    "o": [
+      "several",
+      "each",
+      "either",
+      "both",
+      "all"
+    ],
+    "a": 1,
+    "x": "Otuz zarfın her birinde kendine ait bir kod bulunur. Each tekil its own code ifadesiyle her zarfı ayrı ayrı belirtir.\n\nDiğer seçenekler\n“several” — Bazı zarfları belirtir ve tekil its ile uyumlu değildir.\n“either” — İki seçenekten herhangi birini ifade eder.\n“both” — İki zarfı birlikte belirtirdi.\n“all” — Zarfları topluca alır, its ile belirtilen ayrı tekil ögeyi vermez."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-007",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 2,
+    "q": "Six replacement handles were tested, and each broke under a load below the required minimum. ---- the handles met the minimum strength requirement.",
+    "o": [
+      "Several of",
+      "Every one of",
+      "Both of",
+      "Neither of",
+      "None of"
+    ],
+    "a": 4,
+    "x": "Altı örneğin tamamı kırıldığı için hiçbiri dayanım koşulunu sağlamamıştır. None of bu grubun hiçbir üyesini belirtir.\n\nDiğer seçenekler\n“Several of” — Örneklerden bazılarının dayanım koşulunu sağladığını bildirir.\n“Every one of” — Tüm örneklerin koşulu sağladığını söyler.\n“Both of” — Hem iki örnek varsayar hem de olumlu sonuç bildirir.\n“Neither of” — Neither of yalnızca iki seçenekten söz eder."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-008",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 2,
+    "q": "Ten stations submitted reports. Two had left out the temperature readings, and the other eight had included them. The readings were therefore present in ---- the reports.",
+    "o": [
+      "all but two of",
+      "only two of",
+      "both of",
+      "none of",
+      "fewer than half of"
+    ],
+    "a": 0,
+    "x": "On rapordan yalnız iki tanesinde değerler eksiktir. All but two of, ikisi hariç bütün raporları yani sekiz raporu karşılar.\n\nDiğer seçenekler\n“only two of” — Eksik rapor sayısını dolu rapor sayısı olarak alır.\n“both of” — Toplam rapor sayısı iki değildir.\n“none of” — Sekiz raporda değerler verilmiştir.\n“fewer than half of” — Sekiz, on raporun yarısından fazladır."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-009",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 3,
+    "q": "Fifty-four of the sixty sensors passed the inspection. It is therefore accurate to say that ---- the sensors passed, even though the overall success rate was high.",
+    "o": [
+      "no more than half of",
+      "not all of",
+      "fewer than half of",
+      "every one of",
+      "almost none of"
+    ],
+    "a": 1,
+    "x": "Altı sensör denetimi geçememiştir. Not all of, tümünün başarılı olduğu iddiasını reddederken çoğunluğun başarılı olmasına izin verir.\n\nDiğer seçenekler\n“no more than half of” — Başarıyı en çok 30 sensörle sınırlar.\n“fewer than half of” — 54 sensör toplamın yarısından çoktur.\n“every one of” — Başarısız olan altı sensörü hesaba katmaz.\n“almost none of” — Başarı oranının sıfıra yakın olduğunu ima eder."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-QUA-010",
+    "s": "ingilizce",
+    "t": "Quantifiers",
+    "d": 3,
+    "q": "A survey needs at least 18 responses, but the team can process at most 24. To meet both requirements, it must collect ---- 18 responses and ---- 24.",
+    "o": [
+      "no fewer than / no more than",
+      "no more than / no fewer than",
+      "more than / fewer than",
+      "fewer than / at least",
+      "exactly / more than"
+    ],
+    "a": 0,
+    "x": "İlk koşul 18’in altında kalmamayı, ikinci koşul 24’ü aşmamayı gerektirir. No fewer than ve no more than bu iki sınırı, uç değerleri dâhil ederek verir.\n\nDiğer seçenekler\n“no more than / no fewer than” — Alt ve üst sınırların görevlerini ters çevirir.\n“more than / fewer than” — Geçerli olan 18 ve 24 değerlerini dışarıda bırakır.\n“fewer than / at least” — İlk koşulda 18’in altına iner, ikinci koşulda üst sınırı alt sınır yapar.\n“exactly / more than” — İkinci kısım 24’ü aşmayı gerektirir."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-001",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 1,
+    "q": "Which numbered sentence is out of place in the paragraph about the Saturday repair club?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 3,
+    "x": "Paragraf onarım kulübündeki işleyişi anlatır. IV numaralı cümle, bu işleyişle bağlantısı olmayan bir oyun parkının açılışına geçer.\n\nDiğer seçenekler\n“I” — Kulübü ve işlevini tanıtır.\n“II” — Kulübe getirilen nesneleri örnekler.\n“III” — Onarımın ilk aşamasını açıklar.\n“V” — Ziyaretçilerin onarımı nasıl tamamladığını açıklar.",
+    "p": "(I) On Saturdays, a local repair club helps residents fix broken household objects. (II) Visitors bring items such as loose chair legs or lamps with damaged switches. (III) Volunteers first show them how to identify the problem. (IV) A new playground opened beside the river last summer. (V) The visitors then complete the repair with guidance from the volunteers."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-002",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 1,
+    "q": "In the orchard paragraph, which sentence breaks the continuity of the explanation?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 1,
+    "x": "Açıklama, genç meyve ağaçlarının dondan nasıl korunduğunu izler. II numaralı cümlede elmaların nerede satıldığına geçilmesi bu akışı keser.\n\nDiğer seçenekler\n“I” — Koruma gerektiren sorunu tanıtır.\n“III” — Koruyucu önlemi anlatır.\n“IV” — Örtünün işlevini açıklar.\n“V” — Örtünün ne zaman kaldırıldığını açıklar.",
+    "p": "(I) Young fruit trees can be damaged when the temperature drops sharply after sunset. (II) Apples from the valley are sold at several markets on the coast. (III) On nights when frost is expected, growers cover the smallest trees with light fabric. (IV) The fabric helps hold some of the heat released by the ground. (V) Growers remove the covers in the morning so that light can reach the leaves."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-003",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 1,
+    "q": "Identify the numbered sentence that interrupts the account of the school lending scheme.",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 2,
+    "x": "Paragraf kitap ödünç alma projesini izler. III numaralı cümle okul kapısının boyanmasıyla ilgili olup kitapların seçimi, okunması veya iadesini açıklamaz.\n\nDiğer seçenekler\n“I” — Programın amacını ve zamanını bildirir.\n“II” — Kitap seçiminin nasıl yapıldığını gösterir.\n“IV” — Ailelerin programdaki rolünü verir.\n“V” — Okula dönüşteki son aşamayı anlatır.",
+    "p": "(I) A primary school started a lending scheme so that children could take books home over the weekend. (II) Each child selected a book from a small classroom collection. (III) The school gate was repainted during the summer holidays. (IV) Families were invited to read the selected book together. (V) On Monday, children could recommend their books to others before returning them."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-004",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 2,
+    "q": "Which sentence in the archive passage falls outside the method being described?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 0,
+    "x": "Arşivde pazar seslerinin zaman bilgisiyle etiketlenmesi ve bunun aramayı kolaylaştırması anlatılır. I numaralı cümle yalnızca keman yapımındaki malzeme seçimini açıklar.\n\nDiğer seçenekler\n“II” — Arşivde yapılan işi tanıtır.\n“III” — Etiketlerin nasıl eklendiğini açıklar.\n“IV” — Etiketlerin araştırmacıya sağladığı kolaylığı örnekler.\n“V” — Yöntemin genel faydasını özetler.",
+    "p": "(I) A violin maker may choose different woods for the front and back of an instrument. (II) A sound archive asked volunteers to label recordings made in local markets. (III) Instead of naming the whole recording, the volunteers marked the starting point of each recognizable sound. (IV) A researcher could then move directly to a bell, a street call, or a short exchange. (V) This made the collection easier to search without listening to each recording in full."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-005",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 2,
+    "q": "Which numbered statement does not belong in the account of the roof-surface trial?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 4,
+    "x": "Paragraf açık renk çatı kaplamasının soğutma ihtiyacına etkisini ölçen deneyi anlatır. V numaralı cümle, deneyle ilişkilendirilmeyen eski bir pencere kuralını ekler.\n\nDiğer seçenekler\n“I” — Deneyin araştırma sorusunu verir.\n“II” — Karşılaştırılan iki binayı ve müdahaleyi açıklar.\n“III” — Sıcaklık ölçümlerinin nasıl eşleştirildiğini belirtir.\n“IV” — Hava durumunun karşılaştırmada nasıl kullanıldığını açıklar.",
+    "p": "(I) A city tested whether lighter roof surfaces would reduce the need for indoor cooling. (II) Two similar buildings were selected, and only one received a light coating. (III) The researchers recorded indoor temperatures at the same times in both buildings. (IV) They also noted the weather so they could compare days with similar conditions. (V) An early municipal regulation required buildings on the main square to have matching window frames."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-006",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 2,
+    "q": "Which sentence disrupts the flow of the passage about the two coastline maps?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 2,
+    "x": "Parça, ölçek farkının haritalardaki ayrıntıyı nasıl değiştirdiğini açıklar. III numaralı cümlede matbaa süslerine geçilmesi bu açıklamanın bir adımı değildir.\n\nDiğer seçenekler\n“I” — İki haritada ayrıntı farkı olabileceğini söyler.\n“II” — Ayrıntıyı doğru karşılaştırmak için ölçüt verir.\n“IV” — Ölçeğin bir koyun gösterilmesini nasıl etkilediğini örnekler.\n“V” — Örneğin hangi yanlış çıkarıma yol açmaması gerektiğini açıklar.",
+    "p": "(I) Two maps of the same coastline may show different levels of detail. (II) To compare them, readers should first check the scale on each map. (III) Early printing workshops often used a small decorative emblem on title pages. (IV) A bay that is visible on a large-scale map may be absent from a map showing the whole country. (V) Its absence, therefore, need not mean that the bay formed after the second map was drawn."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-007",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 2,
+    "q": "Which numbered sentence interrupts the passage on the theatre's surtitles?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 1,
+    "x": "Üst yazıların çevirisinde izleyicinin okuma süresi ve bilgi gereksinimi tartışılır. II numaralı kostüm kiralama bilgisi bu iki ölçütle ilişkisizdir.\n\nDiğer seçenekler\n“I” — Üst yazıların izleyici için ne yaptığını tanıtır.\n“III” — Uzun sözlerin niçin kısaltıldığını açıklar.\n“IV” — Çeviride hangi ayrıntıların korunduğunu belirtir.\n“V” — Kısalık ile bilgiyi koruma dengesini özetler.",
+    "p": "(I) When surtitles are displayed above a stage, the audience can read a translation while watching the actors. (II) The theatre rents costumes from a warehouse on the edge of town. (III) Since viewers have only a few seconds to read each line, translators often shorten long speeches. (IV) They try to keep details that will matter in a later scene. (V) A successful surtitle thus balances brevity with the information the audience needs."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-008",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 3,
+    "q": "Which numbered sentence can be removed without losing a step in the explanation of the museum experiment?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 3,
+    "x": "Hatırlatma zamanının ziyaretçilerin gelmesine etkisi karşılaştırılır. IV numaralı cümle zamanla ilgili bilgi içerse de müze koleksiyonunun kayıt düzenini anlatır. Deneyin değişkenlerini veya sonucunu açıklamaz.\n\nDiğer seçenekler\n“I” — Karşılaştırılan uygulamayı tanıtır.\n“II” — İki hatırlatma zamanını açıkça ayırır.\n“III” — Metni sabit tutarak zamanlamayı nasıl sınadıklarını gösterir.\n“V” — Deney sonucunu ve bunun yorumunu verir.",
+    "p": "(I) A museum compared two reminder schedules for visitors who had booked a tour. (II) In one schedule, the message went out a week before the visit, and in the other it went out the previous evening. (III) Both messages contained the same wording, so the team could examine the effect of timing alone. (IV) The museum's collection records list acquisition dates before the names of previous owners. (V) The evening reminder led to fewer empty places, suggesting that messages closer to the visit were easier to act on."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-009",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 3,
+    "q": "Which numbered sentence diverts the discussion from the transport team's investigation?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 0,
+    "x": "Araştırma, otobüslerin zamanında gelmesini nasıl ölçtüklerini ve gecikmeyi nasıl azalttıklarını anlatır. I numaralı cümlede durak panellerinin rengi hatları ayırt etmek için kullanılır. Bu bilgi dakiklik ölçütüne veya gecikmeye bağlanmaz.\n\nDiğer seçenekler\n“II” — Güvenilirlik için kullanılan ölçütü verir.\n“III” — Ölçümün hangi düzeyde yapıldığını belirtir.\n“IV” — Ölçümle belirlenen gecikme noktasını bildirir.\n“V” — Bulgu üzerine yapılan değişikliğin sonucunu verir.",
+    "p": "(I) Some bus shelters were built with side panels in different colours to distinguish the routes. (II) A transport team defined reliability as the likelihood that a bus would arrive within five minutes of its listed time. (III) It measured this likelihood separately for each route instead of reporting a citywide average. (IV) On one route, late trips were concentrated at a single intersection. (V) Moving a stop away from that intersection reduced late arrivals on the route."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-IRR-010",
+    "s": "ingilizce",
+    "t": "Irrelevant sentence",
+    "d": 3,
+    "q": "Which numbered sentence is unrelated to how the water-saving programme was evaluated?",
+    "o": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V"
+    ],
+    "a": 4,
+    "x": "Ölçümler, yağış ve abone türü ayrıştırılarak su kullanımındaki değişimi değerlendirir. V numaralı musluk ayrıntısı suyla ilgili bir nesneden söz eder fakat ölçüm, karşılaştırma veya sonuç hakkında bilgi vermez.\n\nDiğer seçenekler\n“I” — Önce ve sonra karşılaştırmasını tanıtır.\n“II” — İki abone grubunu ayıran denetimi açıklar.\n“III” — Hava koşullarının etkisini nasıl dengelediklerini açıklar.\n“IV” — Düzeltmelerden sonra görülen sonucu verir.",
+    "p": "(I) To evaluate a water-saving programme, a town collected meter readings before and after it began. (II) The team separated changes in household use from changes at large businesses. (III) It also compared months with similar rainfall, since wet weather reduced garden watering. (IV) After these adjustments, the drop in household use was still visible. (V) In the town's oldest buildings, brass handles were once preferred for indoor taps because they were easy to polish."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-001",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 1,
+    "q": "Which reply by the clerk best completes the conversation about the reading room?",
+    "o": [
+      "It will close for the day at two.",
+      "It is already open and will stay open all afternoon.",
+      "You can use the downstairs room at any time.",
+      "The upstairs room is closed until tomorrow.",
+      "It is closed now, but it reopens at two."
+    ],
+    "a": 4,
+    "x": "Maya “saat ikide geri geleceğim” dediğine göre şu an odanın kullanılamadığını ve ikide açılacağını öğrenmiştir.\n\nDiğer seçenekler\n“It will close for the day at two.” — Saat ikide dönmek odayı kullanmaya yetmez.\n“It is already open and will stay open all afternoon.” — Oda şu an açıksa Maya’nın ikide dönmesi gerekmez.\n“You can use the downstairs room at any time.” — Alt katın açık olması üst kata dönülecek saati açıklamaz.\n“The upstairs room is closed until tomorrow.” — Oda bugün yeniden açılmayacaktır.",
+    "p": "Maya: Is the upstairs reading room open this afternoon?\nClerk: ----\nMaya: Then I'll come back at two. I only need to check one reference book."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-002",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 1,
+    "q": "Choose the option that best fits Nora's answer about the invitations.",
+    "o": [
+      "Yes, the corrected version is already on the table.",
+      "Not yet. I was going to print them this afternoon.",
+      "The invitations went out yesterday.",
+      "I printed the last copy this morning.",
+      "Yes, and I've just put them in envelopes."
+    ],
+    "a": 1,
+    "x": "Owen tarihin baskıdan önce düzeltilebileceğini söylüyor. Buna göre Nora henüz baskı yapmamıştır.\n\nDiğer seçenekler\n“Yes, the corrected version is already on the table.” — Düzeltilmiş baskının hazır olduğu belirtilir.\n“The invitations went out yesterday.” — Davetiyeler çoktan gönderilmiştir.\n“I printed the last copy this morning.” — Son baskının tamamlandığı söylenir.\n“Yes, and I've just put them in envelopes.” — Baskı yapılmış ve davetiyeler zarflanmıştır.",
+    "p": "Owen: Have you already printed the invitations?\nNora: ----\nOwen: Good. In that case, I'll correct the date before you print them."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-003",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 1,
+    "q": "Which response from Eren completes the exchange at the bus shelter?",
+    "o": [
+      "There is a printed timetable on the wall behind you.",
+      "The buses are less crowded after six.",
+      "I took this route for the first time yesterday.",
+      "I could not load the timetable on my phone either.",
+      "The bus is usually late in this part of town."
+    ],
+    "a": 0,
+    "x": "Ada duraktan ayrılmadan “oraya bakacağını” söylüyor. Duvarın üzerindeki basılı saat çizelgesi hem bakılacak yeri verir hem de telefon gerektirmeden soruyu çözer.\n\nDiğer seçenekler\n“The buses are less crowded after six.” — Kalabalık saatleri hakkında bilgi verir, çizelgeye yönlendirmez.\n“I took this route for the first time yesterday.” — Eren’in önceki yolculuğunu anlatır.\n“I could not load the timetable on my phone either.” — Çözüm yerine aynı telefon sorununu tekrarlar.\n“The bus is usually late in this part of town.” — Sonraki otobüsü kontrol edebileceği bir yer göstermez.",
+    "p": "Ada: My phone has no signal here. How can I check when the next bus comes?\nEren: ----\nAda: Thanks. I'll look there before we leave the shelter."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-004",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "Which of Aylin's suggestions makes Jo's final response coherent?",
+    "o": [
+      "Let's reduce the font size by just one more point.",
+      "Could we move the existing labels to the far side of the room?",
+      "We could print one language on the labels and leave the other out.",
+      "We should add a longer introduction in each language.",
+      "Let's shorten both texts and keep the font size as it is."
+    ],
+    "a": 4,
+    "x": "Jo’nun son cümlesi iki dilin de kalmasını ve yazının okunaklı olmasını istiyor. Her iki metni kısaltıp puntoyu korumak iki koşulu da sağlar.\n\nDiğer seçenekler\n“Let's reduce the font size by just one more point.” — Küçük yazıyla ilgili sorunu sürdürür.\n“Could we move the existing labels to the far side of the room?” — Etikette yer açmaz ve okunaklılık sorununu çözmez.\n“We could print one language on the labels and leave the other out.” — İki dili aynı anda sunmaz.\n“We should add a longer introduction in each language.” — Metni uzatarak yer sorununu artırır.",
+    "p": "Aylin: We can fit both languages on the exhibition labels if we make the print smaller.\nJo: But some visitors told us they could barely read the current labels.\nAylin: ----\nJo: That would leave space for both languages without making the print harder to read."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-005",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "Which suggestion by Dan is supported by Leila's next action?",
+    "o": [
+      "What if we start outdoors two hours earlier?",
+      "Could we hold it in the school's activity room instead?",
+      "We could shorten the workshop and stay outside.",
+      "Shall we ask everyone to bring a raincoat?",
+      "Could we postpone the workshop until next month?"
+    ],
+    "a": 1,
+    "x": "Leila bir okul odasının aynı saatte uygun olup olmadığını soracak. Dan’in önerisi, etkinliği aynı zaman diliminde odaya taşımaktır.\n\nDiğer seçenekler\n“What if we start outdoors two hours earlier?” — Açık hava ve zaman değişikliği önerir.\n“We could shorten the workshop and stay outside.” — Süreyi kısaltır ancak mekânı değiştirmez.\n“Shall we ask everyone to bring a raincoat?” — Yağmurluk dışarıda kalmayı gerektirir.\n“Could we postpone the workshop until next month?” — Bir ay erteleme, aynı saat için oda sormayı açıklamaz.",
+    "p": "Leila: Our outdoor workshop is scheduled for Saturday, and the forecast now says heavy rain.\nDan: ----\nLeila: Good idea. I'll ask the school whether the room is free at the same time."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-006",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "What does the visitor most likely ask about the fragile notebook?",
+    "o": [
+      "Could I photograph it while it is only partly open?",
+      "Could I close it and photograph just the outside cover?",
+      "May I scan it if I press the pages down very slowly?",
+      "Would a brighter lamp make it safe to flatten the pages?",
+      "Can I remove a page and photograph it separately?"
+    ],
+    "a": 0,
+    "x": "Görevli “o açıyla” kapakları destekleyeceğini söylüyor. Ziyaretçinin sorusu, defteri düzleştirmeden, kısmen açık bir açıda fotoğraflamaya ilişkindir.\n\nDiğer seçenekler\n“Could I close it and photograph just the outside cover?” — Kapalı defterde sayfaları kısmen açık tutacak bir açı yoktur.\n“May I scan it if I press the pages down very slowly?” — Görevlinin açıkladığı düzleştirme yasağıyla çelişir.\n“Would a brighter lamp make it safe to flatten the pages?” — Daha güçlü ışık fiziksel düzleştirmeyi güvenli yapmaz.\n“Can I remove a page and photograph it separately?” — Defterin açılma açısını veya kapakların desteklenmesini açıklamaz.",
+    "p": "Archivist: You can photograph this notebook, but the pages are too fragile to flatten on the scanner.\nVisitor: ----\nArchivist: Yes. The cradle will support the covers at that angle."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-007",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 2,
+    "q": "Which of Iris's replies explains the comparison Sam accepts?",
+    "o": [
+      "Report only the second reading because it is more recent.",
+      "Use the larger reading from each site and ignore the dates.",
+      "Record the day but leave it out of the analysis.",
+      "The second site must always have a higher water level.",
+      "First compare readings taken at both sites under similar conditions."
+    ],
+    "a": 4,
+    "x": "Sam ölçüm zamanının farkı açıklamasını önlemek istiyor. Benzer koşullarda alınmış ölçümleri karşılaştırmak, zaman ve koşul farkının etkisini azaltır.\n\nDiğer seçenekler\n“Report only the second reading because it is more recent.” — İki yer arasında karşılaştırma yapılamaz.\n“Use the larger reading from each site and ignore the dates.” — Yüksek değerleri seçmek koşulları eşleştirmez.\n“Record the day but leave it out of the analysis.” — Ölçüm zamanını denetlemez.\n“The second site must always have a higher water level.” — Bir gözlemden kalıcı bir fark çıkarır.",
+    "p": "Sam: The river was higher when we visited the second site. Should we compare the raw water levels anyway?\nIris: ----\nSam: Right. Then the difference we report won't just reflect the time of our visit."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-008",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 3,
+    "q": "Which of Ken's responses leads most directly to Rita's proposed check?",
+    "o": [
+      "We should count only the requests that were submitted on the final day.",
+      "The number closed might rise because the requests were simpler, even if staff speed stayed the same.",
+      "Since the form is new, the two months must have had exactly the same mix of requests.",
+      "More completed requests prove that each member of staff worked faster.",
+      "The form probably discouraged new requests, so the time spent on a request cannot matter."
+    ],
+    "a": 1,
+    "x": "Rita benzer güçlükteki başvurulara harcanan zamanı karşılaştırmayı öneriyor. Bu öneri, kapanan başvuru sayısının işlerin daha basit olmasından da artabileceği açıklamasına yanıt verir.\n\nDiğer seçenekler\n“We should count only the requests that were submitted on the final day.” — Günü kısıtlar fakat işlerin güçlüğünü ve sürelerini eşleştirmez.\n“Since the form is new, the two months must have had exactly the same mix of requests.” — Aynı iş bileşimini kanıtsız varsayar.\n“More completed requests prove that each member of staff worked faster.” — Karşılaştırmaya gerek olmadığı sonucuna varır.\n“The form probably discouraged new requests, so the time spent on a request cannot matter.” — Süreyi önemsiz sayar ve Rita’nın kontrol önerisini açıklamaz.",
+    "p": "Rita: The help desk closed more requests after we installed the new form. Can we say the staff worked faster?\nKen: ----\nRita: I see. We should check the time spent on comparable requests before making that claim."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-009",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 3,
+    "q": "Which response by Leo supports both parts of Mina's decision?",
+    "o": [
+      "The tests support use with one speaker, but they tell us little about overlapping voices.",
+      "The single-speaker tests were successful, so there is no need to test meetings separately.",
+      "Since meetings can be noisy, the existing tests show nothing at all about the filter.",
+      "The filter is easy to install, so the number of people speaking is beside the point.",
+      "We should claim it works in meetings as long as we mention that the filter is new."
+    ],
+    "a": 0,
+    "x": "Mina hem mevcut sonucun aktarılmasını hem daha geniş iddia için deney yapılmasını önerir. Tek konuşmacıdaki başarının birden çok ses için yeterli kanıt olmadığını belirten yanıt iki kararı da açıklar.\n\nDiğer seçenekler\n“The single-speaker tests were successful, so there is no need to test meetings separately.” — Yeni denemeye gerek olmadığını söyler.\n“Since meetings can be noisy, the existing tests show nothing at all about the filter.” — Tek konuşmacı için elde edilmiş kanıtı da gereksiz yere reddeder.\n“The filter is easy to install, so the number of people speaking is beside the point.” — Kurulum kolaylığı, seslerin üst üste binmesinin etkisini açıklamaz.\n“We should claim it works in meetings as long as we mention that the filter is new.” — Toplantı performansını sınamadan ilan etmeyi önerir.",
+    "p": "Mina: Our sound tests show that the filter works when a single person is speaking. Shall we advertise it for busy meetings?\nLeo: ----\nMina: Fair point. We'll describe what the tests support and run another trial before making a wider claim."
+  },
+  {
+    "id": "AKE-YKS-02-YDT-DIA-010",
+    "s": "ingilizce",
+    "t": "Dialogue completion",
+    "d": 3,
+    "q": "Which proposal by Tom addresses the trade-off in Selin's opening remark?",
+    "o": [
+      "Move all the signs out of the square, even at the confusing junctions.",
+      "Replace the small posts with larger posts at every turn.",
+      "Put a single map at the entrance and remove all help from the route itself.",
+      "Install the same sign on both sides of every turning.",
+      "Use signs only at the junctions where the visitor trial showed repeated mistakes."
+    ],
+    "a": 4,
+    "x": "Tom’un önerisi hem fiziksel kalabalığı azaltmalı hem sık hata yapılan yerlerde yardım sağlamalıdır. Denemede belirlenen sorunlu kavşaklarla sınırlı tabela yerleşimi bu iki amacı birleştirir.\n\nDiğer seçenekler\n“Move all the signs out of the square, even at the confusing junctions.” — Ziyaretçilerin şaşırdığı noktalardaki yönlendirmeyi kaldırır.\n“Replace the small posts with larger posts at every turn.” — Her dönüşte levha bırakır ve direkleri daha belirgin yapar.\n“Put a single map at the entrance and remove all help from the route itself.” — Yol üzerindeki sorunlu noktalarda doğrudan yardım sağlamaz.\n“Install the same sign on both sides of every turning.” — Levha sayısını azaltmak yerine artırır.",
+    "p": "Selin: If we put the signs at every turning, the route will be easy to follow, but the square will be full of posts.\nTom: ----\nSelin: That would keep the main route clear while still helping people at the places where they actually get lost."
+  }
+]

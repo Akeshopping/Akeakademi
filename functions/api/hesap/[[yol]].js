@@ -9,8 +9,8 @@
 //   AKE_YONETICI        (isteğe bağlı) yönetici e-postası, varsayılan alikaaneren13@gmail.com
 //
 // Uçlar:
-//   POST kod-gonder {eposta}         e-postaya 6 haneli giriş kodu gönderir
-//   POST kod-dogrula {eposta, kod}    kodu doğrular, oturum açar (çerez)
+//   POST kod-gonder {eposta}         e-postaya 8 haneli giriş kodu gönderir (60 sn bekleme + saatte 5 kod: tek atomik komut)
+//   POST kod-dogrula {eposta, kod}    kodu doğrular, oturum açar (çerez). Deneme hakkı ÖNCE atomik ayrılır, kod tek komutta tüketilir.
 //   GET  ben                          oturumdaki kullanıcı, paket, bu ayki kullanım
 //   GET  kota                         ücretsiz kalan hak (günlük soru, aylık deneme)
 //   POST kota {tur, adet}             ücretsiz hak ayırır (tur: soru | deneme); biterse 402
@@ -28,6 +28,20 @@ import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
 const ipHits = new Map();
+
+/* Giriş kodu ayarları. Yeni kodlar 8 haneli. ESKI_KOD_HANE yalnızca geçiş içindir: dağıtımdan önce gönderilmiş 6 haneli kodlar
+   (en çok 10 dk geçerli) çalışmaya devam etsin. Hash kod metnini içerdiği için 6 haneli bir giriş 8 haneli kodu asla eşleştirmez;
+   dağıtımdan 10 dk sonra ESKI_KOD_HANE kabulü güvenle kaldırılabilir. */
+const KOD_HANE = 8, ESKI_KOD_HANE = 6, KOD_OMRU_MS = 10 * 60000, DENEME_LIMIT = 5, BEKLEME_MS = 60000, PENCERE_MS = 3600000, SAATLIK_KOD = 5;
+const degisti = r => !!(r && r.meta && r.meta.changes > 0);
+/* Tek tip hata: yanlış kod, süresi dolmuş kod, dolan deneme hakkı, hiç istenmemiş kod ve kullanılmış kod ayırt edilemez (hesap/kod durumu sızmaz) */
+const kodHatasi = () => fail(400, "kod_yanlis", "Kod hatalı ya da süresi dolmuş. Yeni kod iste.");
+/* Düzgün dağılımlı (modulo yanlılığı olmayan) 8 haneli kod; baştaki sıfırlar korunur */
+function girisKodu() {
+  const a = new Uint32Array(1), sinir = Math.floor(4294967296 / 10 ** KOD_HANE) * 10 ** KOD_HANE;
+  do { crypto.getRandomValues(a); } while (a[0] >= sinir);
+  return String(a[0] % 10 ** KOD_HANE).padStart(KOD_HANE, "0");
+}
 
 async function govde(request) { try { return await request.json(); } catch (e) { return {}; } }
 function ipSinir(request, anahtar, adet, ms) {
@@ -48,32 +62,47 @@ export async function onRequest({ request, env, params }) {
     const b = await govde(request), eposta = String(b.eposta || "").trim().toLowerCase();
     if (!EPOSTA_RE.test(eposta)) return fail(400, "eposta_gecersiz");
     if (!ipSinir(request, "kod", 8, 3600000)) return fail(429, "cok_istek");
-    const now = Date.now(), g = await env.DB.prepare("SELECT son_gonderim, pencere, sayac FROM giris WHERE eposta = ?").bind(eposta).first();
-    if (g && now - (g.son_gonderim || 0) < 60000) return fail(429, "bekle", "Yeni kod için 1 dakika bekle.");
-    const pencere = g && now - (g.pencere || 0) < 3600000 ? g.pencere : now, sayac = g && pencere === g.pencere ? (g.sayac || 0) + 1 : 1;
-    if (sayac > 5) return fail(429, "cok_istek", "Bir saat içinde en fazla 5 kod istenebilir.");
-    const a = new Uint32Array(1); crypto.getRandomValues(a);
-    const kod = String(a[0] % 1000000).padStart(6, "0"), hash = await sha256(eposta + ":" + kod + ":" + (env.AKE_GIZLI || "ake"));
-    await env.DB.prepare("INSERT INTO giris (eposta, hash, bitis, deneme, son_gonderim, pencere, sayac) VALUES (?, ?, ?, 0, ?, ?, ?) ON CONFLICT (eposta) DO UPDATE SET hash = excluded.hash, bitis = excluded.bitis, deneme = 0, son_gonderim = excluded.son_gonderim, pencere = excluded.pencere, sayac = excluded.sayac")
-      .bind(eposta, hash, now + 10 * 60000, now, pencere, sayac).run();
+    const now = Date.now(), kod = girisKodu(), hash = await sha256(eposta + ":" + kod + ":" + (env.AKE_GIZLI || "ake"));
+    /* Bekleme süresi ve saatlik sınır TEK atomik komutta uygulanır (önce oku, sonra yaz yarışı yok): eşzamanlı istekler bekleme süresini
+       atlayıp her seferinde deneme sayacını sıfırlayamaz. Şartlar sağlanmazsa satıra dokunulmaz ve etkilenen satır 0 olur. */
+    const talep = await env.DB.prepare(`INSERT INTO giris (eposta, hash, bitis, deneme, son_gonderim, pencere, sayac) VALUES (?, ?, ?, 0, ?, ?, 1)
+      ON CONFLICT (eposta) DO UPDATE SET hash = excluded.hash, bitis = excluded.bitis, deneme = 0, son_gonderim = excluded.son_gonderim,
+        pencere = CASE WHEN excluded.son_gonderim - COALESCE(giris.pencere, 0) < ${PENCERE_MS} THEN giris.pencere ELSE excluded.son_gonderim END,
+        sayac = CASE WHEN excluded.son_gonderim - COALESCE(giris.pencere, 0) < ${PENCERE_MS} THEN COALESCE(giris.sayac, 0) + 1 ELSE 1 END
+      WHERE excluded.son_gonderim - COALESCE(giris.son_gonderim, 0) >= ${BEKLEME_MS}
+        AND (excluded.son_gonderim - COALESCE(giris.pencere, 0) >= ${PENCERE_MS} OR COALESCE(giris.sayac, 0) < ${SAATLIK_KOD})`)
+      .bind(eposta, hash, now + KOD_OMRU_MS, now, now).run();
+    if (!degisti(talep)) { /* yalnızca ileti için okunur (karar yukarıdaki atomik komutta verildi) */
+      const g = await env.DB.prepare("SELECT son_gonderim FROM giris WHERE eposta = ?").bind(eposta).first();
+      return now - ((g && g.son_gonderim) || 0) < BEKLEME_MS ? fail(429, "bekle", "Yeni kod için 1 dakika bekle.") : fail(429, "cok_istek", "Bir saat içinde en fazla 5 kod istenebilir.");
+    }
     const r = await epostaGonder(env, {
       to: eposta, subject: `AKE Akademi giriş kodun: ${kod}`,
       text: `AKE Akademi giriş kodun: ${kod}\n\nKod 10 dakika geçerlidir. Bu kodu kimseyle paylaşma.`,
-      html: epostaSablon("Giriş kodun", `<p style="margin:0 0 14px">akeakademi.com'a giriş yapmak için bu kodu yaz:</p><div style="font-size:34px;font-weight:800;letter-spacing:8px;background:#e9eeff;color:#1c38b0;border-radius:10px;padding:14px;text-align:center">${kod}</div><p style="margin:14px 0 0;color:#475569">Kod 10 dakika geçerlidir. Bu kodu kimseyle paylaşma; AKE Akademi senden asla kod istemez.</p>`)
+      html: epostaSablon("Giriş kodun", `<p style="margin:0 0 14px">akeakademi.com'a giriş yapmak için bu kodu yaz:</p><div style="font-size:32px;font-weight:800;letter-spacing:5px;background:#e9eeff;color:#1c38b0;border-radius:10px;padding:14px;text-align:center">${kod}</div><p style="margin:14px 0 0;color:#475569">Kod 10 dakika geçerlidir. Bu kodu kimseyle paylaşma; AKE Akademi senden asla kod istemez.</p>`)
     });
     if (!r.ok) return fail(502, r.hata === "yapilandirma" ? "yapilandirma" : "eposta", "E-posta gönderilemedi.");
     return json(200, { ok: true });
   }
   if (ad === "kod-dogrula" && m === "POST") {
     const b = await govde(request), eposta = String(b.eposta || "").trim().toLowerCase(), kod = String(b.kod || "").replace(/\D/g, "");
-    if (!EPOSTA_RE.test(eposta) || kod.length !== 6) return fail(400, "kod_gecersiz");
+    if (!EPOSTA_RE.test(eposta) || (kod.length !== KOD_HANE && kod.length !== ESKI_KOD_HANE)) return fail(400, "kod_gecersiz");
     if (!ipSinir(request, "dogrula", 30, 3600000)) return fail(429, "cok_istek");
-    const g = await env.DB.prepare("SELECT hash, bitis, deneme FROM giris WHERE eposta = ?").bind(eposta).first();
-    if (!g || !g.hash || g.bitis < Date.now()) return fail(400, "kod_suresi", "Kodun süresi doldu. Yeni kod iste.");
-    if ((g.deneme || 0) >= 5) return fail(429, "cok_deneme", "Çok fazla yanlış deneme. Yeni kod iste.");
+    /* 0) Doğrulanacak kod kaydı okunur (yalnızca hangi kod sürümüne bağlanacağımızı belirler; karar verilmez). Süreç sürerken yeni kod üretilirse
+       (kod-gonder hash'i değiştirir) bu doğrulamanın ayıracağı hak YENİ kodun kaydına geçemesin diye hak, okunan hash'e bağlanır. */
+    const kayit = await env.DB.prepare("SELECT hash FROM giris WHERE eposta = ? AND hash IS NOT NULL AND bitis > ?").bind(eposta, Date.now()).first();
+    if (!kayit || !kayit.hash) return kodHatasi();
+    /* 1) Deneme hakkı, kod karşılaştırılmadan ÖNCE tek atomik komutla ayrılır: şart (okunan kod hâlâ aynı + süresi geçmedi + hak < 5) ve artış aynı komuttadır.
+       Eşzamanlı N istekten en çok 5'i bu adımı geçer; sınır dolmuşsa kod doğru olsa bile reddedilir. Sayaç başarısız denemelerde geri alınmaz.
+       Araya yeni kod girmişse (hash değişti) komut hiçbir satıra dokunmaz: yeni kodun sayacı/kaydı bu doğrulamadan etkilenmez. */
+    const rez = await env.DB.prepare("UPDATE giris SET deneme = COALESCE(deneme, 0) + 1 WHERE eposta = ? AND hash = ? AND bitis > ? AND COALESCE(deneme, 0) < ?").bind(eposta, kayit.hash, Date.now(), DENEME_LIMIT).run();
+    if (!degisti(rez)) return kodHatasi();
+    /* 2) Karşılaştırma ve tüketim de tek atomik komuttur (hash eşleşirse silinir): aynı doğru kodla gelen eşzamanlı isteklerden yalnızca biri etkilenir (tek kullanım).
+       Hak ayrılan kayıtla (kayit.hash) gönderilen kodun özeti aynı olmalı; bu komut yalnızca gönderilen koda karşılık gelen kaydı tüketir. */
     const hash = await sha256(eposta + ":" + kod + ":" + (env.AKE_GIZLI || "ake"));
-    if (hash !== g.hash) { await env.DB.prepare("UPDATE giris SET deneme = deneme + 1 WHERE eposta = ?").bind(eposta).run(); return fail(400, "kod_yanlis", "Kod yanlış."); }
-    await env.DB.prepare("UPDATE giris SET hash = NULL, deneme = 0 WHERE eposta = ?").bind(eposta).run();
+    if (hash !== kayit.hash) return kodHatasi();
+    const tuk = await env.DB.prepare("UPDATE giris SET hash = NULL, deneme = 0 WHERE eposta = ? AND hash = ? AND bitis > ?").bind(eposta, hash, Date.now()).run();
+    if (!degisti(tuk)) return kodHatasi();
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
     await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
     const u = { id: kid, eposta, ad: "" };

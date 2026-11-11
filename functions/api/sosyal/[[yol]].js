@@ -21,16 +21,16 @@
 //   GET/POST oda {id}                odak odasında şu an kaç kişi var
 
 import { json, fail, sema, oturum, yoneticiMi, bugunIso } from "../../../lib/ortak.js";
+import { ipHiz, hizSinir, bekleBaslik } from "../../../lib/hiz.js";
 import { sosyalSema, haftaAnahtar, haftaBitis, davetKodu, kodTemiz, yeniId, net, takmaTemiz, takmaAl } from "../../../lib/sosyal.js";
 
+const ODA_TAVAN = 20000;
 const SINIR = { ligUye: 8, ligKur: 3, ligKisi: 50, sinifKur: 10, sinifKisi: 300, sinifUye: 3, gunXp: 2500 };
-const ipHits = new Map();
 const ONBELLEK = new Map(); /* canlı deneme sıralaması önbelleği (bu sunucu örneğinde) */
-function ipSinir(request, anahtar, adet, ms) {
-  const ip = request.headers.get("cf-connecting-ip") || "?", k = anahtar + "|" + ip, now = Date.now();
-  const l = (ipHits.get(k) || []).filter(t => now - t < ms); if (l.length >= adet) return false;
-  l.push(now); ipHits.set(k, l); if (ipHits.size > 20000) ipHits.clear(); return true;
-}
+/* Sınırlar D1'de (lib/hiz.js): tüm Worker örneklerinde ortak ve atomik. Tablo yoksa engellemez (bellek içi yedek). */
+async function ipSinir(env, request, anahtar, adet, ms) { const h = await ipHiz(env, request, "s:" + anahtar, adet, ms); return h.izin ? null : fail(429, "cok_istek", "", bekleBaslik(h)); }
+async function kisiSinir(env, kid, anahtar, adet, ms) { const h = await hizSinir(env, { kova: "s:" + anahtar, kimlik: kid, adet, ms }); return h.izin ? null : fail(429, "cok_istek", "", bekleBaslik(h)); }
+const YAZMA_YOLLARI = new Set(["takma", "lig", "sinif", "ozet"]);   /* kullanıcının veri yazdığı sosyal uçlar (xp ve canlı yönetici işlemleri ayrı) */
 async function govde(request) { try { return await request.json(); } catch (e) { return {}; } }
 const tamSayi = (v, max) => Math.max(0, Math.min(max, Math.floor(+v || 0)));
 const adTemiz = s => String(s || "").replace(/[<>"'`\\]/g, "").replace(/\s+/g, " ").trim().slice(0, 40);
@@ -72,12 +72,13 @@ export async function onRequest({ request, env, params }) {
   /* ---------- odak odası: oturum gerekmez ---------- */
   if (ad === "oda") {
     if (m === "POST") {
-      if (!ipSinir(request, "oda", 6, 60000)) return fail(429, "cok_istek");
+      { const red = await ipSinir(env, request, "oda", 6, 60000); if (red) return red; }
       const b = await govde(request), id = String(b.id || "");
       if (!/^[a-z0-9]{8,40}$/i.test(id)) return fail(400, "gecersiz");
       if (b.cik) await env.DB.prepare("DELETE FROM nabiz WHERE id = ?").bind(id).run();
       else await env.DB.batch([
-        env.DB.prepare("INSERT INTO nabiz (id, t) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET t = excluded.t").bind(id, now),
+        /* tablo tavanı: yeni kimlik yalnızca toplam satır < ODA_TAVAN ise eklenir (mevcut kimlik her zaman yenilenir) — tek atomik komut */
+        env.DB.prepare("INSERT INTO nabiz (id, t) SELECT ?1, ?2 WHERE (SELECT COUNT(*) FROM nabiz) < " + ODA_TAVAN + " OR EXISTS (SELECT 1 FROM nabiz WHERE id = ?1) ON CONFLICT (id) DO UPDATE SET t = excluded.t").bind(id, now),
         env.DB.prepare("DELETE FROM nabiz WHERE t < ?").bind(now - 600000)
       ]);
     }
@@ -102,6 +103,13 @@ export async function onRequest({ request, env, params }) {
 
   if (!u) return fail(401, "giris", "Bu özellik için giriş yap.");
   const yon = yoneticiMi(env, u);
+  /* Suistimale açık yazma işlemleri (kullanıcı başına, D1'de atomik): genel yazma bütçesi saatte 240; lig/sınıf kurma ve takma ad değiştirme saatte 10.
+     Kur→ayrıl→kur döngüsüyle tablo şişirme ve takma ad değiştirme spamı bu sınırlarla kesilir; normal kullanımın çok üstündedir. */
+  if (m === "POST" && YAZMA_YOLLARI.has(ad)) {
+    const red = (await kisiSinir(env, u.id, "yaz", 240, 3600000)) || (ad === "takma" && (await kisiSinir(env, u.id, "takma", 10, 3600000)))
+      || ((ad === "lig" || ad === "sinif") && yol[1] === "kur" && (await kisiSinir(env, u.id, "kur", 10, 3600000)));
+    if (red) return red;
+  }
 
   /* ---------- profil ve puan ---------- */
   if (ad === "ben" && m === "GET") {
@@ -122,7 +130,7 @@ export async function onRequest({ request, env, params }) {
     return json(200, { takma: t });
   }
   if (ad === "xp" && m === "POST") {
-    if (!ipSinir(request, "xp:" + u.id, 30, 60000)) return fail(429, "cok_istek");
+    { const red = await kisiSinir(env, u.id, "xp", 30, 60000); if (red) return red; }
     const b = await govde(request);
     const ham = tamSayi(b.d, 400) * 10 + tamSayi(b.y, 400) * 2 + tamSayi(b.deneme, 2) * 50 + tamSayi(b.odak, 6) * 25;
     const hafta = haftaAnahtar(now), gun = bugunIso();
@@ -162,7 +170,7 @@ export async function onRequest({ request, env, params }) {
       return json(200, { id, kod });
     }
     if (alt === "katil" && m === "POST") {
-      if (!ipSinir(request, "katil", 20, 3600000)) return fail(429, "cok_istek");
+      { const red = await ipSinir(env, request, "katil", 20, 3600000); if (red) return red; }
       const kod = kodTemiz((await govde(request)).kod);
       const l = kod.length === 6 ? await env.DB.prepare("SELECT id, ad FROM lig WHERE kod = ?").bind(kod).first() : null;
       if (!l) return fail(404, "kod_yok", "Bu davet kodu ile bir lig bulunamadı.");
@@ -208,7 +216,7 @@ export async function onRequest({ request, env, params }) {
       return json(200, { id, kod });
     }
     if (alt === "katil" && m === "POST") {
-      if (!ipSinir(request, "katil", 20, 3600000)) return fail(429, "cok_istek");
+      { const red = await ipSinir(env, request, "katil", 20, 3600000); if (red) return red; }
       const kod = kodTemiz((await govde(request)).kod);
       const s = kod.length === 6 ? await env.DB.prepare("SELECT id, ad, ogretmen FROM sinif WHERE kod = ?").bind(kod).first() : null;
       if (!s) return fail(404, "kod_yok", "Bu kodla bir sınıf bulunamadı.");

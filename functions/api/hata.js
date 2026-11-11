@@ -3,8 +3,8 @@
 //   GET  /api/hata                   (yönetici) son hatalar
 //   POST /api/hata/temizle           (yönetici) listeyi sıfırlar
 import { json, fail, sema, oturum, yoneticiMi, sha256 } from "../../lib/ortak.js";
+import { hizSinir, ipHiz, bekleBaslik } from "../../lib/hiz.js";
 
-const ipHits = new Map();
 const kirp = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001f]/g, " ").slice(0, n);
 let hazir = false;
 
@@ -15,9 +15,11 @@ export async function onRequest({ request, env }) {
   const url = new URL(request.url), now = Date.now(), temizle = url.pathname.replace(/\/+$/, "").endsWith("/temizle");
 
   if (request.method === "POST" && !temizle) {
-    const ip = request.headers.get("cf-connecting-ip") || "?", l = (ipHits.get(ip) || []).filter(t => now - t < 3600000);
-    if (l.length >= 20) return fail(429, "cok_istek");
-    l.push(now); ipHits.set(ip, l); if (ipHits.size > 20000) ipHits.clear();
+    /* Kayıt sınırı (D1, atomik): IP başına saatte 20 + tüm site için saatte 1500 yazma (farklı IP'lerle tabloyu şişirmeyi/yazma yükünü sınırlar). */
+    const hi = await ipHiz(env, request, "hata", 20, 3600000);
+    if (!hi.izin) return fail(429, "cok_istek", "", bekleBaslik(hi));
+    const hg = await hizSinir(env, { kova: "hata-genel", kimlik: "tum", adet: 1500, ms: 3600000 });
+    if (!hg.izin) return fail(429, "cok_istek", "", bekleBaslik(hg));
     let b = {}; try { b = await request.json(); } catch (e) { }
     const mesaj = kirp(b.m, 300).trim();
     if (!mesaj) return fail(400, "gecersiz");

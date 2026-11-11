@@ -13,6 +13,7 @@
 // Yanıt akışı Anthropic'ten olduğu gibi (SSE) tarayıcıya aktarılır; ayrıştırmayı tarayıcı yapar.
 // Böylece sunucu neredeyse hiç işlemci kullanmaz (Cloudflare ücretsiz planı için önemli).
 
+import { hizSinir, bekleBaslik, kodDenemeSinir } from "../../lib/hiz.js";
 import { json, fail, sema, oturum, aktifPaket, kodBagla, kullanimAl, kullanimArtir, limitler, kodCoz, giderYaz } from "../../lib/ortak.js";
 
 const MAX_IMAGE_BASE64 = 5_000_000;
@@ -23,7 +24,6 @@ const IMAGE_FORMATS = new Map([
   ["image/webp", webpMatches],
   ["image/gif", bytes => bytes.length >= 14 && /^(GIF87a|GIF89a)/.test(bytes) && bytes.endsWith("\x3b")],
 ]);
-const hits = new Map();
 
 function webpMatches(bytes) {
   if (bytes.length < 20 || !bytes.startsWith("RIFF") || bytes.slice(8, 12) !== "WEBP") return false;
@@ -81,7 +81,11 @@ export async function onRequest({ request, env }) {
     if (!u) return fail(401, "giris");
     kid = u.id;
     let pk = await aktifPaket(env, kid);
-    if (!pk && b.code) { const r = await kodBagla(env, kid, b.code); if (r.hata) return fail(r.durum || 400, r.hata); pk = r.paket; }
+    if (!pk && b.code) {
+      /* Erişim kodu denemesi hesap/kod-bagla ile AYNI D1 bütçesini paylaşır; kodBagla'dan ÖNCE denetlenir (b.check dahil bu yolu atlayamaz).
+         Sınırlayıcı çalışmıyorsa 503: arızada kod tahminine izin verilmez. */
+      const red = await kodDenemeSinir(env, request, kid); if (red) return red;
+      const r = await kodBagla(env, kid, b.code); if (r.hata) return fail(r.durum || 400, r.hata); pk = r.paket; }
     if (!pk) return fail(402, "paket");
     plan = pk.plan; bitis = pk.bitis;
     if (b.check) return json(200, { ok: true, plan, bitis });
@@ -95,10 +99,11 @@ export async function onRequest({ request, env }) {
   }
   const code = kid || String(b.code || "").trim().toUpperCase();
 
-  const now = Date.now(), list = (hits.get(code) || []).filter(t => now - t < 5 * 60000);
-  if (list.length >= 40) return fail(429, "rate_limited");
-  list.push(now); hits.set(code, list);
-  if (hits.size > 5000) hits.clear();
+  /* AI istek sınırı (D1, atomik): hesap (veya DB yoksa kod) başına 5 dakikada 40 istek; tüm Worker örneklerinde ortak. */
+  /* DB varken sınırlayıcı çalışmazsa (tablo yok / D1 hatası) ücretli istek REDDEDİLİR: bellek içi yedek örnek başınadır, AI maliyetini sınırsıza açardı. */
+  const ah = await hizSinir(env, { kova: "ai", kimlik: code, adet: 40, ms: 5 * 60000, yedekIzin: !env.DB });
+  if (ah.hata) return fail(503, "gecici", "Servis geçici olarak kullanılamıyor. Biraz sonra tekrar dene.", bekleBaslik(ah));
+  if (!ah.izin) return fail(429, "rate_limited", "", bekleBaslik(ah));
 
   let msgs = Array.isArray(b.messages) ? b.messages : (typeof b.prompt === "string" ? [{ role: "user", content: b.prompt }] : []);
   msgs = msgs.slice(-20).map(m => ({ role: m && m.role === "assistant" ? "assistant" : "user", content: String((m && m.content) || "").slice(0, 16000) })).filter(m => m.content.trim());

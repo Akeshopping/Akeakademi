@@ -9396,7 +9396,7 @@ async function girisSonrasi(j) {
 }
 const HESAP_HATA = {
   eposta_gecersiz: "E-posta adresini kontrol et.", bekle: "Yeni kod için 1 dakika bekle.", cok_istek: "Çok fazla deneme yapıldı. Biraz sonra tekrar dene.",
-  kod_gecersiz: "6 haneli kodu yaz.", kod_yanlis: "Kod yanlış. E-postadaki kodu kontrol et.", kod_suresi: "Kodun süresi doldu. Yeni kod iste.", cok_deneme: "Çok fazla yanlış deneme. Yeni kod iste.",
+  kod_gecersiz: "8 haneli kodu yaz.", kod_yanlis: "Kod yanlış. E-postadaki kodu kontrol et.", kod_suresi: "Kodun süresi doldu. Yeni kod iste.", cok_deneme: "Çok fazla yanlış deneme. Yeni kod iste.",
   eposta: "E-posta gönderilemedi. Adresi kontrol edip tekrar dene.", yapilandirma: "Giriş sistemi henüz ayarlanıyor. Biraz sonra tekrar dene.",
   kod: "Bu erişim kodu geçerli değil. Harfleri ve tireleri kontrol et.", suresi: "Bu kodun süresi dolmuş. Paketini yenilemek için Paketler sayfasına bak.",
   baska_hesap: "Bu erişim kodu başka bir hesaba bağlı. Kodlar kişiseldir; bir sorun varsa bize yaz."
@@ -9406,8 +9406,8 @@ const hesapHata = (j, r) => HESAP_HATA[j && j.error] || (r && r.status >= 500 ? 
 function girisFormu(kisa) {
   const H = HESAP;
   return `${H.ayar.google ? `<a class="btn google" href="/api/hesap/google">${icon("g")}<span>Google ile devam et</span></a><div class="ya-da"><span>ya da e-postayla</span></div>` : ""}
-    ${H.adim === "kod" ? `<form data-s="girisKod" class="stack" style="gap:10px"><p class="small"><b>${esc(H.eposta)}</b> adresine 6 haneli bir kod gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.</p>
-      <div class="row"><input class="in kod-in" name="kod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" aria-label="6 haneli kod" required><button class="btn pri"${H.busy ? " disabled" : ""}>${H.busy ? "Kontrol ediliyor…" : "Giriş yap"}</button></div>
+    ${H.adim === "kod" ? `<form data-s="girisKod" class="stack" style="gap:10px"><p class="small"><b>${esc(H.eposta)}</b> adresine 8 haneli bir kod gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.</p>
+      <div class="row"><input class="in kod-in" name="kod" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="????????" aria-label="8 haneli kod" required><button class="btn pri"${H.busy ? " disabled" : ""}>${H.busy ? "Kontrol ediliyor…" : "Giriş yap"}</button></div>
       <div class="row"><button type="button" class="linkbtn small" data-a="girisGeri">E-postayı değiştir</button><button type="button" class="linkbtn small" data-a="girisTekrar">Kodu yeniden gönder</button></div></form>`
     : `<form data-s="girisEposta" class="row"><input class="in" name="eposta" type="email" autocomplete="email" placeholder="E-posta adresin" aria-label="E-posta adresi" value="${esc(H.eposta)}" required style="flex:1;min-width:200px"><button class="btn ${H.ayar.google ? "" : "pri"}"${H.busy ? " disabled" : ""}>${H.busy ? "Gönderiliyor…" : "Kod gönder"}</button></form>`}
     ${H.err ? `<p class="small" style="color:var(--bad)">${esc(H.err)}</p>` : ""}
@@ -9474,7 +9474,7 @@ const HESAP_SUB = {
     if (r.ok) { const el = document.querySelector(".kod-in"); if (el) el.focus(); }
   },
   async girisKod(fd) {
-    const k = String(fd.get("kod") || "").replace(/\D/g, ""); if (k.length !== 6 || HESAP.busy) { HESAP.err = HESAP_HATA.kod_gecersiz; render(); return; }
+    const k = String(fd.get("kod") || "").replace(/\D/g, ""); if (![6, 8].includes(k.length) || HESAP.busy) { HESAP.err = HESAP_HATA.kod_gecersiz; render(); return; }
     HESAP.busy = true; HESAP.err = ""; render();
     const { r, j } = await hesapIstek("kod-dogrula", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta, kod: k }) }).catch(() => ({ r: { status: 0 }, j: {} }));
     HESAP.busy = false;

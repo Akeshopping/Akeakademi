@@ -4,3 +4,6 @@
 *.sqlite-wal
 soru-cikti/
 fabrika/rapor/son-dogrulama.json
+
+# wrangler yerel durum klasörü (yayına girmesin)
+.wrangler/

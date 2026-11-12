@@ -14,9 +14,9 @@
 //   POST sinif/<id>/cikar {kid} · sinif/<id>/sil   (öğretmen)
 //   POST ozet {ozet}                 sınıf üyesi öğrencinin çalışma özeti
 //   GET  canli                       planlanan, açık ve biten canlı denemeler
-//   GET  canli/<id>/sorular          (deneme açıkken) cevapsız sorular
-//   POST canli/<id>/gonder {cevap, sure}
-//   GET  canli/<id>/sonuc            sıralama; deneme bitince cevaplar ve çözümler
+//   GET  canli/<id>/sorular          (deneme açıkken) cevapsız sorular; öğrencinin açılış anı D1'e kaydedilir
+//   POST canli/<id>/gonder {cevap}   (süre istemciden alınmaz; yanıt yalnızca {kaydedildi:true}, puan sonucZamani'ndan önce verilmez)
+//   GET  canli/<id>/sonuc            sıralama, cevap anahtarı ve çözümler yalnızca yeni gönderim kabul edilmeyen aşamada (sonucZamani)
 //   POST canli/olustur · canli/<id>/sil   (yönetici)
 //   GET/POST oda {id}                odak odasında şu an kaç kişi var
 
@@ -35,6 +35,12 @@ async function govde(request) { try { return await request.json(); } catch (e) {
 const tamSayi = (v, max) => Math.max(0, Math.min(max, Math.floor(+v || 0)));
 const adTemiz = s => String(s || "").replace(/[<>"'`\\]/g, "").replace(/\s+/g, " ").trim().slice(0, 40);
 const bitisOf = c => c.baslangic + c.sure * 60000;
+/* Canlı deneme zaman çizelgesi (HEPSİ SUNUCU SAATİYLE): baslangic → bitis (sorular açık) → kapanis (cevap kabulünün SON anı) → sonucZamani (sıralama, cevap anahtarı, çözümler).
+   TOLERANS yalnızca bitiş anındaki ağ gecikmesi içindir; ANAHTAR_GECIKME, kabul kapandıktan sonra anahtarın açılmasına kadar saat farkı/yoldaki istek payıdır:
+   böylece anahtarın görülebildiği hiçbir anda yeni cevap kabul edilmez. */
+const CANLI_TOLERANS = 60000, CANLI_ANAHTAR_GECIKME = 15000;
+const kapanisOf = c => bitisOf(c) + CANLI_TOLERANS;
+const sonucOf = c => kapanisOf(c) + CANLI_ANAHTAR_GECIKME;
 const durumOf = (c, now) => now < c.baslangic ? "yakinda" : now < bitisOf(c) ? "acik" : "bitti";
 
 async function benzersizKod(env, tablo) {
@@ -96,9 +102,9 @@ export async function onRequest({ request, env, params }) {
       const q = ids.map(() => "?").join(",");
       const s = await env.DB.prepare(`SELECT canli, COUNT(*) AS n FROM canli_sonuc WHERE canli IN (${q}) GROUP BY canli`).bind(...ids).all();
       (s.results || []).forEach(r => say[r.canli] = r.n);
-      if (u) { const b = await env.DB.prepare(`SELECT canli, d, y, b, net FROM canli_sonuc WHERE kid = ? AND canli IN (${q})`).bind(u.id, ...ids).all(); (b.results || []).forEach(r => benim[r.canli] = { d: r.d, y: r.y, b: r.b, net: r.net }); }
+      if (u) { const b = await env.DB.prepare(`SELECT canli, d, y, b, net FROM canli_sonuc WHERE kid = ? AND canli IN (${q})`).bind(u.id, ...ids).all(); const sz = {}; l.forEach(c => sz[c.id] = sonucOf(c)); (b.results || []).forEach(r => benim[r.canli] = now >= sz[r.canli] ? { kaydedildi: true, d: r.d, y: r.y, b: r.b, net: r.net } : { kaydedildi: true }); }
     }
-    return json(200, { simdi: now, denemeler: l.map(c => ({ id: c.id, baslik: c.baslik, tur: c.tur, baslangic: c.baslangic, bitis: bitisOf(c), sure: c.sure, adet: c.adet, durum: durumOf(c, now), katilan: say[c.id] || 0, benim: benim[c.id] || null })) }, { "cache-control": "no-store" });
+    return json(200, { simdi: now, denemeler: l.map(c => ({ id: c.id, baslik: c.baslik, tur: c.tur, baslangic: c.baslangic, bitis: bitisOf(c), sure: c.sure, adet: c.adet, durum: durumOf(c, now), sonucZamani: sonucOf(c), katilan: say[c.id] || 0, benim: benim[c.id] || null })) }, { "cache-control": "no-store" });
   }
 
   if (!u) return fail(401, "giris", "Bu özellik için giriş yap.");
@@ -286,7 +292,7 @@ export async function onRequest({ request, env, params }) {
     const islem = yol[2] || "", bitis = bitisOf(c), durum = durumOf(c, now);
     if (islem === "sil" && m === "POST") {
       if (!yon) return fail(403, "yetki");
-      await env.DB.batch([env.DB.prepare("DELETE FROM canli_sonuc WHERE canli = ?").bind(c.id), env.DB.prepare("DELETE FROM canli WHERE id = ?").bind(c.id)]);
+      await env.DB.batch([env.DB.prepare("DELETE FROM canli_sonuc WHERE canli = ?").bind(c.id), env.DB.prepare("DELETE FROM canli_acilis WHERE canli = ?").bind(c.id), env.DB.prepare("DELETE FROM canli WHERE id = ?").bind(c.id)]);
       return json(200, { ok: true });
     }
     const benim = await env.DB.prepare("SELECT cevap, d, y, b, net, sure FROM canli_sonuc WHERE canli = ? AND kid = ?").bind(c.id, u.id).first();
@@ -294,28 +300,47 @@ export async function onRequest({ request, env, params }) {
       if (durum === "yakinda") return fail(425, "erken", "Deneme henüz başlamadı.");
       if (benim) return fail(409, "gonderildi", "Bu denemeyi zaten gönderdin.");
       if (now > bitis - 60000) return fail(410, "bitti", "Deneme bitti.");
+      /* Açılış kaydı (kullanıcı + deneme bazında, İLK kayıt geçerli): cihaz/istek sayısı ne olursa olsun sıfırlanamaz, değiştirilemez. Kayıt yazılamazsa sorular VERİLMEZ. */
+      await env.DB.prepare("INSERT OR IGNORE INTO canli_acilis (canli, kid, acilis) VALUES (?, ?, ?)").bind(c.id, u.id, now).run();
       const qs = JSON.parse(c.sorular).map(({ a, x, ...q }) => q);
-      return json(200, { id: c.id, baslik: c.baslik, tur: c.tur, bitis, secs: JSON.parse(c.secs || "[]"), sorular: qs }, { "cache-control": "no-store" });
+      return json(200, { id: c.id, baslik: c.baslik, tur: c.tur, bitis, simdi: now, secs: JSON.parse(c.secs || "[]"), sorular: qs }, { "cache-control": "no-store" });
     }
     if (islem === "gonder" && m === "POST") {
+      const kapanis = kapanisOf(c), sonucZamani = sonucOf(c);
       if (durum === "yakinda") return fail(425, "erken");
-      if (now > bitis + 180000) return fail(410, "bitti", "Gönderim süresi doldu.");
-      if (benim) return json(200, { d: benim.d, y: benim.y, b: benim.b, net: benim.net, bitis, zaten: true });
+      /* Daha önce gönderilmiş sonuç her zaman korunur: tekrar gönderim yeni kayıt YAZMAZ, saklanan sonucu döndürür (süre penceresinden bağımsız). */
+      if (benim) return json(200, { kaydedildi: true, bitis, sonucZamani, zaten: true });
+      if (now >= kapanis) return fail(410, "bitti", "Gönderim süresi doldu; bu denemenin cevapları artık kabul edilmiyor.");
+      /* Soruları sunucudan açmayan kullanıcı cevap gönderemez. */
+      const ac = await env.DB.prepare("SELECT acilis FROM canli_acilis WHERE canli = ? AND kid = ?").bind(c.id, u.id).first();
+      if (!ac) return fail(403, "acilmadi", "Bu denemenin sorularını açmadığın için cevap gönderemezsin.");
       const b = await govde(request), qs = JSON.parse(c.sorular), cev = Array.isArray(b.cevap) ? b.cevap : [];
       if (cev.length !== qs.length) return fail(400, "gecersiz");
       let d = 0, y = 0, bos = 0;
       const temiz = qs.map((q, i) => { const a = cev[i]; if (!Number.isInteger(a) || a < 0 || a > 4) { bos++; return null; } if (a === q.a) d++; else y++; return a; });
-      const sure = Math.min(c.sure * 60, tamSayi(b.sure, 86400));
-      await env.DB.prepare("INSERT OR IGNORE INTO canli_sonuc (canli, kid, cevap, d, y, b, net, sure, tarih) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(c.id, u.id, JSON.stringify(temiz), d, y, bos, net(d, y), sure, now).run();
-      return json(200, { d, y, b: bos, net: net(d, y), bitis });
+      /* Taze saat: yukarıdaki kontrollerden bu yana geçen süre (D1 gecikmesi vb.) kapanışı aştıysa KAYIT YAZILMAZ. */
+      const kabul = Date.now();
+      if (kabul >= kapanis) return fail(410, "bitti", "Gönderim süresi doldu; bu denemenin cevapları artık kabul edilmiyor.");
+      /* Süre İSTEMCİDEN ALINMAZ (b.sure yok sayılır): sunucudaki açılış kaydından kabul anına kadar geçen süre; en çok deneme süresi kadar. */
+      const sure = Math.max(1, Math.min(c.sure * 60, Math.round((Math.min(kabul, bitis) - ac.acilis) / 1000)));
+      const ins = await env.DB.prepare("INSERT OR IGNORE INTO canli_sonuc (canli, kid, cevap, d, y, b, net, sure, tarih) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(c.id, u.id, JSON.stringify(temiz), d, y, bos, net(d, y), sure, kabul).run();
+      if (!(ins && ins.meta && ins.meta.changes > 0)) {
+        /* Eşzamanlı/tekrarlı gönderim: tek kayıt vardır (ilk yazılan). Hiçbir gönderim yanıtı puan içermez (sonucZamani'na kadar puan yoklanamaz). */
+        const k = await env.DB.prepare("SELECT 1 AS v FROM canli_sonuc WHERE canli = ? AND kid = ?").bind(c.id, u.id).first();
+        if (!k) return fail(503, "gecici", "Cevapların kaydedilemedi. Lütfen tekrar dene.");
+        return json(200, { kaydedildi: true, bitis, sonucZamani, zaten: true });
+      }
+      return json(200, { kaydedildi: true, bitis, sonucZamani });
     }
     if (islem === "sonuc" && m === "GET") {
-      const ben = benim ? { d: benim.d, y: benim.y, b: benim.b, net: benim.net, sure: benim.sure } : null;
-      /* Bitmiş denemenin sıralaması 20 sn önbelleğe alınır: binlerce kişi aynı anda sonuca bakınca veritabanı yorulmaz */
-      const onb = ONBELLEK.get(c.id), taze = onb && now - onb.t < 20000 && now >= bitis;
+      const ben = benim ? { d: benim.d, y: benim.y, b: benim.b, net: benim.net, sure: benim.sure } : null;   /* yalnızca iç hesap için; sonucZamani'ndan önce istemciye GİTMEZ */
+      /* Sıralama, cevap anahtarı ve çözümler YALNIZCA artık hiçbir yeni gönderimin kabul edilmediği aşamada (sonucZamani) açılır. */
+      const acikMi = now >= sonucOf(c);
+      /* Sonuçlanmış denemenin sıralaması 20 sn önbelleğe alınır: binlerce kişi aynı anda sonuca bakınca veritabanı yorulmaz */
+      const onb = ONBELLEK.get(c.id), taze = onb && now - onb.t < 20000 && acikMi;
       const say = taze ? onb.say : await env.DB.prepare("SELECT COUNT(*) AS n FROM canli_sonuc WHERE canli = ?").bind(c.id).first();
-      const temel = { id: c.id, baslik: c.baslik, tur: c.tur, baslangic: c.baslangic, bitis, sure: c.sure, adet: c.adet, durum, katilan: say.n, benim: ben };
-      if (now < bitis) return json(200, Object.assign(temel, { acik: false }), { "cache-control": "no-store" });
+      const temel = { id: c.id, baslik: c.baslik, tur: c.tur, baslangic: c.baslangic, bitis, sonucZamani: sonucOf(c), sure: c.sure, adet: c.adet, durum, katilan: say.n };
+      if (!acikMi) return json(200, Object.assign(temel, { benim: benim ? { kaydedildi: true } : null, acik: false }), { "cache-control": "no-store" });
       let results;
       if (taze) results = onb.results;
       else {
@@ -325,7 +350,7 @@ export async function onRequest({ request, env, params }) {
       let sira = null;
       if (ben) { const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM canli_sonuc WHERE canli = ? AND (net > ? OR (net = ? AND sure < ?))").bind(c.id, ben.net, ben.net, ben.sure).first(); sira = r.n + 1; }
       const ilk = (results || []).map((r, i) => ({ sira: i + 1, takma: String(r.takma || "Öğrenci").split(" ")[0], d: r.d, y: r.y, b: r.b, net: r.net, ben: r.kid === u.id }));
-      return json(200, Object.assign(temel, { acik: true, sira, siralama: ilk, sorular: JSON.parse(c.sorular), secs: JSON.parse(c.secs || "[]"), cevabim: benim ? JSON.parse(benim.cevap || "[]") : null }));
+      return json(200, Object.assign(temel, { benim: ben ? Object.assign({ kaydedildi: true }, ben) : null, acik: true, sira, siralama: ilk, sorular: JSON.parse(c.sorular), secs: JSON.parse(c.secs || "[]"), cevabim: benim ? JSON.parse(benim.cevap || "[]") : null }));
     }
     return fail(404, "yok");
   }

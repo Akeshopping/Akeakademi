@@ -9922,8 +9922,8 @@ function canliSatir(d) {
   else if (dur === "acik") {
     pill = `<span class="pill ok">Şu an açık</span>`;
     btn = d.benim ? `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">Gönderildi</button>` : !sosAktif() ? `<a class="btn sm pri" href="#hesap">Katılmak için giriş yap</a>` : `<button class="btn sm pri" data-a="canliKatil" data-id="${esc(d.id)}"${busy ? " disabled" : ""}>${busy ? "Açılıyor…" : "Katıl"}</button>`;
-  } else { pill = `<span class="pill">Bitti · ${fmtN(d.katilan)} kişi</span>`; btn = `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">${d.benim ? "Sıralamam" : "Sıralama"}</button>`; }
-  return `<div class="li mli"><div class="grow"><div class="t">${esc(d.baslik)}</div><div class="s">${esc(EXAMS[d.tur] ? EXAMS[d.tur].n : d.tur || "Deneme")} · ${d.adet} soru · ${d.sure} dk · ${saatYazi(d.baslangic)}${dur === "acik" ? ` · bitişe ${kalanYazi(d.bitis - now)}` : ""}${d.benim ? ` · netin ${nfx(d.benim.net)}` : ""}</div></div><div class="li-act">${pill}${btn}</div></div>`;
+  } else { pill = `<span class="pill">${d.sonucZamani && now < d.sonucZamani ? "Sonuçlanıyor" : "Bitti"} · ${fmtN(d.katilan)} kişi</span>`; btn = `<button class="btn sm" data-a="canliSonucAc" data-id="${esc(d.id)}">${d.benim ? "Sıralamam" : "Sıralama"}</button>`; }
+  return `<div class="li mli"><div class="grow"><div class="t">${esc(d.baslik)}</div><div class="s">${esc(EXAMS[d.tur] ? EXAMS[d.tur].n : d.tur || "Deneme")} · ${d.adet} soru · ${d.sure} dk · ${saatYazi(d.baslangic)}${dur === "acik" ? ` · bitişe ${kalanYazi(d.bitis - now)}` : ""}${d.benim ? (d.benim.net != null ? ` · netin ${nfx(d.benim.net)}` : " · cevapların kaydedildi") : ""}</div></div><div class="li-act">${pill}${btn}</div></div>`;
 }
 async function canliKatil(id) {
   if (SOS.busy) return;
@@ -9934,7 +9934,10 @@ async function canliKatil(id) {
     SOS.busy = "";
     if (!r.ok) { toast(j.message || "Denemeye girilemedi."); sosYukle("canli", true); return; }
     const qs = j.sorular.map(q => Object.assign({}, q, { a: -1, x: "" }));
-    startRun({ kind: "exam", type: j.tur, title: j.baslik, mode: "exam", qs, secs: j.secs && j.secs.length ? j.secs : null, dur: Math.max(1, (j.bitis - Date.now()) / 60000), canli: j.id });
+    /* Kalan süre SUNUCU saatine göre (cihaz saati yanlış olsa da sınav sunucudaki bitişte kapanır) */
+    const kalan = j.simdi ? j.bitis - j.simdi : j.bitis - Date.now();
+    startRun({ kind: "exam", type: j.tur, title: j.baslik, mode: "exam", qs, secs: j.secs && j.secs.length ? j.secs : null, dur: Math.max(1, kalan / 60000), canli: j.id });
+    toast("Süre sunucu saatiyle işler. Bitirdiğinde cevaplarını gönder; bitişten sonra yalnızca 1 dakika içinde gönderilen cevaplar kabul edilir.");
   } catch (e) { SOS.busy = ""; toast("Bağlantı kurulamadı."); render(); }
 }
 /* Canlı denemede bitir: cevaplar sunucuda puanlanır, sıralama ve çözümler deneme bitince açılır */
@@ -9956,10 +9959,13 @@ async function canliGonderBekleyen(n) {
     const { r, j } = await sosIstek("canli/" + p.id + "/gonder", { cevap: p.cevap, sure: p.sure });
     if (r.ok) {
       LS.del("ake.canliGonder"); SOS.t.canli = 0; SOS.t["s:" + p.id] = 0;
-      SOS.sonuc[p.id] = Object.assign(SOS.sonuc[p.id] || {}, { id: p.id, baslik: p.baslik, benim: j, bitis: j.bitis, acik: false, gonderiliyor: false });
-      toast(`Cevapların gönderildi: ${j.d} doğru, ${j.y} yanlış, ${nfx(j.net)} net.`); return;
+      SOS.sonuc[p.id] = Object.assign(SOS.sonuc[p.id] || {}, { id: p.id, baslik: p.baslik, benim: { kaydedildi: true }, bitis: j.bitis, sonucZamani: j.sonucZamani, acik: false, gonderiliyor: false });
+      toast("Cevapların başarıyla kaydedildi. Sonuçlar açıklanınca görüntüleyebilirsin."); render(); return;
     }
-    if (r.status === 400 || r.status === 404 || r.status === 410 || r.status === 425) { LS.del("ake.canliGonder"); if (SOS.sonuc[p.id]) SOS.sonuc[p.id].gonderiliyor = false; toast(j.message || "Cevaplar gönderilemedi."); return; }
+    if (r.status === 400 || r.status === 403 || r.status === 404 || r.status === 410 || r.status === 425) {
+      LS.del("ake.canliGonder"); if (SOS.sonuc[p.id]) SOS.sonuc[p.id].gonderiliyor = false;
+      toast(r.status === 410 ? "Gönderim süresi dolduğu için cevapların kabul edilmedi. Sonuçlar açılınca soruları ve çözümleri görebilirsin." : (j.message || "Cevaplar gönderilemedi.")); render(); return;
+    }
   } catch (e) { }
   if (n < 4) setTimeout(() => canliGonderBekleyen(n + 1), 4000 * (n + 1));
   else { if (SOS.sonuc[p.id]) SOS.sonuc[p.id].gonderiliyor = false; toast("Cevaplar henüz gönderilemedi; bağlantı gelince yeniden denenecek."); render(); }
@@ -9996,16 +10002,16 @@ function vCanli() {
   if (!id) return vExam();
   UI.canliId = id;
   const R = SOS.sonuc[id], now = Date.now();
-  if (!R || (!R.gonderiliyor && (!SOS.t["s:" + id] || (R.acik === false && now >= (R.bitis || 0) && now - SOS.t["s:" + id] > 15000) || now - SOS.t["s:" + id] > 120000))) { if (sosAktif()) setTimeout(() => sonucYukle(id), 0); }
+  if (!R || (!R.gonderiliyor && (!SOS.t["s:" + id] || (R.acik === false && now >= (R.sonucZamani || R.bitis || 0) && now - SOS.t["s:" + id] > 15000) || now - SOS.t["s:" + id] > 120000))) { if (sosAktif()) setTimeout(() => sonucYukle(id), 0); }
   const head = `<div class="vhead"><span class="eyebrow">Canlı deneme</span><h1>${esc(R && R.baslik || "Canlı deneme")}</h1>${R && R.baslangic ? `<p>${saatYazi(R.baslangic)} · ${R.adet} soru · ${R.sure} dk · ${fmtN(R.katilan)} katılımcı</p>` : ""}</div>`;
   if (!sosAktif()) return `<div class="view">${head}${sosGirisKart("Canlı deneme")}</div>`;
   if (!R || (!R.baslangic && !R.benim && !R.hata)) return `<div class="view">${head}<div class="empty">${R && R.gonderiliyor ? "Cevapların gönderiliyor…" : "Yükleniyor…"}</div></div>`;
   if (R.hata && !R.baslangic) return `<div class="view">${head}<div class="card"><p>${esc(R.hata === "giris" ? "Sonucu görmek için giriş yap." : R.hata)}</p></div></div>`;
   const ben = R.benim, ex = S.exams.find(e => e.id === "canli:" + id);
-  const skor = ben ? `<div class="tiles">${tile(ben.d, "doğru")}${tile(ben.y, "yanlış")}${tile(ben.b, "boş")}${tile(nfx(ben.net), "net")}</div>` : "";
+  const skor = ben && ben.net != null ? `<div class="tiles">${tile(ben.d, "doğru")}${tile(ben.y, "yanlış")}${tile(ben.b, "boş")}${tile(nfx(ben.net), "net")}</div>` : "";
   if (!R.acik) return `<div class="view">${head}${skor}
-    <div class="card stack"><h2>${ben ? "Cevapların alındı" : R.gonderiliyor ? "Cevapların gönderiliyor…" : "Deneme sürüyor"}</h2>
-      <p class="muted">Sıralama, cevap anahtarı ve çözümler deneme bitince açılır: <b>${saatYazi(R.bitis)}</b> (${kalanYazi(R.bitis - now)} sonra). O zaman bu sayfaya dön ya da yenile.</p>
+    <div class="card stack"><h2>${ben ? "Cevapların başarıyla kaydedildi" : R.gonderiliyor ? "Cevapların gönderiliyor…" : "Deneme sürüyor"}</h2>
+      <p class="muted">${ben ? "Cevapların başarıyla kaydedildi. Sonuçlar açıklanınca görüntüleyebilirsin. " : ""}Sıralama, cevap anahtarı ve çözümler, herkesin cevapları kapandıktan sonra açılır: <b>${saatYazi(R.sonucZamani || R.bitis)}</b>${(R.sonucZamani || R.bitis) > now ? ` (${kalanYazi((R.sonucZamani || R.bitis) - now)} sonra)` : ""}. O zaman bu sayfaya dön ya da yenile.${ben ? "" : " Cevapların henüz gönderilmediyse bitişten sonra en geç 1 dakika içinde göndermelisin."}</p>
       <div class="row"><button class="btn" data-a="canliYenile" data-id="${esc(id)}">Yenile</button><a class="btn ghost" href="#deneme">Deneme merkezi</a></div></div></div>`;
   const L = R.siralama || [], benSatir = ben && R.sira > L.length ? `<div class="li lb-row ben"><span class="lb-n">${R.sira}</span><div class="grow"><div class="t">${esc(SOS.ben ? SOS.ben.takma : "Sen")} <span class="pill form">sen</span></div></div><span class="small muted">${ben.d}D ${ben.y}Y</span><b class="mono">${nfx(ben.net)}</b></div>` : "";
   return `<div class="view">${head}${skor}

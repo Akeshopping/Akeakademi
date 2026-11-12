@@ -8190,6 +8190,92 @@ async function kotaIste(cfg) {
   if (!exam && cfg.qs.length > v) { cfg = Object.assign({}, cfg, { qs: cfg.qs.slice(0, v) }); toast("Ücretsiz pakette bugün " + v + " soru hakkın kaldı."); }
   baslatRun(cfg);
 }
+/* ===== B4 Aşama 3B: güvenli soru kataloğu yükleyici (ÖZELLİK BAYRAKLI · VARSAYILAN KAPALI) [KAT-BASLA] =====
+   Yalnız GET /api/soru/katalog?limit=&sonra= kullanır; BAŞKA parametre, oturum/kota ucu YOK. Bayrak KAPALIYKEN hiçbir istek yapılmaz ve
+   sayfanın mevcut davranışı DEĞİŞMEZ. Bayrak: window.AKE_KATALOG === true ya da adreste ?katalog=1.
+   Güvenlik: yalnız izinli alanlar kabul edilir (id,s,t,d,p,q,o,os,fix; p = paragraf metni, sunucu izin listesindedir). a/x/h/rk/govde/json/kaynak/kopya_of
+   ya da bilinmeyen herhangi bir alan görülürse TÜM katalog atılır ("sizinti"). Hatada BANK'a / eski kaynağa DÜŞÜLMEZ: { ok:false, durum } döner.
+   Yarım katalog asla verilmez (yinelenen id, cursor döngüsü, eksik sayfa → tümü reddedilir). Sonuç yalnız bellekte tutulur; localStorage/sessionStorage/IndexedDB YOK.
+   Bu blok sayfanın başka hiçbir değişkenine (BANK, allQ, S, HESAP…) dokunmaz. */
+const KAT = (() => {
+  const IZIN = new Set(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]), UST = new Set(["n", "bayrak", "sorular", "sonraki"]);
+  const ID_RE = /^[A-Za-z0-9:_.\-]{1,100}$/, LIMIT = 1000, MAX_SAYFA = 12, MAX_SORU = 5000;
+  let bekleyen = null, onbellek = null;
+  const acik = () => { try { return window.AKE_KATALOG === true || /[?&]katalog=1(?:&|$)/.test(location.search); } catch (e) { return false; } };
+  const hata = (durum, mesaj, ek) => Object.assign({ ok: false, durum, mesaj, sorular: [] }, ek || {});
+  const metin = (v, en, bos) => typeof v === "string" && v.length <= en && (bos || v.length > 0);
+  /* tek soru: temiz kopya döner; { sizinti:true } = izin dışı alan; null = biçim bozuk */
+  function soruTemizle(q) {
+    if (!q || typeof q !== "object" || Array.isArray(q)) return null;
+    for (const k of Object.keys(q)) if (!IZIN.has(k)) return { sizinti: true };
+    if (!(typeof q.id === "string" && ID_RE.test(q.id)) || !metin(q.s, 40) || !metin(q.t, 300) || !metin(q.q, 20000)) return null;
+    if (!Number.isInteger(q.d) || q.d < 1 || q.d > 3) return null;
+    if (!Array.isArray(q.o) || q.o.length !== 5 || !q.o.every(x => metin(x, 2000))) return null;
+    if ("p" in q && !metin(q.p, 20000)) return null;
+    if (("os" in q && q.os !== 1) || ("fix" in q && q.fix !== 1)) return null;
+    const c = { id: q.id, s: q.s, t: q.t, d: q.d, q: q.q, o: Object.freeze(q.o.slice()) };
+    if ("p" in q) c.p = q.p; if (q.os === 1) c.os = 1; if (q.fix === 1) c.fix = 1;
+    return Object.freeze(c);
+  }
+  async function sayfaAl(limit, sonra, sinyal) {
+    const yol = "/api/soru/katalog?limit=" + limit + (sonra !== null ? "&sonra=" + encodeURIComponent(sonra) : "");
+    let r; try { r = await fetch(yol, { method: "GET", credentials: "same-origin", headers: { accept: "application/json" }, signal: sinyal }); }
+    catch (e) { return { h: e && e.name === "AbortError" ? hata("iptal", "İstek iptal edildi.") : hata("ag_hatasi", "Bağlantı kurulamadı.") }; }
+    if (r.status === 401) return { h: hata("giris_gerekli", "Soru kataloğu için giriş yapmalısın.") };
+    if (r.status === 429) { const b = parseInt(r.headers && r.headers.get ? r.headers.get("retry-after") : "", 10); return { h: hata("cok_istek", "Çok sık istendi, biraz sonra tekrar dene.", { bekleSn: Number.isFinite(b) && b > 0 ? b : null }) }; }
+    if (r.status === 404) return { h: hata("kapali", "Sunucu soru sistemi şu an kapalı.") };
+    if (r.status === 403) return { h: hata("reddedildi", "İstek reddedildi.") };
+    if (r.status === 400) return { h: hata("istek_reddedildi", "İstek kabul edilmedi.") };
+    if (r.status >= 500) return { h: hata("sunucu_hatasi", "Sunucu şu an yanıt vermiyor.") };
+    if (!r.ok) return { h: hata("beklenmeyen_durum", "Beklenmeyen yanıt (" + r.status + ").") };
+    let j; try { j = await r.json(); } catch (e) { return { h: hata("bozuk_yanit", "Sunucu yanıtı okunamadı.") }; }
+    return { j };
+  }
+  async function calistir(o) {
+    const limit = Number.isInteger(o.limit) && o.limit >= 1 && o.limit <= LIMIT ? o.limit : LIMIT;
+    const tum = [], idler = new Set(), gorulen = new Set(); let sonra = null, onceki = null, bayrak = null, sayfa = 0;
+    for (;;) {
+      if (sayfa >= MAX_SAYFA) return hata("cok_sayfa", "Katalog beklenenden çok sayfa istiyor; durduruldu.");
+      const { h, j } = await sayfaAl(limit, sonra, o.sinyal); if (h) return h;
+      sayfa++;
+      if (!j || typeof j !== "object" || Array.isArray(j) || Object.keys(j).some(k => !UST.has(k))) return hata(Object.keys(j || {}).some(k => !UST.has(k)) ? "sizinti" : "bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
+      if (!Array.isArray(j.sorular) || !Number.isInteger(j.n) || j.n !== j.sorular.length || (j.bayrak !== "hazir" && j.bayrak !== "eksik") || !(j.sonraki === null || typeof j.sonraki === "string")) return hata("bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
+      if (bayrak !== null && bayrak !== j.bayrak) return hata("bozuk_yanit", "Sayfalar arasında bayrak durumu tutarsız.");
+      bayrak = j.bayrak; let son = null;
+      for (const q of j.sorular) {
+        const c = soruTemizle(q);
+        if (c && c.sizinti) return hata("sizinti", "Katalogda izin dışı alan görüldü; katalog atıldı.");
+        if (!c) return hata("bozuk_yanit", "Katalogda geçersiz soru kaydı var.");
+        if (idler.has(c.id)) return hata("yinelenen_id", "Katalogda yinelenen soru kimliği var.");
+        if ((son !== null && !(c.id > son)) || (onceki !== null && !(c.id > onceki))) return hata("bozuk_siralama", "Katalog sayfası sıralı değil.");
+        idler.add(c.id); son = c.id; tum.push(c);
+        if (tum.length > MAX_SORU) return hata("cok_soru", "Katalog beklenenden büyük; durduruldu.");
+      }
+      if (j.sonraki === null) break;
+      const c = j.sonraki;
+      if (!c || c.length > 100 || !ID_RE.test(c)) return hata("bozuk_cursor", "Sayfa imleci geçersiz.");
+      if (gorulen.has(c) || (onceki !== null && !(c > onceki))) return hata("cursor_dongusu", "Sayfa imleci ilerlemiyor.");
+      if (son !== null && c < son) return hata("bozuk_cursor", "Sayfa imleci geriye gidiyor.");
+      gorulen.add(c); onceki = c; sonra = c;
+    }
+    if (!tum.length) return hata("bos_katalog", "Katalog boş geldi.");
+    if (Number.isInteger(o.beklenenToplam) && tum.length !== o.beklenenToplam) return hata("eksik_sayfa", "Katalog eksik: " + tum.length + " / " + o.beklenenToplam + " soru alındı.");
+    const os = tum.filter(q => q.os === 1).length, fix = tum.filter(q => q.fix === 1).length;
+    return Object.freeze({ ok: true, durum: "tamam", sorular: Object.freeze(tum), bayrak, bayrakHazir: bayrak === "hazir", sayim: Object.freeze({ toplam: tum.length, os, fix, sayfa }) });
+  }
+  /* yukle({ limit?, beklenenToplam?, sinyal?, yenile? }) → { ok:true, sorular, bayrak, bayrakHazir, sayim } | { ok:false, durum, mesaj, sorular:[] }.
+     bayrak "eksik" ise os/fix BİLİNMİYOR demektir (bayraksız soru sayılmaz). Aynı anda tek istek zinciri çalışır. */
+  function yukle(o) {
+    o = o || {};
+    if (!acik()) return Promise.resolve(hata("kapali_bayrak", "Katalog yükleyici kapalı."));
+    if (onbellek && !o.yenile) return Promise.resolve(onbellek);
+    if (bekleyen) return bekleyen;
+    bekleyen = calistir(o).then(s => { if (s.ok) onbellek = s; bekleyen = null; return s; }, e => { bekleyen = null; return hata("beklenmeyen_hata", "Katalog yüklenemedi."); });
+    return bekleyen;
+  }
+  return { acik, yukle, temizle() { onbellek = null; } };
+})();
+/* [KAT-BITIR] */
 /* ===== Sunucu tarafı cevap anahtarı (B4) =====
    Akademi sunucusu soruyu cevapsız verir. Çalışma modunda doğru cevap ve çözüm, öğrenci işaretledikten sonra /api/soru/cevap ile gelir;
    denemede anahtar yalnızca /api/soru/bitir ile, deneme bitince gelir ve puan sunucuda hesaplanır. Sunucu bu sistemi açmadıysa

@@ -8200,7 +8200,7 @@ async function kotaIste(cfg) {
 const KAT = (() => {
   const IZIN = new Set(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]), UST = new Set(["n", "bayrak", "sorular", "sonraki"]);
   const ID_RE = /^[A-Za-z0-9:_.\-]{1,100}$/, LIMIT = 1000, MAX_SAYFA = 12, MAX_SORU = 5000;
-  let bekleyen = null, onbellek = null;
+  let bekleyen = null, onbellek = null, nesil = 0, tazeleGerek = false;   // nesil: temizle()/yenileme eski işleri geçersiz kılar; tazeleGerek: temizle() sonrası yüklemeler HTTP önbelleğini atlar (ağa giden her yükleme ya yenile:true ya da temizle() sonrasıdır; bayrak bu yüzden tüketilmez)
   const acik = () => { try { return window.AKE_KATALOG === true || /[?&]katalog=1(?:&|$)/.test(location.search); } catch (e) { return false; } };
   const hata = (durum, mesaj, ek) => Object.assign({ ok: false, durum, mesaj, sorular: [] }, ek || {});
   const metin = (v, en, bos) => typeof v === "string" && v.length <= en && (bos || v.length > 0);
@@ -8217,9 +8217,9 @@ const KAT = (() => {
     if ("p" in q) c.p = q.p; if (q.os === 1) c.os = 1; if (q.fix === 1) c.fix = 1;
     return Object.freeze(c);
   }
-  async function sayfaAl(limit, sonra, sinyal) {
+  async function sayfaAl(limit, sonra, sinyal, tazele) {
     const yol = "/api/soru/katalog?limit=" + limit + (sonra !== null ? "&sonra=" + encodeURIComponent(sonra) : "");
-    let r; try { r = await fetch(yol, { method: "GET", credentials: "same-origin", headers: { accept: "application/json" }, signal: sinyal }); }
+    let r; try { r = await fetch(yol, { method: "GET", credentials: "same-origin", cache: tazele ? "reload" : "default", headers: { accept: "application/json" }, signal: sinyal }); }   // "reload": tarayıcının bayat HTTP önbelleğini atlar (sunucu yanıtı private, max-age=300)
     catch (e) { return { h: e && e.name === "AbortError" ? hata("iptal", "İstek iptal edildi.") : hata("ag_hatasi", "Bağlantı kurulamadı.") }; }
     if (r.status === 401) return { h: hata("giris_gerekli", "Soru kataloğu için giriş yapmalısın.") };
     if (r.status === 429) { const b = parseInt(r.headers && r.headers.get ? r.headers.get("retry-after") : "", 10); return { h: hata("cok_istek", "Çok sık istendi, biraz sonra tekrar dene.", { bekleSn: Number.isFinite(b) && b > 0 ? b : null }) }; }
@@ -8231,12 +8231,12 @@ const KAT = (() => {
     let j; try { j = await r.json(); } catch (e) { return { h: hata("bozuk_yanit", "Sunucu yanıtı okunamadı.") }; }
     return { j };
   }
-  async function calistir(o) {
+  async function calistir(o, tazele) {
     const limit = Number.isInteger(o.limit) && o.limit >= 1 && o.limit <= LIMIT ? o.limit : LIMIT;
     const tum = [], idler = new Set(), gorulen = new Set(); let sonra = null, onceki = null, bayrak = null, sayfa = 0;
     for (;;) {
       if (sayfa >= MAX_SAYFA) return hata("cok_sayfa", "Katalog beklenenden çok sayfa istiyor; durduruldu.");
-      const { h, j } = await sayfaAl(limit, sonra, o.sinyal); if (h) return h;
+      const { h, j } = await sayfaAl(limit, sonra, o.sinyal, tazele); if (h) return h;
       sayfa++;
       if (!j || typeof j !== "object" || Array.isArray(j) || Object.keys(j).some(k => !UST.has(k))) return hata(Object.keys(j || {}).some(k => !UST.has(k)) ? "sizinti" : "bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
       if (!Array.isArray(j.sorular) || !Number.isInteger(j.n) || j.n !== j.sorular.length || (j.bayrak !== "hazir" && j.bayrak !== "eksik") || !(j.sonraki === null || typeof j.sonraki === "string")) return hata("bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
@@ -8268,14 +8268,171 @@ const KAT = (() => {
   function yukle(o) {
     o = o || {};
     if (!acik()) return Promise.resolve(hata("kapali_bayrak", "Katalog yükleyici kapalı."));
-    if (onbellek && !o.yenile) return Promise.resolve(onbellek);
-    if (bekleyen) return bekleyen;
-    bekleyen = calistir(o).then(s => { if (s.ok) onbellek = s; bekleyen = null; return s; }, e => { bekleyen = null; return hata("beklenmeyen_hata", "Katalog yüklenemedi."); });
-    return bekleyen;
+    /* önbellekten/ortak işten dönen sonuçta da ÇAĞIRANIN beklediği toplam yeniden denetlenir */
+    const kontrol = s => (s && s.ok && Number.isInteger(o.beklenenToplam) && s.sorular.length !== o.beklenenToplam) ? hata("eksik_sayfa", "Katalog eksik: " + s.sorular.length + " / " + o.beklenenToplam + " soru alındı.") : s;
+    if (onbellek && !o.yenile) return Promise.resolve(kontrol(onbellek));
+    if (bekleyen && !(o.yenile && !bekleyen.yenile)) return Number.isInteger(o.beklenenToplam) ? bekleyen.p.then(kontrol) : bekleyen.p;   // açık yenileme, yenilemesiz bekleyen işe KATILMAZ (onun HTTP önbelleği atlanmamış olabilir)
+    const n = ++nesil, tazele = !!o.yenile || tazeleGerek, kayit = { n, yenile: !!o.yenile, p: null };   // yeni nesil: önceki bekleyen iş geçersiz olur
+    kayit.p = calistir(o, tazele).then(s => {
+      if (bekleyen && bekleyen.n === n) bekleyen = null;
+      if (n !== nesil) return hata("iptal", "İstek geçersiz kılındı (temizle ya da daha yeni yenileme).");   // eski iş: önbelleğe YAZAMAZ, sonucu da sunmaz
+      if (s.ok) onbellek = s;
+      return s;
+    }, e => { if (bekleyen && bekleyen.n === n) bekleyen = null; return n !== nesil ? hata("iptal", "İstek geçersiz kılındı.") : hata("beklenmeyen_hata", "Katalog yüklenemedi."); });
+    bekleyen = kayit;
+    return kayit.p;
   }
-  return { acik, yukle, temizle() { onbellek = null; } };
+  /* temizle(): önbelleği boşaltır, bekleyen işi geçersiz kılar (geç bitse de önbelleğe yazamaz) ve sonraki yüklemenin HTTP önbelleğini atlamasını ister (çıkış/hesap değişimi) */
+  function temizle() { nesil++; onbellek = null; bekleyen = null; tazeleGerek = true; }
+  return { acik, yukle, temizle };
 })();
 /* [KAT-BITIR] */
+/* ===== B4 Aşama 3B-2: güvenli soru havuzu adaptörü KHAVUZ (ÖZELLİK BAYRAKLI · VARSAYILAN KAPALI) [KHAVUZ-BASLA] =====
+   KAT.yukle() çıktısından, eski senkron havuz fonksiyonlarının (poolOf, buildSet'in özgün-soru kısmı, topicsOf, bankFiltered, dersBilgi konu/soru sayıları,
+   osymElle) KATALOG tabanlı karşılıklarını verir. HİÇBİR mevcut ekrana/fonksiyona BAĞLI DEĞİLDİR; yalnız gölge karşılaştırma içindir.
+   Bayrak: window.AKE_KATALOG_HAVUZ === true ya da ?katalogHavuz=1 (KAT'ın kendi bayrağı da gerekir). Kapalıyken hiçbir şey yapmaz.
+   Güvenlik: yalnız AÇIK İZİN LİSTESİ alanları (id,s,t,d,p,q,o,os,fix) kabul edilir ve kopyalanır; listede olmayan HER alan (cevap/çözüm dahil; tHam da) havuzu kurmaz
+   ("sizinti" ya da "bilinmeyen_alan"). tHam yalnız adaptörün kendisince türetilir. BANK/EKQ/allQ/KONU_ESLE/depolama/eski kaynak adına dokunmaz, kendi ağ isteği yoktur
+   (yalnız KAT.yukle ve KAT.temizle). Katalog yüklenemez/eksik/bozuk gelirse havuz BOŞALTILIR ve tüm sorgular { ok:false } döner; BANK'a ya da cevaplı JSON'a DÜŞÜLMEZ.
+   Asenkron yüklemeler NESİL numarasıyla korunur: temizle() ya da yeni yükleme eski bekleyen işi geçersiz kılar; eski iş sonradan bitse bile havuzu (yeniden) kuramaz.
+   Konu adları KONU_ESLE'den BAĞIMSIZ, deterministik bir eşlemeyle normalize edilir (aşağıdaki HARITA, KONU_ESLE tablosunun kopyasıdır; testler eşitliğini denetler);
+   yalnız gelen kataloğun içeriğine bağlıdır, sıraya ve paylaşılan duruma bağlı değildir ve kimseyi etkilemez. Ham ad tHam'da durur.
+   bayrak "eksik" (bayrakHazir=false) iken os/fix BİLİNMEZ: osymElle ve fixMi durur (ok:false / null), diğer filtreler çalışır.
+   Metin alanları (q, p, o, t) VERİDİR, temizlenmiş HTML DEĞİLDİR: ekranda yalnız kacisli() (fq/esc) ya da doğrudan fq()/esc() ile basılmalıdır; ham innerHTML YASAKTIR.
+   Durum bağımlı süzgeçler (S.reports, S.ans) global S okumaz: ctx = { reports, ans } parametresiyle verilir (yoksa boş).
+   BAKIM NOTU: BEKLENEN (1127/52/37) sabittir; veri değişince yeni akış güvenle DURUR. Ekranlara bağlanmadan önce sayımın sunucudan (özet/#doldu) alınması ayrıca planlanmalıdır. */
+const KHAVUZ = (() => {
+  const BEKLENEN = Object.freeze({ toplam: 1127, os: 52, fix: 37 });   // gölge aşamasında doğrulanmış sayılar; çağrıda geçersiz kılınabilir
+  const IZIN = Object.freeze(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]);   // kabul edilen tek alan kümesi
+  const SIZINTI = Object.freeze(["a", "x", "h", "rk", "govde", "json", "kaynak", "kopya_of", "cevap", "cozum"]);   // yalnız hata TÜRÜNÜ ayırır; güvenlik izin listesindedir
+  const HARITA = (m => { Object.keys(m).forEach(k => Object.freeze(m[k])); return Object.freeze(m); })({
+    "*": { "Anlatım bozukluğu": "Anlatım Bozuklukları", "Ses bilgisi": "Ses Olayları", "Osmanlı Devleti": "Osmanlı Tarihi", "Osmanlı tarihi": "Osmanlı Tarihi", "İnkılap Tarihi": "Atatürk İlkeleri ve İnkılapları", "Atatürk ilke ve inkılapları": "Atatürk İlkeleri ve İnkılapları", "Atatürk İlkeleri": "Atatürk İlkeleri ve İnkılapları", "Osmanlı kuruluş": "Osmanlı Kuruluş ve Yükselme", "Osmanlı yükselme": "Osmanlı Kuruluş ve Yükselme", "Osmanlı kuruluş ve yükselme": "Osmanlı Kuruluş ve Yükselme", "Osmanlı duraklama": "Osmanlı Duraklama ve Gerileme", "Osmanlı duraklama ve gerileme": "Osmanlı Duraklama ve Gerileme", "Selçuklu": "Anadolu Selçuklu Devleti", "Anadolu Selçuklu": "Anadolu Selçuklu Devleti", "Türkiye Selçukluları": "Anadolu Selçuklu Devleti", "Türk-İslam devletleri": "Türk-İslam Devletleri", "Uygarlık ve ticaret": "Uygarlık ve Ticaret", "Dünya'nın şekli ve hareketleri": "Dünya'nın Hareketleri", "Türkiye'nin fiziki coğrafyası": "Türkiye'nin Yer Şekilleri", "Yer şekilleri": "Türkiye'nin Yer Şekilleri", "İç ve dış kuvvetler": "Yerin Şekillenmesi", "Felsefeye giriş": "Felsefeye Giriş", "Felsefenin Doğuşu": "Felsefeye Giriş", "İslam ve İbadet": "İbadetler", "İslam düşüncesinde yorumlar": "İslam Düşüncesi", "Ahlak": "Ahlak ve Değerler", "Oran orantı": "Oran-Orantı", "Oran-orantı": "Oran-Orantı", "EBOB - EKOK": "EBOB-EKOK", "Permütasyon": "Permütasyon ve Kombinasyon", "Kombinasyon": "Permütasyon ve Kombinasyon", "Yüzdeler": "Yüzde Problemleri", "İşçi-havuz problemleri": "İş Problemleri", "Yaş problemleri": "Yaş Problemleri", "Hareket problemleri": "Hareket Problemleri", "İş, güç ve enerji": "İş, Güç ve Enerji", "İş, enerji ve güç": "İş, Güç ve Enerji", "İş, Enerji, Momentum": "İş, Güç ve Enerji", "Enerji": "İş, Güç ve Enerji", "Newton'un hareket yasaları": "Kuvvet ve Hareket", "Kuvvet ve hareket": "Kuvvet ve Hareket", "Atom yapısı": "Atomun Yapısı", "Atom ve yapısı": "Atomun Yapısı", "Atom modelleri": "Atomun Yapısı", "Solunum": "Hücresel Solunum", "Hücresel solunum": "Hücresel Solunum", "İtme ve momentum": "Momentum", "Düşey atışlar": "Atışlar", "Tepkime hızları": "Tepkime Hızı", "Tepkime hızı": "Tepkime Hızı", "Kimyasal tepkimelerde hız": "Tepkime Hızı", "Edebi Sanatlar": "Söz Sanatları", "Söz sanatları": "Söz Sanatları", "Milli Edebiyat": "Millî Edebiyat", "Eser-yazar bilgisi": "Eser-Yazar", "Şairler ve sanatçılar": "Şairler", "Güdüler": "Güdülenme", "Duygu ve Güdü": "Güdülenme ve Duygu", "Güdülenme": "Güdülenme ve Duygu", "Sosyal Değişme": "Toplumsal Değişme", "Sosyal Kurumlar": "Toplumsal Kurumlar", "Sosyoloji tarihi": "Sosyolojik Düşünce", "Kavram": "Kavramlar", "Mantık": "Önermeler", "Grammar": "Tenses", "If clauses": "Conditionals", "Passive voice": "Passive Voice", "Relative clauses": "Relative Clauses", "Translation (EN → TR)": "Translation", "Cumhuriyet dönemi halk şiiri": "Cumhuriyet Dönemi Halk Şiiri", "Ahenk unsurları": "Hece Ölçüsü", "Toplumsal yapı": "Toplumsal Yapı", "Toplumsal hareketlilik": "Toplumsal Değişme", "Hücre Bölünmesi": "Hücre Bölünmeleri", "Hücre bölünmeleri": "Hücre Bölünmeleri", "Hücre bölünmesi": "Hücre Bölünmeleri", "Popülasyon genetiği": "Popülasyon Genetiği", "Hareket": "Kuvvet ve Hareket", "Basit harmonik hareket": "Basit Harmonik Hareket", "Doğal afetler": "Doğal Afetler", "Bilgi felsefesi": "Bilgi Felsefesi", "Ahlak felsefesi": "Ahlak Felsefesi"
+  },
+  mat: {}
+});
+  const hasOwn = Object.prototype.hasOwnProperty;
+  let durum = "bos", hata = null, havuz = null, bayrakHazir = false, bekleyen = null, nesil = 0;   // bekleyen = { n, e, yenile, p }
+  const acik = () => { try { return window.AKE_KATALOG_HAVUZ === true || /[?&]katalogHavuz=1(?:&|$)/.test(location.search); } catch (e) { return false; } };
+  const yok = d => ({ ok: false, durum: d, sorular: [] });
+  const hazirMi = () => durum === "hazir" && !!havuz;
+  const karistirVars = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = b[i]; b[i] = b[j]; b[j] = t; } return b; };
+  const baglam = c => ({ reports: (c && c.reports) || {}, ans: (c && c.ans) || {} });
+  /* n: işi başlatan nesil; araya temizle()/yeni yükleme girdiyse eski iş HİÇBİR durumu değiştiremez */
+  function kapat(n, d, mesaj) { if (n !== nesil) return { ok: false, durum: "iptal", sorular: [] }; havuz = null; bayrakHazir = false; durum = "durdu"; hata = d; return { ok: false, durum: d, mesaj: mesaj || "", sorular: [] }; }
+  function ozet() { return { ok: hazirMi(), durum, hata, toplam: havuz ? havuz.length : 0, bayrakHazir, os: havuz ? havuz.filter(q => q.os === 1).length : 0, fix: havuz ? havuz.filter(q => q.fix === 1).length : 0 }; }
+  /* ---- konu eşlemesi: KONU_ESLE'den bağımsız, deterministik ---- */
+  const buyuk = s => s.split("").filter(c => c !== c.toLocaleLowerCase("tr")).length;
+  const anahtar = s => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşüâîû0-9]/g, "");
+  function temelAd(s, t) {
+    t = String(t).split(" · ")[0].trim(); if (/^Paragraf/.test(t)) return "Paragraf";
+    if (hasOwn.call(HARITA, s) && hasOwn.call(HARITA[s], t)) return HARITA[s][t];
+    return hasOwn.call(HARITA["*"], t) ? HARITA["*"][t] : t;
+  }
+  /* aynı yazımın büyük/küçük harf varyantlarından, KATALOĞUN İÇİNDE en çok büyük harfli olan seçilir (eşitlikte tr sıralamasıyla ilk); kayıt sırasından bağımsızdır */
+  function esleme(sorular) {
+    const sec = new Map();
+    sorular.forEach(q => { const ad = temelAd(q.s, q.t), k = anahtar(ad), cur = sec.get(k); if (cur === undefined || buyuk(ad) > buyuk(cur) || (buyuk(ad) === buyuk(cur) && ad.localeCompare(cur, "tr") < 0)) sec.set(k, ad); });
+    return q => { const ad = temelAd(q.s, q.t); return sec.get(anahtar(ad)) || ad; };
+  }
+  /* izin listesi + şekil denetimi; ihlalde { hata, mesaj } */
+  function denetle(sorular) {
+    for (const q of sorular) {
+      if (!q || typeof q !== "object" || Array.isArray(q)) return { hata: "bozuk_soru", mesaj: "Soru nesnesi değil." };
+      for (const k of Object.keys(q)) if (!IZIN.includes(k)) return SIZINTI.includes(k) ? { hata: "sizinti", mesaj: "Katalogda cevap/çözüm alanı görüldü; havuz kurulmadı." } : { hata: "bilinmeyen_alan", mesaj: "Katalogda izin listesi dışı alan görüldü; havuz kurulmadı." };
+      if (typeof q.id !== "string" || !q.id || typeof q.s !== "string" || typeof q.t !== "string" || !q.t.trim() || typeof q.q !== "string" || typeof q.d !== "number" || !Array.isArray(q.o) || q.o.some(x => typeof x !== "string")
+        || ("p" in q && typeof q.p !== "string") || ("os" in q && q.os !== 1) || ("fix" in q && q.fix !== 1)) return { hata: "bozuk_soru", mesaj: "Soru alanları beklenen biçimde değil." };
+    }
+    return null;
+  }
+  /* yeni dondurulmuş kopyalar: yalnız izin listesindeki alanlar + adaptörün türettiği tHam; ham katalog/KAT sonucu DEĞİŞMEZ */
+  function normalle(sorular) {
+    const ad = esleme(sorular);
+    return Object.freeze(sorular.map(q => { const k = { id: q.id, s: q.s, t: ad(q), d: q.d, q: q.q, o: Object.freeze(q.o.slice()) }; if ("p" in q) k.p = q.p; if ("os" in q) k.os = 1; if ("fix" in q) k.fix = 1; k.tHam = q.t; return Object.freeze(k); }));
+  }
+  /* yukle({ beklenenToplam?, beklenenOs?, beklenenFix?, yenile?, sinyal? }) → ozet() | { ok:false, durum, sorular:[] }
+     Hazır havuz FARKLI beklenen değerlerle çağrılırsa sessizce başarılı DÖNMEZ: eldeki havuza karşı yeniden doğrulanır, uyuşmazsa 'beklenen_farkli' (havuz korunur).
+     yenile:true her zaman yeni yükleme başlatır ve KAT'ta tarayıcı HTTP önbelleğini atlar. */
+  const beklenenler = o => ({ top: Number.isInteger(o.beklenenToplam) ? o.beklenenToplam : BEKLENEN.toplam, os: Number.isInteger(o.beklenenOs) ? o.beklenenOs : BEKLENEN.os, fix: Number.isInteger(o.beklenenFix) ? o.beklenenFix : BEKLENEN.fix });
+  const ayniBek = (a, b) => a.top === b.top && a.os === b.os && a.fix === b.fix;
+  const farkli = () => ({ ok: false, durum: "beklenen_farkli", mesaj: "İstenen toplam/os/fix, kurulu havuz ya da süren yükleme ile uyuşmuyor; yenile:true ile yeniden yükleyin.", sorular: [] });
+  function yukle(o) {
+    o = o || {};
+    if (!acik()) return Promise.resolve({ ok: false, durum: "kapali_bayrak", sorular: [] });
+    const e = beklenenler(o);
+    if (hazirMi() && !o.yenile) { const z = ozet(); return Promise.resolve(z.toplam === e.top && (!bayrakHazir || (z.os === e.os && z.fix === e.fix)) ? z : farkli()); }
+    if (bekleyen && ayniBek(bekleyen.e, e) && (bekleyen.yenile || !o.yenile)) return bekleyen.p;
+    if (bekleyen && !o.yenile) return Promise.resolve(farkli());
+    const n = ++nesil, kayit = { n, e, yenile: !!o.yenile, p: null }; durum = "yukleniyor"; hata = null; havuz = null; bayrakHazir = false;
+    const topN = e.top, osN = e.os, fixN = e.fix;
+    const iptal = () => ({ ok: false, durum: "iptal", sorular: [] });
+    kayit.p = (async () => {
+      let K; try { K = await KAT.yukle({ yenile: !!o.yenile, sinyal: o.sinyal, beklenenToplam: topN }); } catch (x) { return kapat(n, "beklenmeyen_hata", "Katalog yüklenemedi."); }
+      if (n !== nesil) return iptal();   // beklerken temizle()/yeni yükleme oldu: bu iş artık geçersiz
+      if (!K || K.ok !== true || !Array.isArray(K.sorular)) return kapat(n, (K && K.durum) || "beklenmeyen_hata", K && K.mesaj);
+      if (K.sorular.length !== topN) return kapat(n, "eksik_katalog", "Katalog " + K.sorular.length + " / " + topN + " soru verdi; yeni akış durduruldu.");
+      const ihlal = denetle(K.sorular); if (ihlal) return kapat(n, ihlal.hata, ihlal.mesaj);
+      if (K.bayrakHazir === true && (!K.sayim || K.sayim.os !== osN || K.sayim.fix !== fixN)) return kapat(n, "bayrak_sayim_uyusmuyor", "os/fix sayıları beklenenle uyuşmuyor.");
+      let yeni; try { yeni = normalle(K.sorular); } catch (x) { return kapat(n, "bozuk_soru", "Havuz kurulamadı."); }
+      if (n !== nesil) return iptal();
+      havuz = yeni; bayrakHazir = K.bayrakHazir === true; durum = "hazir";
+      return ozet();
+    })().then(s => { if (bekleyen && bekleyen.n === n) bekleyen = null; return s; }, x => { if (bekleyen && bekleyen.n === n) bekleyen = null; return kapat(n, "beklenmeyen_hata", "Havuz kurulamadı."); });
+    bekleyen = kayit;
+    return kayit.p;
+  }
+  /* temizle(): havuzu boşaltır, bekleyen yüklemeyi geçersiz kılar VE KAT önbelleğini de temizler (geç biten iş hiçbirini geri dolduramaz; sonraki yükleme HTTP önbelleğini atlar) */
+  function temizle() { nesil++; bekleyen = null; havuz = null; bayrakHazir = false; durum = "bos"; hata = null; try { KAT.temizle(); } catch (x) { } }
+  /* eski poolOf(s, o) — özgün (katalog) sorular; src "ai" katalogda yoktur → boş */
+  function poolOf(s, o, c) {
+    if (!hazirMi()) return yok("hazir_degil"); o = o || {}; const b = baglam(c);
+    return { ok: true, durum: "hazir", sorular: havuz.filter(q => q.s === s && (!o.topic || q.t === o.topic) && (!o.diff || q.d === o.diff) && !b.reports[q.id] && (!o.src || o.src !== "ai")) };
+  }
+  /* eski buildSet'in özgün-soru ayrımı: taze (çözülmemiş, karışık) ve eski (en uzun süredir görülmeyen önce). Üretilmiş (GENS) sorular bu adaptörün dışındadır. */
+  function secimListeleri(s, o, c, karistir) {
+    const p = poolOf(s, o, c); if (!p.ok) return Object.assign({ taze: [], eski: [], havuz: [] }, p);
+    const b = baglam(c), kar = typeof karistir === "function" ? karistir : karistirVars, h = kar(p.sorular);
+    return { ok: true, durum: "hazir", havuz: h, taze: h.filter(q => !b.ans[q.id]), eski: h.filter(q => b.ans[q.id]).sort((x, y) => (b.ans[x.id][3] || 0) - (b.ans[y.id][3] || 0)), sorular: h };
+  }
+  /* eski topicsOf'un özgün-soru kısmı: [{ t, n }] (tr sıralı). GENS kalıpları çağıran tarafça eklenir. */
+  function topicsOf(s) {
+    if (!hazirMi()) return Object.assign(yok("hazir_degil"), { konular: [] });
+    const m = new Map(); havuz.filter(q => q.s === s).forEach(q => { const e = m.get(q.t) || { t: q.t, n: 0 }; e.n++; m.set(q.t, e); });
+    return { ok: true, durum: "hazir", konular: [...m.values()].sort((a, b) => a.t.localeCompare(b.t, "tr")) };
+  }
+  /* eski dersBilgi'nin BANK kısmı: konu adları ("·" öncesi) ve soru sayısı */
+  function konuAdlari(s) {
+    if (!hazirMi()) return Object.assign(yok("hazir_degil"), { konular: [], n: 0 });
+    const T = new Set(); let n = 0; havuz.forEach(q => { if (q.s === s) { T.add(String(q.t).split(" · ")[0]); n++; } });
+    return { ok: true, durum: "hazir", konular: [...T], n };
+  }
+  function sayilar() {
+    if (!hazirMi()) return Object.assign(yok("hazir_degil"), { toplam: 0, dersler: {} });
+    const d = {}; havuz.forEach(q => { d[q.s] = (d[q.s] || 0) + 1; }); return { ok: true, durum: "hazir", toplam: havuz.length, dersler: d };
+  }
+  /* eski bankFiltered(): B = { s, t, d, src, st, q } */
+  function bankFiltered(B, c) {
+    if (!hazirMi()) return yok("hazir_degil"); B = B || {}; const b = baglam(c), needle = String(B.q || "").trim().toLocaleLowerCase("tr");
+    return { ok: true, durum: "hazir", sorular: havuz.filter(q => (!B.s || q.s === B.s) && (!B.t || q.t === B.t) && (!B.d || q.d === B.d) && (!B.src || B.src !== "ai")
+      && (!B.st || (B.st === "new" ? !b.ans[q.id] : B.st === "wrong" ? (b.ans[q.id] && b.ans[q.id][4] !== 1) : (b.ans[q.id] && b.ans[q.id][4] === 1)))
+      && (!needle || (q.q + " " + (q.p || "") + " " + q.t).toLocaleLowerCase("tr").includes(needle))) };
+  }
+  /* eski osymElle(s): os BİLİNMİYORSA (bayrakHazir=false) DURUR */
+  function osymElle(s, c) {
+    if (!hazirMi()) return yok("hazir_degil"); if (!bayrakHazir) return yok("bayrak_hazir_degil"); const b = baglam(c);
+    return { ok: true, durum: "hazir", sorular: havuz.filter(q => q.s === s && q.os === 1 && !b.reports[q.id]) };
+  }
+  /* sabit şık sırası işareti: true/false yalnız bayrak HAZIRSA; bilinmiyorsa null (çağıran 'sabit' ya da 'karıştır' DİYEMEZ) */
+  function fixMi(q) { if (!hazirMi() || !bayrakHazir || !q) return null; return q.fix === 1; }
+  /* gelecekteki HTML gösterimi için güvenli alanlar: fq/esc yoksa null (ham metin ASLA döndürülmez) */
+  function kacisli(q) {
+    const f = typeof fq === "function" ? fq : (typeof esc === "function" ? esc : null), e = typeof esc === "function" ? esc : null; if (!f || !e || !q || !Array.isArray(q.o)) return null;
+    return { id: e(q.id), t: e(q.t), q: f(q.q), p: q.p ? f(q.p) : "", o: q.o.map(x => f(x)) };
+  }
+  /* testler için: eşleme tablosunun dondurulmuş kopyası (KONU_ESLE tablosuyla eşitliği denetlenir) */
+  const haritaKopya = () => JSON.parse(JSON.stringify(HARITA));
+  return { acik, yukle, durumu: ozet, poolOf, secimListeleri, topicsOf, konuAdlari, sayilar, bankFiltered, osymElle, fixMi, kacisli, temizle, haritaKopya };
+})();
+/* [KHAVUZ-BITIR] */
 /* ===== Sunucu tarafı cevap anahtarı (B4) =====
    Akademi sunucusu soruyu cevapsız verir. Çalışma modunda doğru cevap ve çözüm, öğrenci işaretledikten sonra /api/soru/cevap ile gelir;
    denemede anahtar yalnızca /api/soru/bitir ile, deneme bitince gelir ve puan sunucuda hesaplanır. Sunucu bu sistemi açmadıysa

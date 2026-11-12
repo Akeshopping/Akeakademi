@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/",
+    "/index.html",
+    "/sw.js",
+    "/ayar.js",
+    "/manifest.webmanifest",
+    "/favicon.ico",
+    "/apple-touch-icon.png",
+    "/apple-touch-icon-precomposed.png",
+    "/og.png",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/icons/apple-touch-icon.png",
+    "/icons/eposta-logo-v2.png",
+    "/icons/favicon-32.png",
+    "/icons/favicon-48.png",
+    "/icons/icon-192.png",
+    "/icons/icon-512.png",
+    "/icons/maskable-512.png",
+    "/sorular/ake-yks-02-200.json",
+    "/sorular/liste.json",
+    "/sorular/pilot-100.json",
+    "/sorular/r01.json"
+  ]
+}

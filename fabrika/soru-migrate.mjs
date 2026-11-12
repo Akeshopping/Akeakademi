@@ -187,7 +187,7 @@ export async function uygula(db, plan) {
    GİRDİLER
    ===================================================================== */
 /* Gömülü BANK: index.html'i yerel sunucudan çalıştırıp çıkarır. /api ve /sorular engellenir, yani YALNIZ gömülü banka. Deterministiktir. */
-export async function gomuluBankaCikar(kok = KOK) {
+export async function gomuluBankaCikar(kok = KOK, { bayrak = false } = {}) {   // bayrak=true: Aşama 3A — os/fix gösterim bayraklarını da döndürür (varsayılan çıktı DEĞİŞMEZ)
   let pw; for (const taban of [process.cwd() + "/", "/opt/npm-tools/node_modules/"]) { try { pw = createRequire(taban)("playwright"); break; } catch (e) { } }
   if (!pw) throw new Error("playwright bulunamadı (gömülü banka çıkarılamaz). --embedded-json ile hazır çıktı verilebilir.");
   const srv = http.createServer((q, r) => { const f = q.url.split("?")[0]; if (f === "/" || f === "/index.html") { r.setHeader("content-type", "text/html; charset=utf-8"); return r.end(fs.readFileSync(path.join(kok, "index.html"))); } r.statusCode = 404; r.end("yok"); });
@@ -199,7 +199,7 @@ export async function gomuluBankaCikar(kok = KOK) {
     await p.route("**/sorular/**", r => r.fulfill({ status: 404, body: "yok" }));
     await p.goto("http://127.0.0.1:" + srv.address().port + "/", { waitUntil: "load" });
     await p.waitForFunction(() => typeof BANK !== "undefined" && BANK.length > 0, null, { timeout: 30000 }); await p.waitForTimeout(1500);
-    return await p.evaluate(() => BANK.map(q => { const o = { id: q.id, s: q.s, t: q.t, d: q.d }; if (q.p) o.p = q.p; o.q = q.q; o.o = q.o.slice(); o.a = q.a; o.x = q.x; return o; }));
+    return await p.evaluate(bay => BANK.map(q => { const o = { id: q.id, s: q.s, t: q.t, d: q.d }; if (q.p) o.p = q.p; o.q = q.q; o.o = q.o.slice(); o.a = q.a; o.x = q.x; if (bay) { if (q.os) o.os = 1; if (q.fix) o.fix = 1; } return o; }), bayrak);
   } finally { await b.close(); srv.close(); }
 }
 export function statikKaynaklar(kok = KOK) {

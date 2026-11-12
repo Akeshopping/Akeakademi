@@ -8247,7 +8247,7 @@ async function svBaslat(cfg) {
     qs = qs.map(q => {
       const k = svAday(q) && sunulan.get(q.id); if (!k) return q;
       const c = Object.assign({}, q); delete c.a; delete c.x; delete c.p;
-      c.q = k.s.q; c.o = k.s.o; if (k.s.p) c.p = k.s.p; c.sv = k.oturum; return c;
+      c.q = k.s.q; c.o = k.s.o; if (k.s.p) c.p = k.s.p; if (k.s.os) c.os = 1; if (k.s.fix) c.fix = 1; c.sv = k.oturum; return c;   /* os/fix: sunucu bayrağı (Aşama 3A) yerel işareti tamamlar; cevap anahtarı değildir */
     });
     if (!qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
     baslatRun(Object.assign({}, cfg, { qs }));

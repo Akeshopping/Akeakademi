@@ -103,7 +103,7 @@ export function sizintiBul(v, yasak = YASAKLI_ANAHTAR) {
   })(v, "$");
   return bulunan;
 }
-export const SORU_ANAHTARLARI = new Set(["id", "s", "t", "d", "p", "q", "o"]);
+export const SORU_ANAHTARLARI = new Set(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]);   // os/fix: Aşama 3A gösterim bayrakları (cevap anahtarı değil)
 
 /* ---- yönetim uçları + sahte Anthropic (PR 3) ---- */
 export async function yonetimIstek(T, yol, { m = "POST", govde, cookie } = {}) {

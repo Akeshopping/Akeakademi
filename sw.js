@@ -38,6 +38,7 @@ self.addEventListener("fetch", e => {
   const u = new URL(r.url);
   if (u.origin === location.origin) {
     if (u.pathname.startsWith("/api/")) return; /* sunucu istekleri (hesap, kota, AI, ödeme, yönetim) asla önbelleğe alınmaz */
+    if (u.pathname.startsWith("/sorular/")) return; /* eski statik soru dosyaları (cevap anahtarı içerebilir) asla önbelleğe alınmaz */
     if (r.headers.has("range")) return; /* kısmi istekler (medya) doğrudan ağa */
     if (r.mode === "navigate") {
       /* uygulama kabuğu "/" ; ayrı sayfalar (/sss/, /matematik-yks-sorulari/ ...) kendi adresiyle saklanır ve kabuğu ezmez.

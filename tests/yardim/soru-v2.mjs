@@ -72,7 +72,7 @@ export async function kur({ bayrak = "1", ekEnv = {}, kanonik = true } = {}) {
   /* soru API çağrısı. origin: varsayılan aynı-origin; null → Origin başlığı yok */
   async function api(yol, { m = "POST", govde, cookie, origin = KOK, ek = {}, ham } = {}) {
     const basliklar = { "content-type": "application/json", ...(cookie ? { cookie } : {}), ...(origin ? { origin } : {}), ...ek };
-    const r = await soruMod.onRequest({ request: new Request(KOK + "/api/soru/" + yol, { method: m, headers: basliklar, body: m === "GET" ? undefined : (ham !== undefined ? ham : (govde === undefined ? undefined : JSON.stringify(govde))) }), env, params: { yol: yol.split("/") } });
+    const r = await soruMod.onRequest({ request: new Request(KOK + "/api/soru/" + yol, { method: m, headers: basliklar, body: m === "GET" ? undefined : (ham !== undefined ? ham : (govde === undefined ? undefined : JSON.stringify(govde))) }), env, params: { yol: yol.split("?")[0].split("/") } });
     const t = await r.text(); let j = null; try { j = JSON.parse(t); } catch (e) { }
     return { s: r.status, j, t, h: r.headers };
   }

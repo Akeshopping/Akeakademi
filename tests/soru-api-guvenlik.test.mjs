@@ -97,16 +97,27 @@ test("25) ücretli kullanıcı da tek istekte 50/120'yi aşamaz (adet=100000 →
     assert.equal(r.s, 200); assert.equal(r.j.sorular.length, ust); assert.equal(new Set(r.j.sorular.map(q => q.id)).size, ust); kapat([r.j.oturum]);
   }
 });
-test("abuse: kullanıcı başına en çok 3 açık oturum → 4.'sü 429; bitirince tekrar açılır; limit kullanıcıya özel", async () => {
+test("abuse (B4): kullanıcı başına en çok 3 açık oturum; yenisi açılınca EN ESKİ pratik oturum iptal olur (kilitlenme yok); limit kullanıcıya özel", async () => {
   const k = await yeni(true), diger = await yeni(true), ids = [];
   for (let i = 0; i < 3; i++) { const r = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } }); assert.equal(r.s, 200); ids.push(r.j.oturum); }
   const dort = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } });
-  assert.equal(dort.s, 429); assert.equal(dort.j.error, "cok_acik_oturum");
+  assert.equal(dort.s, 200);
+  const durum = id => DB.db.prepare("SELECT durum FROM soru_oturum WHERE id = ?").get(id).durum;
+  assert.equal(durum(ids[0]), "iptal"); assert.equal(durum(ids[1]), "acik"); assert.equal(durum(ids[2]), "acik");
+  assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM soru_oturum WHERE kid = ? AND durum = 'acik'").get(k.kid).n, 3, "açık oturum sayısı hiçbir an 3'ü aşmaz");
+  assert.equal((await api("cevap", { cookie: k.cookie, govde: { oturum: ids[0], soru: DB.db.prepare("SELECT soru_id FROM soru_oturum_soru WHERE oturum = ?").get(ids[0]).soru_id, secim: 0 } })).s, 410, "iptal edilen oturuma cevap yazılamaz");
   assert.equal((await api("oturum", { cookie: diger.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } })).s, 200);
-  await api("bitir", { cookie: k.cookie, govde: { oturum: ids[0] } });
-  assert.equal((await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } })).s, 200);
   DB.db.prepare("UPDATE soru_oturum SET sona_erme = ? WHERE id = ?").run(Date.now() - 5, ids[1]);   // süresi dolan açık sayılmaz
   assert.equal((await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } })).s, 200);
+});
+test("abuse (B4): iptal önceliği pratiktedir; devam eden SINAV oturumu en son iptal edilir", async () => {
+  const k = await yeni(true);
+  const sinav = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "exam", adet: 3 } });
+  const p1 = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } });
+  const p2 = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } });
+  const yenisi = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } });
+  const durum = id => DB.db.prepare("SELECT durum FROM soru_oturum WHERE id = ?").get(id).durum;
+  assert.equal(yenisi.s, 200); assert.equal(durum(sinav.j.oturum), "acik"); assert.equal(durum(p1.j.oturum), "iptal"); assert.equal(durum(p2.j.oturum), "acik");
 });
 test("oturum kimliği ≥128 bit rastgele; istemci kendi kimliğini seçemez", async () => {
   const k = await yeni(true), r = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 2 } });

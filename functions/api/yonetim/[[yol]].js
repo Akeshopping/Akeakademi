@@ -9,7 +9,7 @@
 //   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez); kullanıcı/aktif paket yoksa 404
 //   Durum değiştiren (GET/HEAD/OPTIONS dışı) tüm istekler aynı kaynaktan (same-origin) gelmek zorundadır; aksi halde 403 "origin".
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
-import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
+import { bayrakAcik, soruYazKanonik, kanonikAlanlar, soruOnayla } from "../../../lib/soru-yaz.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -88,6 +88,19 @@ async function shopier(env, path, opt) {
   return { ok: r.ok, status: r.status, j };
 }
 
+/* soru-ice-aktar: aynı kimlikli kayıt varsa yüklenen içerik kanonik alanlara çevrilip mevcut kayıtla karşılaştırılır.
+   Yanıtta yalnız FARKLI ALAN ADLARI döner (cevap/çözüm değeri asla yazılmaz). */
+async function idIcerikKarsilastir(env, id, aday) {
+  const m = await env.DB.prepare("SELECT s, t, d, govde, a, x FROM soru WHERE id = ?").bind(id).first();
+  if (!m) return { ayni: false, farkli: ["kayit_okunamadi"] };
+  const k = await kanonikAlanlar(Object.assign({ id }, aday), "statik");
+  if (k.hata) return { ayni: false, farkli: ["gecersiz"] };
+  if (m.govde == null || m.a == null || m.x == null) return { ayni: false, farkli: ["mevcut_kanonik_yok"] };
+  const f = [];
+  if (m.s !== aday.s) f.push("s"); if (m.t !== aday.t) f.push("t"); if (m.d !== aday.d) f.push("d");
+  if (m.govde !== k.alan.govde) f.push("govde"); if (m.a !== k.alan.a) f.push("a"); if (String(m.x) !== k.alan.x) f.push("x");
+  return { ayni: !f.length, farkli: f };
+}
 export async function onRequest({ request, env, params }) {
   if (!env.DB) return fail(500, "yapilandirma");
   if (!ayniKaynak(request)) return fail(403, "origin", "Bu istek farklı bir siteden geldiği için reddedildi.");
@@ -96,7 +109,7 @@ export async function onRequest({ request, env, params }) {
   if (!u || !yoneticiMi(env, u)) return fail(403, "yetki");
   const ad = [].concat(params.yol || [])[0] || "", m = request.method, origin = new URL(request.url).origin;
   /* Soru göçü sırasında yazma kilidi (varsayılan KAPALI; AKE_SORU_V2'den bağımsız): yalnız soru yazan iki uç 503 verir, okuma/ödeme/hesap etkilenmez. */
-  if (env.AKE_SORU_MIGRATION_LOCK === "1" && m === "POST" && (ad === "soru-uret" || ad === "soru-karar")) return fail(503, "bakim", "Soru yazımı geçici olarak durduruldu (bakım). Biraz sonra tekrar dene.", { "retry-after": "300" });
+  if (env.AKE_SORU_MIGRATION_LOCK === "1" && m === "POST" && (ad === "soru-uret" || ad === "soru-karar" || ad === "soru-ice-aktar")) return fail(503, "bakim", "Soru yazımı geçici olarak durduruldu (bakım). Biraz sonra tekrar dene.", { "retry-after": "300" });
 
   if (ad === "durum" && m === "GET") {
     /* inceleme bekleyenler: doğrulanamayan ödeme/tutar/para, kod üretim hatası, yarım kalmış (5 dk+) kod üretimi, takılmış (10 dk+) e-posta gönderimi */
@@ -172,6 +185,28 @@ export async function onRequest({ request, env, params }) {
     await giderYaz(env, "soru-uret", "cagri", 0, 0);
     const r = await soruUret(env, b);
     return r.hata ? fail(502, r.hata, "AI soru üretemedi, tekrar dene.") : json(200, r);
+  }
+  /* Toplu soru yükleme (eski "sorular/*.json + liste.json" akışının güvenli yerine): yalnız yönetici, yalnız AKE_SORU_V2=1.
+     Her soru dogrulaSoru ile doğrulanır ve kanonik sütunlarla (govde/a/x/h/rk) tek INSERT'te yazılır; 'banka' durumunda eklenir,
+     yani herkese açık eski /api/sorular'da GÖRÜNMEZ ve istemciye cevapsız (oturum API'si) verilir. Kimlik korunur; aynı kimlik/içerik tekrar yüklenirse yazılmaz (tekrar çalıştırılabilir). */
+  if (ad === "soru-ice-aktar" && m === "POST") {
+    if (!bayrakAcik(env)) return fail(409, "v2_kapali", "Toplu yükleme yalnız korumalı soru sistemi (AKE_SORU_V2) açıkken yapılır.");
+    let b = {}; try { b = await request.json(); } catch (e) { }
+    const l = Array.isArray(b.sorular) ? b.sorular : null;
+    if (!l || !l.length || l.length > 100) return fail(400, "gecersiz", "sorular 1-100 elemanlı dizi olmalı.");
+    const sayi = { yazildi: 0, kopya: 0, var: 0, catisma: 0, kimlikCatismasi: 0, gecersiz: 0 }, sorunlu = [];
+    for (const q of l) {
+      const id = q && typeof q.id === "string" && /^[A-Za-z0-9_.:-]{1,64}$/.test(q.id) ? q.id : null;
+      if (!id) { sayi.gecersiz++; sorunlu.push({ id: null, neden: "id" }); continue; }
+      const aday = {}; for (const k of ["s", "t", "d", "p", "q", "o", "a", "x"]) if (q[k] !== undefined) aday[k] = q[k];
+      const r = await soruYazKanonik(env, aday, { idUret: () => id, durum: "banka", kaynak: "statik" });
+      if (r.durum === "yazildi") sayi.yazildi++; else if (r.durum === "kopya") sayi.kopya++;
+      else if (r.durum === "idCakisma") {   // kimlik zaten var: içerik bütünlüğü denetlenir; mevcut kayıt asla değiştirilmez/silinmez
+        const k = await idIcerikKarsilastir(env, id, aday);
+        if (k.ayni) sayi.var++; else { sayi.kimlikCatismasi++; sorunlu.push({ id, neden: "kimlik_farkli_icerik", farkli: k.farkli }); }
+      } else { sayi[r.durum === "catisma" ? "catisma" : "gecersiz"]++; sorunlu.push({ id, neden: r.durum, hata: r.hata }); }
+    }
+    return json(200, { ok: true, ...sayi, sorunlu: sorunlu.slice(0, 50) });
   }
   if (ad === "sorular" && m === "GET") {
     await soruSema(env);

@@ -7370,7 +7370,7 @@ function record(q, res, chosen) { // res: 1 doğru, 0 yanlış, -1 boş
   else if (S.mistakes[q.id] && !S.mistakes[q.id].learned) { if (tekrarDogru(S.mistakes[q.id])) touch("mistakes"); }
   touch("stats");
 }
-function snap(q) { const o = { id: q.id, s: q.s, t: q.t, d: q.d, q: q.q, o: q.o, a: q.a, x: q.x }; if (q.p) o.p = q.p; if (q.fig) o.fig = q.fig; if (q.gen) o.gen = q.gen; if (q.fix) o.fix = 1; if (q.src) o.src = q.src; return o; }
+function snap(q) { const o = { id: q.id, s: q.s, t: q.t, d: q.d, q: q.q, o: q.o, a: q.a, x: q.x }; if (q.p) o.p = q.p; if (q.fig) o.fig = q.fig; if (q.gen) o.gen = q.gen; if (q.fix) o.fix = 1; if (q.src) o.src = q.src; if (q.sv) o.sv = q.sv; return o; }
 function addMistake(q, chosen) {
   const m = S.mistakes[q.id];
   S.mistakes[q.id] = { q: snap(q), n: (m ? m.n : 0) + 1, ts: Date.now(), ok: 0, learned: false, last: chosen == null ? -1 : chosen, dk: gunSonra(TEKRAR_GUN[0]) };
@@ -7841,7 +7841,7 @@ function reviewItem(q, i) {
   return `<details class="rv"><summary><span class="qno">${i + 1}</span><span class="pill ${res === "d" ? "ok" : res === "y" ? "bad" : ""}">${res === "d" ? "Doğru" : res === "y" ? "Yanlış" : "Boş"}</span><span class="grow">${esc(q.q)}</span></summary>
   <div class="rvb">${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}${q.fig ? figSVG(q.fig) : ""}<div class="qtext">${fq(q.q)}</div>
   <div class="opts">${q.o.map((o, j) => `<div class="opt ${j === q.a ? "right" : j === your ? "wrong" : ""}"><span class="bub">${LET[j]}</span><span class="ot">${fq(o)}</span></div>`).join("")}</div>
-  <p class="small"><b>Çözüm:</b> ${fq(q.x)}</p><p class="xs faint">${esc(SUBJ[q.s] ? SUBJ[q.s].n : "")} · ${esc(q.t)}</p></div></details>`;
+  ${q.x != null ? `<p class="small"><b>Çözüm:</b> ${fq(q.x)}</p>` : ""}<p class="xs faint">${esc(SUBJ[q.s] ? SUBJ[q.s].n : "")} · ${esc(q.t)}</p></div></details>`;
 }
 
 /* ---------- Soru bankası ---------- */
@@ -8148,6 +8148,7 @@ function startRun(cfg) {
       [{ l: "Vazgeç", a: "modalClose" }, { l: "Eskisine devam et", a: "resume" }, { l: "Yenisini başlat", a: "runReplace", k: "pri" }]);
     return;
   }
+  if (!cfg.canli && svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
   if (!cfg.canli && ucretsizMi()) { kotaIste(cfg); return; }
   baslatRun(cfg);
 }
@@ -8188,6 +8189,111 @@ async function kotaIste(cfg) {
   if (v === 0) { kotaLimitModal(exam); return; }
   if (!exam && cfg.qs.length > v) { cfg = Object.assign({}, cfg, { qs: cfg.qs.slice(0, v) }); toast("Ücretsiz pakette bugün " + v + " soru hakkın kaldı."); }
   baslatRun(cfg);
+}
+/* ===== Sunucu tarafı cevap anahtarı (B4) =====
+   Akademi sunucusu soruyu cevapsız verir. Çalışma modunda doğru cevap ve çözüm, öğrenci işaretledikten sonra /api/soru/cevap ile gelir;
+   denemede anahtar yalnızca /api/soru/bitir ile, deneme bitince gelir ve puan sunucuda hesaplanır. Sunucu bu sistemi açmadıysa
+   (AKE_SORU_V2 kapalı) ya da soru sunucuda yoksa eski yerel akış aynen çalışır. Üretilen (gen) ve AI sorular yerelde kalır. */
+const SV = { kapali: false };
+const svKullan = () => sunucuKota() && !SV.kapali && HESAP.hazir && !HESAP.hata && !!HESAP.user && !(window.SV_KAPAT === true);
+const svAday = q => q && typeof q.id === "string" && !q.gen && q.src !== "ai" && !/^g:/.test(q.id);
+function svAdaylar(cfg) {
+  if (cfg.canli || cfg.kind === "mistakes") return [];
+  const gor = new Set(), out = [];
+  for (const q of cfg.qs) if (svAday(q) && !gor.has(q.id)) { gor.add(q.id); out.push(q); }
+  return out;
+}
+async function svIstek(yol, govde, imza) {
+  const r = await fetch("/api/soru/" + yol, { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(govde), signal: imza });
+  let j = {}; try { j = await r.json(); } catch (e) { }
+  return { r, j };
+}
+/* Sunucu oturumu açılamazsa: V2 gerçekten kapalıysa ya da uç yoksa (404; hiçbir şey işlenmediği için kota düşmez) ya da sunucuda uygun soru henüz yoksa ("banka_yok", kota düşmez) eski yerel akış;
+   beklenmeyen hatada (500/503/ağ vb.) eski sisteme DÖNÜLMEZ: durulur ve "Tekrar dene" sunulur. Tekrarda aynı istek anahtarı kullanılır,
+   böylece ilk istek sunucuda tamamlanmış (kota düşmüş) olsa bile aynı oturum geri verilir, ikinci kez kota harcanmaz. */
+function svHataModal(cfg, mesaj) {
+  UI.svBekleyen = cfg;
+  openModal("Sorular şu an açılamadı", `<p>${esc(mesaj)} Hakkın tekrar düşmez; aynı oturum yeniden denenir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Tekrar dene", a: "svTekrar", k: "pri" }]);
+}
+async function svBaslat(cfg) {
+  if (UI.svBusy) return; UI.svBusy = true;
+  try {
+    const exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
+    let kota = null;
+    cfg.svIstek = cfg.svIstek || ("r" + uid() + uid() + uid());
+    for (let i = 0; i < adaylar.length; i += ust) {
+      const parca = adaylar.slice(i, i + ust);
+      let sonuc; try { sonuc = await svIstek("oturum", { istek: cfg.svIstek + "-" + (i / ust), mod: exam ? "exam" : "practice", idler: parca.map(q => q.id) }); } catch (e) { svHataModal(cfg, "Bağlantı kurulamadı."); return; }
+      const { r, j } = sonuc;
+      if (r.status === 401) { HESAP.user = null; HESAP.ucr = null; kotaGirisModal(); return; }
+      if (r.status === 402) { if (i === 0) { HESAP.ucr = j.kota ? Object.assign({}, HESAP.ucr || {}, j.kota) : HESAP.ucr; kotaLimitModal(exam); return; } toast("Ücretsiz hakkın bu kadarına yetti; kalan sorular sete eklenmedi."); break; }
+      if (r.status === 429) { toast("Çok sık oturum açtın. Birazdan tekrar dene."); return; }
+      if (r.status === 404) { SV.kapali = true; if (i === 0) { startRunEski(cfg); return; } break; }     // V2 kapalı: eski uyumluluk akışı
+      if (r.status === 503 && j.error === "banka_yok") { if (i === 0) { startRunEski(cfg); return; } break; }                // sunucuda henüz uygun soru yok (kota düşmedi)
+      if (!r.ok) { svHataModal(cfg, r.status >= 500 ? "Sunucu şu an yanıt vermiyor." : "İstek kabul edilmedi."); return; }
+      kota = j.kota || kota;
+      (j.sorular || []).forEach(s => { if (s && typeof s.id === "string" && Array.isArray(s.o) && s.o.length === 5 && typeof s.q === "string") sunulan.set(s.id, { oturum: j.oturum, s }); });
+    }
+    if (!sunulan.size) { startRunEski(cfg); return; }
+    if (kota && !kota.sinirsiz && kota.kalan != null) HESAP.ucr = Object.assign({}, HESAP.ucr || {}, exam ? { kalanDeneme: kota.kalan } : { kalanSoru: kota.kalan });
+    let qs = cfg.qs.slice();
+    const yerel = qs.filter(q => !(svAday(q) && sunulan.has(q.id)));
+    if (!exam && yerel.length && kota && !kota.sinirsiz && kota.kalan === 0) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
+    else if (!exam && yerel.length && !(kota && kota.sinirsiz)) {
+      const v = await kotaAl("soru", yerel.length);
+      if (v < 0) { render(); return; }
+      if (v < yerel.length) { const at = new Set(yerel.slice(v)); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
+    }
+    qs = qs.map(q => {
+      const k = svAday(q) && sunulan.get(q.id); if (!k) return q;
+      const c = Object.assign({}, q); delete c.a; delete c.x; delete c.p;
+      c.q = k.s.q; c.o = k.s.o; if (k.s.p) c.p = k.s.p; c.sv = k.oturum; return c;
+    });
+    if (!qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
+    baslatRun(Object.assign({}, cfg, { qs }));
+  } finally { UI.svBusy = false; }
+}
+function startRunEski(cfg) { if (cfg.canli || !ucretsizMi()) { baslatRun(cfg); return; } kotaIste(cfg); }
+/* çalışma modu: cevap sunucuya gider, doğru seçenek ve çözüm geri gelir */
+async function svCevap(R, i, o) {
+  const q = R.qs[i]; if (UI.svBusy) return; UI.svBusy = true;
+  try {
+    const { r, j } = await svIstek("cevap", { oturum: q.sv, soru: q.id, secim: o });
+    if (RUN !== R) return;
+    if (r.status === 401) { HESAP.user = null; kotaGirisModal(); return; }
+    if (r.status === 409 || r.status === 410) { toast("Bu oturumun süresi dolmuş. Soruyu yeni bir oturumda çöz."); return; }
+    if (!r.ok || !Number.isInteger(j.a)) { toast("Cevabın kaydedilemedi. Bağlantını kontrol edip tekrar dene."); return; }
+    q.a = j.a; q.x = typeof j.x === "string" ? j.x : "";
+    pickAnswerYerel(o, i);
+  } catch (e) { toast("Bağlantı kurulamadı. Cevabını tekrar işaretle."); }
+  finally { UI.svBusy = false; render(); }
+}
+/* bitiş: deneme sunucuda değerlendirilir (anahtar ancak şimdi gelir); çalışma oturumu sunucuda kapatılır */
+async function svBitir(R) {
+  const exam = R.mode === "exam", oturumlar = [...new Set(R.qs.filter(q => q.sv).map(q => q.sv))];
+  let hata = null;
+  for (const id of oturumlar) {
+    const govde = { oturum: id };
+    if (exam) govde.cevaplar = R.qs.map((q, i) => q.sv === id ? { soru: q.id, secim: Number.isInteger(R.ans[i]) ? R.ans[i] : null } : null).filter(Boolean);
+    let sonuc; try { sonuc = await svIstek("bitir", govde); } catch (e) { return exam ? "ag" : null; }
+    const { r, j } = sonuc;
+    if (r.ok) { (j.sorular || []).forEach(s => { if (exam && s && Number.isInteger(s.a)) R.qs.forEach(q => { if (q.sv === id && q.id === s.id) { q.a = s.a; q.x = typeof s.x === "string" ? s.x : ""; } }); }); continue; }
+    if (r.status === 401) return exam ? "ag" : null;
+    hata = hata || (r.status === 409 || r.status === 410 || r.status === 404 ? "bitmis" : "ag");
+  }
+  return hata;
+}
+function finishRun(auto) {
+  const R = RUN; if (!R) return;
+  if (R.canli || !R.qs.some(q => q.sv)) { finishRunYerel(auto); return; }
+  if (UI.svBitirBusy || (UI.svBekle && Date.now() < UI.svBekle)) return;
+  UI.svBitirBusy = true;
+  svBitir(R).then(h => {
+    UI.svBitirBusy = false; if (RUN !== R) return;
+    if (R.mode === "exam" && h === "ag") { UI.svBekle = Date.now() + 5000; toast("Deneme değerlendirilemedi: bağlantı yok. Birazdan tekrar denenecek, cevapların saklandı."); render(); return; }
+    if (R.mode === "exam" && h === "bitmis") { R.qs.forEach((q, i) => { if (q.sv && q.a == null) R.ans[i] = null; }); toast("Bu denemenin sunucu oturumu bitmiş; anahtarı alınamayan sorular boş sayıldı."); }
+    UI.svBekle = 0; finishRunYerel(auto);
+  });
 }
 function baslatRun(cfg) {
   const qs = cfg.qs.map(q => snap(q));
@@ -8246,7 +8352,12 @@ function paraIdea(q) {
 }
 
 function pickAnswer(o) {
-  const R = RUN, i = R.cur, q = R.qs[i];
+  const R = RUN, q = R.qs[R.cur];
+  if (R.mode === "study" && !R.rev[R.cur] && q.sv && q.a == null) { svCevap(R, R.cur, o); return; }
+  pickAnswerYerel(o);
+}
+function pickAnswerYerel(o, idx) {
+  const R = RUN, i = idx == null ? R.cur : idx, q = R.qs[i];
   if (R.mode === "exam") { R.ans[i] = R.ans[i] === o ? null : o; saveRun(); render(); return; }
   if (R.rev[i]) return;
   R.ans[i] = o; R.rev[i] = true;
@@ -8265,7 +8376,7 @@ function moveTo(i) {
   saveRun(); render();
   const qc = document.querySelector(".qcard"); if (qc) { const top = qc.getBoundingClientRect().top + window.scrollY - 130; if (window.scrollY > top) window.scrollTo(0, Math.max(0, top)); }
 }
-function finishRun(auto) {
+function finishRunYerel(auto) {
   const R = RUN; if (!R) return;
   if (R.canli) { canliBitir(R, auto); return; }
   const per = R.secs.map(s => ({ n: s.n, d: 0, y: 0, b: 0 }));
@@ -8280,7 +8391,7 @@ function finishRun(auto) {
   const D = per.reduce((a, p) => a + p.d, 0), Y = per.reduce((a, p) => a + p.y, 0), B = per.reduce((a, p) => a + p.b, 0);
   const used = R.dur ? Math.min(R.dur, Math.round((Date.now() - R.start) / 1000)) : Math.round((Date.now() - R.start) / 1000);
   const result = { id: uid(), kind: R.kind, type: R.type, title: R.title, date: Date.now(), secs: used, dur: R.dur, mode: R.mode, sections: per, d: D, y: Y, b: B, net: net(D, Y),
-    qs: R.qs.map((q, i) => Object.assign(snap(q), { your: R.ans[i] })) };
+    qs: R.qs.map((q, i) => { const o = Object.assign(snap(q), { your: R.ans[i] }); delete o.sv; return o; }) };
   memLog(R.kind, R.mode === "exam" ? `${R.title} · ${D} doğru, ${Y} yanlış, ${B} boş · ${nfx(result.net)} net` : `${R.title} · ${D} doğru / ${R.qs.length} soru`);
   if (R.kind === "exam" && R.mode === "exam" && D + Y >= 20) xpEkle("deneme");
   if (R.kind === "exam") { S.exams.push(result); touch("exams"); UI.resultId = result.id; UI.lastResult = null; }
@@ -11976,6 +12087,7 @@ const ACT = {
   startExam() { startExamFromUI(); },
   openResult(d) { UI.resultId = d.id; UI.lastResult = null; go("sonuc"); },
   resume() { UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
+  svTekrar() { const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
   runReplace() { const c = UI.pendingRun; UI.pendingRun = null; RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },
   discardAsk() { openModal("Oturum silinsin mi?", `<p>"${esc(RUN.title)}" oturumundaki cevapların silinecek.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sil", a: "discard", k: "pri" }]); },
   discard() { RUN = null; saveRun(); UI.modal = null; UI.inRun = false; render(); },

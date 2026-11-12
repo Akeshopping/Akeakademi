@@ -229,7 +229,8 @@ test("kapsam: soru-api yalnız functions/api/soru/[[yol]].js tarafından içe ak
   const { readdirSync, readFileSync: oku } = await import("node:fs"), { join } = await import("node:path");
   const tara = d => readdirSync(d, { withFileTypes: true }).flatMap(x => x.isDirectory() ? tara(join(d, x.name)) : [join(d, x.name)]);
   for (const f of tara("functions")) { const var_ = /soru-api|soru-kanonik/.test(oku(f, "utf8")); assert.equal(var_, f.endsWith(join("soru", "[[yol]].js")), f); }
-  for (const f of ["index.html", "sw.js", "functions/api/sorular.js"]) assert.ok(!/api\/soru\/|soru-api/.test(oku(f, "utf8")), f + " yeni API'ye bağlanmış");
+  /* B4: index.html artık korumalı API'yi (feature-detect ile) çağırır; sw.js ve legacy /api/sorular kodu soru-api'ye bağlanmaz (yalnız bayrak modülü soru-bayrak.js) */
+  for (const f of ["sw.js", "functions/api/sorular.js", "functions/sorular/[[yol]].js"]) assert.ok(!/api\/soru\/|soru-api/.test(oku(f, "utf8")), f + " yeni API'ye bağlanmış");
 });
 
 test("doküman: güncel göç toplamı 1.216 ve yönetim write-path cutover blocker notu mevcut; kota yardımcısı 'yalnız okur' diye anlatılmıyor", async () => {

@@ -21,18 +21,21 @@
 //   POST kod-bagla {kod}              erişim kodunu hesaba bağlar
 //   POST sil                          hesabı ve verilerini siler
 
+import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
 import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
 import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
-const ipHits = new Map();
 
 /* Giriş kodu ayarları. Yeni kodlar 8 haneli. ESKI_KOD_HANE yalnızca geçiş içindir: dağıtımdan önce gönderilmiş 6 haneli kodlar
    (en çok 10 dk geçerli) çalışmaya devam etsin. Hash kod metnini içerdiği için 6 haneli bir giriş 8 haneli kodu asla eşleştirmez;
    dağıtımdan 10 dk sonra ESKI_KOD_HANE kabulü güvenle kaldırılabilir. */
 const KOD_HANE = 8, ESKI_KOD_HANE = 6, KOD_OMRU_MS = 10 * 60000, DENEME_LIMIT = 5, BEKLEME_MS = 60000, PENCERE_MS = 3600000, SAATLIK_KOD = 5;
+/* Saatlik IP sınırları. Okul/kafe gibi ortak IP'lerdeki meşru kullanıcıları engellememek için geniş tutuldu; asıl koruma e-posta başına
+   veritabanı sınırlarıdır (60 sn bekleme, saatte 5 kod, 5 deneme). Sınırlar yalnızca toplu kötüye kullanımı ve e-posta bombalamayı keser. */
+const IP_KOD = 20, IP_DOGRULA = 60;
 const degisti = r => !!(r && r.meta && r.meta.changes > 0);
 /* Tek tip hata: yanlış kod, süresi dolmuş kod, dolan deneme hakkı, hiç istenmemiş kod ve kullanılmış kod ayırt edilemez (hesap/kod durumu sızmaz) */
 const kodHatasi = () => fail(400, "kod_yanlis", "Kod hatalı ya da süresi dolmuş. Yeni kod iste.");
@@ -44,11 +47,9 @@ function girisKodu() {
 }
 
 async function govde(request) { try { return await request.json(); } catch (e) { return {}; } }
-function ipSinir(request, anahtar, adet, ms) {
-  const ip = request.headers.get("cf-connecting-ip") || "?", k = anahtar + "|" + ip, now = Date.now();
-  const l = (ipHits.get(k) || []).filter(t => now - t < ms); if (l.length >= adet) return false;
-  l.push(now); ipHits.set(k, l); if (ipHits.size > 20000) ipHits.clear(); return true;
-}
+/* IP başına sınır: bellek içi Map yerine D1 (lib/hiz.js) — tüm Worker örneklerinde ortak, atomik. Tablo yoksa engellemez (bellek içi yedek). */
+/* Sınır aşıldıysa 429 yanıtı (Retry-After ile), değilse null döner. */
+async function ipSinir(env, request, anahtar, adet, ms) { const h = await ipHiz(env, request, "h:" + anahtar, adet, ms); return h.izin ? null : fail(429, "cok_istek", "", bekleBaslik(h)); }
 const kullaniciJson = (env, u) => ({ id: u.id, eposta: u.eposta || "", ad: u.ad || "", yonetici: yoneticiMi(env, u) });
 
 export async function onRequest({ request, env, params }) {
@@ -61,7 +62,7 @@ export async function onRequest({ request, env, params }) {
   if (ad === "kod-gonder" && m === "POST") {
     const b = await govde(request), eposta = String(b.eposta || "").trim().toLowerCase();
     if (!EPOSTA_RE.test(eposta)) return fail(400, "eposta_gecersiz");
-    if (!ipSinir(request, "kod", 8, 3600000)) return fail(429, "cok_istek");
+    { const red = await ipSinir(env, request, "kod", IP_KOD, 3600000); if (red) return red; }
     const now = Date.now(), kod = girisKodu(), hash = await sha256(eposta + ":" + kod + ":" + (env.AKE_GIZLI || "ake"));
     /* Bekleme süresi ve saatlik sınır TEK atomik komutta uygulanır (önce oku, sonra yaz yarışı yok): eşzamanlı istekler bekleme süresini
        atlayıp her seferinde deneme sayacını sıfırlayamaz. Şartlar sağlanmazsa satıra dokunulmaz ve etkilenen satır 0 olur. */
@@ -87,7 +88,7 @@ export async function onRequest({ request, env, params }) {
   if (ad === "kod-dogrula" && m === "POST") {
     const b = await govde(request), eposta = String(b.eposta || "").trim().toLowerCase(), kod = String(b.kod || "").replace(/\D/g, "");
     if (!EPOSTA_RE.test(eposta) || (kod.length !== KOD_HANE && kod.length !== ESKI_KOD_HANE)) return fail(400, "kod_gecersiz");
-    if (!ipSinir(request, "dogrula", 30, 3600000)) return fail(429, "cok_istek");
+    { const red = await ipSinir(env, request, "dogrula", IP_DOGRULA, 3600000); if (red) return red; }
     /* 0) Doğrulanacak kod kaydı okunur (yalnızca hangi kod sürümüne bağlanacağımızı belirler; karar verilmez). Süreç sürerken yeni kod üretilirse
        (kod-gonder hash'i değiştirir) bu doğrulamanın ayıracağı hak YENİ kodun kaydına geçemesin diye hak, okunan hash'e bağlanır. */
     const kayit = await env.DB.prepare("SELECT hash FROM giris WHERE eposta = ? AND hash IS NOT NULL AND bitis > ?").bind(eposta, Date.now()).first();
@@ -171,7 +172,8 @@ export async function onRequest({ request, env, params }) {
     return json(200, { ok: true });
   }
   if (ad === "kod-bagla" && m === "POST") {
-    if (!ipSinir(request, "bagla", 20, 3600000)) return fail(429, "cok_istek");
+    /* Erişim kodu deneme bütçesi /api/ai ile ORTAKTIR (lib/hiz.js kodDenemeSinir); D1 arızasında kod tahminine izin verilmez. */
+    { const red = await kodDenemeSinir(env, request, u.id); if (red) return red; }
     const b = await govde(request), r = await kodBagla(env, u.id, b.kod);
     if (r.hata) return fail(r.durum || 400, r.hata);
     const k = await kullanimAl(env, u.id);

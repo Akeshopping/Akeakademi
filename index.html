@@ -7198,7 +7198,8 @@ normalize();
    S.sahip, ake.state içinde S ile AYNI yazımda saklanır (tek setItem: sahip ve veri hiçbir zaman ayrışmaz). "ake.sahip" yalnız çok sekmeli ucuz bir bayraktır.
    Hesap değişince önceki sahibin S + RUN + sohbeti "ake.yuva.<kimlik>" yuvasına KOPYALANIR (silinmez), yeni sahibin yuvası varsa yüklenir, yoksa boş durumla başlanır.
    Sahibi bilinmeyen (eski) kayıt "ake.sahipsiz.<zaman>" yuvasına KOPYALANIR; hesaba aktarım yalnız açık kullanıcı seçimiyledir. Yuvalar otomatik silinmez. */
-const OT = { sahip: String((S && S.sahip) || ""), nesil: 0, engelli: false, cakisti: false, son: "" };
+const OT = { bekle: "", gy: null, sahip: String((S && S.sahip) || ""), nesil: 0, engelli: false, cakisti: false, son: "" };
+let chatCtl = null;   /* sohbet isteği iptal denetleyicisi; kimlik değişiminde de iptal edilir, bu yüzden erken bildirilir */
 const YUVA = "ake.yuva.", SAHIPSIZ = "ake.sahipsiz.";
 try { if (OT.sahip) LS.set("ake.sahip", OT.sahip); else LS.del("ake.sahip"); } catch (e) { }
 const enUpd = o => Math.max(0, ...Object.values((o && o.upd) || {}).map(Number).filter(Number.isFinite));
@@ -7219,34 +7220,62 @@ function yuvaYaz(k, birles) {   /* birles: daha yeni bir kopya zaten varsa dokun
 }
 function sahipsizListe() { const o = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf(SAHIPSIZ) === 0) o.push(k); } } catch (e) { } return o.sort(); }
 function sahipsizAlanlar(y) { return Object.keys(AREA).filter(a => alanVar(y.S, a) && ((y.S.upd || {})[a] || 0) > (S.upd[a] || 0)); }
-function sahipEngel() {   /* depolama dolu / yazılamadı: mevcut veri KORUNUR, hesaba hiçbir şey aktarılmaz, kullanıcıya görünür hata */
-  OT.engelli = true; cloud.col = null; cloud.state = "local";
-  try { openModal("Depolama dolu", "<p>Bu cihazın tarayıcı depolaması dolu olduğu için önceki yerel ilerleme güvenle ayrılamadı. Mevcut verin silinmedi ve hesabına hiçbir şey aktarılmadı. Eşitleme durduruldu; depolamada yer açıp sayfayı yenile.</p>", [{ l: "Tamam", a: "modalClose" }]); } catch (e) { }
+function sahipEngel(neden) {   /* depolama dolu / yazılamadı: mevcut veri KORUNUR, hesaba hiçbir şey aktarılmaz, görünür hata + YENİDEN DENE (kalıcı engel yok) */
+  OT.engelli = true; cloud.col = null; cloud.state = "local"; OT.bekle = neden || "yedek";
+  const m = {
+    cakisma: "Başka bir sekmede farklı bir hesaba geçildi, ancak bu sekmedeki kaydedilmemiş ilerleme cihaz depolamasına yedeklenemedi (depolama dolu). <b>Sayfayı yenileme ve kapatma</b>: ilerlemen şu an yalnız bu sekmede duruyor. Depolamada yer açıp “Yeniden dene”ye bas.",
+    gecis: "Hesap geçişi sırasında yerel kayıtlar eksiksiz yazılamadı (depolama dolu). Önceki verin ve bu hesabın kayıtları silinmedi; eşitleme durduruldu. Depolamada yer açıp “Yeniden dene”ye bas.",
+    yedek: "Bu cihazın tarayıcı depolaması dolu olduğu için önceki yerel ilerleme güvenle ayrılamadı. Mevcut verin silinmedi ve hesabına hiçbir şey aktarılmadı. Eşitleme durduruldu; depolamada yer açıp “Yeniden dene”ye bas."
+  }[OT.bekle];
+  try { openModal("Depolama dolu", "<p>" + m + "</p>", [{ l: "Yeniden dene", a: "sahipYenidenDene" }, { l: "Tamam", a: "modalClose" }]); } catch (e) { }
   return false;
 }
-function sahipCakisma() {   /* başka sekme/çerez hesabı değiştirdi: bu sekmenin bellekteki ilerlemesi sahibinin yuvasına korunur, sayfa yenilenir */
-  if (OT.cakisti) return; OT.cakisti = true; OT.nesil++; clearTimeout(saveTimer);
-  try { if (OT.sahip) yuvaYaz(YUVA + OT.sahip, true); else if (veriVarMi(S)) yuvaYaz(SAHIPSIZ + Date.now(), false); } catch (e) { }
-  OT.engelli = true; setTimeout(() => { try { location.reload(); } catch (e) { } }, 50);
+function cakismaYedekle() {   /* bellekteki ilerleme sahibinin yuvasına (sahibi bilinmiyorsa sahipsiz yuvaya) KOPYALANIR; başarı döner */
+  try { if (OT.sahip) return yuvaYaz(YUVA + OT.sahip, true); if (veriVarMi(S)) return yuvaYaz(SAHIPSIZ + Date.now(), false); return true; } catch (e) { return false; }
 }
-function sahipAyir(id) {   /* S/RUN/sohbet yeni sahibe göre kurulur; yazma sırası: önce durum (sahip içinde), sonra bayrak */
+function sahipCakisma() {   /* başka sekme/çerez hesabı değiştirdi: bellekteki ilerleme yedeklenir; YALNIZ yedek başarılıysa sayfa yenilenir */
+  if (OT.cakisti) return; OT.cakisti = true; OT.nesil++; clearTimeout(saveTimer);
+  OT.engelli = true;
+  if (!cakismaYedekle()) { sahipEngel("cakisma"); return; }
+  setTimeout(() => { try { location.reload(); } catch (e) { } }, 50);
+}
+function sahipUyariSeridi() { return OT.engelli && OT.bekle ? `<div class="sahip-uyari" role="alert" style="position:sticky;top:0;z-index:60;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 12px;background:#fde68a;color:#1f1300;font-size:14px"><span>Kayıt durdu: depolama dolu. Verin cihazda korunuyor.</span><button class="btn sm" data-a="sahipYenidenDene">Yeniden dene</button></div>` : ""; }
+function sahipBekleGoster() { try { if (OT.bekle && OT.engelli && !UI.modal) sahipEngel(OT.bekle); } catch (e) { } }   /* açılışta yarım kalmış geçiş varsa hata penceresi + Yeniden dene görünür */
+function sahipYenidenDene() {   /* depolama düzeldikten sonra: bekleyen adımı güvenle yeniden dener */
+  UI.modal = null;
+  if (OT.bekle === "cakisma") { if (cakismaYedekle()) { OT.bekle = ""; setTimeout(() => { try { location.reload(); } catch (e) { } }, 50); } else sahipEngel("cakisma"); return; }
+  if (OT.bekle === "gecis") { if (sahipYaz(OT.sahip, OT.gy)) { OT.gy = null; OT.bekle = ""; OT.engelli = false; render(); hesapEsitle(); } else sahipEngel("gecis"); return; }
+  OT.bekle = ""; OT.engelli = false; render(); hesapEsitle();   /* "yedek": önceki sahibin yuvası yazılamamıştı; geçiş baştan denenir */
+}
+/* Geçiş yazımları: önce önceki sahibin artığı (ake.run/ake.chat; yedeği yuvada) silinir, sonra state → sahip bayrağı → run → chat yazılır; her adım DENETLENİR.
+   Kaynak yuva (yeni sahibin yedeği) ANCAK hepsi başarılıysa silinir. Yarım kalırsa yuva durur; sayfa açılışında sahipToparla() tamamlar. */
+function sahipYaz(id, y, temizle) {
+  if (temizle) { LS.del("ake.run"); LS.del("ake.chat"); }
+  S.sahip = id;
+  if (!LS.set("ake.state", JSON.stringify(S))) return false;
+  if (!LS.set("ake.sahip", id)) return false;
+  if (RUN && !LS.set("ake.run", JSON.stringify(RUN))) return false;
+  if (!LS.set("ake.chat", JSON.stringify(UI.chat))) return false;
+  if (y) LS.del(YUVA + id);
+  return true;
+}
+function sahipAyir(id) {   /* S/RUN/sohbet yeni sahibe göre kurulur */
   clearTimeout(saveTimer); clearTimeout(rozetT); dirty.clear(); cloud.busy = false;
   const y = yuvaOku(YUVA + id);
   S = y ? y.S : defState(); normalize();
   RUN = y && y.RUN ? y.RUN : null; UI.chat = y && Array.isArray(y.chat) ? y.chat : [];
-  UI.inRun = false; UI.modal = null; OT.sahip = id; S.sahip = id;
-  if (!LS.set("ake.state", JSON.stringify(S))) return sahipEngel();
-  LS.set("ake.sahip", id); saveRun(); LS.set("ake.chat", JSON.stringify(UI.chat));
-  if (y) LS.del(YUVA + id);
-  return true;
+  UI.inRun = false; UI.modal = null; OT.sahip = id; OT.gy = y;
+  if (!sahipYaz(id, y, true)) return sahipEngel("gecis");
+  OT.gy = null; return true;
 }
 /* girişte, hesapEsitle'den ÖNCE: yerel ilerlemenin sahibini doğrulanmış hesap kimliğiyle karşılaştırır. false: eşitleme yapılmaz. */
 function sahipUyumla(id) {
   if (!id) return false;
+  if (OT.bekle) return false;   /* yarım kalan geçiş/yedek: kullanıcı 'Yeniden dene' diyene kadar eşitleme ve sahip değişimi YOK (engel kendiliğinden kalkmaz, sahte çakışma da sayılmaz) */
   if ((LS.get("ake.sahip") || "") !== OT.sahip) { sahipCakisma(); return false; }
   if (OT.sahip === id) { OT.engelli = false; OT.son = "ayni"; return true; }
   if (!OT.sahip) {
-    if (!veriVarMi(S) && !RUN) { OT.sahip = id; S.sahip = id; if (!LS.set("ake.state", JSON.stringify(S))) return sahipEngel(); LS.set("ake.sahip", id); OT.son = "benimsendi"; return true; }
+    if (!veriVarMi(S) && !RUN) { OT.sahip = id; S.sahip = id; if (!LS.set("ake.state", JSON.stringify(S)) || !LS.set("ake.sahip", id)) return sahipEngel("gecis"); OT.son = "benimsendi"; return true; }
     let chat = []; try { chat = UI.chat || []; } catch (e) { }
     if (!LS.set(SAHIPSIZ + Date.now(), JSON.stringify({ v: 1, ts: Date.now(), S, RUN, chat }))) return sahipEngel();
     OT.son = "sahipsiz"; return sahipAyir(id);
@@ -7355,6 +7384,7 @@ async function initCloud() {
   render();
 }
 function saveLabel() {
+  if (OT.engelli) return ["retry", OT.bekle ? "Kayıt durdu: depolama dolu" : "Kayıt durdu"];   /* kayıt engelliyken 'kayıtlı' izlenimi verilmez */
   return { cloud: ["cloud", "Hesabına kaydediliyor"], loading: ["", "Hesabın yükleniyor…"], slow: ["retry", "Hesaba ulaşılamıyor, bu cihazda saklanıyor"], retry: ["retry", "Kayıt bekliyor, tekrar denenecek"], local: ["", "Bu cihazda kayıtlı"] }[cloud.state] || ["", "Bu cihazda kayıtlı"];
 }
 function paintSave() { const el = document.getElementById("savest"); if (el) { const [c, t] = saveLabel(); el.className = "save " + c; el.innerHTML = `<i></i><span class="lbl">${t}</span>`; el.title = t; } }
@@ -7764,7 +7794,8 @@ function header() {
   return `<header class="top"><div class="top-in">
     <a class="brand" href="#bugun" aria-label="AKE Akademi ana sayfa">${logoTile("hl")}${WORDMARK}</a>
     <div class="top-sp"></div>
-    <div id="savest" class="save ${c}" title="${t}"><i></i><span class="lbl">${t}</span></div>
+    <div id="savest" class="save ${c}" title="${t}" role="status"><i></i><span class="lbl">${t}</span></div>
+    ${OT.engelli && OT.bekle ? `<button class="btn sm" data-a="sahipYenidenDene" aria-label="Depolama hatasını yeniden dene">Yeniden dene</button>` : ""}
     ${cloud.owner && IN_CLAUDE ? `<button class="btn sm adm-go" data-a="admEnter" title="Yönetim paneli (yalnızca sen görüyorsun)">${icon("users")}<span>Panel</span></button>` : ""}
     ${!IN_CLAUDE && !HESAP.yok && HESAP.hazir && !HESAP.hata ? (HESAP.user ? `<a class="btn sm ghost hesap-btn" href="#hesap" aria-label="Hesabım" title="${esc(HESAP.user.eposta)}"><span class="av">${esc((HESAP.user.ad || HESAP.user.eposta || "?").slice(0, 1).toLocaleUpperCase("tr"))}</span></a>` : `<a class="btn sm giris-btn" href="#hesap" aria-label="Giriş yap">${icon("users")}<span>Giriş yap</span></a>`) : ""}
     <button type="button" class="btn sm ghost tema-btn" data-a="temaHizli" aria-label="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}" title="${koyuMu() ? "Açık temaya geç" : "Koyu temaya geç"}">${icon(koyuMu() ? "sun" : "moon")}</button>
@@ -8214,6 +8245,16 @@ function vTutor() {
 }
 /* ===== Soru çözme oturumu (deneme, test, paragraf, yanlış tekrarı) ===== */
 let RUN = (() => { try { const r = LS.get("ake.run"); return r ? JSON.parse(r) : null; } catch (e) { return null; } })();
+/* Sayfa açılışında yarım kalmış geçişten güvenli toparlanma: geçerli sahibin yuvası hâlâ duruyorsa geçiş tamamlanmamıştır; yuva doğruluk kaynağıdır */
+(function sahipToparla() {
+  try {
+    if (!OT.sahip) return; const y = yuvaOku(YUVA + OT.sahip); if (!y) return;
+    if (enUpd(y.S) > enUpd(S)) { S = y.S; normalize(); }
+    if (!RUN && y.RUN) RUN = y.RUN;
+    if (!UI.chat.length && Array.isArray(y.chat) && y.chat.length) UI.chat = y.chat;
+    OT.gy = y; if (sahipYaz(OT.sahip, y, false)) OT.gy = null; else { OT.engelli = true; OT.bekle = "gecis"; }
+  } catch (e) { }
+})();
 function saveRun() { if (OT.engelli || (LS.get("ake.sahip") || "") !== OT.sahip) return; if (RUN) LS.set("ake.run", JSON.stringify(RUN)); else LS.del("ake.run"); }
 const isNumOpts = q => q.o.every(o => /^[−\-]?\d/.test(String(o).trim()));
 const plainQ = s => String(s || "").replace(/\^\{([^}]*)\}/g, "^$1").replace(/_\{([^}]*)\}/g, "_$1").replace(/√\{([^}]*)\}/g, "√($1)");
@@ -9746,6 +9787,9 @@ function hesapKimlikGuncelle(yeni) {
   if (once !== sonra) {
     try { saveLocal(); } catch (e) { }   /* eski kimliğin bekleyen yerel ilerlemesi önce yazılır (zamanlayıcı iptal edilecek) */
     OT.nesil++; clearTimeout(saveTimer); cloud.busy = false;   /* uçuştaki kayıt/eşitleme işlemleri eski nesle bağlı kalır, yeni hesabı etkileyemez */
+    /* eski nesle ait AI işlemleri (sohbet/plan): iptal edilir, yeni nesil temiz başlar; geç gelen sonuçlar nesil denetiminde düşer */
+    try { if (chatCtl) chatCtl.abort(); } catch (e) { }
+    chatCtl = null; UI.chatBusy = false; UI.planBusy = false; UI.planErr = "";
     try { KHAVUZ.temizle(); } catch (e) { }
   }
 }
@@ -9833,7 +9877,7 @@ async function initHesap() {
   const d = await hesapBenDene();
   HESAP.hazir = true;
   if (d === "ok") { render(); await hesapEsitle(); sosyalBasla(); }
-  ekSorularYukle();
+  ekSorularYukle(); sahipBekleGoster();
   const h = location.hash || "";
   if (/giris=ok/.test(h)) { toast("Giriş yapıldı. İlerlemen artık hesabında saklanıyor."); history.replaceState(null, "", "#hesap"); }
   else if (/hata=google/.test(h)) { toast("Google ile giriş tamamlanamadı. Tekrar dene ya da e-postayla giriş yap."); history.replaceState(null, "", "#hesap"); }
@@ -9932,6 +9976,7 @@ Object.assign(OZ_ACT, {
     if (kod && !HESAP.paket) { try { const b = await hesapIstek("kod-bagla", { method: "POST", body: JSON.stringify({ kod }) }); if (b.r.ok) hesapUygula(b.j); } catch (e) { } }
     render(); toast(ok ? "Eski ilerlemen hesabına aktarıldı." : "Depolama hatası: eski kayıt silinmedi, aktarım yarım kalabilir.");
   },
+  sahipYenidenDene() { sahipYenidenDene(); },
   sahipsizSonra() { UI.modal = null; render(); toast("Eski kayıt bu cihazda saklanıyor; hesabına aktarılmadı."); },
   async cikis() { try { KHAVUZ.temizle(); } catch (e) { } try { if (cloud.col && dirty.size) await Promise.race([flush(), new Promise(o => setTimeout(o, 4000))]); else saveLocal(); } catch (e) { } try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } hesapKimlikGuncelle(null); HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
   hesapSilAsk() { openModal("Hesabın silinsin mi?", "<p>Hesabın ve hesabında saklanan tüm çalışma verilerin kalıcı olarak silinir. Bu cihazdaki kopya silinmez. Hesabına bağlı paket kodu başka hesapta kullanılamaz hâle gelir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Hesabımı sil", a: "hesapSilGo", k: "pri" }]); },
@@ -12294,7 +12339,7 @@ function render() {
   if (adminMode()) APP.innerHTML = vAdminShell();
   else if (r === "tanitim" && !(RUN && UI.inRun)) {
     let main; try { main = vTanitim(); } catch (e) { console.error(e); hataBildir("Görünüm (tanitim): " + (e && e.message), "", 0); main = `<div class="view"><div class="card"><h2>Tanıtım sayfası açılamadı</h2><p class="muted" style="margin-top:8px"><a href="#bugun">Uygulamaya geç</a></p></div></div>`; }
-    APP.innerHTML = `${main}${UI.modal ? modalHTML() : ""}${UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : ""}`;
+    APP.innerHTML = `${sahipUyariSeridi()}${main}${UI.modal ? modalHTML() : ""}${UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : ""}`;
     setTimeout(atlKur, 0);
   }
   else {
@@ -12322,7 +12367,6 @@ async function aiStream(key, input, opts) {
   } catch (e) { st.text = (e && e.text) || ""; st.err = aiErr(e); }
   st.busy = false; render();
 }
-let chatCtl = null;
 async function sendChat(text) {
   text = (text || "").trim();
   if ((!text && !UI.chatImg) || UI.chatBusy || !aiOn()) return;
@@ -12333,13 +12377,16 @@ async function sendChat(text) {
   while (hist.length && hist[0].role !== "user") hist.shift();
   const prevU = UI.chat.filter(m => m.role === "user").slice(-2).map(m => m.content).join("\n");
   const input = [{ role: "user", content: AI_RULES + "\n\n" + studentCtx() + bilgiBlok(prevU) + "\n\nÖğrencinin mesajları aşağıda. Fotoğraf eklenmişse önce sorudaki metni ve seçenekleri oku, sonra çöz." }].concat(hist);
-  chatCtl = new AbortController();
-  const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => { const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
+  const _n = OT.nesil;   /* işlemin başladığı hesap/oturum nesli: değişirse bu işlem yeni hesabı hiçbir yolla etkilemez */
+  const ctl = chatCtl = new AbortController();
+  const opts = { cache: false, signal: ctl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => { if (_n !== OT.nesil) return; const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
   if (img) opts.images = [img];
   try {
     const r = await AI.fn(input, opts);
+    if (_n !== OT.nesil) return;
     UI.chat.push(Object.assign({ role: "assistant", content: r.text + (r.truncated ? "\n\n(Yanıt uzunluk sınırında kesildi.)" : "") }, r.guclu ? { g: 1 } : {}));
   } catch (e) {
+    if (_n !== OT.nesil) return;
     const msg = aiErr(e);
     if (e && e.text) UI.chat.push({ role: "assistant", content: e.text + (msg ? "\n\n(" + msg + ")" : "") });
     else if (msg) toast(msg);
@@ -12392,6 +12439,7 @@ Yalnızca ${arr.length} sayıdan oluşan bir JSON dizisi döndür. Örnek: [2,0,
 }
 async function planAI() {
   if (premOnly()) { toast("AI ile kişisel çalışma planı Premium pakette var."); return; }
+  const _n = OT.nesil;   /* işlemin başladığı hesap/oturum nesli */
   UI.planBusy = true; UI.planErr = ""; UI.modal = null; render();
   try {
     const prompt = `${studentCtx()}
@@ -12399,11 +12447,12 @@ Bu YKS öğrencisi için Pazartesi'den Pazar'a 7 günlük bir çalışma planı 
 Ders anahtarları: ${Object.entries(SUBJ).map(([k, v]) => k + "=" + v.n).join(", ")}
 Yalnızca JSON dizisi döndür: [{"day":0,"text":"Görev","s":"mat","min":45}]  (day: 0=Pazartesi … 6=Pazar; s yukarıdaki anahtarlardan biri ya da boş metin; min dakika)`;
     const arr = await AI.fn.json(prompt, { cache: false, modelTier: "complex" });
+    if (_n !== OT.nesil) return;
     const tasks = (Array.isArray(arr) ? arr : []).map(o => ({ id: uid(), day: Number(o && o.day), text: String((o && o.text) || "").slice(0, 140), s: SUBJ[o && o.s] ? o.s : "", min: Math.max(0, Math.min(600, Math.round(Number(o && o.min) || 0))), done: false }))
       .filter(t => Number.isInteger(t.day) && t.day >= 0 && t.day <= 6 && t.text.trim());
     if (!tasks.length) throw { code: "invalid_json" };
     S.plan.tasks = tasks; touch("plan"); memLog("plan", tasks.length + " görev"); toast("Haftalık planın hazır.");
-  } catch (e) { UI.planErr = aiErr(e); }
+  } catch (e) { if (_n !== OT.nesil) return; UI.planErr = aiErr(e); }
   UI.planBusy = false; render();
 }
 
@@ -12729,6 +12778,7 @@ initCloud();
 initAI();
 initHesap();
 initRoom();
+sahipBekleGoster();
 
 
 </script>

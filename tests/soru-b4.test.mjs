@@ -191,11 +191,11 @@ test("19) yüklenen yeni soru güvenli sisteme OTOMATİK girer: oturumla cevaps�
 });
 
 /* ---------- katalog (cevapsız) + kimlikle oturum ---------- */
-test("20) katalog: anonim 401; girişli kullanıcıya yalnız cevapsız alanlar; uygun olmayan satırlar yok; private önbellek", async () => {
+test("20) katalog: anonim 401; girişli kullanıcıya yalnız cevapsız alanlar; uygun olmayan satırlar yok; private, no-store", async () => {
   assert.equal((await api("katalog", { m: "GET" })).s, 401);
   DB.db.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar, govde, a, x, kaynak, rk, h) VALUES ('kat-bekliyor','mat','K',1,NULL,'bekliyor',0,0,?,1,'GIZLI-BEKLEYEN-COZUM','ai',5,'hk1')").run(JSON.stringify({ q: "Bekleyen", o: ["a", "b", "c", "d", "e"] }));
   const k = await yeni(false), r = await api("katalog", { m: "GET", cookie: k.cookie });
-  assert.equal(r.s, 200); assert.ok(r.j.n === 200 && r.j.sorular.length === r.j.n && typeof r.j.sonraki === "string", "varsayılan sayfa 200, tüm katalog tek seferde gelmez"); assert.equal(r.h.get("cache-control"), "private, max-age=300");
+  assert.equal(r.s, 200); assert.ok(r.j.n === 200 && r.j.sorular.length === r.j.n && typeof r.j.sonraki === "string", "varsayılan sayfa 200, tüm katalog tek seferde gelmez"); assert.equal(r.h.get("cache-control"), "private, no-store");
   assert.deepEqual(sizintiBul(r.j), []); for (const q of r.j.sorular.slice(0, 50)) assert.ok(Object.keys(q).every(a => SORU_ANAHTARLARI.has(a)));
   assert.ok(!r.t.includes("COZUM-") && !r.t.includes("GIZLI-BEKLEYEN") && !r.j.sorular.some(q => q.id === "kat-bekliyor"));
   assert.ok(!r.j.sorular.some(q => DB.db.prepare("SELECT kopya_of FROM soru WHERE id = ?").get(q.id).kopya_of), "kopya satırlar katalogda yok");

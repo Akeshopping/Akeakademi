@@ -155,6 +155,12 @@ export async function onRequest({ request, env, params }) {
     const t = cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
   }
+  /* Hesaplar arası karışma koruması: istemci, verinin AİT OLDUĞU hesabı x-ake-hesap başlığıyla bildirir. Yetki YİNE yalnız sunucunun doğruladığı oturumdan (u.id) gelir;
+     başlık oturumdaki hesapla uyuşmuyorsa (başka sekmede çerez değişti) okuma/yazma yapılmaz, mevcut veri aynen kalır. Başlıksız eski istemciler eskisi gibi çalışır. */
+  if (ad === "veri" && (m === "GET" || m === "PUT")) {
+    const beklenen = request.headers.get("x-ake-hesap");
+    if (beklenen !== null && beklenen !== u.id) return json(409, { error: "hesap_uyumsuz" }, { "cache-control": "no-store" });
+  }
   if (ad === "veri" && m === "GET") {
     const { results } = await env.DB.prepare("SELECT alan, json FROM veri WHERE kid = ?").bind(u.id).all();
     const alanlar = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); } catch (e) { } });

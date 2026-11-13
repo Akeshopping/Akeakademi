@@ -7522,7 +7522,7 @@ function webAI() {
     catch (e) { throw { code: opts.signal && opts.signal.aborted ? "cancelled" : "network" }; }
     if (!r.ok) {
       let j = {}; try { j = await r.json(); } catch (e) { }
-      if (j.error === "giris") { if (typeof HESAP !== "undefined") HESAP.user = null; AI.fn = null; throw { code: "giris" }; }
+      if (j.error === "giris") { if (typeof HESAP !== "undefined") hesapKimlikGuncelle(null); AI.fn = null; throw { code: "giris" }; }
       if (j.error === "paket") { if (typeof HESAP !== "undefined") HESAP.paket = null; AI.fn = null; throw { code: "paket" }; }
       if (j.error === "kota" && typeof HESAP !== "undefined" && HESAP.kullanim) { const m = +r.headers.get("x-ake-mesaj"); if (m) HESAP.kullanim.mesaj = m; }
       if (r.status === 401) { webAIKapat(); throw { code: j.error === "suresi" ? "suresi" : "kod" }; }
@@ -8176,7 +8176,7 @@ async function kotaAl(tur, adet) {
   if (UI.kotaBusy) return -1; UI.kotaBusy = true;
   try {
     const { r, j } = await hesapIstek("kota", { method: "POST", body: JSON.stringify({ tur, adet }) });
-    if (r.status === 401) { HESAP.user = null; HESAP.ucr = null; kotaGirisModal(); return -1; }
+    if (r.status === 401) { hesapKimlikGuncelle(null); HESAP.ucr = null; kotaGirisModal(); return -1; }
     if (r.status === 402) { HESAP.ucr = j; return 0; }
     if (!r.ok) { toast("Bağlantı kurulamadı. Birazdan tekrar dene."); return -1; }
     HESAP.ucr = j.sinirsiz ? { sinirsiz: true } : j; return j.verildi;
@@ -8468,7 +8468,7 @@ async function svBaslat(cfg) {
       const parca = adaylar.slice(i, i + ust);
       let sonuc; try { sonuc = await svIstek("oturum", { istek: cfg.svIstek + "-" + (i / ust), mod: exam ? "exam" : "practice", idler: parca.map(q => q.id) }); } catch (e) { svHataModal(cfg, "Bağlantı kurulamadı."); return; }
       const { r, j } = sonuc;
-      if (r.status === 401) { HESAP.user = null; HESAP.ucr = null; kotaGirisModal(); return; }
+      if (r.status === 401) { hesapKimlikGuncelle(null); HESAP.ucr = null; kotaGirisModal(); return; }
       if (r.status === 402) { if (i === 0) { HESAP.ucr = j.kota ? Object.assign({}, HESAP.ucr || {}, j.kota) : HESAP.ucr; kotaLimitModal(exam); return; } toast("Ücretsiz hakkın bu kadarına yetti; kalan sorular sete eklenmedi."); break; }
       if (r.status === 429) { toast("Çok sık oturum açtın. Birazdan tekrar dene."); return; }
       if (r.status === 404) { SV.kapali = true; if (i === 0) { startRunEski(cfg); return; } break; }     // V2 kapalı: eski uyumluluk akışı
@@ -8503,7 +8503,7 @@ async function svCevap(R, i, o) {
   try {
     const { r, j } = await svIstek("cevap", { oturum: q.sv, soru: q.id, secim: o });
     if (RUN !== R) return;
-    if (r.status === 401) { HESAP.user = null; kotaGirisModal(); return; }
+    if (r.status === 401) { hesapKimlikGuncelle(null); kotaGirisModal(); return; }
     if (r.status === 409 || r.status === 410) { toast("Bu oturumun süresi dolmuş. Soruyu yeni bir oturumda çöz."); return; }
     if (!r.ok || !Number.isInteger(j.a)) { toast("Cevabın kaydedilemedi. Bağlantını kontrol edip tekrar dene."); return; }
     q.a = j.a; q.x = typeof j.x === "string" ? j.x : "";
@@ -9657,8 +9657,16 @@ async function hesapIstek(path, opt) {
   let j = {}; try { j = await r.json(); } catch (e) { }
   return { r, j };
 }
+/* Hesap kimliği (HESAP.user) YALNIZ buradan değişir. Kimlik değişirse (ilk giriş, başka hesap, çıkış, hesap silme, oturum kaybı) güvenli soru havuzu + katalog önbelleği
+   temizlenir ve bekleyen katalog yüklemesi geçersiz kılınır (KHAVUZ.temizle: nesil++ ve KAT.temizle). Kimlik AYNIysa (hesap bilgisi yenileme) hazır katalog korunur, ağ isteği çıkmaz. */
+const hesapKimlikAnahtar = u => (u && u.id != null) ? "i:" + String(u.id) : (u && u.eposta) ? "e:" + String(u.eposta) : "";
+function hesapKimlikGuncelle(yeni) {
+  const once = hesapKimlikAnahtar(HESAP.user), sonra = hesapKimlikAnahtar(yeni);
+  HESAP.user = yeni || null;
+  if (once !== sonra) { try { KHAVUZ.temizle(); } catch (e) { } }
+}
 function hesapUygula(j) {
-  if (j.kullanici) HESAP.user = j.kullanici;
+  if (j.kullanici) hesapKimlikGuncelle(j.kullanici);
   if ("paket" in j) HESAP.paket = j.paket || null;
   if (j.kullanim) HESAP.kullanim = j.kullanim;
   if ("limit" in j) HESAP.limit = j.limit || null;
@@ -9678,7 +9686,7 @@ const webCol = () => ({
   doc(a) {
     return { async set(o) {
       const r = await fetch("/api/hesap/veri/" + a, { method: "PUT", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(o) });
-      if (r.status === 401) { HESAP.user = null; throw { code: "not_granted" }; }
+      if (r.status === 401) { hesapKimlikGuncelle(null); throw { code: "not_granted" }; }
       if (r.status === 413) throw { code: "invalid_argument" };
       if (r.status === 409) { setTimeout(() => { if (HESAP.user) hesapEsitle(); }, 1500); return; }
       if (!r.ok) throw { code: "network" };
@@ -9715,7 +9723,7 @@ async function hesapBenDene() {
     const { r, j } = await hesapIstek("ben", { signal: ac.signal });
     if (j.ayar) HESAP.ayar = j.ayar;
     if (r.ok) { HESAP.hata = false; hesapUygula(j); HESAP.hazir = true; return "ok"; }
-    if (r.status === 401) { HESAP.hata = false; HESAP.user = null; HESAP.paket = null; HESAP.ucr = null; AI.fn = null; AI.images = false; return "giris"; }
+    if (r.status === 401) { HESAP.hata = false; hesapKimlikGuncelle(null); HESAP.paket = null; HESAP.ucr = null; AI.fn = null; AI.images = false; return "giris"; }
     if (DEV_HOST) { HESAP.yok = true; return "yok"; } /* geliştirme önizlemesi: hesap sunucusu çalışmıyor, yerel yedek */
     HESAP.hata = true; return "hata";
   } catch (e) {
@@ -9815,9 +9823,9 @@ Object.assign(OZ_ACT, {
   async hesapTekrarDene() { if (HESAP.busy) return; HESAP.busy = true; render(); let d = "hata"; try { d = await hesapBenDene(); } finally { HESAP.busy = false; } if (d === "ok") { render(); await hesapEsitle(); sosyalBasla(); } else if (d === "hata") toast(HESAP_DOGRULANAMADI); render(); },
   girisGeri() { HESAP.adim = "eposta"; HESAP.err = ""; render(); },
   async girisTekrar() { if (HESAP.busy || !HESAP.eposta) return; HESAP.busy = true; HESAP.err = ""; render(); const { r, j } = await hesapIstek("kod-gonder", { method: "POST", body: JSON.stringify({ eposta: HESAP.eposta }) }).catch(() => ({ r: { status: 0 }, j: {} })); HESAP.busy = false; if (r.ok) toast("Yeni kod gönderildi."); else HESAP.err = hesapHata(j, r); render(); },
-  async cikis() { try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } HESAP.user = null; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
+  async cikis() { try { KHAVUZ.temizle(); } catch (e) { } try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } hesapKimlikGuncelle(null); HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
   hesapSilAsk() { openModal("Hesabın silinsin mi?", "<p>Hesabın ve hesabında saklanan tüm çalışma verilerin kalıcı olarak silinir. Bu cihazdaki kopya silinmez. Hesabına bağlı paket kodu başka hesapta kullanılamaz hâle gelir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Hesabımı sil", a: "hesapSilGo", k: "pri" }]); },
-  async hesapSilGo() { UI.modal = null; const { r } = await hesapIstek("sil", { method: "POST" }).catch(() => ({ r: { ok: false } })); if (!r.ok) { toast("Hesap silinemedi. Tekrar dene."); render(); return; } HESAP.user = null; HESAP.paket = null; cloud.col = null; cloud.state = "local"; AI.fn = null; render(); toast("Hesabın silindi."); }
+  async hesapSilGo() { UI.modal = null; const { r } = await hesapIstek("sil", { method: "POST" }).catch(() => ({ r: { ok: false } })); if (!r.ok) { toast("Hesap silinemedi. Tekrar dene."); render(); return; } hesapKimlikGuncelle(null); HESAP.paket = null; cloud.col = null; cloud.state = "local"; AI.fn = null; render(); toast("Hesabın silindi."); }
 });
 const HESAP_SUB = {
   async girisEposta(fd) {
@@ -10095,7 +10103,7 @@ async function sosYukle(k, zorla) {
     if (k === "lig" || k === "ben") await xpGonder();
     const { r, j } = await sosIstek(k);
     if (r.ok) { SOS[k] = j; SOS.err[k] = ""; }
-    else { SOS.err[k] = r.status === 401 ? "" : (j.message || "Şu an yüklenemedi. Biraz sonra tekrar dene."); if (r.status === 401 && k !== "canli") HESAP.user = null; }
+    else { SOS.err[k] = r.status === 401 ? "" : (j.message || "Şu an yüklenemedi. Biraz sonra tekrar dene."); if (r.status === 401 && k !== "canli") hesapKimlikGuncelle(null); }
   } catch (e) { SOS.err[k] = "Bağlantı kurulamadı."; }
   SOS.t[k] = Date.now(); SOS.t[k + "_b"] = 0;
   if (k === "canli") pazarOto();

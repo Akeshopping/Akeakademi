@@ -8317,7 +8317,7 @@ async function kotaIste(cfg) {
    Yarım katalog asla verilmez (yinelenen id, cursor döngüsü, eksik sayfa → tümü reddedilir). Sonuç yalnız bellekte tutulur; localStorage/sessionStorage/IndexedDB YOK.
    Bu blok sayfanın başka hiçbir değişkenine (BANK, allQ, S, HESAP…) dokunmaz. */
 const KAT = (() => {
-  const IZIN = new Set(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]), UST = new Set(["n", "bayrak", "sorular", "sonraki"]);
+  const IZIN = new Set(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]), UST = new Set(["n", "bayrak", "beklenen", "sorular", "sonraki"]);
   const ID_RE = /^[A-Za-z0-9:_.\-]{1,100}$/, LIMIT = 1000, MAX_SAYFA = 12, MAX_SORU = 5000;
   let bekleyen = null, onbellek = null, nesil = 0, tazeleGerek = false;   // nesil: temizle()/yenileme eski işleri geçersiz kılar; tazeleGerek: temizle() sonrası yüklemeler HTTP önbelleğini atlar (ağa giden her yükleme ya yenile:true ya da temizle() sonrasıdır; bayrak bu yüzden tüketilmez)
   const acik = () => { try { return window.AKE_KATALOG === true || /[?&]katalog=1(?:&|$)/.test(location.search); } catch (e) { return false; } };
@@ -8336,6 +8336,15 @@ const KAT = (() => {
     if ("p" in q) c.p = q.p; if (q.os === 1) c.os = 1; if (q.fix === 1) c.fix = 1;
     return Object.freeze(c);
   }
+  const tamS = v => Number.isSafeInteger(v) && v >= 0;
+  /* beklenen: yalnız {toplam, os, fix} — toplam tamsayı; os/fix ikisi de tamsayı ya da ikisi de null. Dönüş: { b } geçerli | { sizinti:true } fazladan alan | { bozuk:true } */
+  function beklenenDenetle(b) {
+    if (!b || typeof b !== "object" || Array.isArray(b)) return { bozuk: true };
+    const ks = Object.keys(b); if (ks.some(k => k !== "toplam" && k !== "os" && k !== "fix")) return { sizinti: true };
+    if (ks.length !== 3 || !tamS(b.toplam)) return { bozuk: true };
+    if (!((b.os === null && b.fix === null) || (tamS(b.os) && tamS(b.fix) && b.os <= b.toplam && b.fix <= b.toplam))) return { bozuk: true };
+    return { b: Object.freeze({ toplam: b.toplam, os: b.os, fix: b.fix }) };
+  }
   async function sayfaAl(limit, sonra, sinyal, tazele) {
     const yol = "/api/soru/katalog?limit=" + limit + (sonra !== null ? "&sonra=" + encodeURIComponent(sonra) : "");
     let r; try { r = await fetch(yol, { method: "GET", credentials: "same-origin", cache: tazele ? "reload" : "default", headers: { accept: "application/json" }, signal: sinyal }); }   // "reload": tarayıcının bayat HTTP önbelleğini atlar (sunucu yanıtı private, max-age=300)
@@ -8352,7 +8361,7 @@ const KAT = (() => {
   }
   async function calistir(o, tazele) {
     const limit = Number.isInteger(o.limit) && o.limit >= 1 && o.limit <= LIMIT ? o.limit : LIMIT;
-    const tum = [], idler = new Set(), gorulen = new Set(); let sonra = null, onceki = null, bayrak = null, sayfa = 0;
+    const tum = [], idler = new Set(), gorulen = new Set(); let sonra = null, onceki = null, bayrak = null, sayfa = 0, ilkBek = null, sonBek = null;
     for (;;) {
       if (sayfa >= MAX_SAYFA) return hata("cok_sayfa", "Katalog beklenenden çok sayfa istiyor; durduruldu.");
       const { h, j } = await sayfaAl(limit, sonra, o.sinyal, tazele); if (h) return h;
@@ -8360,7 +8369,19 @@ const KAT = (() => {
       if (!j || typeof j !== "object" || Array.isArray(j) || Object.keys(j).some(k => !UST.has(k))) return hata(Object.keys(j || {}).some(k => !UST.has(k)) ? "sizinti" : "bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
       if (!Array.isArray(j.sorular) || !Number.isInteger(j.n) || j.n !== j.sorular.length || (j.bayrak !== "hazir" && j.bayrak !== "eksik") || !(j.sonraki === null || typeof j.sonraki === "string")) return hata("bozuk_yanit", "Katalog yanıtı beklenen biçimde değil.");
       if (bayrak !== null && bayrak !== j.bayrak) return hata("bozuk_yanit", "Sayfalar arasında bayrak durumu tutarsız.");
-      bayrak = j.bayrak; let son = null;
+      bayrak = j.bayrak;
+      /* sunucu sözleşmesi: beklenen YALNIZ ilk ve son sayfada nesnedir (zorunlu, geçerli); ara sayfada null. Anahtar her yanıtta bulunur. */
+      if (!("beklenen" in j)) return hata("bozuk_yanit", "Katalog yanıtında beklenen alanı yok.");
+      const ucta = sayfa === 1 || j.sonraki === null;
+      if (ucta) {
+        if (j.beklenen === null) return hata("sayim_yok", "Sunucu ilk/son sayfada soru sayısını bildirmedi.");
+        const d = beklenenDenetle(j.beklenen); if (d.sizinti) return hata("sizinti", "Katalog sayımında izin dışı alan görüldü; katalog atıldı."); if (!d.b) return hata("bozuk_yanit", "Katalog sayımı beklenen biçimde değil.");
+        if (bayrak === "eksik" && d.b.os !== null) return hata("bozuk_yanit", "Bayrak eksikken os/fix sayısı verildi.");
+        if (bayrak === "hazir" && d.b.os === null) return hata("tutarsiz_sayim", "Bayrak hazırken os/fix sayısı yok.");
+        if (sayfa === 1) { if (d.b.toplam > MAX_SORU) return hata("cok_soru", "Katalog beklenenden büyük; durduruldu."); ilkBek = d.b; }
+        sonBek = d.b;
+      } else if (j.beklenen !== null) return hata("bozuk_yanit", "Ara sayfada sayım beklenmiyordu.");
+      let son = null;
       for (const q of j.sorular) {
         const c = soruTemizle(q);
         if (c && c.sizinti) return hata("sizinti", "Katalogda izin dışı alan görüldü; katalog atıldı.");
@@ -8377,12 +8398,24 @@ const KAT = (() => {
       if (son !== null && c < son) return hata("bozuk_cursor", "Sayfa imleci geriye gidiyor.");
       gorulen.add(c); onceki = c; sonra = c;
     }
+    /* sunucunun doğruladığı sayılar: ilk = son, ve toplanan gerçek soru sayısına (ve bayrak hazırsa os/fix sayısına) uymalı; uymazsa katalog KURULMAZ */
+    const gos = tum.filter(q => q.os === 1).length, gfix = tum.filter(q => q.fix === 1).length;
+    if (!ilkBek || !sonBek || ilkBek.toplam !== sonBek.toplam || ilkBek.os !== sonBek.os || ilkBek.fix !== sonBek.fix) return hata("tutarsiz_sayim", "Sayfalar arasında soru sayısı değişti.");
+    if (tum.length !== sonBek.toplam) return hata("tutarsiz_sayim", "Katalog sayımı uymuyor: " + tum.length + " / " + sonBek.toplam + " soru alındı.");
+    if (sonBek.os !== null && (gos !== sonBek.os || gfix !== sonBek.fix)) return hata("tutarsiz_sayim", "os/fix sayısı sunucunun bildirdiğiyle uyuşmuyor.");
     if (!tum.length) return hata("bos_katalog", "Katalog boş geldi.");
     if (Number.isInteger(o.beklenenToplam) && tum.length !== o.beklenenToplam) return hata("eksik_sayfa", "Katalog eksik: " + tum.length + " / " + o.beklenenToplam + " soru alındı.");
-    const os = tum.filter(q => q.os === 1).length, fix = tum.filter(q => q.fix === 1).length;
-    return Object.freeze({ ok: true, durum: "tamam", sorular: Object.freeze(tum), bayrak, bayrakHazir: bayrak === "hazir", sayim: Object.freeze({ toplam: tum.length, os, fix, sayfa }) });
+    return Object.freeze({ ok: true, durum: "tamam", sorular: Object.freeze(tum), bayrak, bayrakHazir: bayrak === "hazir", beklenen: sonBek, sayim: Object.freeze({ toplam: tum.length, os: gos, fix: gfix, sayfa }) });
   }
-  /* yukle({ limit?, beklenenToplam?, sinyal?, yenile? }) → { ok:true, sorular, bayrak, bayrakHazir, sayim } | { ok:false, durum, mesaj, sorular:[] }.
+  /* sayım tutarsızlığı/eksikliği sunucu kaynaklı geçici olabilir: EN FAZLA BİR kez yeniden denenir (HTTP önbelleği atlanarak); ikinci sonuç da bozuksa açık hata ({ denendi:2 }) ile durur — sabit sayılara DÜŞÜLMEZ */
+  const SAYIM_HATASI = new Set(["tutarsiz_sayim", "sayim_yok"]);
+  async function calistirTekrar(o, tazele) {
+    const s1 = await calistir(o, tazele);
+    if (s1.ok || !SAYIM_HATASI.has(s1.durum) || (o.sinyal && o.sinyal.aborted)) return s1;
+    const s2 = await calistir(o, true);
+    return s2.ok ? s2 : Object.assign({}, s2, { denendi: 2 });
+  }
+  /* yukle({ limit?, beklenenToplam?, sinyal?, yenile? }) → { ok:true, sorular, bayrak, bayrakHazir, beklenen:{toplam,os,fix} (sunucunun doğrulanmış sayıları), sayim } | { ok:false, durum, mesaj, sorular:[] }.
      bayrak "eksik" ise os/fix BİLİNMİYOR demektir (bayraksız soru sayılmaz). Aynı anda tek istek zinciri çalışır. */
   function yukle(o) {
     o = o || {};
@@ -8392,7 +8425,7 @@ const KAT = (() => {
     if (onbellek && !o.yenile) return Promise.resolve(kontrol(onbellek));
     if (bekleyen && !(o.yenile && !bekleyen.yenile)) return Number.isInteger(o.beklenenToplam) ? bekleyen.p.then(kontrol) : bekleyen.p;   // açık yenileme, yenilemesiz bekleyen işe KATILMAZ (onun HTTP önbelleği atlanmamış olabilir)
     const n = ++nesil, tazele = !!o.yenile || tazeleGerek, kayit = { n, yenile: !!o.yenile, p: null };   // yeni nesil: önceki bekleyen iş geçersiz olur
-    kayit.p = calistir(o, tazele).then(s => {
+    kayit.p = calistirTekrar(o, tazele).then(s => {
       if (bekleyen && bekleyen.n === n) bekleyen = null;
       if (n !== nesil) return hata("iptal", "İstek geçersiz kılındı (temizle ya da daha yeni yenileme).");   // eski iş: önbelleğe YAZAMAZ, sonucu da sunmaz
       if (s.ok) onbellek = s;
@@ -8419,9 +8452,10 @@ const KAT = (() => {
    bayrak "eksik" (bayrakHazir=false) iken os/fix BİLİNMEZ: osymElle ve fixMi durur (ok:false / null), diğer filtreler çalışır.
    Metin alanları (q, p, o, t) VERİDİR, temizlenmiş HTML DEĞİLDİR: ekranda yalnız kacisli() (fq/esc) ya da doğrudan fq()/esc() ile basılmalıdır; ham innerHTML YASAKTIR.
    Durum bağımlı süzgeçler (S.reports, S.ans) global S okumaz: ctx = { reports, ans } parametresiyle verilir (yoksa boş).
-   BAKIM NOTU: BEKLENEN (1127/52/37) sabittir; veri değişince yeni akış güvenle DURUR. Ekranlara bağlanmadan önce sayımın sunucudan (özet/#doldu) alınması ayrıca planlanmalıdır. */
+   SAYILAR: çalışma sırasında SABİT sayı YOKTUR. Beklenen toplam/os/fix, sunucunun /katalog yanıtındaki (KAT'ın doğruladığı) sayılardır; os/fix yalnız bayrak hazırsa denetlenir.
+   Çağrıda açıkça verilen beklenenToplam/beklenenOs/beklenenFix (testler için) sunucu sayısının yerine geçer. Sayım gelmez/tutarsız kalırsa (KAT bir kez yeniden dener) havuz KURULMAZ: açık hata durumu.
+   SINIR: katalog 5000 soruyu aşarsa (KAT.MAX_SORU) bu tam-havuz yüklemesi durur; daha büyük havuz için AYRI tasarım gerekir. */
 const KHAVUZ = (() => {
-  const BEKLENEN = Object.freeze({ toplam: 1127, os: 52, fix: 37 });   // gölge aşamasında doğrulanmış sayılar; çağrıda geçersiz kılınabilir
   const IZIN = Object.freeze(["id", "s", "t", "d", "p", "q", "o", "os", "fix"]);   // kabul edilen tek alan kümesi
   const SIZINTI = Object.freeze(["a", "x", "h", "rk", "govde", "json", "kaynak", "kopya_of", "cevap", "cozum"]);   // yalnız hata TÜRÜNÜ ayırır; güvenlik izin listesindedir
   const HARITA = (m => { Object.keys(m).forEach(k => Object.freeze(m[k])); return Object.freeze(m); })({
@@ -8471,26 +8505,28 @@ const KHAVUZ = (() => {
   /* yukle({ beklenenToplam?, beklenenOs?, beklenenFix?, yenile?, sinyal? }) → ozet() | { ok:false, durum, sorular:[] }
      Hazır havuz FARKLI beklenen değerlerle çağrılırsa sessizce başarılı DÖNMEZ: eldeki havuza karşı yeniden doğrulanır, uyuşmazsa 'beklenen_farkli' (havuz korunur).
      yenile:true her zaman yeni yükleme başlatır ve KAT'ta tarayıcı HTTP önbelleğini atlar. */
-  const beklenenler = o => ({ top: Number.isInteger(o.beklenenToplam) ? o.beklenenToplam : BEKLENEN.toplam, os: Number.isInteger(o.beklenenOs) ? o.beklenenOs : BEKLENEN.os, fix: Number.isInteger(o.beklenenFix) ? o.beklenenFix : BEKLENEN.fix });
+  const beklenenler = o => ({ top: Number.isInteger(o.beklenenToplam) ? o.beklenenToplam : null, os: Number.isInteger(o.beklenenOs) ? o.beklenenOs : null, fix: Number.isInteger(o.beklenenFix) ? o.beklenenFix : null });   // null = sunucunun doğrulanmış sayısı
   const ayniBek = (a, b) => a.top === b.top && a.os === b.os && a.fix === b.fix;
   const farkli = () => ({ ok: false, durum: "beklenen_farkli", mesaj: "İstenen toplam/os/fix, kurulu havuz ya da süren yükleme ile uyuşmuyor; yenile:true ile yeniden yükleyin.", sorular: [] });
   function yukle(o) {
     o = o || {};
     if (!acik()) return Promise.resolve({ ok: false, durum: "kapali_bayrak", sorular: [] });
     const e = beklenenler(o);
-    if (hazirMi() && !o.yenile) { const z = ozet(); return Promise.resolve(z.toplam === e.top && (!bayrakHazir || (z.os === e.os && z.fix === e.fix)) ? z : farkli()); }
+    if (hazirMi() && !o.yenile) { const z = ozet(); return Promise.resolve((e.top === null || z.toplam === e.top) && (!bayrakHazir || ((e.os === null || z.os === e.os) && (e.fix === null || z.fix === e.fix))) ? z : farkli()); }
     if (bekleyen && ayniBek(bekleyen.e, e) && (bekleyen.yenile || !o.yenile)) return bekleyen.p;
     if (bekleyen && !o.yenile) return Promise.resolve(farkli());
     const n = ++nesil, kayit = { n, e, yenile: !!o.yenile, p: null }; durum = "yukleniyor"; hata = null; havuz = null; bayrakHazir = false;
-    const topN = e.top, osN = e.os, fixN = e.fix;
     const iptal = () => ({ ok: false, durum: "iptal", sorular: [] });
     kayit.p = (async () => {
-      let K; try { K = await KAT.yukle({ yenile: !!o.yenile, sinyal: o.sinyal, beklenenToplam: topN }); } catch (x) { return kapat(n, "beklenmeyen_hata", "Katalog yüklenemedi."); }
+      let K; try { K = await KAT.yukle(Object.assign({ yenile: !!o.yenile, sinyal: o.sinyal }, e.top !== null ? { beklenenToplam: e.top } : {})); } catch (x) { return kapat(n, "beklenmeyen_hata", "Katalog yüklenemedi."); }
       if (n !== nesil) return iptal();   // beklerken temizle()/yeni yükleme oldu: bu iş artık geçersiz
       if (!K || K.ok !== true || !Array.isArray(K.sorular)) return kapat(n, (K && K.durum) || "beklenmeyen_hata", K && K.mesaj);
+      const sb = K.beklenen; if (!sb || !Number.isSafeInteger(sb.toplam)) return kapat(n, "sayim_yok", "Sunucunun doğruladığı soru sayısı yok; havuz kurulmadı.");
+      const topN = e.top !== null ? e.top : sb.toplam;
       if (K.sorular.length !== topN) return kapat(n, "eksik_katalog", "Katalog " + K.sorular.length + " / " + topN + " soru verdi; yeni akış durduruldu.");
       const ihlal = denetle(K.sorular); if (ihlal) return kapat(n, ihlal.hata, ihlal.mesaj);
-      if (K.bayrakHazir === true && (!K.sayim || K.sayim.os !== osN || K.sayim.fix !== fixN)) return kapat(n, "bayrak_sayim_uyusmuyor", "os/fix sayıları beklenenle uyuşmuyor.");
+      const osN = e.os !== null ? e.os : sb.os, fixN = e.fix !== null ? e.fix : sb.fix;   // bayrak hazırsa sunucu sayısı zorunludur (KAT null'ı reddeder); null kalırsa denetim geçmez
+      if (K.bayrakHazir === true && (!K.sayim || !Number.isSafeInteger(osN) || !Number.isSafeInteger(fixN) || K.sayim.os !== osN || K.sayim.fix !== fixN)) return kapat(n, "bayrak_sayim_uyusmuyor", "os/fix sayıları beklenenle uyuşmuyor.");
       let yeni; try { yeni = normalle(K.sorular); } catch (x) { return kapat(n, "bozuk_soru", "Havuz kurulamadı."); }
       if (n !== nesil) return iptal();
       havuz = yeni; bayrakHazir = K.bayrakHazir === true; durum = "hazir";

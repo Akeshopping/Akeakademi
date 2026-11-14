@@ -17,7 +17,7 @@ const srv = http.createServer(async (q, r) => {
   if (f === "/api/soru/katalog") {
     D.katalogIstek++; if (!kul) return js(r, 401, {});
     if (D.tut[kul]) await D.tut[kul].kapi;   // bekleyen yükleme: test serbest bırakana kadar yanıt gelmez
-    return js(r, 200, { n: N, bayrak: "hazir", sorular: veri(kul), sonraki: null });
+    { const l = veri(kul); return js(r, 200, { n: N, bayrak: "hazir", beklenen: { toplam: l.length, os: l.filter(q => q.os === 1).length, fix: l.filter(q => q.fix === 1).length }, sorular: l, sonraki: null }); }
   }
   if (f === "/api/hesap/ben") { D.benIstek++; if (!kul || D.benDurum === 401) return js(r, 401, { error: "giris" }); return js(r, 200, { kullanici: { id: kul, eposta: kul + "@x.test", ad: "" }, paket: null, ucretsiz: null, ayar: { google: false, eposta: true } }); }
   if (f === "/api/hesap/veri") return js(r, 200, { alanlar: {} });

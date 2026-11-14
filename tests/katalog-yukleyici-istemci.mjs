@@ -23,7 +23,7 @@ async function ac(url, { mod = "ok", bekle = 1500, beklenenKat = true } = {}) {
       if (mod === "500") return r.fulfill({ status: 500, contentType: "application/json", body: "{}" });
       const limit = +u.searchParams.get("limit"), sonra = u.searchParams.get("sonra"), kalanlar = SOR.filter(q => sonra === null || q.id > sonra), devam = kalanlar.length > limit, sayfa = devam ? kalanlar.slice(0, limit) : kalanlar;
       const sorular = mod === "sizinti" ? sayfa.map((q, i) => i === 3 ? { ...q, a: 2, x: "SIRRI-COZUM" } : q) : sayfa;
-      return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ n: sorular.length, bayrak: "hazir", sorular, sonraki: devam ? sayfa[sayfa.length - 1].id : null }) });
+      return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ n: sorular.length, bayrak: "hazir", beklenen: (sonra === null || !devam) ? { toplam: SOR.length, os: SOR.filter(q => q.os === 1).length, fix: SOR.filter(q => q.fix === 1).length } : null, sorular, sonraki: devam ? sayfa[sayfa.length - 1].id : null }) });
     }
     if (u.pathname.startsWith("/api/")) return r.fulfill({ status: 404, contentType: "application/json", body: "{}" });
     return r.continue();

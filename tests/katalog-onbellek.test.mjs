@@ -18,7 +18,7 @@ function kur(ilkN = 20) {
     const kay = { yol, init, surum: S.surum, n: S.n, oturum: S.oturum, coz: null, sira: S.cagri.length }; S.cagri.push(kay);   // anlık görüntü
     if (S.tut && S.tut(kay)) await new Promise(r => { kay.coz = r; });
     if (!kay.oturum) return yanit(401, {}); if (kay.hata500) return yanit(500, {});
-    const liste = veri(kay.surum, kay.n); return yanit(200, { n: liste.length, bayrak: "hazir", sorular: liste, sonraki: null }); };
+    const liste = veri(kay.surum, kay.n); return yanit(200, { n: liste.length, bayrak: "hazir", beklenen: { toplam: liste.length, os: liste.filter(q => q.os === 1).length, fix: liste.filter(q => q.fix === 1).length }, sorular: liste, sonraki: null }); };
   const esc = s => String(s), fq = esc;
   const { KAT, KHAVUZ } = new Function("fetch", "window", "location", "esc", "fq", BLOK + "\nreturn { KAT, KHAVUZ };")(S.fetch, { AKE_KATALOG: true, AKE_KATALOG_HAVUZ: true }, { search: "" }, esc, fq);
   return { S, KAT, KHAVUZ };
@@ -74,8 +74,9 @@ const surumler = H => new Set(["mat", "turkce"].flatMap(s => H.poolOf(s).sorular
     if (hazir && S.cagri.length && !S.cagri.some(c => "v" + c.surum === surum)) hataSay++; }
   t(`5f ${sayi} rastgele yükle/yenile/temizle/tamamla dizisinde: içerik karışmaz, son işlem temizle ise havuz ve KAT önbelleği boş`, sayi === 150 && hataSay === 0, hataSay); }
 /* 6) farklı beklenen toplam / os / fix */
-{ const { S, KHAVUZ: H } = kur(20); await H.yukle(bek(20)); const n0 = S.cagri.length; const tek = [["toplam", bek(19)], ["os", bek(20, { beklenenOs: OS + 1 })], ["fix", bek(20, { beklenenFix: FIX + 1 })], ["varsayılan 1127/52/37", {}]];
+{ const { S, KHAVUZ: H } = kur(20); await H.yukle(bek(20)); const n0 = S.cagri.length; const tek = [["toplam", bek(19)], ["os", bek(20, { beklenenOs: OS + 1 })], ["fix", bek(20, { beklenenFix: FIX + 1 })]];
   for (const [ad, o] of tek) { const r = await H.yukle(o); t(`6 hazır havuz, farklı ${ad} → 'beklenen_farkli' (ok:false), ağ isteği yok, havuz korunur`, r.ok === false && r.durum === "beklenen_farkli" && S.cagri.length === n0 && H.durumu().ok, JSON.stringify(r)); }
+  const varsayilan = await H.yukle({}); t("6g beklenen verilmedi: sabit 1127/52/37 YOK; kurulu havuz sunucunun doğruladığı sayılarla kabul edilir, ağ isteği yok", varsayilan.ok === true && varsayilan.toplam === 20 && S.cagri.length === n0, JSON.stringify(varsayilan));
   const ayni = await H.yukle(bek(20)); t("6a aynı beklenenle çağrı başarılı ve ağ isteği yok", ayni.ok && S.cagri.length === n0);
   const yen = await H.yukle(bek(19, { yenile: true })); t("6b farklı beklenen + yenile:true → yeniden doğrulanır (ağ isteği) ve sayı uyuşmadığı için DURUR", yen.ok === false && (yen.durum === "eksik_sayfa" || yen.durum === "eksik_katalog") && S.cagri.length === n0 + 1 && H.poolOf("mat").ok === false, JSON.stringify(yen)); }
 { const { S, KHAVUZ: H } = kur(20); S.tut = k => true; const a = H.yukle(bek(20)); await tik(); const b = await H.yukle(bek(19)); t("6c süren yüklemeye FARKLI beklenenle katılınmaz ('beklenen_farkli'); süren yükleme etkilenmez", b.durum === "beklenen_farkli" && S.cagri.length === 1); S.cagri[0].coz(); t("6d süren yükleme yine de tamamlanır", (await a).ok); }

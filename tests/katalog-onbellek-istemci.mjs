@@ -11,7 +11,7 @@ const srv = http.createServer((q, r) => { const u = new URL(q.url, "http://x"), 
   if (f === "/" || f === "/index.html") { r.setHeader("content-type", "text/html; charset=utf-8"); return r.end(YENI); }
   if (f === "/api/soru/katalog") { D.katalogIstek++; D.basliklar.push({ cc: q.headers["cache-control"] || "", pragma: q.headers["pragma"] || "" });
     const kul = ((q.headers.cookie || "").match(/(?:^|;\s*)oturum=([^;]+)/) || [])[1]; if (!kul) { r.statusCode = 401; r.setHeader("content-type", "application/json"); r.setHeader("cache-control", "no-store"); return r.end("{}"); }
-    const l = veri(D.surum, kul); r.setHeader("content-type", "application/json"); r.setHeader("cache-control", D.cc); return r.end(JSON.stringify({ n: l.length, bayrak: "hazir", sorular: l, sonraki: null })); }
+    const l = veri(D.surum, kul); r.setHeader("content-type", "application/json"); r.setHeader("cache-control", D.cc); return r.end(JSON.stringify({ n: l.length, bayrak: "hazir", beklenen: { toplam: l.length, os: l.filter(q => q.os === 1).length, fix: l.filter(q => q.fix === 1).length }, sorular: l, sonraki: null })); }
   if (f.startsWith("/api/")) { r.statusCode = 404; r.setHeader("content-type", "application/json"); return r.end("{}"); }
   r.statusCode = 404; r.end(""); });
 await new Promise(ok => srv.listen(0, "127.0.0.1", ok)); const URL0 = "http://127.0.0.1:" + srv.address().port + "/";

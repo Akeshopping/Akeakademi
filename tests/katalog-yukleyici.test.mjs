@@ -22,6 +22,7 @@ const OS = SORULAR.filter(q => q.os).length, FIX = SORULAR.filter(q => q.fix).le
 
 const yanit = (durum, govde, baslik = {}) => ({ status: durum, ok: durum >= 200 && durum < 300, headers: { get: k => baslik[String(k).toLowerCase()] ?? null }, json: async () => { if (govde === "BOZUK") throw new SyntaxError("x"); return govde; } });
 /* sahte sunucu: katalog'un gerçek keyset davranışı. ayar: { bayrak, sorular, degistir(sayfaNo, govde) , durum } */
+const bek = (l, bayrak) => ({ toplam: l.length, os: bayrak === "hazir" ? l.filter(q => q.os === 1).length : null, fix: bayrak === "hazir" ? l.filter(q => q.fix === 1).length : null });
 function sunucu(ayar = {}) {
   const cagrilar = []; let sayfaNo = 0; const liste = ayar.sorular || SORULAR;
   const fetch = async (yol, init = {}) => {
@@ -32,7 +33,7 @@ function sunucu(ayar = {}) {
     if (ayar.durum) { const d = typeof ayar.durum === "function" ? ayar.durum(sayfaNo) : ayar.durum; if (d) { sayfaNo++; return d; } }
     const limit = +u.searchParams.get("limit"), sonra = u.searchParams.get("sonra");
     const kalanlar = liste.filter(q => sonra === null || q.id > sonra), devam = kalanlar.length > limit, sayfa = devam ? kalanlar.slice(0, limit) : kalanlar;
-    let govde = { n: sayfa.length, bayrak: ayar.bayrak || "hazir", sorular: sayfa.map(q => ({ ...q, o: q.o.slice() })), sonraki: devam ? sayfa[sayfa.length - 1].id : null };
+    let govde = { n: sayfa.length, bayrak: ayar.bayrak || "hazir", beklenen: (sonra === null || !devam) ? bek(liste, ayar.bayrak || "hazir") : null, sorular: sayfa.map(q => ({ ...q, o: q.o.slice() })), sonraki: devam ? sayfa[sayfa.length - 1].id : null };
     if (ayar.degistir) govde = ayar.degistir(sayfaNo, govde) || govde;
     sayfaNo++; return yanit(200, govde);
   };
@@ -92,16 +93,18 @@ await durumDene("13e bozuk JSON → bozuk_yanit", yanit(200, "BOZUK"), "bozuk_ya
 { const s = sunucu({ degistir: (n, g) => { if (n === 0) g.sorular[1] = { ...g.sorular[0] }; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("16 sayfa İÇİNDE yinelenen id → yinelenen_id, boş sonuç", !r.ok && r.durum === "yinelenen_id" && r.sorular.length === 0); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 1) { g.sorular[0] = { ...SORULAR[5], o: SORULAR[5].o.slice() }; } return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("17 sayfalar ARASI yinelenen id → reddedilir (yinelenen_id ya da bozuk_siralama), boş sonuç", !r.ok && ["yinelenen_id", "bozuk_siralama"].includes(r.durum) && r.sorular.length === 0, r.durum); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 0) g.sonraki = "syn0999"; return g; } }); const sd = { ...s }; let say = 0;
-  const K = kur(async (yol, i) => { say++; const r = await s.fetch(yol, i); const j = await r.json(); if (say > 1) { j.sonraki = "syn0999"; j.sorular = []; j.n = 0; } return yanit(200, j); }); const r = await K.yukle();
+  const K = kur(async (yol, i) => { say++; const r = await s.fetch(yol, i); const j = await r.json(); if (say > 1) { j.sonraki = "syn0999"; j.sorular = []; j.n = 0; j.beklenen = null; } return yanit(200, j); }); const r = await K.yukle();
   t("18 cursor DÖNGÜSÜ (aynı imleç tekrar) → cursor_dongusu, sonsuz istek yok", !r.ok && r.durum === "cursor_dongusu" && say <= 3 && r.sorular.length === 0, dizge(r)); }
-{ let say = 0; const K = kur(async () => { say++; return yanit(200, { n: 0, bayrak: "hazir", sorular: [], sonraki: "syn" + String(1000 + say).padStart(4, "0") }); }); const r = await K.yukle();
+{ let say = 0; const K = kur(async () => { say++; return yanit(200, { n: 0, bayrak: "hazir", beklenen: say === 1 ? { toplam: 0, os: 0, fix: 0 } : null, sorular: [], sonraki: "syn" + String(1000 + say).padStart(4, "0") }); }); const r = await K.yukle();
   t("19 sonsuz ilerleyen imleç → cok_sayfa ile durur (en fazla 12 istek)", !r.ok && r.durum === "cok_sayfa" && say === 12 && r.sorular.length === 0, say + " " + r.durum); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 0) g.sonraki = "bozuk imleç!"; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("20 bozuk imleç biçimi → bozuk_cursor", !r.ok && r.durum === "bozuk_cursor" && r.sorular.length === 0); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 0) g.sonraki = "syn0001"; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("20b imleç son sorunun GERİSİNDE → bozuk_cursor", !r.ok && r.durum === "bozuk_cursor"); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 0) g.sonraki = 5; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("20c imleç string değil → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit"); }
-{ const s = sunucu({ degistir: (n, g) => { if (n === 1) { g.sorular = g.sorular.slice(0, 100); g.n = 100; g.sonraki = null; } return g; } }), K = kur(s.fetch); const r = await K.yukle({ beklenenToplam: 1127 });
-  t("21 EKSİK SAYFA (ozet toplamı ile uyuşmaz) → eksik_sayfa, kısmi katalog verilmez", !r.ok && r.durum === "eksik_sayfa" && r.sorular.length === 0, dizge(r).slice(0, 200)); }
-{ const s = sunucu({ degistir: (n, g) => { if (n === 0) { g.sonraki = null; } return g; } }), K = kur(s.fetch); const r = await K.yukle({ beklenenToplam: 1127 }); t("21b sunucu erken 'bitti' derse (1000/1127) → eksik_sayfa", !r.ok && r.durum === "eksik_sayfa"); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sorular[0] && g.sorular[0].id !== "syn0000") { g.sorular = g.sorular.slice(0, 100); g.n = 100; g.sonraki = null; } return g; } }), K = kur(s.fetch); const r = await K.yukle({ beklenenToplam: 1127 });
+  t("21 EKSİK SAYFA (sunucu 1127 diyor, 1100 geldi) → tutarsiz_sayim, bir yeniden deneme, kısmi katalog verilmez", !r.ok && r.durum === "tutarsiz_sayim" && r.denendi === 2 && r.sorular.length === 0 && s.cagrilar.length === 4, dizge(r).slice(0, 200)); }
+{ const s = sunucu({ sorular: SORULAR.slice(0, 1100) }), K = kur(s.fetch); const r = await K.yukle({ beklenenToplam: 1127 });
+  t("21a sunucu tutarlı (1100) ama çağıranın açık beklenenToplam değeri 1127 → eksik_sayfa (yeniden deneme yok)", !r.ok && r.durum === "eksik_sayfa" && r.sorular.length === 0 && s.cagrilar.length === 2, dizge(r).slice(0, 160)); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sonraki !== null) g.sonraki = null; return g; } }), K = kur(s.fetch); const r = await K.yukle({ beklenenToplam: 1127 }); t("21b sunucu erken 'bitti' derse (1000/1127) → tutarsiz_sayim", !r.ok && r.durum === "tutarsiz_sayim" && r.sorular.length === 0); }
 { const s = sunucu({ sorular: [] }), K = kur(s.fetch); const r = await K.yukle(); t("21c boş katalog → bos_katalog", !r.ok && r.durum === "bos_katalog"); }
 { const s = sunucu({ degistir: (n, g) => { g.n = g.n + 1; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("22 n ile sorular.length uyuşmaz → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit"); }
 { const s = sunucu({ degistir: (n, g) => { if (n === 1) g.bayrak = "eksik"; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("22b sayfalar arası bayrak tutarsız → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit"); }
@@ -124,5 +127,38 @@ for (const alan of ["a", "x", "h", "rk", "govde", "json", "kaynak", "kopya_of", 
   t("28 blok BANK, allQ, EKQ, localStorage, sessionStorage, indexedDB, LS., /sorular/ , 'ake.' içermez", !/\b(BANK|allQ|EKQ|S\.aiQs)\b|localStorage|sessionStorage|indexedDB|\bLS\.|\/sorular\/|"ake\./.test(BLOK.replace(/\/\*[\s\S]*?\*\//g, "")), "yorum dışı kodda yasaklı ad var");
   t("29 blokta başka uç noktası yok: yalnız '/api/soru/katalog'", [...BLOK.matchAll(/\/api\/[a-z\/]+/g)].every(m => m[0] === "/api/soru/katalog")); }
 { const s = sunucu({ durum: yanit(500, {}) }), K = kur(s.fetch); const r = await K.yukle(); t("30 hata durumunda BANK'a düşülmez: kapsamda BANK yok ve sonuç boş (ReferenceError oluşmadı)", !r.ok && r.sorular.length === 0 && typeof r.durum === "string"); }
+
+/* ---- 3B-5: sunucu sayım sözleşmesi (beklenen) ---- */
+{ const s = sunucu(), K = kur(s.fetch); const r = await K.yukle();
+  t("31 normal: ilk/son sayfa beklenen nesnesi, ara sayfa null; sonuç beklenen = {1127,52,37}", r.ok && r.beklenen && r.beklenen.toplam === 1127 && r.beklenen.os === 52 && r.beklenen.fix === 37 && r.sayim.os === 52, dizge(r.beklenen)); }
+{ const s = sunucu(), K = kur(s.fetch); const r = await K.yukle({ limit: 300 });
+  t("32 4 sayfa: ara sayfalarda null kabul edilir", r.ok && r.sayim.sayfa === 4 && r.sorular.length === 1127, dizge(r.sayim || r)); }
+{ const s = sunucu({ degistir: (n, g) => { if (n === 1) g.beklenen = { toplam: 1127, os: 52, fix: 37 }; return g; } }), K = kur(s.fetch); const r = await K.yukle({ limit: 300 });
+  t("33 ARA sayfada beklenen nesnesi → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit" && r.sorular.length === 0, dizge(r).slice(0, 120)); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sorular[0] && g.sorular[0].id === "syn0000") g.beklenen = null; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("34 İLK sayfada beklenen null → sabit sayıya DÜŞMEZ: bir yeniden deneme, sonra açık hata sayim_yok (denendi:2)", !r.ok && r.durum === "sayim_yok" && r.denendi === 2 && r.sorular.length === 0 && s.cagrilar.length === 2, dizge(r).slice(0, 160) + " çağrı=" + s.cagrilar.length); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sonraki === null) g.beklenen = null; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("35 SON sayfada beklenen null → sayim_yok (denendi:2)", !r.ok && r.durum === "sayim_yok" && r.denendi === 2, dizge(r).slice(0, 120)); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sonraki === null) g.beklenen = { ...g.beklenen, toplam: 1126 }; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("36 ilk ≠ son sayım → tutarsiz_sayim, kurulmaz", !r.ok && r.durum === "tutarsiz_sayim" && r.sorular.length === 0, dizge(r).slice(0, 120)); }
+{ const s = sunucu({ degistir: (n, g) => { if (g.sonraki === null) g.beklenen = { toplam: 1127, os: 51, fix: 37 }; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("37 os ilk ≠ son → tutarsiz_sayim", !r.ok && r.durum === "tutarsiz_sayim"); }
+{ const s = sunucu({ degistir: (n, g) => { g.beklenen = { toplam: 1127, os: 53, fix: 37 }; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("38 ilk=son ama os gerçek işaret sayısına uymaz → tutarsiz_sayim", !r.ok && r.durum === "tutarsiz_sayim"); }
+{ const s = sunucu({ degistir: (n, g) => { g.beklenen = { ...g.beklenen, toplam: 1128 }; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("39 ilk=son ama toplam gerçek soru sayısına uymaz → tutarsiz_sayim", !r.ok && r.durum === "tutarsiz_sayim"); }
+{ let say = 0; const s = sunucu({ degistir: (n, g) => { if (++say <= 2) g.beklenen = g.beklenen && n === 0 ? { ...g.beklenen, toplam: 1126 } : g.beklenen; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+  t("40 tutarsızlık geçiciyse tek yeniden denemede kurulur (ikinci tarama temiz)", r.ok && r.sorular.length === 1127 && s.cagrilar.length === 4, dizge(r.sayim || r) + " çağrı=" + s.cagrilar.length); }
+{ for (const [ad, b] of [["fazla anahtar", { toplam: 1127, os: 52, fix: 37, a: 1 }], ["cevap alanı", { toplam: 1127, os: 52, fix: 37, x: "SIRRI-COZUM" }]]) { const s = sunucu({ degistir: (n, g) => { g.beklenen = b; return g; } }), K = kur(s.fetch); const r = await K.yukle();
+    t("41 beklenen içinde " + ad + " → sizinti, katalog atılır (yeniden deneme yok)", !r.ok && r.durum === "sizinti" && r.sorular.length === 0 && s.cagrilar.length === 1 && !sizdirdiMi(r)); } }
+{ for (const [ad, b] of [["negatif", { toplam: -1, os: null, fix: null }], ["kesir", { toplam: 1.5, os: null, fix: null }], ["metin", { toplam: "1127", os: 52, fix: 37 }], ["yalnız os null", { toplam: 1127, os: null, fix: 37 }], ["os>toplam", { toplam: 1127, os: 2000, fix: 37 }], ["eksik anahtar", { toplam: 1127, os: 52 }], ["dizi", [1127, 52, 37]], ["metin nesnesi", "1127"]]) {
+    const s = sunucu({ degistir: (n, g) => { g.beklenen = b; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("42 geçersiz beklenen (" + ad + ") → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit" && r.sorular.length === 0, dizge(r).slice(0, 100)); } }
+{ const s = sunucu({ degistir: (n, g) => { delete g.beklenen; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("43 beklenen anahtarı hiç yok → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit"); }
+{ const s = sunucu({ bayrak: "eksik" }), K = kur(s.fetch); const r = await K.yukle(); t("44 bayrak eksik: os/fix null kabul edilir, bayrakHazir=false, toplam doğrulanır", r.ok && r.bayrakHazir === false && r.beklenen.os === null && r.beklenen.toplam === 1127); }
+{ const s = sunucu({ bayrak: "eksik", degistir: (n, g) => { g.beklenen = { toplam: 1127, os: 52, fix: 37 }; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("45 bayrak eksikken os/fix sayısı verilirse → bozuk_yanit", !r.ok && r.durum === "bozuk_yanit"); }
+{ const s = sunucu({ degistir: (n, g) => { g.beklenen = { ...g.beklenen, os: null, fix: null }; return g; } }), K = kur(s.fetch); const r = await K.yukle(); t("46 bayrak hazırken os/fix null → tutarsiz_sayim (bir yeniden deneme)", !r.ok && r.durum === "tutarsiz_sayim" && r.denendi === 2); }
+{ const buyuk = Array.from({ length: 5001 }, (_, i) => ({ ...SORULAR[i % SORULAR.length], id: "bg" + String(i).padStart(5, "0") })), s = sunucu({ sorular: buyuk }), K = kur(s.fetch); const r = await K.yukle();
+  t("47 ilk sayfada toplam > 5000 → cok_soru, ilk istekte durur", !r.ok && r.durum === "cok_soru" && s.cagrilar.length === 1, dizge(r).slice(0, 100) + " çağrı=" + s.cagrilar.length); }
+{ const s = sunucu({ sorular: SORULAR.slice(0, 5) }), K = kur(s.fetch); const r = await K.yukle(); t("48 tek sayfalık katalog: ilk=son aynı nesne, tek istek", r.ok && r.sorular.length === 5 && s.cagrilar.length === 1 && r.beklenen.toplam === 5); }
 
 console.log(`\n${gecen} geçti, ${kalan} kaldı`); process.exit(kalan ? 1 : 0);

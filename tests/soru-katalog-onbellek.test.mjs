@@ -23,7 +23,7 @@ test("1) girişli katalog GET: 200 ve Cache-Control tam olarak 'private, no-stor
   do { const r = await kat(k, "?limit=25" + (sonra ? "&sonra=" + encodeURIComponent(sonra) : "")); assert.equal(r.s, 200); assert.equal(cc(r), "private, no-store"); assert.ok(!/max-age|public/.test(cc(r))); assert.ok(r.j.sorular.length > 0); sonra = r.j.sonraki; sayfa++; } while (sonra && sayfa < 5);
   assert.ok(sayfa >= 2, "birden çok sayfa denendi");
   const r = await kat(k); assert.equal(r.s, 200); assert.equal(cc(r), "private, no-store");
-  assert.ok(Object.keys(r.j).every(a => ["n", "bayrak", "sorular", "sonraki"].includes(a)), "gövdede kullanıcıya özel alan yok"); for (const q of r.j.sorular.slice(0, 30)) assert.ok(Object.keys(q).every(a => SORU_ANAHTARLARI.has(a)));
+  assert.ok(Object.keys(r.j).every(a => ["n", "bayrak", "beklenen", "sorular", "sonraki"].includes(a)), "gövdede kullanıcıya özel alan yok"); assert.deepEqual(Object.keys(r.j.beklenen).sort(), ["fix", "os", "toplam"], "beklenen: yalnız üç sayı (kullanıcıya özel değil; tüm kullanıcılar için aynı)"); for (const q of r.j.sorular.slice(0, 30)) assert.ok(Object.keys(q).every(a => SORU_ANAHTARLARI.has(a)));
 });
 test("2) diğer uçların davranışı DEĞİŞMEDİ: özet/oturum hataları 'private, no-store'; eski /api/sorular 'public, max-age=300'", async () => {
   const k = await yeni();

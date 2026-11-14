@@ -7954,6 +7954,43 @@ function reviewItem(q, i) {
 }
 
 /* ---------- Soru bankası ---------- */
+/* ---- #banka KATALOG KAYNAĞI (güvenli mod: window.AKE_KATALOG_BANKA === true) ----
+   Açıkken liste/sayı/konu/filtre/başlatma YALNIZ KHAVUZ'un (katalog) sonucundan gelir; BANK, allQ, EKQ, S.aiQs'ye geri dönüş YOKTUR.
+   Hazır değilse (yükleniyor / giriş gerekli / katalog kapalı-bozuk / hesap değişti) açık durum gösterilir; eski soru listelenmez ya da başlatılmaz.
+   Eski bankFiltered() S.reports elemesi YAPMAZ; güvenli mod da yapmaz (yeni davranış eklenmedi). Süzgeçler (ders/konu/seviye/arama/S.ans) KHAVUZ.bankFiltered ile aynı anlamdadır; AI kaynağı bu modda yoktur. */
+const SV_N = { n: 0 };   /* sunucu soru işlemi (oturum/cevap) nesli: ACT.cikis başlarken artar; flush()/OT.nesil'den BAĞIMSIZDIR. Çıkış sonradan başarısız olsa da önceki işlemler yeniden geçerli olmaz. */
+const BK = { n: 0, d: "bos", kod: "", kimlik: "", cikis: false };   // cikis: ACT.cikis başladı ve oturum henüz temizlenmedi → yeniden yükleme YOK, liste YOK   // d: bos | yukleniyor | hazir | hata
+function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (bankaGuvenliMi()) queueMicrotask(() => { try { if (route() === "banka") render(); } catch (e) { } }); }
+function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata" | "cikis"
+  if (BK.cikis) return "cikis";
+  if (!HESAP.hazir) return "yukleniyor";
+  if (HESAP.hata) return "hata";
+  if (!HESAP.user) return "giris";
+  if (BK.d === "hazir" && (BK.kimlik !== hesapKimlikAnahtar(HESAP.user) || !KHAVUZ.durumu().ok)) { BK.d = "bos"; BK.n++; }   // hesap/havuz uyuşmuyor: eski sonuç kullanılmaz
+  if (BK.d === "hazir") return "hazir";
+  if (BK.d === "hata") return /^kapali/.test(BK.kod) ? "kapali" : "hata";
+  return "yukleniyor";
+}
+function bankaYukle(yenile) {
+  if (BK.cikis) return;
+  const n = ++BK.n, k = hesapKimlikAnahtar(HESAP.user); BK.d = "yukleniyor"; BK.kod = ""; BK.kimlik = k;
+  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (route() === "banka") render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
+  KHAVUZ.yukle(yenile ? { yenile: true } : {}).then(r => bitti(r && r.ok ? "hazir" : "hata", r && r.durum), () => bitti("hata", "beklenmeyen_hata"));
+}
+function bankaHazirDegil() { if (bankaDurum() === "giris") kotaGirisModal(); else toast("Soru kataloğu hazır değil."); }
+function bankaListe() {
+  if (bankaDurum() !== "hazir") return [];
+  const r = KHAVUZ.bankFiltered(Object.assign({}, UI.bank, { src: "" }), { ans: S.ans });
+  return r && r.ok ? r.sorular : [];
+}
+function bankaDurumGorunumu(d) {
+  if (d === "yukleniyor" && HESAP.hazir && !HESAP.hata && HESAP.user && BK.d === "bos") bankaYukle(false);
+  const M = { yukleniyor: ["Soru kataloğu yükleniyor…", ""], giris: ["Soru bankasını görmek için giriş yap", `<button class="btn pri" data-a="bankaGiris">Giriş yap</button>`],
+    cikis: ["Çıkış yapılıyor…", ""], kapali: ["Soru bankası şu an kapalı", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`], hata: ["Soru kataloğu yüklenemedi", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`] }[d] || ["Soru kataloğu yükleniyor…", ""];
+  return `<div class="view"><div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1></div>${subTabs(SORU_TABS, "banka")}
+  <div class="card stack" data-banka-durum="${d}"><div class="empty">${M[0]}</div>${M[1] ? `<div class="row">${M[1]}</div>` : ""}</div></div>`;
+}
+function bankListesi() { return bankaGuvenliMi() ? bankaListe() : bankFiltered(); }   /* ekran çağrıları buradan geçer; eski bankFiltered() aynen durur (gölge testleri onu ayrı çalıştırır) */
 function bankFiltered() {
   const B = UI.bank, needle = B.q.trim().toLocaleLowerCase("tr");
   return allQ().filter(q => (!B.s || q.s === B.s) && (!B.t || q.t === B.t) && (!B.d || q.d === B.d) && (!B.src || (B.src === "ai" ? q.src === "ai" : q.src !== "ai"))
@@ -7961,17 +7998,18 @@ function bankFiltered() {
     && (!needle || (q.q + " " + (q.p || "") + " " + q.t).toLocaleLowerCase("tr").includes(needle)));
 }
 function bankList() {
-  const list = bankFiltered(), shown = list.slice(0, UI.bank.lim);
+  const list = bankListesi(), shown = list.slice(0, UI.bank.lim);
   if (!list.length) return `<div class="empty">Bu filtrelerle soru bulunamadı.</div>`;
   return `<div class="list">${shown.map(q => { const a = S.ans[q.id], st = !a ? "" : a[4] === 1 ? `<span class="pill ok">Doğru</span>` : `<span class="pill bad">Yanlış</span>`;
-    return `<div class="li"><div class="grow"><div class="t">${esc(q.q.length > 140 ? q.q.slice(0, 140) + "…" : q.q)}</div><div class="s">${esc(SUBJ[q.s].n)} · ${esc(q.t)} · ${DIFF[q.d]}${q.src === "ai" ? " · AI, çift kontrollü" : ""}</div></div>${st}<button class="btn sm" data-a="bankOne" data-id="${q.id}">Çöz</button></div>`; }).join("")}</div>
+    return `<div class="li"><div class="grow"><div class="t">${esc(q.q.length > 140 ? q.q.slice(0, 140) + "…" : q.q)}</div><div class="s">${esc(SUBJ[q.s] ? SUBJ[q.s].n : q.s)} · ${esc(q.t)} · ${DIFF[q.d]}${q.src === "ai" ? " · AI, çift kontrollü" : ""}</div></div>${st}<button class="btn sm" data-a="bankOne" data-id="${q.id}">Çöz</button></div>`; }).join("")}</div>
     ${list.length > shown.length ? `<button class="btn ghost wide" data-a="bankMore">${list.length - shown.length} soru daha göster</button>` : ""}`;
 }
 function vBank() {
-  const B = UI.bank, tops = B.s ? topicsOf(B.s).filter(t => t.n) : [], list = bankFiltered();
-  const ai = S.aiQs.length;
+  const G = bankaGuvenliMi(), dur = G ? bankaDurum() : "hazir"; if (dur !== "hazir") return bankaDurumGorunumu(dur);
+  const B = UI.bank, tops = B.s ? (G ? KHAVUZ.topicsOf(B.s).konular : topicsOf(B.s)).filter(t => t.n) : [], list = bankListesi();
+  const ai = G ? 0 : S.aiQs.length, bankN = G ? KHAVUZ.durumu().toplam : BANK.length;
   return `<div class="view">
-  <div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1><p>${BANK.length} özgün, çözümü yazılmış soru${ai ? ` ve senin ürettiğin ${ai} AI sorusu` : ""}. Denemelerde ve Çalışma stüdyosunda bunlara ek olarak her seferinde yeni sayılarla üretilen sorular da gelir; gördüğün soru tekrar karşına çıkmaz.</p></div>
+  <div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1><p>${bankN} özgün, çözümü yazılmış soru${ai ? ` ve senin ürettiğin ${ai} AI sorusu` : ""}. Denemelerde ve Çalışma stüdyosunda bunlara ek olarak her seferinde yeni sayılarla üretilen sorular da gelir; gördüğün soru tekrar karşına çıkmaz.</p></div>
   ${subTabs(SORU_TABS, "banka")}
   <div class="card stack">
     <div class="fields">
@@ -8267,9 +8305,19 @@ function startRun(cfg) {
       [{ l: "Vazgeç", a: "modalClose" }, { l: "Eskisine devam et", a: "resume" }, { l: "Yenisini başlat", a: "runReplace", k: "pri" }]);
     return;
   }
+  if (cfg.bankaGuvenli) { bankaGuvenliBaslat(cfg); return; }   /* #banka güvenli modu (AKE_KATALOG_BANKA): yerel çözüm yolu yok */
   if (!cfg.canli && svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
   if (!cfg.canli && ucretsizMi()) { kotaIste(cfg); return; }
   baslatRun(cfg);
+}
+/* #banka güvenli modu: yalnız bankOne/bankAll bu işareti koyar (bayrak: window.AKE_KATALOG_BANKA === true). Başlık metnine bakılmaz; diğer startRun çağıranları etkilenmez.
+   Bu mod açıkken sunucu oturumu açılamazsa yerel (cevaplı) set ASLA açılmaz: giriş gerekiyorsa giriş modalı, değilse açık hata gösterilir. */
+const bankaGuvenliMi = () => window.AKE_KATALOG_BANKA === true;
+const bankaCfg = cfg => bankaGuvenliMi() ? Object.assign({}, cfg, { bankaGuvenli: true }) : cfg;
+function bankaGuvenliBaslat(cfg) {
+  if (svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
+  if (HESAP.hazir && !HESAP.hata && !HESAP.user) { kotaGirisModal(); return; }
+  openModal("Sorular şu an açılamadı", `<p>Bu sorular yalnız sunucu üzerinden açılır ve şu an ulaşılamıyor. Lütfen biraz sonra tekrar dene.</p>`, [{ l: "Tamam", a: "modalClose", k: "pri" }]);
 }
 /* Ücretsiz pakette soru/deneme başlatmadan önce hak ayrılır. Giriş yalnızca bu işlemde istenir; gezmek, okumak serbesttir. */
 const KOTA_GIT = `<a class="btn pri" href="#premium" data-a="modalClose">Paketlere bak</a>`;
@@ -8614,31 +8662,38 @@ function svHataModal(cfg, mesaj) {
   openModal("Sorular şu an açılamadı", `<p>${esc(mesaj)} Hakkın tekrar düşmez; aynı oturum yeniden denenir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Tekrar dene", a: "svTekrar", k: "pri" }]);
 }
 async function svBaslat(cfg) {
-  if (UI.svBusy) return; UI.svBusy = true;
+  if (UI.svBusy || BK.cikis) return;   /* çıkış sürerken yeni sunucu oturumu başlamaz */
+  /* işlem nesli: başladığı andaki OT.nesil + hesap kimliği yakalanır; her await sonrası, yan etkilerden ÖNCE denetlenir. A→B→A da eski işlemdir (nesil iki kez artar).
+     Meşgul kilidi bu işleme ait bir belirteçtir: eski işlemin finally'si yeni hesabın kilidini kaldıramaz. */
+  const kilit = {}, nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user), eski = () => nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || hesapKimlikAnahtar(HESAP.user) !== kim;
+  UI.svBusy = kilit;
   try {
-    const exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
+    const gv = !!cfg.bankaGuvenli, exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
     let kota = null;
     cfg.svIstek = cfg.svIstek || ("r" + uid() + uid() + uid());
     for (let i = 0; i < adaylar.length; i += ust) {
       const parca = adaylar.slice(i, i + ust);
-      let sonuc; try { sonuc = await svIstek("oturum", { istek: cfg.svIstek + "-" + (i / ust), mod: exam ? "exam" : "practice", idler: parca.map(q => q.id) }); } catch (e) { svHataModal(cfg, "Bağlantı kurulamadı."); return; }
+      let sonuc; try { sonuc = await svIstek("oturum", { istek: cfg.svIstek + "-" + (i / ust), mod: exam ? "exam" : "practice", idler: parca.map(q => q.id) }); } catch (e) { if (eski()) return; svHataModal(cfg, "Bağlantı kurulamadı."); return; }
+      if (eski()) return;   /* hesap değişti: bu yanıt RUN, ake.run, modal, kota ve oturum durumuna DOKUNAMAZ (401/402/429 dahil) */
       const { r, j } = sonuc;
       if (r.status === 401) { hesapKimlikGuncelle(null); HESAP.ucr = null; kotaGirisModal(); return; }
       if (r.status === 402) { if (i === 0) { HESAP.ucr = j.kota ? Object.assign({}, HESAP.ucr || {}, j.kota) : HESAP.ucr; kotaLimitModal(exam); return; } toast("Ücretsiz hakkın bu kadarına yetti; kalan sorular sete eklenmedi."); break; }
       if (r.status === 429) { toast("Çok sık oturum açtın. Birazdan tekrar dene."); return; }
-      if (r.status === 404) { SV.kapali = true; if (i === 0) { startRunEski(cfg); return; } break; }     // V2 kapalı: eski uyumluluk akışı
-      if (r.status === 503 && j.error === "banka_yok") { if (i === 0) { startRunEski(cfg); return; } break; }                // sunucuda henüz uygun soru yok (kota düşmedi)
+      if (r.status === 404) { SV.kapali = true; if (i === 0) { if (gv) { svHataModal(cfg, "Soru hizmeti şu an kapalı."); return; } startRunEski(cfg); return; } break; }     // V2 kapalı: eski uyumluluk akışı
+      if (r.status === 503 && j.error === "banka_yok") { if (i === 0) { if (gv) { svHataModal(cfg, "Sunucuda bu sorular şu an hazır değil."); return; } startRunEski(cfg); return; } break; }                // sunucuda henüz uygun soru yok (kota düşmedi)
       if (!r.ok) { svHataModal(cfg, r.status >= 500 ? "Sunucu şu an yanıt vermiyor." : "İstek kabul edilmedi."); return; }
       kota = j.kota || kota;
       (j.sorular || []).forEach(s => { if (s && typeof s.id === "string" && Array.isArray(s.o) && s.o.length === 5 && typeof s.q === "string") sunulan.set(s.id, { oturum: j.oturum, s }); });
     }
-    if (!sunulan.size) { startRunEski(cfg); return; }
+    if (!sunulan.size) { if (gv) { svHataModal(cfg, "Sunucu bu soruları şu an sunamadı."); return; } startRunEski(cfg); return; }
     if (kota && !kota.sinirsiz && kota.kalan != null) HESAP.ucr = Object.assign({}, HESAP.ucr || {}, exam ? { kalanDeneme: kota.kalan } : { kalanSoru: kota.kalan });
     let qs = cfg.qs.slice();
     const yerel = qs.filter(q => !(svAday(q) && sunulan.has(q.id)));
-    if (!exam && yerel.length && kota && !kota.sinirsiz && kota.kalan === 0) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
+    if (gv) { if (yerel.length) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Bazı sorular sunucudan alınamadı; yalnız sunucunun verdiği sorular açıldı."); } }   /* güvenli mod: yerel soru ve kotaAl yok */
+    else if (!exam && yerel.length && kota && !kota.sinirsiz && kota.kalan === 0) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
     else if (!exam && yerel.length && !(kota && kota.sinirsiz)) {
       const v = await kotaAl("soru", yerel.length);
+      if (eski()) return;
       if (v < 0) { render(); return; }
       if (v < yerel.length) { const at = new Set(yerel.slice(v)); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
     }
@@ -8649,22 +8704,22 @@ async function svBaslat(cfg) {
     });
     if (!qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
     baslatRun(Object.assign({}, cfg, { qs }));
-  } finally { UI.svBusy = false; }
+  } finally { if (UI.svBusy === kilit) UI.svBusy = false; }
 }
 function startRunEski(cfg) { if (cfg.canli || !ucretsizMi()) { baslatRun(cfg); return; } kotaIste(cfg); }
 /* çalışma modu: cevap sunucuya gider, doğru seçenek ve çözüm geri gelir */
 async function svCevap(R, i, o) {
-  const q = R.qs[i]; if (UI.svBusy) return; UI.svBusy = true;
+  const q = R.qs[i]; if (UI.svBusy || BK.cikis) return; const kilit = {}, sn = SV_N.n; UI.svBusy = kilit;
   try {
     const { r, j } = await svIstek("cevap", { oturum: q.sv, soru: q.id, secim: o });
-    if (RUN !== R) return;
+    if (RUN !== R || sn !== SV_N.n) return;   /* çıkış başladıysa bu yanıt hiçbir şeyi değiştirmez */
     if (r.status === 401) { hesapKimlikGuncelle(null); kotaGirisModal(); return; }
     if (r.status === 409 || r.status === 410) { toast("Bu oturumun süresi dolmuş. Soruyu yeni bir oturumda çöz."); return; }
     if (!r.ok || !Number.isInteger(j.a)) { toast("Cevabın kaydedilemedi. Bağlantını kontrol edip tekrar dene."); return; }
     q.a = j.a; q.x = typeof j.x === "string" ? j.x : "";
     pickAnswerYerel(o, i);
   } catch (e) { toast("Bağlantı kurulamadı. Cevabını tekrar işaretle."); }
-  finally { UI.svBusy = false; render(); }
+  finally { if (UI.svBusy === kilit) UI.svBusy = false; render(); }
 }
 /* bitiş: deneme sunucuda değerlendirilir (anahtar ancak şimdi gelir); çalışma oturumu sunucuda kapatılır */
 async function svBitir(R) {
@@ -9827,6 +9882,7 @@ function hesapKimlikGuncelle(yeni) {
     try { if (chatCtl) chatCtl.abort(); } catch (e) { }
     chatCtl = null; UI.chatBusy = false; UI.planBusy = false; UI.planErr = "";
     try { KHAVUZ.temizle(); } catch (e) { }
+    bankaSifirla(); UI.svBusy = false; UI.svBekleyen = null;   /* eski hesabın sunucu oturumu işlemi yeni hesabı kilitlemez; bekleyen "Tekrar dene" eski hesaba aittir */
   }
 }
 function hesapUygula(j) {
@@ -10014,7 +10070,16 @@ Object.assign(OZ_ACT, {
   },
   sahipYenidenDene() { sahipYenidenDene(); },
   sahipsizSonra() { UI.modal = null; render(); toast("Eski kayıt bu cihazda saklanıyor; hesabına aktarılmadı."); },
-  async cikis() { try { KHAVUZ.temizle(); } catch (e) { } try { if (cloud.col && dirty.size) await Promise.race([flush(), new Promise(o => setTimeout(o, 4000))]); else saveLocal(); } catch (e) { } try { await hesapIstek("cikis", { method: "POST" }); } catch (e) { } hesapKimlikGuncelle(null); HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor."); },
+  async cikis() {
+    if (BK.cikis) return;   /* çıkış zaten sürüyor */
+    try { KHAVUZ.temizle(); } catch (e) { } bankaSifirla(); BK.cikis = true; SV_N.n++; UI.svBusy = false; UI.svBekleyen = null;   /* bekleyen soru işlemleri geçersiz; flush()/saveLocal etkilenmez */
+    try {
+      try { if (cloud.col && dirty.size) await Promise.race([flush(), new Promise(o => setTimeout(o, 4000))]); else saveLocal(); } catch (e) { }
+      let tamam = false; try { const { r } = await hesapIstek("cikis", { method: "POST" }); tamam = !!(r && (r.ok || r.status === 401)); } catch (e) { tamam = false; }   /* 401: sunucuda zaten oturum yok = çıkmış; başka her şey (500/ağ hatası) BELİRSİZ → başarı varsayılmaz */
+      if (!tamam) { BK.cikis = false; render(); openModal("Çıkış tamamlanamadı", `<p>Çıkış isteği sunucuya ulaşmadı ya da tamamlanmadı. Oturumun hâlâ açık olabilir. Bağlantını kontrol edip tekrar dene.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Tekrar dene", a: "cikis", k: "pri" }]); return; }
+      hesapKimlikGuncelle(null); BK.cikis = false; HESAP.paket = null; HESAP.kullanim = null; HESAP.limit = null; HESAP.ucr = null; sosyalSifirla(); cloud.col = null; cloud.state = "local"; AI.fn = null; AI.images = false; UI.modal = null; render(); toast("Çıkış yapıldı. Bu cihazdaki ilerlemen duruyor.");   /* önceki başarısız denemenin "Çıkış tamamlanamadı" penceresi kapanır */
+    } finally { if (BK.cikis) { BK.cikis = false; try { render(); } catch (e) { } } }
+  },
   hesapSilAsk() { openModal("Hesabın silinsin mi?", "<p>Hesabın ve hesabında saklanan tüm çalışma verilerin kalıcı olarak silinir. Bu cihazdaki kopya silinmez. Hesabına bağlı paket kodu başka hesapta kullanılamaz hâle gelir.</p>", [{ l: "Vazgeç", a: "modalClose" }, { l: "Hesabımı sil", a: "hesapSilGo", k: "pri" }]); },
   async hesapSilGo() { UI.modal = null; const { r } = await hesapIstek("sil", { method: "POST" }).catch(() => ({ r: { ok: false } })); if (!r.ok) { toast("Hesap silinemedi. Tekrar dene."); render(); return; } hesapKimlikGuncelle(null); HESAP.paket = null; cloud.col = null; cloud.state = "local"; AI.fn = null; render(); toast("Hesabın silindi."); }
 });
@@ -12535,7 +12600,7 @@ const ACT = {
   startExam() { startExamFromUI(); },
   openResult(d) { UI.resultId = d.id; UI.lastResult = null; go("sonuc"); },
   resume() { UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
-  svTekrar() { const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
+  svTekrar() { if (BK.cikis) return; const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
   runReplace() { const c = UI.pendingRun; UI.pendingRun = null; RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },
   discardAsk() { openModal("Oturum silinsin mi?", `<p>"${esc(RUN.title)}" oturumundaki cevapların silinecek.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sil", a: "discard", k: "pri" }]); },
   discard() { RUN = null; saveRun(); UI.modal = null; UI.inRun = false; render(); },
@@ -12621,8 +12686,10 @@ Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta
     }
     toast(sent ? "Bildirimin iletildi, teşekkürler." : "Bildirimin bu cihaza kaydedildi; bu soru denemelerinde artık karşına çıkmayacak.");
   },
-  bankOne(d) { const list = bankFiltered(), i = Math.max(0, list.findIndex(q => q.id === d.id)); startRun({ kind: "practice", title: "Soru bankası", mode: "study", qs: list.slice(i, i + 30) }); },
-  bankAll() { startRun({ kind: "practice", title: "Soru bankası", mode: "study", qs: bankFiltered().slice(0, 40) }); },
+  bankOne(d) { if (bankaGuvenliMi() && bankaDurum() !== "hazir") { bankaHazirDegil(); return; } const list = bankListesi(), i = Math.max(0, list.findIndex(q => q.id === d.id)); if (bankaGuvenliMi() && !list.some(q => q.id === d.id)) return; startRun(bankaCfg({ kind: "practice", title: "Soru bankası", mode: "study", qs: list.slice(i, i + 30) })); },
+  bankAll() { if (bankaGuvenliMi() && bankaDurum() !== "hazir") { bankaHazirDegil(); return; } startRun(bankaCfg({ kind: "practice", title: "Soru bankası", mode: "study", qs: bankListesi().slice(0, 40) })); },
+  bankaTekrar() { if (bankaGuvenliMi() && HESAP.user) { bankaYukle(true); render(); } },
+  bankaGiris() { kotaGirisModal(); },
   bankMore() { UI.bank.lim += 40; const el = document.getElementById("bankList"); if (el) el.innerHTML = bankList(); },
   genRun() { genRun(); },
   genSolve() { const ids = (UI.gen.res && UI.gen.res.ids) || []; startRun({ kind: "practice", title: "AI soruları", mode: "study", qs: ids.map(id => S.aiQs.find(q => q.id === id)).filter(Boolean) }); },
@@ -12725,7 +12792,7 @@ const CHG = {
   importFile(el) { const f = el.files && el.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { const ta = document.getElementById("impTxt"); if (ta) ta.value = String(r.result || ""); }; r.readAsText(f); }
 };
 const INP = {
-  bankQ(el) { UI.bank.q = el.value; UI.bank.lim = 40; const l = document.getElementById("bankList"), c = document.getElementById("bankCount"); if (l) l.innerHTML = bankList(); if (c) c.textContent = bankFiltered().length + " soru"; },
+  bankQ(el) { UI.bank.q = el.value; UI.bank.lim = 40; const l = document.getElementById("bankList"), c = document.getElementById("bankCount"); if (l) l.innerHTML = bankList(); if (c) c.textContent = bankListesi().length + " soru"; },
   chatDraft(el) { UI.chatDraft = el.value; el.style.height = "auto"; el.style.height = Math.min(160, el.scrollHeight) + "px"; },
   paraDraft(el) { UI.paraDraft[el.dataset.id] = el.value; }
 };

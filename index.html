@@ -7960,7 +7960,7 @@ function reviewItem(q, i) {
    Eski bankFiltered() S.reports elemesi YAPMAZ; güvenli mod da yapmaz (yeni davranış eklenmedi). Süzgeçler (ders/konu/seviye/arama/S.ans) KHAVUZ.bankFiltered ile aynı anlamdadır; AI kaynağı bu modda yoktur. */
 const SV_N = { n: 0 };   /* sunucu soru işlemi (oturum/cevap) nesli: ACT.cikis başlarken artar; flush()/OT.nesil'den BAĞIMSIZDIR. Çıkış sonradan başarısız olsa da önceki işlemler yeniden geçerli olmaz. */
 const BK = { n: 0, d: "bos", kod: "", kimlik: "", cikis: false };   // cikis: ACT.cikis başladı ve oturum henüz temizlenmedi → yeniden yükleme YOK, liste YOK   // d: bos | yukleniyor | hazir | hata
-function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (bankaGuvenliMi()) queueMicrotask(() => { try { if (route() === "banka") render(); } catch (e) { } }); }
+function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (katalogGuvenliMi()) queueMicrotask(() => { try { if (route() === "banka" || route() === "paragraf") render(); } catch (e) { } }); }
 function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata" | "cikis"
   if (BK.cikis) return "cikis";
   if (!HESAP.hazir) return "yukleniyor";
@@ -7974,7 +7974,7 @@ function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata
 function bankaYukle(yenile) {
   if (BK.cikis) return;
   const n = ++BK.n, k = hesapKimlikAnahtar(HESAP.user); BK.d = "yukleniyor"; BK.kod = ""; BK.kimlik = k;
-  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (route() === "banka") render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
+  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (route() === "banka" || route() === "paragraf") render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
   KHAVUZ.yukle(yenile ? { yenile: true } : {}).then(r => bitti(r && r.ok ? "hazir" : "hata", r && r.durum), () => bitti("hata", "beklenmeyen_hata"));
 }
 function bankaHazirDegil() { if (bankaDurum() === "giris") kotaGirisModal(); else toast("Soru kataloğu hazır değil."); }
@@ -7989,6 +7989,38 @@ function bankaDurumGorunumu(d) {
     cikis: ["Çıkış yapılıyor…", ""], kapali: ["Soru bankası şu an kapalı", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`], hata: ["Soru kataloğu yüklenemedi", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`] }[d] || ["Soru kataloğu yükleniyor…", ""];
   return `<div class="view"><div class="vhead"><span class="eyebrow">Açıklamalı sorular</span><h1>Soru bankası</h1></div>${subTabs(SORU_TABS, "banka")}
   <div class="card stack" data-banka-durum="${d}"><div class="empty">${M[0]}</div>${M[1] ? `<div class="row">${M[1]}</div>` : ""}</div></div>`;
+}
+/* ---- #paragraf KATALOG KAYNAĞI (güvenli mod: window.AKE_KATALOG_PARAGRAF === true; 3C-2) ----
+   Liste/sayı/başlatma YALNIZ KHAVUZ'un Türkçe + p alanlı sorularından gelir; BANK, GENS (paragraf-*), EKQ, S.aiQs YOKTUR. Sunucu oturumu zorunludur (yerel cevaplı fallback yok).
+   Durum makinesi #banka ile ortaktır (BK: yükleniyor/giriş/hazır/kapalı/hata/çıkış; hesap ve çıkış nesli). Güvenli RUN kalıcı işaretlidir (RUN.gvn = "paragraf").
+   Güvenli olmayan (eski/yerel/başka ekran) RUN bu ekrandan açılmaz, silinmez, ezilmez; açık durum kartı gösterilir. */
+function paraHavuz() {
+  if (bankaDurum() !== "hazir") return [];
+  const r = KHAVUZ.poolOf("turkce"); return r && r.ok ? r.sorular.filter(q => q.p) : [];
+}
+function paragrafEskiUyari() { toast("Yarım kalan eski bir oturum var. Bu ekran onu açmaz ya da silmez; önce o oturumu başka ekrandan bitir veya sil."); try { render(); } catch (e) { } }
+function paraEskiKart() {
+  const n = RUN.ans.filter(a => a != null).length;
+  return `<div class="card stack" data-paragraf-durum="eski-oturum"><div><b>Yarım kalan eski oturum korunuyor:</b> ${esc(RUN.title)} · ${n}/${RUN.qs.length} cevap</div>
+    <p class="small muted">Bu oturum sunucu kontrollü paragraf akışına ait değil. Güvenlik için bu ekran onu açmaz, silmez ve yeni paragraf antrenmanını onun üzerine başlatmaz. Oturumu başka bir ekrandaki “Yarım kalan oturum” bandından devam ettirebilir ya da silebilirsin.</p></div>`;
+}
+function paraDurumGorunumu(d) {
+  if (d === "yukleniyor" && HESAP.hazir && !HESAP.hata && HESAP.user && BK.d === "bos") bankaYukle(false);
+  const M = { yukleniyor: ["Paragraf soruları yükleniyor…", ""], giris: ["Paragraf sorularını görmek için giriş yap", `<button class="btn pri" data-a="bankaGiris">Giriş yap</button>`],
+    cikis: ["Çıkış yapılıyor…", ""], kapali: ["Paragraf soruları şu an kapalı", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`], hata: ["Paragraf soruları yüklenemedi", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`] }[d] || ["Paragraf soruları yükleniyor…", ""];
+  return `<div class="view"><div class="vhead"><span class="eyebrow">Hız ve anlama</span><h1>Paragraf atölyesi</h1></div>${subTabs(SORU_TABS, "paragraf")}
+  <div class="card stack" data-paragraf-durum="${d}"><div class="empty">${M[0]}</div>${M[1] ? `<div class="row">${M[1]}</div>` : ""}</div>${RUN && !RUN.gvn ? paraEskiKart() : ""}</div>`;
+}
+/* paraStart (id == null): çözülmemiş katalog soruları önce, sonra çözülenler (en çok 20); paraOne (id): seçilen sorudan başlayan dönüşümlü liste. GENS/yerel üretim YOK. */
+function paragrafBaslat(id) {
+  if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
+  if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }
+  const P = paraHavuz(); if (!P.length) { toast("Şu an çözülecek paragraf sorusu yok."); return; }
+  let qs;
+  if (id == null) qs = shuffle(P.filter(q => !S.ans[q.id])).concat(shuffle(P.filter(q => S.ans[q.id]))).slice(0, 20);
+  else { const i = P.findIndex(q => q.id === id); if (i < 0) { toast("Bu soru artık listede yok."); return; } qs = P.slice(i).concat(P.slice(0, i)); }
+  startRun(paragrafCfg({ kind: "para", title: "Paragraf antrenmanı", mode: "study", qs }));
 }
 function bankListesi() { return bankaGuvenliMi() ? bankaListe() : bankFiltered(); }   /* ekran çağrıları buradan geçer; eski bankFiltered() aynen durur (gölge testleri onu ayrı çalıştırır) */
 function bankFiltered() {
@@ -8092,15 +8124,16 @@ function uretKartlari(s, gs, G2) {
 
 /* ---------- Paragraf atölyesi ---------- */
 function vPara() {
-  const P = BANK.filter(q => q.s === "turkce" && q.p).concat(S.aiQs.filter(q => q.s === "turkce" && q.p));
+  const G = paragrafGuvenliMi(), dur = G ? bankaDurum() : "hazir"; if (dur !== "hazir") return paraDurumGorunumu(dur);
+  const P = G ? paraHavuz() : BANK.filter(q => q.s === "turkce" && q.p).concat(S.aiQs.filter(q => q.s === "turkce" && q.p));
   const t = S.para.times, avg = t.length ? Math.round(t.reduce((a, b) => a + b, 0) / t.length) : 0, n = S.para.c + S.para.w;
-  return `<div class="view">${resumeBanner()}
+  return `<div class="view">${G && RUN && !RUN.gvn ? paraEskiKart() : resumeBanner()}
   <div class="vhead"><span class="eyebrow">Hız ve anlama</span><h1>Paragraf atölyesi</h1><p>TYT Türkçe'nin yarısından fazlası paragraf sorusudur. Her soruda hedef süre 90 saniye; kronometre seni takip eder, çözümden sonra ana fikri kendi cümlenle yazıp ${IN_CLAUDE ? "Claude'a" : "Premium'daki AI öğretmene"} değerlendirtebilirsin.</p></div>
   ${subTabs(SORU_TABS, "paragraf")}
-  <div class="tiles">${tile(n, "paragraf sorusu")}${tile("%" + pct(S.para.c, n), "doğruluk")}${tile(avg ? avg + " sn" : "–", "ortalama süre")}${tile(P.length + PARA_N, "paragraf")}</div>
+  <div class="tiles">${tile(n, "paragraf sorusu")}${tile("%" + pct(S.para.c, n), "doğruluk")}${tile(avg ? avg + " sn" : "–", "ortalama süre")}${tile(G ? P.length : P.length + PARA_N, "paragraf")}</div>
   <div class="card stack"><div class="card-h" style="margin:0"><h2>Antrenman</h2><button class="btn pri" data-a="paraStart">Paragraf antrenmanını başlat</button></div>
     <div class="list">${P.map(q => { const a = S.ans[q.id]; return `<div class="li"><div class="grow"><div class="t">${esc(q.p.slice(0, 110))}…</div><div class="s">${esc(q.t)}</div></div>${a ? `<span class="pill ${a[4] === 1 ? "ok" : "bad"}">${a[4] === 1 ? "Doğru" : "Yanlış"}</span>` : ""}<button class="btn sm" data-a="paraOne" data-id="${q.id}">Çöz</button></div>`; }).join("")}</div>
-    <p class="small muted">Antrenman, aşağıdaki özgün sorulara ek olarak ${PARA_N} paragraftan ana düşünce, başlık, çıkarım ve akışı bozan cümle soruları üretir.${aiOn() ? " Daha fazlası için Çalışma stüdyosunda AI ile yeni paragraf sorusu üretebilirsin." : ""}</p>
+    <p class="small muted">${G ? "Antrenman yalnız yukarıdaki sunucu kontrollü özgün paragraf sorularından açılır; cevapları sunucuda kontrol edilir." : `Antrenman, aşağıdaki özgün sorulara ek olarak ${PARA_N} paragraftan ana düşünce, başlık, çıkarım ve akışı bozan cümle soruları üretir.${aiOn() ? " Daha fazlası için Çalışma stüdyosunda AI ile yeni paragraf sorusu üretebilirsin." : ""}`}</p>
   </div></div>`;
 }
 
@@ -8299,13 +8332,14 @@ const plainQ = s => String(s || "").replace(/\^\{([^}]*)\}/g, "^$1").replace(/_\
 
 function startRun(cfg) {
   if (!cfg.qs || !cfg.qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
+  if (cfg.paragrafGuvenli && RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (yerel/başka) oturum güvenli #paragraf tarafından ASLA ezilmez; force olsa bile */
   if (RUN && !cfg.force) {
     UI.pendingRun = cfg;
     openModal("Yarım kalan oturum var", `<p>"${esc(RUN.title)}" oturumun henüz bitmedi. Yeni oturum başlarsa o oturumdaki cevaplar silinir.</p>`,
       [{ l: "Vazgeç", a: "modalClose" }, { l: "Eskisine devam et", a: "resume" }, { l: "Yenisini başlat", a: "runReplace", k: "pri" }]);
     return;
   }
-  if (cfg.bankaGuvenli) { bankaGuvenliBaslat(cfg); return; }   /* #banka güvenli modu (AKE_KATALOG_BANKA): yerel çözüm yolu yok */
+  if (cfg.bankaGuvenli || cfg.paragrafGuvenli) { bankaGuvenliBaslat(cfg); return; }   /* #banka güvenli modu (AKE_KATALOG_BANKA): yerel çözüm yolu yok */
   if (!cfg.canli && svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
   if (!cfg.canli && ucretsizMi()) { kotaIste(cfg); return; }
   baslatRun(cfg);
@@ -8313,6 +8347,9 @@ function startRun(cfg) {
 /* #banka güvenli modu: yalnız bankOne/bankAll bu işareti koyar (bayrak: window.AKE_KATALOG_BANKA === true). Başlık metnine bakılmaz; diğer startRun çağıranları etkilenmez.
    Bu mod açıkken sunucu oturumu açılamazsa yerel (cevaplı) set ASLA açılmaz: giriş gerekiyorsa giriş modalı, değilse açık hata gösterilir. */
 const bankaGuvenliMi = () => window.AKE_KATALOG_BANKA === true;
+const paragrafGuvenliMi = () => window.AKE_KATALOG_PARAGRAF === true;   /* #paragraf güvenli modu (3C-2): KHAVUZ p'li sorular, sunucu oturumu zorunlu, yerel cevaplı yol yok */
+const katalogGuvenliMi = () => bankaGuvenliMi() || paragrafGuvenliMi();   /* BK durum makinesi (katalog yükleme/çıkış/hesap nesli) iki güvenli mod için ortaktır */
+const paragrafCfg = cfg => paragrafGuvenliMi() ? Object.assign({}, cfg, { paragrafGuvenli: true }) : cfg;
 const bankaCfg = cfg => bankaGuvenliMi() ? Object.assign({}, cfg, { bankaGuvenli: true }) : cfg;
 function bankaGuvenliBaslat(cfg) {
   if (svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
@@ -8668,7 +8705,7 @@ async function svBaslat(cfg) {
   const kilit = {}, nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user), eski = () => nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || hesapKimlikAnahtar(HESAP.user) !== kim;
   UI.svBusy = kilit;
   try {
-    const gv = !!cfg.bankaGuvenli, exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
+    const gv = !!(cfg.bankaGuvenli || cfg.paragrafGuvenli), exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
     let kota = null;
     cfg.svIstek = cfg.svIstek || ("r" + uid() + uid() + uid());
     for (let i = 0; i < adaylar.length; i += ust) {
@@ -8754,6 +8791,7 @@ function baslatRun(cfg) {
     perm: qs.map(q => (q.fix || sabitSira(q)) ? [0, 1, 2, 3, 4] : shuffle([0, 1, 2, 3, 4])),
     ans: qs.map(() => null), rev: [], flag: [], times: [], start: Date.now(), dur: Math.round((cfg.dur || 0) * 60), cur: 0, qStart: Date.now(),
     secs: cfg.secs || [{ n: cfg.title, from: 0, to: qs.length }], canli: cfg.canli || null };
+  if (cfg.paragrafGuvenli) RUN.gvn = "paragraf";   /* kalıcı işaret (ake.run'a yazılır): güvenli paragraf RUN'ı; yalnız bu RUN güvenli ekrandan devam ettirilebilir/ezilebilir */
   markSeen(qs);
   UI.inRun = true; UI.modal = null; UI.sheetOpen = null; saveRun(); render(); window.scrollTo(0, 0); startTick();
 }
@@ -8770,7 +8808,7 @@ function vRun() {
   const corr = perm.indexOf(q.a), qk = "q:" + q.id;
   const expl = rev ? `<div class="expl"><div class="res ${sel === q.a ? "ok" : "bad"}">${sel === q.a ? "Doğru!" : `Yanlış. Doğru cevap ${LET[corr]}.`}</div><p>${fq(q.x)}</p>
     ${R.kind === "para" && R.times[i] ? `<p class="small muted">Bu soruda ${R.times[i]} saniye harcadın${R.times[i] > 90 ? "; hedef 90 saniye" : ""}.</p>` : ""}
-    <div class="row"><button class="btn sm" data-a="benzerEkle" title="Bu sorunun mantığında yeni sorular sıraya eklenir"${UI.benzerBusy ? " disabled" : ""}>${UI.benzerBusy ? "Hazırlanıyor…" : "Benzerini çöz"}</button>${aiOn() ? `<button class="btn sm" data-a="aiExplain"${UI.ai[qk] && UI.ai[qk].busy ? " disabled" : ""}>${icon("spark")} AI açıklasın</button>` : ""}${sesBtn("sesCozum", "", "cozum:" + q.id, "Çözümü dinle")}<button class="btn sm ghost" data-a="reportAsk">${icon("flag")} Bildir</button></div>
+    <div class="row">${R.gvn ? "" : `<button class="btn sm" data-a="benzerEkle" title="Bu sorunun mantığında yeni sorular sıraya eklenir"${UI.benzerBusy ? " disabled" : ""}>${UI.benzerBusy ? "Hazırlanıyor…" : "Benzerini çöz"}</button>`}${aiOn() ? `<button class="btn sm" data-a="aiExplain"${UI.ai[qk] && UI.ai[qk].busy ? " disabled" : ""}>${icon("spark")} AI açıklasın</button>` : ""}${sesBtn("sesCozum", "", "cozum:" + q.id, "Çözümü dinle")}<button class="btn sm ghost" data-a="reportAsk">${icon("flag")} Bildir</button></div>
     ${aiBox(qk)}${R.kind === "para" && q.p && aiOn() ? paraIdea(q) : ""}</div>` : "";
   const last = i === R.qs.length - 1;
   const wide = window.matchMedia && window.matchMedia("(min-width:900px)").matches, open = UI.sheetOpen == null ? wide : UI.sheetOpen;
@@ -9533,6 +9571,7 @@ function benzerSorular(q, n) {
 /* Çözüm sırasında: benzer soruları bu oturumda hemen sonraya ekle */
 function benzerYerlestir(add) {
   const R = RUN; if (!R || !add.length) return;
+  if (R.gvn) { toast("Güvenli paragraf oturumuna yerel soru eklenemez."); return; }   /* güvenli RUN'a yerel/AI cevaplı soru GİREMEZ (tek giriş noktası) */
   const k = add.length, at = R.cur + 1;
   const ins = (arr, vals) => { if (arr.length < at) arr.length = at; arr.splice(at, 0, ...vals); };
   ins(R.qs, add);
@@ -9544,6 +9583,7 @@ function benzerYerlestir(add) {
   moveTo(at);
 }
 function benzerYok(q, yer) {
+  if (yer === "run" && RUN && RUN.gvn) { toast("Güvenli paragraf oturumuna yerel soru eklenemez."); return; }
   if (!aiOn()) { toast("Bu konuda başka hazır soru yok."); return; }
   UI.benzerQ = { q: snap(q), yer };
   openModal("AI ile benzer soru üretilsin mi?", `<p>"${esc(q.t)}" konusunda hazır benzer soru yok. AI bu sorunun mantığında 3 yeni soru yazsın, cevaplarını ikinci kez kontrol etsin.</p>${IN_CLAUDE ? "" : `<p class="small muted">Bu işlem 2 AI mesaj hakkı kullanır.</p>`}`,
@@ -9551,6 +9591,7 @@ function benzerYok(q, yer) {
 }
 function benzerEkle() {
   const R = RUN; if (!R) return;
+  if (R.gvn) { toast("Güvenli paragraf oturumuna yerel soru eklenemez."); return; }
   const q = R.qs[R.cur], add = benzerSorular(q, 3).map(snap);
   if (!add.length) { benzerYok(q, "run"); return; }
   benzerYerlestir(add);
@@ -9564,6 +9605,7 @@ function benzerBaslat(q) {
 async function benzerAI() {
   const _n = OT.nesil;   /* AI yanıtı hesap değiştikten sonra gelirse yeni hesabın S'sine yazılmaz */
   const B = UI.benzerQ; UI.modal = null; if (!B || UI.benzerBusy) { render(); return; }
+  if (B.yer === "run" && RUN && RUN.gvn) { UI.benzerQ = null; render(); toast("Güvenli paragraf oturumuna yerel soru eklenemez."); return; }   /* AI çağrısı yapılmaz, hak harcanmaz */
   const q = B.q, s = q.s, en = s === "ingilizce", sj = SUBJ[s] || { n: s, e: "" };
   UI.benzerBusy = true; render(); toast("AI benzer soruları hazırlıyor…");
   try {
@@ -12599,9 +12641,9 @@ const ACT = {
   exStep(d) { const type = UI.exam.type || defaultExam(), r = examRows(type).find(x => x.key === d.k); if (!r) return; UI.exam.custom[d.k] = Math.max(0, Math.min(r.full, r.n + (+d.v))); render(); },
   startExam() { startExamFromUI(); },
   openResult(d) { UI.resultId = d.id; UI.lastResult = null; go("sonuc"); },
-  resume() { UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
+  resume() { if (paragrafGuvenliMi() && route() === "paragraf" && RUN && !RUN.gvn) { paragrafEskiUyari(); return; } UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
   svTekrar() { if (BK.cikis) return; const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
-  runReplace() { const c = UI.pendingRun; UI.pendingRun = null; RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },
+  runReplace() { const c = UI.pendingRun; if (c && c.paragrafGuvenli && RUN && !RUN.gvn) { UI.pendingRun = null; UI.modal = null; paragrafEskiUyari(); return; } UI.pendingRun = null; RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },
   discardAsk() { openModal("Oturum silinsin mi?", `<p>"${esc(RUN.title)}" oturumundaki cevapların silinecek.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sil", a: "discard", k: "pri" }]); },
   discard() { RUN = null; saveRun(); UI.modal = null; UI.inRun = false; render(); },
   pick(d) { pickAnswer(+d.o); },
@@ -12688,17 +12730,18 @@ Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta
   },
   bankOne(d) { if (bankaGuvenliMi() && bankaDurum() !== "hazir") { bankaHazirDegil(); return; } const list = bankListesi(), i = Math.max(0, list.findIndex(q => q.id === d.id)); if (bankaGuvenliMi() && !list.some(q => q.id === d.id)) return; startRun(bankaCfg({ kind: "practice", title: "Soru bankası", mode: "study", qs: list.slice(i, i + 30) })); },
   bankAll() { if (bankaGuvenliMi() && bankaDurum() !== "hazir") { bankaHazirDegil(); return; } startRun(bankaCfg({ kind: "practice", title: "Soru bankası", mode: "study", qs: bankListesi().slice(0, 40) })); },
-  bankaTekrar() { if (bankaGuvenliMi() && HESAP.user) { bankaYukle(true); render(); } },
+  bankaTekrar() { if (katalogGuvenliMi() && HESAP.user) { bankaYukle(true); render(); } },
   bankaGiris() { kotaGirisModal(); },
   bankMore() { UI.bank.lim += 40; const el = document.getElementById("bankList"); if (el) el.innerHTML = bankList(); },
   genRun() { genRun(); },
   genSolve() { const ids = (UI.gen.res && UI.gen.res.ids) || []; startRun({ kind: "practice", title: "AI soruları", mode: "study", qs: ids.map(id => S.aiQs.find(q => q.id === id)).filter(Boolean) }); },
   paraStart() {
+    if (paragrafGuvenliMi()) { paragrafBaslat(null); return; }
     const own = shuffle(allQ().filter(q => q.s === "turkce" && q.p && !S.reports[q.id] && !S.ans[q.id])).slice(0, 8), gens = GENS.filter(g => g.id.startsWith("paragraf-")), used = new Set(), qs = own.slice();
     let guard = 0; while (qs.length < 20 && guard++ < 80) { const q = genQ(pick(gens), "turkce", used); if (q) qs.push(q); }
     startRun({ kind: "para", title: "Paragraf antrenmanı", mode: "study", qs: shuffle(qs) });
   },
-  paraOne(d) { const P = allQ().filter(q => q.s === "turkce" && q.p), i = Math.max(0, P.findIndex(q => q.id === d.id)); startRun({ kind: "para", title: "Paragraf antrenmanı", mode: "study", qs: P.slice(i).concat(P.slice(0, i)) }); },
+  paraOne(d) { if (paragrafGuvenliMi()) { paragrafBaslat(d && d.id); return; } const P = allQ().filter(q => q.s === "turkce" && q.p), i = Math.max(0, P.findIndex(q => q.id === d.id)); startRun({ kind: "para", title: "Paragraf antrenmanı", mode: "study", qs: P.slice(i).concat(P.slice(0, i)) }); },
   mistTab(d) { UI.mist.tab = d.k; render(); },
   mistStart() { const l = openMistakes().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); },
   mistOne(d) { const m = S.mistakes[d.id]; if (m) startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: [m.q] }); },

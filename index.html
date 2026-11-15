@@ -7960,7 +7960,7 @@ function reviewItem(q, i) {
    Eski bankFiltered() S.reports elemesi YAPMAZ; güvenli mod da yapmaz (yeni davranış eklenmedi). Süzgeçler (ders/konu/seviye/arama/S.ans) KHAVUZ.bankFiltered ile aynı anlamdadır; AI kaynağı bu modda yoktur. */
 const SV_N = { n: 0 };   /* sunucu soru işlemi (oturum/cevap) nesli: ACT.cikis başlarken artar; flush()/OT.nesil'den BAĞIMSIZDIR. Çıkış sonradan başarısız olsa da önceki işlemler yeniden geçerli olmaz. */
 const BK = { n: 0, d: "bos", kod: "", kimlik: "", cikis: false };   // cikis: ACT.cikis başladı ve oturum henüz temizlenmedi → yeniden yükleme YOK, liste YOK   // d: bos | yukleniyor | hazir | hata
-function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (katalogGuvenliMi()) queueMicrotask(() => { try { if (route() === "banka" || route() === "paragraf") render(); } catch (e) { } }); }
+function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (katalogGuvenliMi()) queueMicrotask(() => { try { if (katalogEkranMi()) render(); } catch (e) { } }); }
 function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata" | "cikis"
   if (BK.cikis) return "cikis";
   if (!HESAP.hazir) return "yukleniyor";
@@ -7974,7 +7974,7 @@ function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata
 function bankaYukle(yenile) {
   if (BK.cikis) return;
   const n = ++BK.n, k = hesapKimlikAnahtar(HESAP.user); BK.d = "yukleniyor"; BK.kod = ""; BK.kimlik = k;
-  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (route() === "banka" || route() === "paragraf") render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
+  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (katalogEkranMi()) render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
   KHAVUZ.yukle(yenile ? { yenile: true } : {}).then(r => bitti(r && r.ok ? "hazir" : "hata", r && r.durum), () => bitti("hata", "beklenmeyen_hata"));
 }
 function bankaHazirDegil() { if (bankaDurum() === "giris") kotaGirisModal(); else toast("Soru kataloğu hazır değil."); }
@@ -7984,7 +7984,8 @@ function bankaListe() {
   return r && r.ok ? r.sorular : [];
 }
 /* güvenli #banka/#paragraf ekranında işaretsiz (eski/yerel/başka ekran) RUN: açılmaz, silinmez, ezilmez; yalnız açık durum kartı */
-const guvenliEkranMi = () => (bankaGuvenliMi() && route() === "banka") || (paragrafGuvenliMi() && route() === "paragraf");
+const katalogEkranMi = () => ["banka", "paragraf", "studyo"].includes(route());   /* BK durum makinesinin yeniden çizdiği güvenli ekranlar */
+const guvenliEkranMi = () => (bankaGuvenliMi() && route() === "banka") || (paragrafGuvenliMi() && route() === "paragraf") || (studyoGuvenliMi() && route() === "studyo");
 function bankaEskiKart() {
   const n = RUN.ans.filter(a => a != null).length;
   return `<div class="card stack" data-banka-durum="eski-oturum"><div><b>Yarım kalan eski oturum korunuyor:</b> ${esc(RUN.title)} · ${n}/${RUN.qs.length} cevap</div>
@@ -8073,18 +8074,57 @@ const SC_EXAM = [["TYT", "Temel Yeterlilik Testi"], ["AYT", "Alan Yeterlilik Tes
 const SC_DIFF = [[1, "Kolay"], [2, "Orta"], [3, "Zor"], [0, "Karışık"]];
 const SC_CHECK = `<svg class="sc3-ck" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/><path d="M5.6 10.4l3 3 5.8-6.2" fill="none" stroke="var(--sc-on)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function scExamBilgi(e) { const set = new Set(Object.keys(SUBJ).filter(k => SUBJ[k].e === e)); return { ders: set.size, soru: allQ().filter(q => set.has(q.s)).length }; }
+/* ---- #studyo KATALOG KAYNAĞI (güvenli mod: window.AKE_KATALOG_STUDYO === true; 3C-3) ----
+   Açıkken #studyo'nun konu listesi, sayaçları ve "Teste başla" yolu YALNIZ KHAVUZ'dan (sunucu kataloğu) beslenir; BANK, EKQ, S.aiQs ve GENS (g:) güvenli seti ASLA doldurmaz.
+   İstenen sayı mevcuttan fazlaysa en fazla mevcut sayıda soru açılır ve bu kullanıcıya söylenir. Sunucu oturumu zorunludur; hata/boş/kısmi yanıtta yerel fallback ve yerel kota yolu yoktur.
+   Güvenli RUN kalıcı işaretlidir (RUN.gvn = "studyo"). KAPSAM: yalnız #studyo "Teste başla" (ACT.stBasla). ACT.topicStart, OZ_ACT.dersKarisik ve plan/kart/koç/deneme çağıranları DEĞİŞMEDİ; bu adımla güvenli SAYILMAZ. */
+const stBaglam = () => ({ reports: S.reports || {}, ans: S.ans || {} });
+function stHavuzG(s, f) { if (bankaDurum() !== "hazir") return null; const r = KHAVUZ.secimListeleri(s, f || {}, stBaglam()); return r && r.ok ? r : null; }
+function stKonularG(s) {
+  const r = stHavuzG(s, {}); if (!r) return []; const m = new Map();
+  r.sorular.forEach(q => m.set(q.t, (m.get(q.t) || 0) + 1));
+  return [...m.entries()].map(([t, n]) => ({ t, n, g: 0 })).sort((a, b) => a.t.localeCompare(b.t, "tr"));
+}
+const stDersBilgiG = k => ({ konu: stKonularG(k).length });
+function stExamBilgiG(e) { let ders = 0, soru = 0; Object.keys(SUBJ).filter(k => SUBJ[k].e === e).forEach(k => { const r = stHavuzG(k, {}), n = r ? r.sorular.length : 0; if (n) { ders++; soru += n; } }); return { ders, soru }; }
+function stEskiKart() {
+  const n = RUN.ans.filter(a => a != null).length;
+  return `<div class="card stack" data-studyo-durum="eski-oturum"><div><b>Yarım kalan eski oturum korunuyor:</b> ${esc(RUN.title)} · ${n}/${RUN.qs.length} cevap</div>
+    <p class="small muted">Bu oturum sunucu kontrollü çalışma stüdyosu akışına ait değil. Güvenlik için bu ekran onu açmaz, silmez ve yeni testi onun üzerine başlatmaz. Oturumu başka bir ekrandaki “Yarım kalan oturum” bandından devam ettirebilir ya da silebilirsin.</p></div>`;
+}
+function stDurumGorunumu(d) {
+  if (d === "yukleniyor" && HESAP.hazir && !HESAP.hata && HESAP.user && BK.d === "bos") bankaYukle(false);
+  const M = { yukleniyor: ["Soru kataloğu yükleniyor…", ""], giris: ["Çalışma stüdyosunu kullanmak için giriş yap", `<button class="btn pri" data-a="bankaGiris">Giriş yap</button>`],
+    cikis: ["Çıkış yapılıyor…", ""], kapali: ["Çalışma stüdyosu şu an kapalı", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`], hata: ["Soru kataloğu yüklenemedi", `<button class="btn" data-a="bankaTekrar">Tekrar dene</button>`] }[d] || ["Soru kataloğu yükleniyor…", ""];
+  return `<div class="view sc3"><section class="sc3-hero"><h1>Soru Çözüm Merkezi</h1></section>${subTabs(SORU_TABS, "studyo")}
+  <div class="card stack" data-studyo-durum="${d}"><div class="empty">${M[0]}</div>${M[1] ? `<div class="row">${M[1]}</div>` : ""}</div>${RUN && !RUN.gvn ? stEskiKart() : ""}</div>`;
+}
+function studyoBaslat() {
+  const St = UI.studio, o = stOpt();
+  if (!St.s || !SUBJ[St.s]) { toast("Önce bir ders seç."); return; }
+  if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
+  if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  const f = {}; if (St.t) f.topic = St.t; if (o.d) f.diff = o.d;
+  const r = stHavuzG(St.s, f); if (!r) { bankaHazirDegil(); return; }
+  const qs = r.taze.concat(r.eski).slice(0, o.n);   /* çözülmemişler önce; fazlası DOLDURULMAZ (GENS/BANK/EKQ/AI yok) */
+  if (!qs.length) { toast("Katalogda bu seçim için soru bulunamadı. Zorluğu 'Karışık' yap ya da başka bir konu seç."); return; }
+  if (qs.length < o.n) toast(`Katalogda bu seçim için ${qs.length} soru var (istediğin ${o.n}). Test ${qs.length} soruyla başlıyor.`);
+  startRun(studyoCfg({ kind: "practice", title: `${SUBJ[St.s].n} · ${St.t || "karışık"}` + (o.d ? " · " + DIFF[o.d] : ""), mode: "study", qs }));   /* sıra KORUNUR: KHAVUZ taze listeyi zaten karıştırdı; eskiler "en uzun süredir görülmeyen önce" kalır (son karıştırma YOK) */
+}
 function vStudio() {
+  const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
   const St = UI.studio;
   if (St.s && !SUBJ[St.s]) St.s = null;
   if (St.s) St.e = SUBJ[St.s].e; else if (!SC_EXAM.some(x => x[0] === St.e)) St.e = defaultExam() === "YDT" ? "YDT" : "TYT";
   const seen = St.seen || (St.seen = {}), yeni = k => seen[k] ? "" : (seen[k] = 1, " sc3-new");
-  const e = St.e, s = St.s, dersler = Object.keys(SUBJ).filter(k => SUBJ[k].e === e), tops = s ? topicsOf(s) : [];
+  const e = St.e, s = St.s, dersler = Object.keys(SUBJ).filter(k => SUBJ[k].e === e), tops = s ? (G ? stKonularG(s) : topicsOf(s)) : [];
   if (St.t && !tops.some(x => x.t === St.t)) St.t = "";
   const t = St.t || "", o = stOpt(), goal = gunlukHedef(), td = S.daily[dayKey()] || { q: 0, c: 0 }, yuz = Math.min(100, Math.round(td.q / goal * 100));
-  const ders = s ? dersOzet(s) : null, dn = s ? SUBJ[s].n.replace(/^AYT /, "") : "";
+  const avR = G && s ? stHavuzG(s, { topic: t || undefined, diff: o.d || undefined }) : null, avN = avR ? avR.sorular.length : 0, ders = s ? dersOzet(s) : null, dn = s ? SUBJ[s].n.replace(/^AYT /, "") : "";
   const sec = (no, baslik, id, ek, ic) => `<section class="sc3-step${ek || ""}" id="${id}" aria-labelledby="${id}-h"><div class="sc3-sh"><span class="sc3-n" aria-hidden="true">${no}</span><h2 id="${id}-h">${baslik}</h2></div>${ic}</section>`;
-  const sinav = `<div class="sc3-exams" role="group" aria-label="Sınav türü">${SC_EXAM.map(([k, ad]) => { const b = scExamBilgi(k), on = k === e; return `<button type="button" id="sc3-e-${k}" data-a="stE" data-k="${k}" class="sc3-ex${k === "YDT" ? " yd" : ""}${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-ex-t">${k}</span><span class="sc3-ex-s">${ad}</span><span class="sc3-ex-m">${b.ders} ders · ${fmtN(b.soru)} soru</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
-  const dersBtn = `<div class="sc3-ders" role="group" aria-label="Ders">${dersler.map(k => { const on = k === s, bi = dersBilgi(k); return `<button type="button" id="sc3-s-${k}" data-a="stDers" data-s="${k}" class="sc3-d${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-d-t">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</span><span class="sc3-d-s">${bi.konu} konu</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
+  const sinav = `<div class="sc3-exams" role="group" aria-label="Sınav türü">${SC_EXAM.map(([k, ad]) => { const b = G ? stExamBilgiG(k) : scExamBilgi(k), on = k === e; return `<button type="button" id="sc3-e-${k}" data-a="stE" data-k="${k}" class="sc3-ex${k === "YDT" ? " yd" : ""}${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-ex-t">${k}</span><span class="sc3-ex-s">${ad}</span><span class="sc3-ex-m">${b.ders} ders · ${fmtN(b.soru)} soru</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
+  const dersBtn = `<div class="sc3-ders" role="group" aria-label="Ders">${dersler.map(k => { const on = k === s, bi = G ? stDersBilgiG(k) : dersBilgi(k); return `<button type="button" id="sc3-s-${k}" data-a="stDers" data-s="${k}" class="sc3-d${on ? " on" : ""}" aria-pressed="${on}"><span class="sc3-d-t">${esc(SUBJ[k].n.replace(/^AYT /, ""))}</span><span class="sc3-d-s">${bi.konu} konu</span>${on ? SC_CHECK : ""}</button>`; }).join("")}</div>`;
   const konuSatir = (val, ad, alt, isi) => { const on = (val === t); return `<button type="button" id="sc3-t-${val ? "x" + tops.findIndex(x => x.t === val) : "tum"}" data-a="stT" data-t="${esc(val)}" class="sc3-k${on ? " on" : ""}" aria-pressed="${on}"><span class="heat ${isi}" aria-hidden="true"></span><span class="sc3-k-b"><span class="sc3-k-t">${esc(ad)}</span><span class="sc3-k-s">${alt}</span></span>${on ? SC_CHECK : ""}</button>`; };
   const konu = !s ? "" : !tops.length ? `<div class="empty">Bu ders için henüz konu bulunamadı. Başka bir ders seç.</div>`
     : `<div class="sc3-kl" role="group" aria-label="Konu">${konuSatir("", "Tüm konular", `${tops.length} konudan karışık${ders.n ? ` · bu derste ${ders.n} soru çözdün, %${ders.acc} doğru` : ""}`, isiSinif(ders.acc))}${tops.map(x => { const k = konuOzet(s, x.t); return konuSatir(x.t, x.t, `${x.g ? "Sınırsız soru" : x.n + " soru"}${k.n ? ` · ${k.n} çözdün, %${k.acc} doğru` : " · henüz çözmedin"}`, isiSinif(k.acc)); }).join("")}</div><div class="hm-leg sc3-leg">${heatLegend()}</div>`;
@@ -8094,9 +8134,9 @@ function vStudio() {
   const ozet = `<aside class="sc3-aside" aria-label="Seçim özeti"><div class="sc3-sum"><h2>Seçimlerin</h2>
     <dl><div><dt>Sınav</dt><dd>${e}</dd></div><div><dt>Ders</dt><dd>${s ? esc(dn) : `<span class="sc3-bos">Henüz seçmedin</span>`}</dd></div><div><dt>Konu</dt><dd>${s ? esc(t || "Tüm konular") : `<span class="sc3-bos">–</span>`}</dd></div><div><dt>Zorluk</dt><dd>${zl}</dd></div><div><dt>Soru sayısı</dt><dd>${o.n}</dd></div></dl>
     <button class="btn pri wide sc3-go" id="sc3-go" data-a="stBasla"${s ? "" : " disabled aria-describedby=\"sc3-go-h\""}>Teste başla</button>
-    <p class="xs muted sc3-go-h" id="sc3-go-h" aria-live="polite">${s ? "Çözülmemiş sorular önce gelir; set boyunca doğru cevap ve çözüm her sorudan sonra gösterilir." : "Başlamak için önce bir ders seç."}</p></div>
+    <p class="xs muted sc3-go-h" id="sc3-go-h" aria-live="polite">${s ? (G ? `Katalogda bu seçimde ${avN} soru var${avN && avN < o.n ? `; test ${avN} soruyla başlar (istediğin ${o.n}). ` : ". "}` : "") + "Çözülmemiş sorular önce gelir; set boyunca doğru cevap ve çözüm her sorudan sonra gösterilir." : "Başlamak için önce bir ders seç."}</p></div>
     <div class="sc3-osym"><div class="sc3-osym-h"><h2>ÖSYM tarzı sorular</h2><span class="pill">Ayrı bölüm</span></div><p>Öncüllü (I, II, III), “söylenemez / değildir”, paragraf ve çok adımlı zor sorular. İstersen sınav süresiyle çalışırsın.</p><a class="btn wide" href="#osym" id="sc3-osym">ÖSYM tarzıyla çöz</a></div></aside>`;
-  return `<div class="view sc3">${resumeBanner()}
+  return `<div class="view sc3">${G && RUN && !RUN.gvn ? stEskiKart() : resumeBanner()}
   <section class="sc3-hero" aria-labelledby="sc3-h1"><h1 id="sc3-h1">Soru Çözüm Merkezi</h1><p class="sc3-sub">Hedefine uygun sorularla ilerle.</p>
     <div class="sc3-prog"><div class="sc3-prog-h"><span>Bugünkü ilerlemen</span><b>${td.q} / ${goal} soru</b></div>
       <div class="sc3-bar" role="progressbar" aria-label="Bugünkü ilerlemen" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${Math.min(td.q, goal)}"><i style="width:${yuz}%"></i></div>
@@ -8340,7 +8380,7 @@ const plainQ = s => String(s || "").replace(/\^\{([^}]*)\}/g, "^$1").replace(/_\
 
 function startRun(cfg) {
   if (!cfg.qs || !cfg.qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
-  if ((cfg.paragrafGuvenli || cfg.bankaGuvenli) && RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (yerel/başka) oturum güvenli #paragraf/#banka tarafından ASLA ezilmez; force olsa bile */
+  if (cfgGuvenli(cfg) && RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (yerel/başka) oturum güvenli #paragraf/#banka tarafından ASLA ezilmez; force olsa bile */
   if (RUN && !cfg.force) {
     UI.pendingRun = cfg;
     openModal("Yarım kalan oturum var", `<p>"${esc(RUN.title)}" oturumun henüz bitmedi. Yeni oturum başlarsa o oturumdaki cevaplar silinir.</p>`,
@@ -8348,7 +8388,7 @@ function startRun(cfg) {
     if (UI.modal) UI.modal.runOnay = true;   /* etkin değiştirme onayı: yalnız bu pencere açıkken runReplace işlem yapar */
     return;
   }
-  if (cfg.bankaGuvenli || cfg.paragrafGuvenli) { bankaGuvenliBaslat(cfg); return; }   /* #banka güvenli modu (AKE_KATALOG_BANKA): yerel çözüm yolu yok */
+  if (cfgGuvenli(cfg)) { bankaGuvenliBaslat(cfg); return; }   /* #banka güvenli modu (AKE_KATALOG_BANKA): yerel çözüm yolu yok */
   if (!cfg.canli && svKullan() && svAdaylar(cfg).length) { svBaslat(cfg); return; }
   if (!cfg.canli && ucretsizMi()) { kotaIste(cfg); return; }
   baslatRun(cfg);
@@ -8357,7 +8397,10 @@ function startRun(cfg) {
    Bu mod açıkken sunucu oturumu açılamazsa yerel (cevaplı) set ASLA açılmaz: giriş gerekiyorsa giriş modalı, değilse açık hata gösterilir. */
 const bankaGuvenliMi = () => window.AKE_KATALOG_BANKA === true;
 const paragrafGuvenliMi = () => window.AKE_KATALOG_PARAGRAF === true;   /* #paragraf güvenli modu (3C-2): KHAVUZ p'li sorular, sunucu oturumu zorunlu, yerel cevaplı yol yok */
-const katalogGuvenliMi = () => bankaGuvenliMi() || paragrafGuvenliMi();   /* BK durum makinesi (katalog yükleme/çıkış/hesap nesli) iki güvenli mod için ortaktır */
+const studyoGuvenliMi = () => window.AKE_KATALOG_STUDYO === true;   /* #studyo güvenli modu (3C-3; varsayılan KAPALI): liste/sayaç/başlatma YALNIZ KHAVUZ, sunucu oturumu zorunlu */
+const cfgGuvenli = c => !!(c && (c.bankaGuvenli || c.paragrafGuvenli || c.studyoGuvenli));
+const studyoCfg = cfg => studyoGuvenliMi() ? Object.assign({}, cfg, { studyoGuvenli: true }) : cfg;
+const katalogGuvenliMi = () => bankaGuvenliMi() || paragrafGuvenliMi() || studyoGuvenliMi();   /* BK durum makinesi (katalog yükleme/çıkış/hesap nesli) iki güvenli mod için ortaktır */
 const paragrafCfg = cfg => paragrafGuvenliMi() ? Object.assign({}, cfg, { paragrafGuvenli: true }) : cfg;
 const bankaCfg = cfg => bankaGuvenliMi() ? Object.assign({}, cfg, { bankaGuvenli: true }) : cfg;
 function bankaGuvenliBaslat(cfg) {
@@ -8714,7 +8757,7 @@ async function svBaslat(cfg) {
   const kilit = {}, nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user), eski = () => nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || hesapKimlikAnahtar(HESAP.user) !== kim;
   UI.svBusy = kilit;
   try {
-    const gv = !!(cfg.bankaGuvenli || cfg.paragrafGuvenli), exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
+    const gv = cfgGuvenli(cfg), exam = cfg.mode === "exam", ust = exam ? 120 : 50, adaylar = svAdaylar(cfg), sunulan = new Map();
     let kota = null;
     cfg.svIstek = cfg.svIstek || ("r" + uid() + uid() + uid());
     for (let i = 0; i < adaylar.length; i += ust) {
@@ -8801,6 +8844,7 @@ function baslatRun(cfg) {
     ans: qs.map(() => null), rev: [], flag: [], times: [], start: Date.now(), dur: Math.round((cfg.dur || 0) * 60), cur: 0, qStart: Date.now(),
     secs: cfg.secs || [{ n: cfg.title, from: 0, to: qs.length }], canli: cfg.canli || null };
   if (cfg.bankaGuvenli) RUN.gvn = "banka";   /* kalıcı işaret: güvenli #banka RUN'ı; benzer/AI eylemleri R.gvn ile reddedilir (yerel cevaplı soru giremez) */
+  if (cfg.studyoGuvenli) RUN.gvn = "studyo";   /* kalıcı işaret: güvenli #studyo RUN'ı (3C-3) */
   if (cfg.paragrafGuvenli) RUN.gvn = "paragraf";   /* kalıcı işaret (ake.run'a yazılır): güvenli paragraf RUN'ı; yalnız bu RUN güvenli ekrandan devam ettirilebilir/ezilebilir */
   markSeen(qs);
   UI.inRun = true; UI.modal = null; UI.sheetOpen = null; saveRun(); render(); window.scrollTo(0, 0); startTick();
@@ -9904,7 +9948,7 @@ Object.assign(OZ_ACT, {
   stE(d) { if (!SC_EXAM.some(x => x[0] === d.k)) return; Object.assign(UI.studio, { e: d.k, s: null, t: "", seen: {} }); render(); },
   stDers(d) { if (!SUBJ[d.s]) return; Object.assign(UI.studio, { s: d.s, t: "" }); UI.gen.s = d.s; render(); if (window.innerWidth < 1024) setTimeout(() => { const el = document.getElementById("sc3-s3"); if (el) el.scrollIntoView({ block: "start", behavior: ERISIM.hareket === "off" || matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth" }); }, 40); },
   stT(d) { UI.studio.t = d.t || ""; render(); },
-  stBasla() { const St = UI.studio; if (!St.s || !SUBJ[St.s]) { toast("Önce bir ders seç."); return; } if (St.t) ACT.topicStart({ s: St.s, t: St.t }); else OZ_ACT.dersKarisik({ s: St.s }); },
+  stBasla() { const St = UI.studio; if (!St.s || !SUBJ[St.s]) { toast("Önce bir ders seç."); return; } if (studyoGuvenliMi()) { studyoBaslat(); return; } if (St.t) ACT.topicStart({ s: St.s, t: St.t }); else OZ_ACT.dersKarisik({ s: St.s }); },
   raporKopya() { const t = veliRaporMetni(); try { navigator.clipboard.writeText(t).then(() => toast("Rapor kopyalandı."), () => toast("Kopyalanamadı; metni seçip kopyalayabilirsin.")); } catch (e) { toast("Kopyalanamadı; metni seçip kopyalayabilirsin."); } },
   pomoMod(d) { if (POMO.run || !POMO_SURE[d.k]) return; POMO.mode = d.k; POMO.kalan = POMO_SURE[d.k]; pomoKaydet(); render(); },
   pomoBasla() { POMO.end = Date.now() + pomoKalan() * 1000; POMO.run = true; pomoKaydet(); if (!pomoTimer) pomoTimer = setInterval(pomoTick, 1000); render(); },
@@ -12654,8 +12698,8 @@ const ACT = {
   resume() { if (guvenliEkranMi() && RUN && !RUN.gvn) { paragrafEskiUyari(); return; } UI.pendingRun = null; UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
   svTekrar() { if (BK.cikis) return; const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
   runReplace() { const c = UI.pendingRun, onay = !!(c && UI.modal && UI.modal.runOnay); UI.pendingRun = null; if (!onay) return;   /* bekleyen cfg + açık onay penceresi yoksa HİÇBİR ŞEY yapma (RUN ve ake.run korunur) */
-    if (RUN && !RUN.gvn && (c.paragrafGuvenli || c.bankaGuvenli)) { UI.pendingRun = null; UI.modal = null; paragrafEskiUyari(); return; }
-    if (c.paragrafGuvenli || c.bankaGuvenli) { UI.modal = null; startRun(Object.assign(c, { force: true })); return; }   /* güvenli değiştirme: eski RUN sunucu yeni soruları BAŞARIYLA döndürmeden silinmez (500/402/404/ağ hatasında korunur, yerel fallback yok); başarıda baslatRun yerine geçer */
+    if (RUN && !RUN.gvn && cfgGuvenli(c)) { UI.pendingRun = null; UI.modal = null; paragrafEskiUyari(); return; }
+    if (cfgGuvenli(c)) { UI.modal = null; startRun(Object.assign(c, { force: true })); return; }   /* güvenli değiştirme: eski RUN sunucu yeni soruları BAŞARIYLA döndürmeden silinmez (500/402/404/ağ hatasında korunur, yerel fallback yok); başarıda baslatRun yerine geçer */
     RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },
   discardAsk() { openModal("Oturum silinsin mi?", `<p>"${esc(RUN.title)}" oturumundaki cevapların silinecek.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Sil", a: "discard", k: "pri" }]); },
   discard() { RUN = null; saveRun(); UI.modal = null; UI.inRun = false; render(); },

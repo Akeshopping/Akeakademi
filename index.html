@@ -7959,8 +7959,8 @@ function reviewItem(q, i) {
    Hazır değilse (yükleniyor / giriş gerekli / katalog kapalı-bozuk / hesap değişti) açık durum gösterilir; eski soru listelenmez ya da başlatılmaz.
    Eski bankFiltered() S.reports elemesi YAPMAZ; güvenli mod da yapmaz (yeni davranış eklenmedi). Süzgeçler (ders/konu/seviye/arama/S.ans) KHAVUZ.bankFiltered ile aynı anlamdadır; AI kaynağı bu modda yoktur. */
 const SV_N = { n: 0 };   /* sunucu soru işlemi (oturum/cevap) nesli: ACT.cikis başlarken artar; flush()/OT.nesil'den BAĞIMSIZDIR. Çıkış sonradan başarısız olsa da önceki işlemler yeniden geçerli olmaz. */
-const BK = { n: 0, d: "bos", kod: "", kimlik: "", cikis: false };   // cikis: ACT.cikis başladı ve oturum henüz temizlenmedi → yeniden yükleme YOK, liste YOK   // d: bos | yukleniyor | hazir | hata
-function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; if (katalogGuvenliMi()) queueMicrotask(() => { try { if (katalogEkranMi()) render(); } catch (e) { } }); }
+const BK = { n: 0, d: "bos", kod: "", kimlik: "", cikis: false, sonra: null };   // cikis: ACT.cikis başladı ve oturum henüz temizlenmedi → yeniden yükleme YOK, liste YOK   // d: bos | yukleniyor | hazir | hata
+function bankaSifirla() { BK.n++; BK.d = "bos"; BK.kod = ""; BK.kimlik = ""; BK.sonra = null; if (katalogGuvenliMi()) queueMicrotask(() => { try { if (katalogEkranMi()) render(); } catch (e) { } }); }
 function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata" | "cikis"
   if (BK.cikis) return "cikis";
   if (!HESAP.hazir) return "yukleniyor";
@@ -7974,7 +7974,7 @@ function bankaDurum() {   // "yukleniyor" | "giris" | "hazir" | "kapali" | "hata
 function bankaYukle(yenile) {
   if (BK.cikis) return;
   const n = ++BK.n, k = hesapKimlikAnahtar(HESAP.user); BK.d = "yukleniyor"; BK.kod = ""; BK.kimlik = k;
-  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (katalogEkranMi()) render(); } catch (e) { } };   // geç/eski yanıt hiçbir şeyi değiştirmez
+  const bitti = (d, kod) => { if (n !== BK.n || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== k) return; BK.d = d; BK.kod = kod || ""; try { if (katalogEkranMi()) render(); } catch (e) { } const f = BK.sonra; BK.sonra = null; if (f) { try { f(); } catch (e) { } } };   // geç/eski yanıt hiçbir şeyi değiştirmez; bekleyen dış giriş (3C-4a) yalnız geçerli yanıtta çalışır
   KHAVUZ.yukle(yenile ? { yenile: true } : {}).then(r => bitti(r && r.ok ? "hazir" : "hata", r && r.durum), () => bitti("hata", "beklenmeyen_hata"));
 }
 function bankaHazirDegil() { if (bankaDurum() === "giris") kotaGirisModal(); else toast("Soru kataloğu hazır değil."); }
@@ -8100,17 +8100,42 @@ function stDurumGorunumu(d) {
   <div class="card stack" data-studyo-durum="${d}"><div class="empty">${M[0]}</div>${M[1] ? `<div class="row">${M[1]}</div>` : ""}</div>${RUN && !RUN.gvn ? stEskiKart() : ""}</div>`;
 }
 function studyoBaslat() {
-  const St = UI.studio, o = stOpt();
+  const St = UI.studio;
   if (!St.s || !SUBJ[St.s]) { toast("Önce bir ders seç."); return; }
   if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
   if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
+  studyoCek(St.s, St.t, stOpt());
+}
+/* güvenli çekirdek (#studyo "Teste başla" ve 3C-4a dış girişleri ortak): katalog hazır varsayılır; yine de eski RUN ve havuz yeniden denetlenir */
+function studyoCek(s, t, o) {
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
-  const f = {}; if (St.t) f.topic = St.t; if (o.d) f.diff = o.d;
-  const r = stHavuzG(St.s, f); if (!r) { bankaHazirDegil(); return; }
+  const f = {}; if (t) f.topic = t; if (o.d) f.diff = o.d;
+  const r = stHavuzG(s, f); if (!r) { bankaHazirDegil(); return; }
   const qs = r.taze.concat(r.eski).slice(0, o.n);   /* çözülmemişler önce; fazlası DOLDURULMAZ (GENS/BANK/EKQ/AI yok) */
   if (!qs.length) { toast("Katalogda bu seçim için soru bulunamadı. Zorluğu 'Karışık' yap ya da başka bir konu seç."); return; }
   if (qs.length < o.n) toast(`Katalogda bu seçim için ${qs.length} soru var (istediğin ${o.n}). Test ${qs.length} soruyla başlıyor.`);
-  startRun(studyoCfg({ kind: "practice", title: `${SUBJ[St.s].n} · ${St.t || "karışık"}` + (o.d ? " · " + DIFF[o.d] : ""), mode: "study", qs }));   /* sıra KORUNUR: KHAVUZ taze listeyi zaten karıştırdı; eskiler "en uzun süredir görülmeyen önce" kalır (son karıştırma YOK) */
+  startRun(studyoCfg({ kind: "practice", title: `${SUBJ[s].n} · ${t || "karışık"}` + (o.d ? " · " + DIFF[o.d] : ""), mode: "study", qs }));   /* sıra KORUNUR: KHAVUZ taze listeyi zaten karıştırdı; eskiler "en uzun süredir görülmeyen önce" kalır (son karıştırma YOK) */
+}
+/* 3C-4a: stüdyo DIŞI ekranlardan (ana sayfa, plan, kart, ilerleme, ısı haritası...) ACT.topicStart / OZ_ACT.dersKarisik güvenli çekirdeğe bağlanır (bayrak açıkken).
+   Katalog henüz yüklenmemişse yükleme EYLEM SIRASINDA başlar; beklerken yerel RUN açılmaz. Yükleme/oturum/çıkış/hesap nesli her bekleyişten sonra denetlenir (geç yanıt yeni hesaba RUN açamaz). */
+function studyoGiris(s, t, o) {
+  if (!SUBJ[s]) return;
+  if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski işaretsiz RUN: yükleme de başlatılmaz, değiştirme penceresi de açılmaz */
+  const d = bankaDurum();
+  if (d === "hazir") { studyoCek(s, t, o); return; }
+  if (d === "giris") { kotaGirisModal(); return; }
+  if (d === "yukleniyor" && HESAP.hazir && !HESAP.hata && HESAP.user) {
+    const nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user);
+    BK.sonra = () => {
+      if (nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== kim) return;   /* hesap/çıkış/nesil değişti: eski bekleyen eylem RUN açamaz */
+      if (bankaDurum() === "hazir") studyoCek(s, t, o); else toast("Soru kataloğu yüklenemedi. Biraz sonra tekrar dene.");
+    };
+    if (BK.d === "bos") bankaYukle(false);
+    toast("Soru kataloğu yükleniyor; hazır olunca test başlayacak.");
+    return;
+  }
+  toast(d === "yukleniyor" ? "Hesap bilgisi yükleniyor; birazdan tekrar dene." : "Soru kataloğu şu an açılamadı. Biraz sonra tekrar dene.");   /* kapalı / hata: yerel soruya DÜŞÜLMEZ */
 }
 function vStudio() {
   const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
@@ -9794,7 +9819,7 @@ function gunlukProgram() {
   return out;
 }
 function gtaskHTML(x) {
-  const at = x.a === "topicStart" ? ` data-s="${x.ds}" data-t="${esc(x.dt)}"` : x.a === "go" ? ` data-h="${x.h}"` : x.k ? ` data-k="${x.k}"` : "";
+  const at = x.a === "topicStart" ? ` data-s="${x.ds}" data-t="${esc(x.dt)}" data-adet="10"` : x.a === "go" ? ` data-h="${x.h}"` : x.k ? ` data-k="${x.k}"` : "";
   return `<div class="gtask${x.done ? " done" : ""}"><span class="ck" aria-hidden="true"></span><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(x.s)}</div></div>${x.done ? `<span class="small muted">Tamam</span>` : `<button class="btn sm" data-a="${x.a}"${at}>${x.l}</button>`}</div>`;
 }
 
@@ -9925,7 +9950,7 @@ function vKisa() {
   <div class="vhead"><h1>Kısa ders kartları</h1><p>Yukarı kaydırarak ilerle. Her kart bir dakikalık özet; hazır hissettiğinde o dersten soru çöz.</p></div>
   ${subTabs(TEKRAR_TABS, "kisa")}
   <div class="kisa-feed">${K.map((k, i) => `<article class="kisa"><span class="k-ders">${esc(SUBJ[k.s] ? SUBJ[k.s].n : "Genel")} · ${i + 1}/${K.length}</span><h2>${esc(k.n)}</h2><ul>${k.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-    <div class="k-alt">${sesBtn("sesKisa", ` data-n="${i}"`, "kisa:" + i, "Dinle")}${SUBJ[k.s] ? `<button class="btn sm pri" data-a="dersKarisik" data-s="${k.s}">Bu dersten 10 soru</button>` : ""}</div></article>`).join("")}</div>
+    <div class="k-alt">${sesBtn("sesKisa", ` data-n="${i}"`, "kisa:" + i, "Dinle")}${SUBJ[k.s] ? `<button class="btn sm pri" data-a="dersKarisik" data-s="${k.s}" data-adet="10">Bu dersten 10 soru</button>` : ""}</div></article>`).join("")}</div>
   </div>`;
 }
 
@@ -9942,7 +9967,7 @@ function vUret() {
 Object.assign(OZ_ACT, {
   dersSec(d) { UI.studio.s = d.s; UI.gen.s = d.s; render(); },
   dersAc(d) { UI.studio.s = d.s; UI.gen.s = d.s; go("studyo"); },
-  dersKarisik(d) { if (!SUBJ[d.s]) return; const o = stOpt(); const b = buildSet([[d.s, o.n]], { unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · karışık`, o); },
+  dersKarisik(d) { if (!SUBJ[d.s]) return; const o = stOpt(); if (studyoGuvenliMi()) { if (d.adet === 10 || d.adet === "10") o.n = 10; studyoGiris(d.s, "", o); return; } const b = buildSet([[d.s, o.n]], { unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · karışık`, o); },
   stN(d) { UI.studio.n = +d.n || 10; render(); },
   stD(d) { UI.studio.d = +d.d || 0; render(); },
   stE(d) { if (!SC_EXAM.some(x => x[0] === d.k)) return; Object.assign(UI.studio, { e: d.k, s: null, t: "", seen: {} }); render(); },
@@ -12688,7 +12713,7 @@ const ACT = {
     else if (d.k === "mini") { UI.exam.type = defaultExam(); UI.exam.size = "quarter"; UI.exam.mode = "exam"; UI.exam.dur = ""; startExamFromUI(); }
     else if (d.k === "weak") { const w = weakTopics(1)[0]; if (w) ACT.topicStart({ s: w.s, t: w.t }); else ACT.quick({ k: "mix" }); }
   },
-  topicStart(d) { const o = stOpt(); const b = buildSet([[d.s, o.n]], { topic: d.t, unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · ${d.t}`, o); },
+  topicStart(d) { const o = stOpt(); if (studyoGuvenliMi()) { if (d.adet === 10 || d.adet === "10") o.n = 10; studyoGiris(d.s, d.t, o); return; } const b = buildSet([[d.s, o.n]], { topic: d.t, unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · ${d.t}`, o); },
   exType(d) { UI.exam.type = d.k; render(); },
   exSize(d) { UI.exam.size = d.k; render(); },
   exMode(d) { UI.exam.mode = d.k; render(); },

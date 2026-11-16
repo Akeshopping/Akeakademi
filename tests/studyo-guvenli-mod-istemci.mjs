@@ -222,13 +222,19 @@ for (const [ad, ayar, beklenen] of [["giris", { giris: false }, "giris"], ["kapa
   D3.cikisTut.ac(); await p.evaluate(() => window.__cik).catch(() => { }); await p.waitForTimeout(700); const son = await p.evaluate(() => ({ kullanici: !!HESAP.user, satir: document.querySelectorAll(".sc3-k").length }));
   t("GÜVENLİ", "Y4b çıkış tamamlanınca: kullanıcı yok, liste yok, 'giris' kartı", !son.kullanici && son.satir === 0 && (await kartDeger(p)) === "giris", JSON.stringify({ ...son, kart: await kartDeger(p) })); await c.close(); }
 
-/* =====================  DIŞ: #studyo DIŞI çağıranlar bu adımla güvenli SAYILMAZ (bilinçli açık kalan risk; yeşil belgeleme)  ===================== */
+/* =====================  3C-4a: ACT.topicStart / OZ_ACT.dersKarisik artık GÜVENLİ çekirdeğe bağlı (ayrıntılı sözleşme: tests/studyo-dis-cagiranlar-istemci.mjs); kapsam DIŞI yollar yerel kalır  ===================== */
 { sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await hazirBekle(p);
   await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; const St = UI.studio; St.n = 10; St.d = 0; });
   await p.evaluate(([s, tt]) => ACT.topicStart({ s, t: tt }), [DERS, TA]); const r = await ozet(p);
-  t("DIŞ", "X1 bayrak açıkken ACT.topicStart (plan/zayıf konu/hızlı weak çağıranı) YEREL kalır: sete BANK/GENS soruları girer (güvenli SAYILMAZ; bu adımın kapsamı dışında)", r.run && (r.bankN + r.genN) > 0, JSON.stringify({ ...r, ids: undefined }));
+  t("GÜVENLİ", `X1 bayrak açıkken ACT.topicStart (plan/zayıf konu çağıranı) GÜVENLİ çekirdeğe bağlı: konuda ${katTA.length} katalog sorusu → tam ${katTA.length} soru, yalnız katalog, sunucu oturumlu, cevapsız, gvn='studyo' (BANK/GENS dolgusu yok)`, sadeceKat(r, new Set(katTA.map(x => x.id))) && r.n === katTA.length && r.gvn === "studyo", JSON.stringify({ ...r, ids: undefined }));
   await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; }); await p.evaluate(([s]) => OZ_ACT.dersKarisik({ s }), [DERS]); const r2 = await ozet(p);
-  t("DIŞ", "X2 bayrak açıkken OZ_ACT.dersKarisik (kartlar 'Bu dersten 10 soru') YEREL kalır: sete BANK/GENS soruları girer (güvenli SAYILMAZ)", r2.run && (r2.bankN + r2.genN) > 0, JSON.stringify({ ...r2, ids: undefined })); await c.close(); }
+  t("GÜVENLİ", "X2 bayrak açıkken OZ_ACT.dersKarisik (kart 'Bu dersten 10 soru') GÜVENLİ çekirdeğe bağlı: 10 soru, yalnız katalog, sunucu oturumlu, cevapsız, gvn='studyo'", sadeceKat(r2, KS) && r2.n === 10 && r2.gvn === "studyo", JSON.stringify({ ...r2, ids: undefined }));
+  for (const [ad, f] of [["ACT.quick mix (plan 'Karışık test')", () => ACT.quick({ k: "mix" })], ["ACT.quick mini (haftalık mini deneme)", () => ACT.quick({ k: "mini" })], ["ACT.kocTest (koç)", () => ACT.kocTest({ s: "SB", t: "TT" })]]) {
+    await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; });
+    await p.evaluate(([fs, s, tt]) => { new Function("return (" + fs.replace('"SB"', JSON.stringify(s)).replace('"TT"', JSON.stringify(tt)) + ")()")(); }, [f.toString(), DERS, TB]); const x = await ozet(p);
+    t("DIŞ", `X ${ad}: 3C-4a kapsamı DIŞINDA; bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, x.run && !x.gvn && x.ids.some(i => !KS.has(i)), JSON.stringify({ ...x, ids: undefined }));
+  }
+  await c.close(); }
 
 console.log(`\nÖZET: ${gecen} geçti, ${kalan} kaldı` + (kirmizi.length ? "\nKIRMIZI: " + kirmizi.join(" | ") : ""));
 await b.close(); srv.close(); process.exit(kalan ? 1 : 0);

@@ -229,10 +229,12 @@ for (const [ad, ayar, beklenen] of [["giris", { giris: false }, "giris"], ["kapa
   t("GÜVENLİ", `X1 bayrak açıkken ACT.topicStart (plan/zayıf konu çağıranı) GÜVENLİ çekirdeğe bağlı: konuda ${katTA.length} katalog sorusu → tam ${katTA.length} soru, yalnız katalog, sunucu oturumlu, cevapsız, gvn='studyo' (BANK/GENS dolgusu yok)`, sadeceKat(r, new Set(katTA.map(x => x.id))) && r.n === katTA.length && r.gvn === "studyo", JSON.stringify({ ...r, ids: undefined }));
   await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; }); await p.evaluate(([s]) => OZ_ACT.dersKarisik({ s }), [DERS]); const r2 = await ozet(p);
   t("GÜVENLİ", "X2 bayrak açıkken OZ_ACT.dersKarisik (kart 'Bu dersten 10 soru') GÜVENLİ çekirdeğe bağlı: 10 soru, yalnız katalog, sunucu oturumlu, cevapsız, gvn='studyo'", sadeceKat(r2, KS) && r2.n === 10 && r2.gvn === "studyo", JSON.stringify({ ...r2, ids: undefined }));
-  for (const [ad, f] of [["ACT.quick mix (plan 'Karışık test')", () => ACT.quick({ k: "mix" })], ["ACT.quick mini (haftalık mini deneme)", () => ACT.quick({ k: "mini" })], ["ACT.kocTest (koç)", () => ACT.kocTest({ s: "SB", t: "TT" })]]) {
+  await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; }); await p.evaluate(() => ACT.quick({ k: "mix" })); const xm = await ozet(p);
+  t("GÜVENLİ", "X3 bayrak açıkken ACT.quick mix (plan 'Karışık test') GÜVENLİ çekirdeğe bağlı (3C-4b): gvn='studyo', yalnız katalog kimlikleri, sunucu oturumlu, BANK/GENS dolgusu yok (ayrıntı: tests/studyo-karma-istemci.mjs)", xm.run && xm.gvn === "studyo" && xm.ids.every(i => KS.has(i)) && xm.bankN === 0 && xm.genN === 0 && xm.svN === xm.n, JSON.stringify({ ...xm, ids: undefined }));
+  for (const [ad, f] of [["ACT.quick mini (haftalık mini deneme)", () => ACT.quick({ k: "mini" })], ["ACT.kocTest (koç)", () => ACT.kocTest({ s: "SB", t: "TT" })]]) {
     await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; });
     await p.evaluate(([fs, s, tt]) => { new Function("return (" + fs.replace('"SB"', JSON.stringify(s)).replace('"TT"', JSON.stringify(tt)) + ")()")(); }, [f.toString(), DERS, TB]); const x = await ozet(p);
-    t("DIŞ", `X ${ad}: 3C-4a kapsamı DIŞINDA; bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, x.run && !x.gvn && x.ids.some(i => !KS.has(i)), JSON.stringify({ ...x, ids: undefined }));
+    t("DIŞ", `X ${ad}: 3C-4a/3C-4b kapsamı DIŞINDA; bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, x.run && !x.gvn && x.ids.some(i => !KS.has(i)), JSON.stringify({ ...x, ids: undefined }));
   }
   await c.close(); }
 

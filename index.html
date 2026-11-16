@@ -8154,6 +8154,26 @@ function studyoKarmaCek() {
   startRun(studyoCfg({ kind: "practice", title: "Karma test", mode: "study", qs: shuffle(qs) }));
 }
 function studyoKarmaGiris() { studyoGirisCalistir(studyoKarmaCek); }
+/* 3C-4c: mini deneme (ACT.quick mini), bayrak AÇIKKEN: bölüm başına KHAVUZ'dan (önce taze, sonra eski) examRows çeyrek adedi kadar soru; eksik DOLDURULMAZ (BANK/EKQ/AI/GENS yok), eksik dersler bildirilir,
+   toplam 0 ise RUN açılmaz; sınav modu + otomatik süre (ex.min · seçilen/tam; katalog tamsa mevcut yerel mini ile aynı); güvenli cfg (studyoGuvenli) → sunucu sınav oturumu zorunlu, yerel fallback/kota yok.
+   Deneme merkezinden başlatılan tam/yarım/çeyrek/özel denemeler (startExamFromUI) DEĞİŞMEZ. */
+function studyoMiniCek() {
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  const E = UI.exam, type = E.type || defaultExam(), ex = EXAMS[type], rows = examRows(type), qs = [], secs = [], eksik = [], gor = new Set();
+  for (const r of rows) {
+    const h = stHavuzG(r.s, {}); if (!h) { bankaHazirDegil(); return; }
+    const al = h.taze.concat(h.eski).filter(q => !gor.has(q.id)).slice(0, r.n);
+    if (al.length < r.n) eksik.push(`${SUBJ[r.s].n}: ${al.length}/${r.n}`);
+    let sec = secs[secs.length - 1];
+    if (!sec || sec.n !== r.sec) { sec = { n: r.sec, from: qs.length, to: qs.length }; secs.push(sec); }
+    for (const q of al) { gor.add(q.id); qs.push(q); } sec.to = qs.length;
+  }
+  if (!qs.length) { toast("Katalogda mini deneme için soru bulunamadı."); return; }
+  if (eksik.length) toast("Katalogda bazı derslerde yeterli soru yok: " + eksik.join(", "));
+  const full = rows.reduce((a, r) => a + r.full, 0), auto = Math.max(5, Math.round(ex.min * qs.length / full));
+  startRun(studyoCfg({ kind: "exam", type, title: ex.n + " denemesi · mini", mode: "exam", qs, secs: secs.filter(x => x.to > x.from), dur: auto }));
+}
+function studyoMiniGiris() { studyoGirisCalistir(studyoMiniCek); }
 function vStudio() {
   const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
   const St = UI.studio;
@@ -8792,6 +8812,18 @@ function svHataModal(cfg, mesaj) {
   UI.svBekleyen = cfg;
   openModal("Sorular şu an açılamadı", `<p>${esc(mesaj)} Hakkın tekrar düşmez; aynı oturum yeniden denenir.</p>`, [{ l: "Vazgeç", a: "modalClose" }, { l: "Tekrar dene", a: "svTekrar", k: "pri" }]);
 }
+/* Güvenli sınavda sunucunun vermediği sorular çıkarılınca bölüm aralıkları (from/to) kalan soruların ESKİ bölüm üyeliğine göre yeniden kurulur; boş bölüm çıkar.
+   Üyeliği belirlenemeyen soru olursa null döner; svBaslat bu durumda ESKİ secs'i KULLANMAZ, kalan sorular için tek adlandırılmış bölüm (from:0,to:n) kurar ve bildirir. */
+function svSecsKur(eskiQs, secs, kalan) {
+  if (!secs || !secs.length) return null;
+  const yer = new Map(eskiQs.map((q, i) => [q, i])), out = []; let son = null;
+  for (let k = 0; k < kalan.length; k++) {
+    const i = yer.get(kalan[k]), s = i == null ? null : secs.find(x => i >= x.from && i < x.to);
+    if (!s) return null;
+    if (son === s) out[out.length - 1].to = k + 1; else { out.push({ n: s.n, from: k, to: k + 1 }); son = s; }
+  }
+  return out;
+}
 async function svBaslat(cfg) {
   if (UI.svBusy || BK.cikis) return;   /* çıkış sürerken yeni sunucu oturumu başlamaz */
   /* işlem nesli: başladığı andaki OT.nesil + hesap kimliği yakalanır; her await sonrası, yan etkilerden ÖNCE denetlenir. A→B→A da eski işlemdir (nesil iki kez artar).
@@ -8820,7 +8852,8 @@ async function svBaslat(cfg) {
     if (kota && !kota.sinirsiz && kota.kalan != null) HESAP.ucr = Object.assign({}, HESAP.ucr || {}, exam ? { kalanDeneme: kota.kalan } : { kalanSoru: kota.kalan });
     let qs = cfg.qs.slice();
     const yerel = qs.filter(q => !(svAday(q) && sunulan.has(q.id)));
-    if (gv) { if (yerel.length) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Bazı sorular sunucudan alınamadı; yalnız sunucunun verdiği sorular açıldı."); } }   /* güvenli mod: yerel soru ve kotaAl yok */
+    let secsYeni = null;
+    if (gv) { if (yerel.length) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); secsYeni = svSecsKur(cfg.qs, cfg.secs, qs); const belirsiz = !secsYeni && !!(cfg.secs && cfg.secs.length); if (belirsiz) secsYeni = [{ n: "Bölüm dağılımı doğrulanamadı", from: 0, to: qs.length }]; toast(yerel.length + " soru sunucudan alınamadı; yalnız sunulan " + qs.length + " soruyla açıldı." + (belirsiz ? " Bölüm dağılımı doğrulanamadı; sorular tek bölüm olarak gösterilecek." : "")); } }   /* güvenli mod: yerel soru ve kotaAl yok; bölüm aralıkları (secs) kalan soruların eski bölüm üyeliğine göre yeniden kurulur */
     else if (!exam && yerel.length && kota && !kota.sinirsiz && kota.kalan === 0) { const at = new Set(yerel); qs = qs.filter(q => !at.has(q)); toast("Ücretsiz pakette bugün hakkın bu kadarına yetti."); }
     else if (!exam && yerel.length && !(kota && kota.sinirsiz)) {
       const v = await kotaAl("soru", yerel.length);
@@ -8834,7 +8867,7 @@ async function svBaslat(cfg) {
       c.q = k.s.q; c.o = k.s.o; if (k.s.p) c.p = k.s.p; if (k.s.os) c.os = 1; if (k.s.fix) c.fix = 1; c.sv = k.oturum; return c;   /* os/fix: sunucu bayrağı (Aşama 3A) yerel işareti tamamlar; cevap anahtarı değildir */
     });
     if (!qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
-    baslatRun(Object.assign({}, cfg, { qs }));
+    baslatRun(Object.assign({}, cfg, secsYeni ? { qs, secs: secsYeni } : { qs }));
   } finally { if (UI.svBusy === kilit) UI.svBusy = false; }
 }
 function startRunEski(cfg) { if (cfg.canli || !ucretsizMi()) { baslatRun(cfg); return; } kotaIste(cfg); }
@@ -12727,7 +12760,7 @@ const ACT = {
   go(d) { go(d.h); },
   quick(d) {
     if (d.k === "mix") { if (studyoGuvenliMi()) { studyoKarmaGiris(); return; } const b = buildSet(mixParts(), { unsolvedFirst: true }); startRun({ kind: "practice", title: "Karma test", mode: "study", qs: shuffle(b.qs) }); }
-    else if (d.k === "mini") { UI.exam.type = defaultExam(); UI.exam.size = "quarter"; UI.exam.mode = "exam"; UI.exam.dur = ""; startExamFromUI(); }
+    else if (d.k === "mini") { UI.exam.type = defaultExam(); UI.exam.size = "quarter"; UI.exam.mode = "exam"; UI.exam.dur = ""; if (studyoGuvenliMi()) studyoMiniGiris(); else startExamFromUI(); }
     else if (d.k === "weak") { const w = weakTopics(1)[0]; if (w) ACT.topicStart({ s: w.s, t: w.t }); else ACT.quick({ k: "mix" }); }
   },
   topicStart(d) { const o = stOpt(); if (studyoGuvenliMi()) { if (d.adet === 10 || d.adet === "10") o.n = 10; studyoGiris(d.s, d.t, o); return; } const b = buildSet([[d.s, o.n]], { topic: d.t, unsolvedFirst: true, diff: o.d || undefined }); stBaslat(b, `${SUBJ[d.s].n} · ${d.t}`, o); },

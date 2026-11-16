@@ -8118,18 +8118,19 @@ function studyoCek(s, t, o) {
 }
 /* 3C-4a: stüdyo DIŞI ekranlardan (ana sayfa, plan, kart, ilerleme, ısı haritası...) ACT.topicStart / OZ_ACT.dersKarisik güvenli çekirdeğe bağlanır (bayrak açıkken).
    Katalog henüz yüklenmemişse yükleme EYLEM SIRASINDA başlar; beklerken yerel RUN açılmaz. Yükleme/oturum/çıkış/hesap nesli her bekleyişten sonra denetlenir (geç yanıt yeni hesaba RUN açamaz). */
-function studyoGiris(s, t, o) {
-  if (!SUBJ[s]) return;
+function studyoGiris(s, t, o) { if (!SUBJ[s]) return; studyoGirisCalistir(() => studyoCek(s, t, o)); }
+/* 3C-4b: ortak giriş (yükleme/bekletme/çıkış/hesap-nesil koruması): ACT.topicStart, OZ_ACT.dersKarisik ve karma test aynı kapıdan geçer */
+function studyoGirisCalistir(calistir) {
   if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski işaretsiz RUN: yükleme de başlatılmaz, değiştirme penceresi de açılmaz */
   const d = bankaDurum();
-  if (d === "hazir") { studyoCek(s, t, o); return; }
+  if (d === "hazir") { calistir(); return; }
   if (d === "giris") { kotaGirisModal(); return; }
   if (d === "yukleniyor" && HESAP.hazir && !HESAP.hata && HESAP.user) {
     const nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user);
     BK.sonra = () => {
       if (nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== kim) return;   /* hesap/çıkış/nesil değişti: eski bekleyen eylem RUN açamaz */
-      if (bankaDurum() === "hazir") studyoCek(s, t, o); else toast("Soru kataloğu yüklenemedi. Biraz sonra tekrar dene.");
+      if (bankaDurum() === "hazir") calistir(); else toast("Soru kataloğu yüklenemedi. Biraz sonra tekrar dene.");
     };
     if (BK.d === "bos") bankaYukle(false);
     toast("Soru kataloğu yükleniyor; hazır olunca test başlayacak.");
@@ -8137,6 +8138,22 @@ function studyoGiris(s, t, o) {
   }
   toast(d === "yukleniyor" ? "Hesap bilgisi yükleniyor; birazdan tekrar dene." : "Soru kataloğu şu an açılamadı. Biraz sonra tekrar dene.");   /* kapalı / hata: yerel soruya DÜŞÜLMEZ */
 }
+/* 3C-4b: karma test (ACT.quick mix), bayrak AÇIKKEN: mixParts() ders/adet dağılımı korunur; her ders için KHAVUZ'dan önce taze, sonra eski sorular; eksik DOLDURULMAZ (BANK/EKQ/AI/GENS yok);
+   eksik dersler açıkça bildirilir, toplam 0 ise RUN açılmaz; seçimden SONRA mevcut karma test karıştırması korunur; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu, yerel fallback/kota yok. */
+function studyoKarmaCek() {
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  const qs = [], eksik = [];
+  for (const [s, n] of mixParts()) {
+    const r = stHavuzG(s, {}); if (!r) { bankaHazirDegil(); return; }
+    const al = r.taze.concat(r.eski).slice(0, n);
+    if (al.length < n) eksik.push(`${SUBJ[s].n}: ${al.length}/${n}`);
+    for (const q of al) qs.push(q);
+  }
+  if (!qs.length) { toast("Katalogda karma test için soru bulunamadı."); return; }
+  if (eksik.length) toast("Katalogda bazı derslerde yeterli soru yok: " + eksik.join(", "));
+  startRun(studyoCfg({ kind: "practice", title: "Karma test", mode: "study", qs: shuffle(qs) }));
+}
+function studyoKarmaGiris() { studyoGirisCalistir(studyoKarmaCek); }
 function vStudio() {
   const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
   const St = UI.studio;
@@ -12709,7 +12726,7 @@ const ACT = {
   modalClose() { UI.modal = null; UI.pendingRun = null; render(); },   /* "Vazgeç": bekleyen çalışma yapılandırması da düşer */
   go(d) { go(d.h); },
   quick(d) {
-    if (d.k === "mix") { const b = buildSet(mixParts(), { unsolvedFirst: true }); startRun({ kind: "practice", title: "Karma test", mode: "study", qs: shuffle(b.qs) }); }
+    if (d.k === "mix") { if (studyoGuvenliMi()) { studyoKarmaGiris(); return; } const b = buildSet(mixParts(), { unsolvedFirst: true }); startRun({ kind: "practice", title: "Karma test", mode: "study", qs: shuffle(b.qs) }); }
     else if (d.k === "mini") { UI.exam.type = defaultExam(); UI.exam.size = "quarter"; UI.exam.mode = "exam"; UI.exam.dur = ""; startExamFromUI(); }
     else if (d.k === "weak") { const w = weakTopics(1)[0]; if (w) ACT.topicStart({ s: w.s, t: w.t }); else ACT.quick({ k: "mix" }); }
   },

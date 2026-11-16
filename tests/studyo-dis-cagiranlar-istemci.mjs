@@ -265,7 +265,9 @@ for (const ad of ["topicStart", "dersKarisik"]) {
 }
 
 /* =====================  DIŞ: bu adımın kapsamı DIŞINDA kalan yollar bayrak açıkken de YEREL kalır (güvenli SAYILMAZ; yeşil belgeleme)  ===================== */
-for (const [ad, js0] of [["ACT.quick mix (plan 'Karışık test')", () => ACT.quick({ k: "mix" })], ["ACT.quick mini (haftalık mini deneme)", () => ACT.quick({ k: "mini" })], ["ACT.kocTest (koç)", ([s, tt]) => ACT.kocTest({ s, t: tt })]]) {
+{ sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await onYukle(p); await runSil(p); await p.evaluate(() => ACT.quick({ k: "mix" })); const xm = await ozet(p);
+  t("GÜVENLİ", "X ACT.quick mix (plan 'Karışık test') artık GÜVENLİ çekirdeğe bağlı (3C-4b): gvn='studyo', yalnız katalog kimlikleri, sunucu oturumlu, BANK/GENS dolgusu yok (ayrıntı: tests/studyo-karma-istemci.mjs)", xm.run && xm.gvn === "studyo" && xm.ids.every(i => KS.has(i)) && xm.bankN === 0 && xm.genN === 0 && xm.svN === xm.n, JSON.stringify({ ...xm, ids: undefined })); await c.close(); }
+for (const [ad, js0] of [["ACT.quick mini (haftalık mini deneme)", () => ACT.quick({ k: "mini" })], ["ACT.kocTest (koç)", ([s, tt]) => ACT.kocTest({ s, t: tt })]]) {
   sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await onYukle(p); await runSil(p);
   await p.evaluate(([f, a]) => { new Function("a", "return (" + f + ")(a)")(a); }, [js0.toString(), [DERS, TB]]); const r = await ozet(p);
   t("DIŞ", `X ${ad}: bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, r.run && !r.gvn && r.ids.some(i => !KS.has(i)), JSON.stringify({ ...r, ids: undefined })); await c.close();

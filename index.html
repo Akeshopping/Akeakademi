@@ -8174,6 +8174,36 @@ function studyoMiniCek() {
   startRun(studyoCfg({ kind: "exam", type, title: ex.n + " denemesi · mini", mode: "exam", qs, secs: secs.filter(x => x.to > x.from), dur: auto }));
 }
 function studyoMiniGiris() { studyoGirisCalistir(studyoMiniCek); }
+/* 3C-4d: koç testi (ACT.kocTest), bayrak AÇIKKEN: seviye ağırlıkları (kolay/orta/zor) korunur; sorular YALNIZ KHAVUZ'dan (önce taze, sonra eski). Açık yanlışlardan en çok n'li en fazla 2 tanesi KİMLİKLE katalogda aranır ve RUN'a
+   katalogdaki cevapsız nesneyle girer (S.mistakes[].q anlık görüntüsü KOPYALANMAZ); katalogda olmayan, g: ya da görselli eski yanlışlar elenir ve bildirilir. Konu yetmezse aynı dersten katalogla 10'a tamamlanır; yine yetmezse eksik sayıyla açılır ve bildirilir.
+   BANK/EKQ/AI/GENS dolgusu ve yerel kota/fallback YOK; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu. KAPSAM DIŞI (DEĞİŞMEZ, cevaplı yerel kaynak): kocOrnekler ve mist* yolları. */
+function studyoKocCek(s, t) {
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  if (!SUBJ[s]) return;
+  const hT = stHavuzG(s, { topic: t }), hS = stHavuzG(s, {}); if (!hT || !hS) { bankaHazirDegil(); return; }
+  const a = kocAnaliz().find(x => x.s === s && x.t === t), L = a ? a.seviye : 2, ids = new Set(), mq = [], kat = new Map(hS.havuz.map(q => [q.id, q]));
+  let at = 0;
+  for (const m of Object.values(S.mistakes).filter(m => !m.learned && m.q && m.q.s === s && m.q.t === t).sort((x, y) => y.n - x.n)) {
+    if (mq.length >= 2) break;
+    const id = String(m.q.id), k = (m.q.fig || m.q.gen || /^g:/.test(id)) ? null : kat.get(id);
+    if (!k) { at++; continue; }
+    if (ids.has(id)) continue;   /* tekrar */
+    ids.add(id); mq.push(k);
+  }
+  const kalan = 10 - mq.length, w = [[6, 3, 1], [2, 5, 3], [1, 3, 6]][L - 1], top = w[0] + w[1] + w[2], take = [];
+  let sayi = w.map(x => Math.round(kalan * x / top)); sayi[1] += kalan - sayi.reduce((p, c) => p + c, 0);
+  const ekle = (h, n) => { let k = 0; for (const q of h.taze.concat(h.eski)) { if (k >= n) break; if (ids.has(q.id)) continue; ids.add(q.id); take.push(q); k++; } };
+  sayi.forEach((c, i) => { if (c > 0) { const h = stHavuzG(s, { topic: t, diff: i + 1 }); if (h) ekle(h, c); } });
+  if (take.length < kalan) ekle(hT, kalan - take.length);
+  if (take.length < kalan) ekle(hS, kalan - take.length);   /* konu havuzu küçükse aynı dersten KATALOGLA tamamla (GENS/BANK/EKQ/AI yok) */
+  const qs = mq.concat(take), nt = [];
+  if (at) nt.push(at + " eski yanlış katalogda bulunamadığı (üretilmiş, görselli ya da kaldırılmış) için teste alınmadı.");
+  if (!qs.length) { toast((nt.length ? nt.join(" ") + " " : "") + "Katalogda bu konu için soru bulunamadı."); return; }
+  if (qs.length < 10) nt.push(`Katalogda bu konu ve dersten ${qs.length} soru var (istediğin 10). Test ${qs.length} soruyla başlıyor.`);
+  if (nt.length) toast(nt.join(" "));
+  startRun(studyoCfg({ kind: "practice", title: `Sana özel · ${t}`, mode: "study", qs: shuffle(qs) }));
+}
+function studyoKocGiris(s, t) { if (!SUBJ[s]) return; studyoGirisCalistir(() => studyoKocCek(s, t)); }
 function vStudio() {
   const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
   const St = UI.studio;
@@ -11774,7 +11804,7 @@ Object.assign(OZ_ACT, {
   kocAc(d) { const a = kocAnaliz().find(x => x.s === d.s && x.t === d.t); KOC.key = d.s + "|" + d.t; KOC.ex = kocOrnekler(d.s, d.t, a ? a.seviye : 2); try { LS.set("ake.koc." + dayKey() + "." + KOC.key, "1"); } catch (e) { } go("koc"); window.scrollTo(0, 0); },
   kocGeri() { KOC.key = ""; KOC.ex = null; render(); window.scrollTo(0, 0); },
   kocYeniOrnek() { const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t); KOC.ex = kocOrnekler(s, t, a ? a.seviye : 2); render(); },
-  kocTest(d) { const b = kocSet(d.s, d.t, 10); startRun({ kind: "practice", title: `Sana özel · ${d.t}`, mode: "study", qs: b.qs }); }
+  kocTest(d) { if (studyoGuvenliMi()) { studyoKocGiris(d.s, d.t); return; } const b = kocSet(d.s, d.t, 10); startRun({ kind: "practice", title: `Sana özel · ${d.t}`, mode: "study", qs: b.qs }); }
 });
 /* ===== ÖSYM tarzı sorular: öncüllü, "söylenemez / değildir", paragraf ve zor kalıp soruları ===== */
 UI.osym = { e: "TYT", s: "", n: 10, mode: "study" };

@@ -231,13 +231,13 @@ for (const [ad, y, senlar] of [["ana sayfa 'Karışık test'", GIRIS["ana sayfa 
   t("GÜVENLİ", "Q ana sayfa 'Karışık test': çıkış isteği beklerken katalog yanıtı gelir → RUN ve ake.run yok, yerel set yok, /oturum ve yerel kota isteği yok; yeni tıklama da RUN açmaz", tk && basladi && geldi && !o1.run && o1.lsId === null && ist1 === 0 && D.kota === 0 && !o2.run && o2.lsId === null && o2.genN === 0 && o2.bankN === 0 && D.istekler.length === 0, JSON.stringify({ tk, basladi, geldi, run1: o1.run, lsId1: o1.lsId, oturum1: ist1, tk2, run2: o2.run, lsId2: o2.lsId, oturum2: D.istekler.length, kota: D.kota }));
   D3.cikisTut.ac(); await p.evaluate(() => window.__cik).catch(() => { }); await p.waitForTimeout(600); await c.close(); }
 
-/* =====================  DIŞ: bu adımın kapsamı DIŞINDA kalan yollar bayrak açıkken de YEREL kalır (güvenli SAYILMAZ; yeşil belgeleme)  ===================== */
+/* =====================  DIŞ: 3C-4d sonrası: kocTest de güvenli çekirdeğe bağlı (kocOrnekler ve mist* KAPSAM DIŞI; tests/studyo-koc-istemci.mjs)  ===================== */
 { sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await onYukle(p); await runSil(p); await p.evaluate(() => { ACT.quick({ k: "mini" }); }); const xmi = await ozet(p);
   t("GÜVENLİ", "X ACT.quick mini artık GÜVENLİ çekirdeğe bağlı (3C-4c): yerel dolgu yok: RUN açılırsa gvn='studyo', yalnız katalog kimlikleri, sunucu oturumlu, BANK/GENS yok; katalogda deneme dersi yoksa RUN açılmaz (ayrıntı: tests/studyo-mini-istemci.mjs)", !xmi.run || (xmi.gvn === "studyo" && xmi.ids.every(i => KS.has(i)) && xmi.bankN === 0 && xmi.genN === 0 && xmi.svN === xmi.n), JSON.stringify({ ...xmi, ids: undefined })); await c.close(); }
 for (const [ad, kod] of [["ACT.kocTest (koç testi)", "ACT.kocTest({ s: X.s, t: X.t })"]]) {
   sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await onYukle(p); await runSil(p);
   await p.evaluate(([k, x]) => { new Function("X", k)(x); }, [kod, XKON]); const r = await ozet(p);
-  t("DIŞ", `X ${ad}: bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, r.run && !r.gvn && r.ids.some(i => !KS.has(i)), JSON.stringify({ ...r, ids: undefined })); await c.close();
+  t("GÜVENLİ", `X ${ad} (3C-4d): bayrak açıkken GÜVENLİ çekirdeğe bağlı: RUN açılırsa gvn='studyo', yalnız katalog kimlikleri, sunucu oturumlu, BANK/GENS dolgusu yok (ayrıntı: tests/studyo-koc-istemci.mjs; kocOrnekler ve mist* KAPSAM DIŞI, güvenli sayılmaz)`, r.run && r.gvn === "studyo" && r.ids.every(i => KS.has(i)) && r.bankN === 0 && r.genN === 0 && r.svN === r.n, JSON.stringify({ ...r, ids: undefined })); await c.close();
 }
 
 console.log(`\nÖZET: ${gecen} geçti, ${kalan} kaldı` + (kirmizi.length ? "\nKIRMIZI: " + kirmizi.join(" | ") : ""));

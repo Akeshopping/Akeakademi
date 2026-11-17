@@ -236,7 +236,7 @@ for (const [ad, ayar, beklenen] of [["giris", { giris: false }, "giris"], ["kapa
   for (const [ad, f] of [["ACT.kocTest (koç)", () => ACT.kocTest({ s: "SB", t: "TT" })]]) {
     await p.evaluate(() => { RUN = null; UI.modal = null; UI.svBusy = false; UI.inRun = false; });
     await p.evaluate(([fs, s, tt]) => { new Function("return (" + fs.replace('"SB"', JSON.stringify(s)).replace('"TT"', JSON.stringify(tt)) + ")()")(); }, [f.toString(), DERS, TB]); const x = await ozet(p);
-    t("DIŞ", `X ${ad}: 3C-4a/3C-4b kapsamı DIŞINDA; bayrak açıkken YEREL kalır (güvenli SAYILMAZ): gvn yok, katalog dışı soru var`, x.run && !x.gvn && x.ids.some(i => !KS.has(i)), JSON.stringify({ ...x, ids: undefined }));
+    t("GÜVENLİ", `X ${ad} (3C-4d): bayrak açıkken GÜVENLİ çekirdeğe bağlı: RUN açılırsa gvn='studyo', yalnız katalog kimlikleri, sunucu oturumlu, BANK/GENS dolgusu yok (ayrıntı: tests/studyo-koc-istemci.mjs; kocOrnekler ve mist* KAPSAM DIŞI, güvenli sayılmaz)`, x.run && x.gvn === "studyo" && x.ids.every(i => KS.has(i)) && x.bankN === 0 && x.genN === 0 && x.svN === x.n, JSON.stringify({ ...x, ids: undefined }));
   }
   await c.close(); }
 

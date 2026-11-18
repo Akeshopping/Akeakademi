@@ -7265,6 +7265,7 @@ function sahipAyir(id) {   /* S/RUN/sohbet yeni sahibe göre kurulur */
   S = y ? y.S : defState(); normalize();
   RUN = y && y.RUN ? y.RUN : null; UI.chat = y && Array.isArray(y.chat) ? y.chat : [];
   UI.inRun = false; UI.modal = null; OT.sahip = id; OT.gy = y;
+  KOC.ex = null; KOC.key = "";   /* 3C-4e: koç örnekleri eski hesaptan kalmaz */
   if (!sahipYaz(id, y, true)) return sahipEngel("gecis");
   OT.gy = null; return true;
 }
@@ -11698,6 +11699,8 @@ Object.assign(OZ_ACT, { pushAc() { pushAc(); }, pushKaydet() { pushAc(); }, push
 Object.assign(OZ_CHG, { pushSlot(el) { const k = el.dataset.k; PUSHU.slots = el.checked ? [...new Set([...PUSHU.slots, k])] : PUSHU.slots.filter(x => x !== k); } });
 /* ===== Sana özel koç: çözdüğün sorulardan zayıf konularını kod ile analiz eder, sana özel çözümlü örnek ve test hazırlar (yapay zekâ kullanmaz, ücretsizdir) ===== */
 var KOC = { ex: null, key: "" };
+const kocBayrakAnahtar = (gun, key) => "ake.koc." + encodeURIComponent(OT.sahip || "_").replace(/\./g, "%2E") + "." + gun + "." + key;   /* 3C-4e: günlük "örnek tamamlandı" bayrağı HESABA bağlı; eski kimliksiz ake.koc.<gün>.* anahtarı okunmaz/aktarılmaz */
+const KOC_GUV = new WeakSet();   /* 3C-4e: güvenli kocOrnekler dalının ÜRETTİĞİ örnek nesneleri (bellekte işaretli; id biçimi/alanlar güvenli kaynak kanıtı sayılmaz) */
 const KOC_MIN = 4;
 const kocSay = (s) => (s.match(/1/g) || []).length;
 function kocAnaliz() {
@@ -11746,11 +11749,16 @@ function kocSet(s, t, n) {
 }
 /* çözümlü örnekler: önce bankadaki açıklamalı sorular, sonra üretilen sorular */
 function kocOrnekler(s, t, L) {
+  if (studyoGuvenliMi()) {   /* B4 3C-4e: güvenli modda YALNIZ konuya uygun GENS öğretici örnekleri; BANK/EKQ/S.aiQs/poolOf yoluna girmez, başka konuya/yerel havuza düşmez */
+    const gens = gensOf(s, t), out = [], used = new Set();
+    for (let i = 0; i < 6 && out.length < 3 && gens.length; i++) { const q = genQ(pick(gens), s, used); if (q && !q.stale && q.x && q.o && q.o.length >= 4) { const e = { id: q.id, q: q.q, p: q.p, o: q.o, a: q.a, x: q.x, d: q.d }; KOC_GUV.add(e); out.push(e); } }
+    return out;
+  }
   const hedef = L || 2, havuz = poolOf(s, { topic: t }).filter(q => !q.gen && !q.fig && q.x && q.o && q.o.length >= 4);
   const sirali = shuffle(havuz).sort((a, b) => Math.abs(a.d - hedef) - Math.abs(b.d - hedef) || (S.ans[a.id] ? 1 : 0) - (S.ans[b.id] ? 1 : 0));
   const out = sirali.slice(0, 2), used = new Set();
   const gens = gensOf(s, t); for (let i = 0; i < 6 && out.length < 3 && gens.length; i++) { const g = pick(gens), q = genQ(g, s, used); if (q && !q.stale) out.push(q); }
-  return out.slice(0, 3).map(q => ({ q: q.q, p: q.p, o: q.o, a: q.a, x: q.x, d: q.d }));
+  return out.slice(0, 3).map(q => ({ id: q.id, q: q.q, p: q.p, o: q.o, a: q.a, x: q.x, d: q.d }));   /* id korunur: bayrak geçişinde kaynak ayırt edilir (kocOrnekKart id'yi kullanmaz) */
 }
 const kocOrnekKart = (e, i) => `<div class="card stack" style="background:var(--line2)"><div class="card-h" style="margin:0"><b>Çözümlü örnek ${i + 1}</b><span class="pill">${DIFF[e.d] || ""}</span></div>
   ${e.p ? `<div class="para small">${fq(e.p)}</div>` : ""}<div class="qtext">${fq(e.q)}</div>
@@ -11759,7 +11767,7 @@ const kocOrnekKart = (e, i) => `<div class="card stack" style="background:var(--
 function kocGunluk() {
   const z = kocZayif(2); if (!z.length) return [];
   const gun = dayKey(), tp = (S.daily[gun] && S.daily[gun].tp) || {}, steps = [];
-  steps.push({ k: "ornek", s: z[0].s, t: z[0].t, l: `${z[0].t}: çözümlü örnekleri incele`, done: LS.get("ake.koc." + gun + "." + z[0].k) === "1" });
+  if (!studyoGuvenliMi() || gensOf(z[0].s, z[0].t).length) steps.push({ k: "ornek", s: z[0].s, t: z[0].t, l: `${z[0].t}: çözümlü örnekleri incele`, done: LS.get(kocBayrakAnahtar(gun, z[0].k)) === "1" });   /* 3C-4e: güvenli modda örnek üreteci olmayan konuda 'örnek' adımı yok */
   steps.push({ k: "test", s: z[0].s, t: z[0].t, l: `${z[0].t}: 10 soruluk test`, done: (tp[z[0].k] || 0) >= 8 });
   if (z[1]) steps.push({ k: "test", s: z[1].s, t: z[1].t, l: `${z[1].t}: 10 soruluk test`, done: (tp[z[1].k] || 0) >= 8 });
   return steps;
@@ -11774,6 +11782,7 @@ function kocKonuKart(x) {
 function vKoc() {
   if (KOC.key) {
     const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t);
+    if (studyoGuvenliMi() && (KOC.ex || []).some(e => !(e && typeof e === "object" && KOC_GUV.has(e)))) KOC.ex = kocOrnekler(s, t, a ? a.seviye : 2);   /* 3C-4e: bayrak sonradan açıldıysa güvenli dal tarafından ÜRETİLMEMİŞ (KOC_GUV'de olmayan: BANK/EKQ/AI/taklit g: kimlikli) eski örnekler gösterilmez; güvenli kaynakla yeniden üretilir (güvenli modda üretilmiş GENS örnekleri korunur) */
     const ms = Object.values(S.mistakes).filter(m => !m.learned && m.q && m.q.s === s && m.q.t === t && !m.q.fig && m.q.o).sort((x, y) => y.n - x.n).slice(0, 3);
     return `<div class="view"><div class="vhead"><h1>${esc(t)}</h1><p>${esc(SUBJ[s].n)} · sana özel konu çalışması</p></div>
       <div class="row"><button class="btn sm ghost" data-a="kocGeri">← Sana özel</button></div>
@@ -11781,7 +11790,7 @@ function vKoc() {
         <div class="tiles">${tile(a.acc != null ? "%" + a.acc : "-", "genel doğruluk")}${tile(a.rec != null ? "%" + Math.round(a.rec * 100) : "-", "son sorularda")}${tile(a.open, "öğrenilmemiş yanlış")}</div>
         <div class="stack">${a.byD.map((b, i) => `<div><div class="small" style="display:flex;justify-content:space-between"><span>${DIFF[i + 1]}</span><span class="muted">${b.n ? "%" + b.acc + " · " + b.n + " soru" : "henüz çözmedin"}</span></div><div class="bar"><i style="width:${b.acc || 0}%"></i></div></div>`).join("")}</div>
         <p class="small muted" style="margin:0">Önerilen başlangıç seviyesi: <b>${["", "Temel (kolay ağırlıklı)", "Orta", "İleri (zor ağırlıklı)"][a.seviye]}</b>. Testin buna göre hazırlanır.</p></div>` : `<div class="card"><p style="margin:0">Bu konuda henüz yeterli verin yok. Önce örnekleri incele, sonra testi çöz.</p></div>`}
-      <div class="stack"><h2 style="margin:0">Çözümlü örnekler</h2>${(KOC.ex || []).map(kocOrnekKart).join("") || `<div class="empty">Bu konu için örnek bulunamadı.</div>`}<div class="row"><button class="btn sm" data-a="kocYeniOrnek">Başka örnekler getir</button></div></div>
+      <div class="stack"><h2 style="margin:0">Çözümlü örnekler</h2>${(KOC.ex || []).map(kocOrnekKart).join("") || `<div class="empty">${studyoGuvenliMi() ? "Bu konu için henüz çözümlü örnek yok." : "Bu konu için örnek bulunamadı."}</div>`}${studyoGuvenliMi() && !(KOC.ex || []).length ? "" : `<div class="row"><button class="btn sm" data-a="kocYeniOrnek">Başka örnekler getir</button></div>`}</div>
       ${ms.length ? `<div class="stack"><h2 style="margin:0">Senin yanlışların</h2>${ms.map(m => `<div class="card stack"><div class="qtext">${fq(m.q.q)}</div><p class="small" style="margin:0">${m.last != null && m.last >= 0 ? `Senin cevabın <b>${LET[m.last]}</b>, doğru cevap <b>${LET[m.q.a]}</b>.` : `Doğru cevap <b>${LET[m.q.a]}</b>: ${fq(m.q.o[m.q.a])}`}</p><div class="expl"><p>${fq(m.q.x)}</p></div></div>`).join("")}</div>` : ""}
       <div class="card stack"><h2 style="margin:0">Hazırsan test zamanı</h2><p class="small muted" style="margin:0">10 soru: seviyene uygun yeni sorular ve varsa öğrenmediğin yanlışlarından 2 tanesi.</p><div class="row"><button class="btn pri" data-a="kocTest" data-s="${s}" data-t="${esc(t)}">Testi başlat</button></div></div></div>`;
   }
@@ -11801,7 +11810,7 @@ function kartKoc() {
   return `<section class="card stack"><div class="card-h" style="margin:0"><h2>Sana özel çalışma</h2>${kocDurumPill(z.durum)}</div><p style="margin:0"><b>${esc(z.t)}</b> (${esc(SUBJ[z.s].n)}) şu an en çok destek gereken konun. ${esc(z.why[0] || "")}</p><div class="row"><button class="btn pri sm" data-a="kocAc" data-s="${z.s}" data-t="${esc(z.t)}">Çalışmaya başla</button><a class="btn sm" href="#koc">Tüm analizim</a></div></section>`;
 }
 Object.assign(OZ_ACT, {
-  kocAc(d) { const a = kocAnaliz().find(x => x.s === d.s && x.t === d.t); KOC.key = d.s + "|" + d.t; KOC.ex = kocOrnekler(d.s, d.t, a ? a.seviye : 2); try { LS.set("ake.koc." + dayKey() + "." + KOC.key, "1"); } catch (e) { } go("koc"); window.scrollTo(0, 0); },
+  kocAc(d) { const a = kocAnaliz().find(x => x.s === d.s && x.t === d.t); KOC.key = d.s + "|" + d.t; KOC.ex = kocOrnekler(d.s, d.t, a ? a.seviye : 2); if (!studyoGuvenliMi() || KOC.ex.length) { try { LS.set(kocBayrakAnahtar(dayKey(), KOC.key), "1"); } catch (e) { } }   /* 3C-4e: güvenli modda örnek yoksa günlük 'tamamlandı' bayrağı yazılmaz */ go("koc"); window.scrollTo(0, 0); },
   kocGeri() { KOC.key = ""; KOC.ex = null; render(); window.scrollTo(0, 0); },
   kocYeniOrnek() { const [s, t] = KOC.key.split("|"), a = kocAnaliz().find(x => x.s === s && x.t === t); KOC.ex = kocOrnekler(s, t, a ? a.seviye : 2); render(); },
   kocTest(d) { if (studyoGuvenliMi()) { studyoKocGiris(d.s, d.t); return; } const b = kocSet(d.s, d.t, 10); startRun({ kind: "practice", title: `Sana özel · ${d.t}`, mode: "study", qs: b.qs }); }

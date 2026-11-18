@@ -8,7 +8,7 @@ import { SAYFA, sayfaCiz, sonSayfaCiz } from "../../ortak/sayfalar.js";
 
 function huzmeDokusu(THREE) {
   const c = document.createElement("canvas"); c.width = 64; c.height = 256; const x = c.getContext("2d");
-  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "rgba(255,236,205,.9)"); g.addColorStop(.35, "rgba(255,230,195,.35)"); g.addColorStop(1, "rgba(255,225,190,0)");
+  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "rgba(250,214,208,.9)"); g.addColorStop(.35, "rgba(250,214,208,.35)"); g.addColorStop(1, "rgba(250,214,208,0)");
   x.fillStyle = g; x.fillRect(0, 0, 64, 256);
   const h = x.createLinearGradient(0, 0, 64, 0); h.addColorStop(0, "rgba(0,0,0,1)"); h.addColorStop(.2, "rgba(0,0,0,0)"); h.addColorStop(.8, "rgba(0,0,0,0)"); h.addColorStop(1, "rgba(0,0,0,1)");
   x.globalCompositeOperation = "destination-out"; x.fillStyle = h; x.fillRect(0, 0, 64, 256);
@@ -18,31 +18,31 @@ function huzmeDokusu(THREE) {
 baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, camera, renderer, mobil, durum }) {
   scene.background = GECE.clone(); scene.fog = new THREE.Fog(GECE.clone(), 5, 36);
   const KG = 1.7, KY = 3.3, GY = 1.65, SON_Z = -34; /* kapı genişliği ve yüksekliği, göz hizası, son sayfanın konumu */
-  scene.add(new THREE.HemisphereLight(0x2b2a24, 0x050504, .22));
+  scene.add(new THREE.HemisphereLight(0x3a3340, 0x0e0b10, .22));
 
   /* ---------- salon: yansıtıcı taş zemin, duvar, kasa, kanatlar, sütunlar ---------- */
-  const zemin = new THREE.Mesh(new THREE.PlaneGeometry(60, 110), new THREE.MeshStandardMaterial({ color: 0x151513, roughness: .24, metalness: .55, envMapIntensity: .06 }));
+  const zemin = new THREE.Mesh(new THREE.PlaneGeometry(60, 110), new THREE.MeshStandardMaterial({ color: 0x1e1a22, roughness: .24, metalness: .55, envMapIntensity: .06 }));
   zemin.rotation.x = -Math.PI / 2; zemin.position.z = -12; scene.add(zemin);
-  const duvarMat = new THREE.MeshStandardMaterial({ color: 0x181816, roughness: .95, metalness: 0, envMapIntensity: .04 });
+  const duvarMat = new THREE.MeshStandardMaterial({ color: 0x221e27, roughness: .95, metalness: 0, envMapIntensity: .04 });
   const dw = 30, dh = 14, kal = .6;
   [-(KG / 2 + dw / 2), KG / 2 + dw / 2].forEach(x => { const m = new THREE.Mesh(new THREE.BoxGeometry(dw, dh, kal), duvarMat); m.position.set(x, dh / 2, 0); scene.add(m); });
   const ustDuvar = new THREE.Mesh(new THREE.BoxGeometry(KG, dh - KY, kal), duvarMat); ustDuvar.position.set(0, KY + (dh - KY) / 2, 0); scene.add(ustDuvar);
-  const kasaMat = new THREE.MeshPhysicalMaterial({ color: 0xB69A68, metalness: 1, roughness: .32, clearcoat: .3, envMapIntensity: 1.2 });
+  const kasaMat = new THREE.MeshPhysicalMaterial({ color: 0xd94f43, metalness: 1, roughness: .32, clearcoat: .3, envMapIntensity: 1.2 });
   const ka = .09;
   [[-KG / 2 - ka / 2, KY / 2, ka, KY + ka], [KG / 2 + ka / 2, KY / 2, ka, KY + ka], [0, KY + ka / 2, KG + ka * 2, ka]].forEach(([x, y, w, h]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, kal + .06), kasaMat); m.position.set(x, y, 0); scene.add(m); });
-  const kanatMat = new THREE.MeshPhysicalMaterial({ color: 0x2a2a26, metalness: .4, roughness: .5, envMapIntensity: .8 });
+  const kanatMat = new THREE.MeshPhysicalMaterial({ color: 0x3a3340, metalness: .4, roughness: .5, envMapIntensity: .8 });
   const KANAT = [-1, 1].map(yon => {
     const men = new THREE.Group(); men.position.set(yon * KG / 2, 0, kal / 2 - .04); scene.add(men);
     const p = new THREE.Mesh(new THREE.BoxGeometry(KG / 2, KY, .07), kanatMat); p.position.set(-yon * KG / 4, KY / 2, 0); men.add(p);
     const kenar = new THREE.Mesh(new THREE.BoxGeometry(.02, KY - .3, .08), kasaMat); kenar.position.set(-yon * (KG / 2 - .06), KY / 2, .01); men.add(kenar);
     return { men, yon };
   });
-  const sutunMat = new THREE.MeshStandardMaterial({ color: 0x1c1c19, roughness: .6, metalness: .3, envMapIntensity: .08 });
+  const sutunMat = new THREE.MeshStandardMaterial({ color: 0x221e27, roughness: .6, metalness: .3, envMapIntensity: .08 });
   for (let i = 0; i < 4; i++) [-1, 1].forEach(y => { const s = new THREE.Mesh(new THREE.BoxGeometry(.55, 9, .55), sutunMat); s.position.set(y * (3.2 + i * .15), 4.5, 2.2 + i * 3.2); scene.add(s); });
-  const kenarIsik = new THREE.DirectionalLight(0x8fb3a0, .5); kenarIsik.position.set(-6, 5, 8); scene.add(kenarIsik);
+  const kenarIsik = new THREE.DirectionalLight(0xf27d6d, .5); kenarIsik.position.set(-6, 5, 8); scene.add(kenarIsik);
 
   /* kapıdan sızan sıcak ışık: nokta ışık, parıltı, zemine yayılan huzmeler */
-  const kapiIsik = new THREE.PointLight(0xf1dfb6, 0, 14, 1.8); kapiIsik.position.set(0, 1.8, 1.2); scene.add(kapiIsik);
+  const kapiIsik = new THREE.PointLight(0xfad6d0, 0, 14, 1.8); kapiIsik.position.set(0, 1.8, 1.2); scene.add(kapiIsik);
   const parilti = new THREE.Sprite(new THREE.SpriteMaterial({ map: isikDokusu(THREE), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
   parilti.position.set(0, 1.7, .5); parilti.scale.set(4.5, 6, 1); scene.add(parilti);
   const hd = huzmeDokusu(THREE), HUZME = [];
@@ -69,7 +69,7 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   const SAYFALAR = HAZIR.map((v, i) => {
     const c = document.createElement("canvas"); c.width = 512; c.height = 724; sayfaCiz(c, v, false);
     const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; cizimler.push([c, v, tex]);
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(1.06, 1.5), new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xfff3e0, emissiveIntensity: .4, roughness: .7, metalness: 0, side: THREE.DoubleSide }));
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(1.06, 1.5), new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xfff3ef, emissiveIntensity: .4, roughness: .7, metalness: 0, side: THREE.DoubleSide }));
     const u = .07 + i / (SAY - 1) * .86, merkez = kor.getPointAt(u), tan = kor.getTangentAt(u);
     const yan = new THREE.Vector3().crossVectors(tan, new THREE.Vector3(0, 1, 0)).normalize(), taraf = i % 2 ? -1 : 1;
     m.position.copy(merkez).addScaledVector(yan, taraf * (1.25 + (i % 3) * .3)).add(new THREE.Vector3(0, ((i * 37) % 7) / 7 - .4, 0));
@@ -83,7 +83,7 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   document.fonts && document.fonts.load('700 40px "AKE Sans"').then(() => { cizimler.forEach(([c, v, t]) => { sayfaCiz(c, v, true); t.needsUpdate = true; }); sonSayfaCiz(sc, true); sTex.needsUpdate = true; });
 
   /* ders yolları: yola paralel ışık çizgileri ve üzerlerinde ilerleyen ışık */
-  const RENK = [0x7fae96, 0xB69A68, 0xD5DDCF, 0xE3CFA0];
+  const RENK = [0xC79BE0, 0x8FB4F0, 0x5FC4CC, 0xE0B050];
   const CIZGI = RENK.map((r, k) => {
     const pts = []; for (let i = 0; i <= 120; i++) { const u = i / 120, p = kor.getPointAt(u), an = u * 9 + k * 1.6; pts.push(p.clone().add(new THREE.Vector3(Math.cos(an) * (1.5 + k * .25), Math.sin(an) * .25 - 1.15 + k * .06, 0))); }
     const egri = new THREE.CatmullRomCurve3(pts), geo = new THREE.TubeGeometry(egri, 360, .0045 + k * .001, 5, false);
@@ -96,11 +96,11 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   const N = mobil ? 380 : 800, pos = new Float32Array(N * 3), hiz = new Float32Array(N);
   for (let i = 0; i < N; i++) { pos.set([(Math.random() - .5) * 7, Math.random() * 3.6, 7 - Math.random() * 41], i * 3); hiz[i] = .03 + Math.random() * .08; }
   const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const toz = new THREE.Points(tg, new THREE.PointsMaterial({ size: .035, map: isikDokusu(THREE, "255,240,215", 64), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(toz);
+  const toz = new THREE.Points(tg, new THREE.PointsMaterial({ size: .035, map: isikDokusu(THREE, "250,214,208", 64), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(toz);
 
   /* koridorda kamerayı izleyen yumuşak ışık ve son karelerde ekranı örten krem katman */
-  const fener = new THREE.PointLight(0xf1dfb6, 0, 10, 1.4); scene.add(fener);
-  const ortu = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xF5F1E8, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false }));
+  const fener = new THREE.PointLight(0xfad6d0, 0, 10, 1.4); scene.add(fener);
+  const ortu = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xf8f5f0, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false }));
   ortu.renderOrder = 999; ortu.frustumCulled = false; ortu.position.z = -.4; camera.add(ortu); scene.add(camera);
 
   const bg = new THREE.Color(), bak = new THREE.Vector3(), tmp = new THREE.Vector3(), tan = new THREE.Vector3();

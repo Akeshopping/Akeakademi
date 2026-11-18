@@ -1447,7 +1447,9 @@ html .vitrin,html .sc3-hero{background:linear-gradient(135deg,var(--ink-fixed) 0
 .atl-top .atl-b.giris:hover{background:rgba(248,245,240,.18)}
 
 /* ---- 23. soru çözme bildirimi: alt çubuğun parçası, hiçbir şıkkın/açıklamanın üstüne binmez ---- */
-html:has(.run) .toast{top:calc(env(safe-area-inset-top,0px) + 6px);bottom:auto;left:8px;right:8px;transform:none;width:auto;max-width:560px;height:48px;margin:0 auto;display:flex;align-items:center;padding:0 14px;z-index:80;pointer-events:none;background:var(--ink-fixed);color:var(--on-dark);border:1px solid rgba(248,245,240,.12);animation:ritimToast .24s var(--ease) both}
+/* genel bildirim, soru çözmede kullanılmaz: aynı mesaj .run-toast satırında akışta gösterilir */
+html:has(.run .run-toast) .toast{display:none}
+.run-toast{display:flex;align-items:center;gap:8px;min-height:40px;margin:2px 0 8px;padding:8px 14px;border-radius:var(--r-sm,10px);background:var(--ink-fixed);color:var(--on-dark);border:1px solid rgba(248,245,240,.12);border-left:3px solid #F27D6D;font-size:14px;line-height:1.3;animation:ritimToast .24s var(--ease) both}
 @keyframes ritimToast{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.run-toast{animation:none}}
 
@@ -7940,7 +7942,7 @@ function modalHTML() {
 }
 function openModal(title, body, acts) { UI.modal = { title, body, acts: acts || [{ l: "Kapat", a: "modalClose" }] }; render(); }
 let toastT = null;
-function toast(t) { UI.toast = t; try { bildirimSesi(bsesTur(t)); } catch (e) { } render(); clearTimeout(toastT); toastT = setTimeout(() => { UI.toast = null; const el = document.querySelector(".toast"); if (el) el.remove(); }, 3800); }
+function toast(t) { UI.toast = t; try { bildirimSesi(bsesTur(t)); } catch (e) { } render(); clearTimeout(toastT); toastT = setTimeout(() => { UI.toast = null; document.querySelectorAll(".toast,.run-toast").forEach(el => el.remove()); }, 3800); }
 const tile = (v, l) => `<div class="tile"><b>${v}</b><span>${l}</span></div>`;
 const subjOpts = (sel, all) => (all ? `<option value="">Tüm dersler</option>` : "") + Object.entries(SUBJ).map(([k, v]) => `<option value="${k}"${sel === k ? " selected" : ""}>${v.n}</option>`).join("");
 const defaultExam = () => ({ SAY: "SAY", EA: "EA", SOZ: "SOZ", DIL: "YDT" })[S.profile.alan] || "TYT";
@@ -8465,6 +8467,7 @@ function vRun() {
   return `<div class="run">
   <div class="runbar"><button class="btn sm ghost" data-a="runExit">${icon("back")} Çık</button><span class="ttl">${esc(R.title)}</span>
     <span class="timer" id="timer" title="${R.dur ? "Kalan süre" : "Geçen süre"}">${timerTxt}</span>${R.mode === "exam" ? `<button class="btn sm ghost" data-a="flag" aria-pressed="${!!R.flag[i]}">${icon("flag")} ${R.flag[i] ? "İşaretli" : "İşaretle"}</button>` : ""}<button class="btn sm pri" data-a="finishAsk">Bitir</button></div>
+  ${UI.toast ? `<div class="run-toast" role="status">${esc(UI.toast)}</div>` : ""}
   <div class="rprog" role="progressbar" aria-label="Soru ilerlemesi" aria-valuemin="1" aria-valuemax="${R.qs.length}" aria-valuenow="${i + 1}">${R.qs.map((_, j) => `<i class="${j === i ? "cur" : R.ans[j] != null ? "dn" : ""}"></i>`).join("")}</div>
   <div class="rmain">
   <div class="qcard">

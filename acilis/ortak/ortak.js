@@ -84,7 +84,7 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
     const d = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
     m.innerHTML = `<div class="mf-in"><svg class="mf-logo" viewBox="0 0 64 64"><defs><linearGradient id="mfg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="0" y2="40"><stop offset="0" stop-color="#f27d6d"/><stop offset=".5" stop-color="#fad6d0"/><stop offset="1" stop-color="#f27d6d"/><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="110 0" dur="1.9s" begin="0.5s" fill="freeze"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#mfg)" d="${d}"/><path class="mf-edge" fill="none" stroke="#fad6d0" stroke-width=".9" stroke-linejoin="round" pathLength="100" d="${d}"/></svg><b class="mf-wm">AKE <span>Akademi</span></b></div>`;
     document.body.appendChild(m); void m.offsetWidth; m.classList.add("on");
-    setTimeout(bitir, 2500);
+    setTimeout(bitir, 3000);
   }
   function acilisBitir(kaydet, hizli) {
     oynuyor = false; D.classList.remove("oynuyor", "kilit"); setTimeout(() => kutu && kutu.classList.add("serbest"), 1000); durum.g = 1; if (kaydet !== false && !sinema) depo(anahtar, "goruldu");

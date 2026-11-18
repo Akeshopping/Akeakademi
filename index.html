@@ -1446,6 +1446,43 @@ html .vitrin,html .sc3-hero{background:linear-gradient(135deg,var(--ink-fixed) 0
 .atl-top .atl-b.giris{background:rgba(248,245,240,.10);border-color:rgba(248,245,240,.32);color:var(--porcelain-fixed)}
 .atl-top .atl-b.giris:hover{background:rgba(248,245,240,.18)}
 
+/* ---- 23. soru çözme bildirimi: alt çubuğun parçası, hiçbir şıkkın/açıklamanın üstüne binmez ---- */
+html:has(.run) .toast{top:calc(env(safe-area-inset-top,0px) + 6px);bottom:auto;left:8px;right:8px;transform:none;width:auto;max-width:560px;height:48px;margin:0 auto;display:flex;align-items:center;padding:0 14px;z-index:80;pointer-events:none;background:var(--ink-fixed);color:var(--on-dark);border:1px solid rgba(248,245,240,.12);animation:ritimToast .24s var(--ease) both}
+@keyframes ritimToast{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.run-toast{animation:none}}
+
+/* ---- 24. "Seni tanıyalım": kompakt; Bugünün programı ilk ekranda ---- */
+.ob{padding:14px 16px;gap:12px}
+.ob .card-h{gap:10px}.ob .card-h h2{font-size:17px}
+.ob-nokta i{width:22px}
+.ob .in{height:44px;font-size:15px;border-radius:10px}
+.ob .ob-chips{gap:8px}
+.ob-chip{min-height:44px;padding:0 14px;font-size:14px}
+.ob .row .btn.pri{min-height:44px;min-width:112px}
+.ob .f > span{font-size:12.5px}
+@media (max-width:899px){
+  .ob{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px}
+  .ob .card-h{grid-column:1/-1}.ob-nokta small{display:none}
+  .ob div.f,.ob p{grid-column:1/-1}
+  .ob .row{grid-column:1/-1}
+  .ob:has(label.f) label.f{grid-column:1;grid-row:2}
+  .ob:has(label.f) .row{grid-column:2;grid-row:2}
+  .ob:has(label.f) div.f{grid-row:3}
+  .ob:has(label.f) .row .btn.pri{min-width:96px;flex:none}
+  .ob p{font-size:12.5px}
+}
+@media (min-width:900px){
+  .card.ob{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;padding:14px 20px;min-height:0}
+  .card.ob>*{margin:0}
+  .ob .card-h{flex:1 0 100%}
+  .ob label.f{width:min(280px,30%);flex:0 0 auto}
+  .ob div.f{flex:1 1 320px}
+  .ob .row{margin-left:auto;flex:none}
+  .ob p{flex:1 0 100%;order:9;margin:0}
+}
+.card.today{margin-top:2px}
+.card.today .card-h h2{font-size:22px}
+
 </style>
 <script>
 "use strict";

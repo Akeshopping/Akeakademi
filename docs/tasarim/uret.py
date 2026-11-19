@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """AKE Ritmi görsel katmanını yeniden üretir: main'deki index.html -> tasarım dalındaki index.html.
 
-Kullanım (depo kökünden):  python3 tasarim/uret.py [--base origin/main] [--out index.html]
+Kullanım (depo kökünden):  python3 docs/tasarim/uret.py [--base origin/main] [--out index.html]
 Taban sürüm (--base) varsayılan olarak origin/main, o yoksa main. Başka hiçbir yere yazmaz.
-Sabit yerel yol yok: betik kendi klasörünü (tasarim/) ve bir üst klasörü (depo kökü) kullanır.
-Ayrıntı: tasarim/README.md"""
+Sabit yerel yol yok: betik kendi klasörünü (docs/tasarim/) ve iki üst klasörü (depo kökü) kullanır.
+Ayrıntı: docs/tasarim/README.md"""
 import re,subprocess,sys,pathlib,os,argparse
 T=pathlib.Path(__file__).resolve().parent
-ap=argparse.ArgumentParser(); ap.add_argument('--base'); ap.add_argument('--out',default='index.html'); ap.add_argument('--repo',default=str(T.parent)); A=ap.parse_args()
+ap=argparse.ArgumentParser(); ap.add_argument('--base'); ap.add_argument('--out',default='index.html'); ap.add_argument('--repo',default=str(T.parent.parent)); A=ap.parse_args()
 W=pathlib.Path(A.repo).resolve()
 def _ref():
     for r in ([A.base] if A.base else [])+['origin/main','main']:

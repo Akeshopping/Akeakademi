@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Açılış (acilis/) dosyalarını yeni AKE Ritmi paletine eşler. Idempotent. Yazı tipi base64'üne dokunmaz."""
 import re,pathlib,sys
-R=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else pathlib.Path(__file__).resolve().parent.parent)/'acilis'
+R=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else pathlib.Path(__file__).resolve().parent.parent.parent)/'acilis'
 HEX={'171715':'28232c','1c1b18':'28232c','06111f':'28232c','1f3a2f':'3a3340','30302b':'3a3340',
  'f5f1e8':'f8f5f0','f4efe4':'f8f5f0','f5f0e6':'f8f5f0','f3efe6':'f8f5f0','fbf8f1':'ffffff','fdfcf8':'ffffff',
  'ede6d7':'f1ece4','ede7da':'f1ece4','e0d8c8':'e8e1d9','d8d0c2':'e8e1d9','e6dfd1':'e8e1d9',

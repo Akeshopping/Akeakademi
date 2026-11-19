@@ -1,11 +1,11 @@
-# tasarim/ — AKE Ritmi görünüm üretim süreci
+# docs/tasarim/ — AKE Ritmi görünüm üretim süreci
 
 `index.html` (görsel yenileme) elle yazılmaz; `main` dalındaki `index.html`'den bu klasördeki betikle **yeniden üretilir**. Böylece `main` güncellense bile tasarım kaybolmaz.
 
 ## Çalıştırma (Python 3, ek paket yok)
 
-    python3 tasarim/uret.py                 # tabanı origin/main (yoksa main), çıktıyı ./index.html yazar
-    python3 tasarim/uret.py --base origin/main --out /tmp/yeni.html   # taban = bir git sürümü (dal/etiket/commit)
+    python3 docs/tasarim/uret.py                 # tabanı origin/main (yoksa main), çıktıyı ./index.html yazar
+    python3 docs/tasarim/uret.py --base origin/main --out /tmp/yeni.html   # taban = bir git sürümü (dal/etiket/commit)
 
 Yol sabit değildir; her şey bu klasöre göre bulunur. Aynı girdiyle aynı çıktı üretilir (kontrol: iki kez çalıştırıp `cmp`).
 
@@ -30,3 +30,5 @@ Statik dosyalar (üretilmez, doğrudan düzenlenir): `acilis/*.css`, `acilis/ort
 ## Yeni ayar eklemek
 
 Ayar anahtarlarını `jsedits_renk.py` içine yazın (ERISIM + `erisimSet` izinli değerler + Ayarlar kartı). `jsedits.py` ve `uret.py` değişmeden kalır; ayarlar yeniden üretimde kaybolmaz.
+
+Not: klasör `docs/` altındadır çünkü depo kökündeki her üst düzey öğe yol-koruma testiyle sınıflandırılmak zorundadır; `docs/` zaten korunan (yayına verilmeyen) klasördür.

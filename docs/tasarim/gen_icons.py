@@ -3,7 +3,7 @@
 import asyncio,re,base64,sys,pathlib,io
 from playwright.async_api import async_playwright
 from PIL import Image
-R=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else pathlib.Path(__file__).resolve().parent.parent)
+R=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else pathlib.Path(__file__).resolve().parent.parent.parent)
 D="M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z"
 def mark(a,b,vb="0 0 64 64",extra=""):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" {extra}><defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="58" y2="60"><stop offset="0" stop-color="{a}"/><stop offset="1" stop-color="{b}"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#g)" d="{D}"/></svg>'

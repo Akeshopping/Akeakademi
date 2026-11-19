@@ -1567,10 +1567,29 @@ html:has(.run .run-toast) .toast{display:none}
   .plan-grid{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}
   .plan-side{position:sticky;top:132px}
 }
-/* zemin ışığı: planın kartları arkasından görünsün (sabit, animasyonsuz) */
-#app:has(.plan-glass)::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:radial-gradient(46vmax 34vmax at 86% 12%,rgba(var(--coral-deco-rgb),.2),transparent 72%),radial-gradient(42vmax 36vmax at 4% 70%,rgba(var(--coral-light-rgb),.14),transparent 74%)}
-:root[data-theme="dark"] #app:has(.plan-glass)::before{background:radial-gradient(46vmax 34vmax at 86% 12%,rgba(var(--coral-light-rgb),.2),transparent 72%),radial-gradient(42vmax 36vmax at 4% 70%,rgba(var(--coral-deco-rgb),.15),transparent 74%)}
+/* zemin derinliği: palete uyumlu, yavaş renk katmanı; kartların arkasında seçilir (yalnız plan; soru çözme etkilenmez).
+   Hareket Kapalı, hareket azaltma ve düşük güçte aynı görünüm sabit kalır. */
+:root{--amb3-rgb:240,170,110}
+:root[data-pal="zumrut"]{--amb3-rgb:226,196,112}
+:root[data-pal="lavanta"]{--amb3-rgb:236,134,196}
+:root[data-pal="bakir"]{--amb3-rgb:112,150,176}
+#app:has(.plan-glass)::before,#app:has(.plan-glass)::after{content:"";position:fixed;z-index:-1;pointer-events:none;inset:-12%}
+#app:has(.plan-glass)::before{
+  background:radial-gradient(30vmax 26vmax at 72% 40%,rgba(var(--coral-deco-rgb),.5),transparent 66%),
+             radial-gradient(28vmax 24vmax at 18% 60%,rgba(var(--coral-light-rgb),.42),transparent 66%)}
+#app:has(.plan-glass)::after{
+  background:radial-gradient(30vmax 26vmax at 56% 80%,rgba(var(--amb3-rgb),.42),transparent 66%),
+             radial-gradient(26vmax 22vmax at 90% 58%,rgba(var(--coral-deco-rgb),.34),transparent 66%)}
+:root[data-theme="dark"] #app:has(.plan-glass)::before{
+  background:radial-gradient(30vmax 26vmax at 72% 40%,rgba(var(--coral-light-rgb),.46),transparent 66%),
+             radial-gradient(28vmax 24vmax at 18% 60%,rgba(var(--coral-deco-rgb),.4),transparent 66%)}
+:root[data-theme="dark"] #app:has(.plan-glass)::after{
+  background:radial-gradient(30vmax 26vmax at 56% 80%,rgba(var(--amb3-rgb),.34),transparent 66%),
+             radial-gradient(26vmax 22vmax at 90% 58%,rgba(var(--coral-light-rgb),.34),transparent 66%)}
+html.fx-on:not(.fx-lite):not([data-motion="off"]) #app:has(.plan-glass)::before{animation:akePlanA 42s ease-in-out infinite alternate}
+html.fx-on:not(.fx-lite):not([data-motion="off"]) #app:has(.plan-glass)::after{animation:akePlanB 56s ease-in-out infinite alternate}
+@keyframes akePlanA{to{transform:translate3d(-5%,4%,0) scale(1.1)}}
+@keyframes akePlanB{to{transform:translate3d(5%,-4%,0) scale(1.08)}}
 
 /* ---- 28. cam yüzey: ince kenar, hafif bulanıklık; destek yoksa ya da düşük güçte düz yüzey ---- */
 html{--cam-a:100%;--cam-blur:0px}

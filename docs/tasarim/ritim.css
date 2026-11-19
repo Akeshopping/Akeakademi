@@ -332,6 +332,18 @@ html:has(.run .run-toast) .toast{display:none}
 .renk-chip:focus-visible,.renk-nokta:focus-visible,.pal-kart:focus-visible,.renk-ozel input:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
 /* canlı örnek kart */
 .sd-ornek{position:relative;overflow:hidden;border-radius:14px;padding:18px 16px;background:var(--paper);border:1px solid var(--line)}
+/* Ayarlardaki görsel seçimlerde kısa, sessiz geçişler. */
+.pal-kart{transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background-color .18s ease}
+@media (hover:hover) and (pointer:fine){.pal-kart:hover{transform:translateY(-2px)}}
+.renk-gel{animation:akeAyarAc .2s ease-out both}
+.pal-kart.on{animation:akeAyarSec .18s ease-out both}
+@keyframes akeAyarAc{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes akeAyarSec{from{transform:scale(.985)}to{transform:scale(1)}}
+html[data-motion="off"] .renk-gel,html[data-motion="off"] .pal-kart.on{animation:none}
+html[data-motion="off"] .pal-kart{transition:none}
+html.fx-lite .renk-gel,html.fx-lite .pal-kart.on{animation:none}
+html.fx-lite .pal-kart{transition:none}
+@media (prefers-reduced-motion:reduce){.renk-gel,.pal-kart.on{animation:none}.pal-kart{transition:none}}
 .sd-isik{position:absolute;width:150px;height:150px;border-radius:50%;left:-20px;top:-34px;background:rgba(var(--coral-deco-rgb),.5);filter:blur(26px)}
 .sd-isik.b{left:auto;right:-26px;top:auto;bottom:-44px;background:rgba(var(--coral-light-rgb),.38)}
 .sd-kart{position:relative;display:grid;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
@@ -406,3 +418,13 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
   .pomo .oda{margin:0;font-size:13px;line-height:1.4}
   .pomo>.small.muted{max-width:none;margin:0;font-size:13px;line-height:1.45}
 }
+
+/* ---- 31. mevcut çalışma serisinin haftalık zinciri; yalnız kayıtlı günlük veriyi gösterir ---- */
+.seri-hafta{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:12px 8px;border:1px solid var(--line);border-radius:16px;background:var(--sunk)}
+.seri-gun{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;color:var(--ink2);font-size:11px;font-weight:650}
+.seri-gun:not(:last-child)::after{content:"";position:absolute;top:16px;left:calc(50% + 16px);width:calc(100% - 30px);height:2px;background:var(--line-strong)}
+.seri-isaret{position:relative;z-index:1;display:grid;place-items:center;width:32px;height:32px;border:2px solid var(--line-strong);border-radius:50%;background:var(--card);color:var(--ink2);font-size:14px;line-height:1}
+.seri-gun.tam .seri-isaret{border-color:var(--coral);background:var(--coral);color:var(--on-coral);box-shadow:0 4px 12px -6px var(--coral)}
+.seri-gun.kor .seri-isaret{border-style:dashed;border-color:var(--coral);color:var(--coral-ink)}
+.seri-gun.bugun .seri-isaret{border-color:var(--coral)}
+@media (max-width:360px){.seri-hafta{padding:12px 3px}.seri-gun{font-size:10px}}

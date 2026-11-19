@@ -18,6 +18,7 @@ Yol sabit değildir; her şey bu klasöre göre bulunur. Aynı girdiyle aynı ç
 | `jsedits.py` | Ana görünüm kodu düzenlemeleri (`rep(eski, yeni, adet)`; adet tutmazsa durur) |
 | `jsedits_acilis.py` | Açılış seçenekleri ve Ayarlar seçimi |
 | `jsedits_renk.py` | Palet, özel renk (kontrast denetimli), şeffaf kartlar, plan ve rozet düzeni |
+| `jsedits_video.py` | Mevcut serinin haftalık görsel zinciri (seri hesabı ve rozet koşulları değişmez) |
 | `acilis_recolor.py`, `gen_icons.py` | Açılış/ikon yeniden renklendirme (gerekirse; varsayılan yol = depo kökü) |
 | `rakam.woff2` | Rakam yazı tipi alt kümesi |
 

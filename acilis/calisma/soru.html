@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f0e6">
+<meta name="theme-color" content="#f8f5f0">
 <title>Soru Çözme · AKE Akademi</title>
 <link rel="stylesheet" href="../ortak/ortak.css">
 <style>
 /* Çalışma ekranı: soru merkezde, dikkat dağıtan hareket yok. Masaüstünde sağda cevap kâğıdı, tablette ve telefonda alttan açılan sayfa. */
 body{background:var(--krem)}
-.ust-cubuk{position:sticky;top:0;z-index:20;background:rgba(245,240,230,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--cizgi);padding-top:env(safe-area-inset-top,0px)}
+.ust-cubuk{position:sticky;top:0;z-index:20;background:rgba(248,245,240,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--cizgi);padding-top:env(safe-area-inset-top,0px)}
 .ust-cubuk .w{display:flex;align-items:center;gap:12px;min-height:64px}
 .baslik-k{display:flex;flex-direction:column;line-height:1.25;min-width:0}
 .baslik-k b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.baslik-k span{font-size:14px;color:var(--murekkep3)}
 .sure{margin-left:auto;font:700 17px/1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:.02em;padding:0 6px}
-.isaret-b[aria-pressed="true"]{--bg:var(--isaret-z);--fg:var(--isaret);border-color:#e5c58c}
+.isaret-b[aria-pressed="true"]{--bg:var(--isaret-z);--fg:var(--isaret);border-color:#fad6d0}
 .isaret-b svg{fill:none}.isaret-b[aria-pressed="true"] svg{fill:currentColor}
 .ilerleme{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;height:5px;margin:0 auto;max-width:1200px;padding:0 var(--g2) 0 var(--g);transform:translateY(-1px)}
 .ilerleme i{border-radius:3px;background:var(--krem2)}
@@ -29,7 +29,7 @@ body{background:var(--krem)}
 .secenek{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .secenek button{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) 24px;align-items:center;gap:14px;min-height:60px;padding:10px 16px 10px 12px;text-align:left;border-radius:14px;border:1.5px solid var(--cizgi);background:var(--yuzey);font:400 18px/1.45 var(--sans);color:var(--murekkep);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color var(--hiz) var(--e),background-color var(--hiz) var(--e),box-shadow var(--hiz) var(--e),transform 120ms var(--e)}
 .secenek .h{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font:700 16px/1 var(--sans);background:var(--krem2);color:var(--murekkep2);transition:background-color var(--hiz),color var(--hiz)}
-@media (hover:hover){.secenek button:not(:disabled):hover{border-color:#9fb4ea;background:#fdfcf8}}
+@media (hover:hover){.secenek button:not(:disabled):hover{border-color:#d94f43;background:#ffffff}}
 .secenek button:active:not(:disabled){transform:scale(.995)}
 .secenek button:focus-visible{outline:none;box-shadow:0 0 0 3px var(--krem),0 0 0 5px var(--mavi)}
 .secenek button[aria-pressed="true"]{border-color:var(--murekkep);box-shadow:inset 0 0 0 1px var(--murekkep)}
@@ -44,7 +44,7 @@ body{background:var(--krem)}
 .cozum .sonuc i{width:10px;height:10px;border-radius:50%;background:var(--dogru)}.cozum .sonuc.y i{background:var(--yanlis)}
 .cozum p{margin:10px 0 0;font-size:17.5px;line-height:1.65;color:var(--murekkep)}
 .cozum .not{font-size:14.5px;color:var(--murekkep3);margin-top:12px}
-.alt-cubuk{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(245,240,230,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--cizgi);padding:12px var(--g2) calc(12px + env(safe-area-inset-bottom,0px)) var(--g)}
+.alt-cubuk{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(248,245,240,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--cizgi);padding:12px var(--g2) calc(12px + env(safe-area-inset-bottom,0px)) var(--g)}
 .alt-cubuk .ic{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:48px}
 .alt-cubuk .dugmeler{max-width:720px;width:100%;margin:0 auto;display:flex;gap:12px}
 .alt-cubuk .btn{min-height:52px}.alt-cubuk .ana{flex:1}
@@ -52,7 +52,7 @@ body{background:var(--krem)}
 .kagit h2{font:700 15px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--murekkep3);margin:0 0 14px}
 .izgara{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .izgara button{position:relative;min-height:48px;border-radius:12px;border:1.5px solid var(--cizgi);background:var(--yuzey);font:700 16px/1 var(--sans);color:var(--murekkep);cursor:pointer;font-variant-numeric:tabular-nums;transition:border-color var(--hiz),background-color var(--hiz)}
-@media (hover:hover){.izgara button:hover{border-color:#9fb4ea}}
+@media (hover:hover){.izgara button:hover{border-color:#d94f43}}
 .izgara button:focus-visible{outline:none;box-shadow:0 0 0 3px var(--krem),0 0 0 5px var(--mavi)}
 .izgara button.c{background:var(--murekkep);color:#fff;border-color:var(--murekkep)}
 .izgara button.d{background:var(--dogru-z);border-color:var(--dogru);color:var(--dogru)}
@@ -66,8 +66,8 @@ body{background:var(--krem)}
 .ozet b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.ozet span{font-size:13px;color:var(--murekkep3)}
 .kagit .btn,#kagitSayfa .btn{width:100%;margin-top:16px}
 .sayfa-ac{display:none}
-dialog.sayfa{border:0;padding:0;margin:0;max-width:none;width:100%;position:fixed;inset:auto 0 0 0;border-radius:22px 22px 0 0;background:var(--krem);color:var(--murekkep);box-shadow:0 -20px 50px -20px rgba(13,27,51,.45)}
-dialog.sayfa::backdrop{background:rgba(13,27,51,.35)}
+dialog.sayfa{border:0;padding:0;margin:0;max-width:none;width:100%;position:fixed;inset:auto 0 0 0;border-radius:22px 22px 0 0;background:var(--krem);color:var(--murekkep);box-shadow:0 -20px 50px -20px rgba(40,35,44,.45)}
+dialog.sayfa::backdrop{background:rgba(40,35,44,.35)}
 dialog.sayfa .ic{padding:12px var(--g2) calc(20px + env(safe-area-inset-bottom,0px)) var(--g)}
 dialog.sayfa .tutamac{width:44px;height:5px;border-radius:3px;background:var(--cizgi);margin:0 auto 14px}
 dialog.sayfa .bas{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -125,7 +125,7 @@ const SORULAR = [{"s": "Türkçe", "t": "Paragraf", "d": 2, "p": "Bir dili öğr
   try { const k = JSON.parse(localStorage.getItem("ake.ornekSet") || "null"); if (k && k.sec && k.sec.length === N) D = k; } catch (e) {}
   const kaydet = () => { try { localStorage.setItem("ake.ornekSet", JSON.stringify(D)); } catch (e) {} };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const IK = { d: '<svg class="ik" viewBox="0 0 24 24" fill="none" stroke="#17785f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>', y: '<svg class="ik" viewBox="0 0 24 24" fill="none" stroke="#b4324b" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' };
+  const IK = { d: '<svg class="ik" viewBox="0 0 24 24" fill="none" stroke="#476650" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>', y: '<svg class="ik" viewBox="0 0 24 24" fill="none" stroke="#9e1b4b" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' };
   function durumu(i) { if (D.kontrol[i]) return D.sec[i] === SORULAR[i].a ? "d" : "y"; return D.sec[i] >= 0 ? "c" : ""; }
   function kagitHTML() {
     const d = D.kontrol.filter((k, i) => k && D.sec[i] === SORULAR[i].a).length, y = D.kontrol.filter((k, i) => k && D.sec[i] !== SORULAR[i].a).length, b = N - d - y;

@@ -9518,6 +9518,7 @@ function maliyetKarti() {
     <div class="tiles">${tile(d(M.bugunUsd), "bugün")}${tile(d(M.ayUsd), "bu ay")}${tile(M.ayCagri || 0, "bu ay AI çağrısı")}</div>
     <p class="small muted">Bu ay ${t(M.ayUsd)} (kur ${tl} TL varsayıldı). Sohbet, çözüm ve soru üretimi dahil; gerçek token kullanımından hesaplanır, Anthropic panelindeki rakamla küçük farklar olabilir.</p>
     <p class="small muted">AI ile soru üretme: bugün ${M.soruUretBugun || 0}/${M.soruUretLimit} (günlük sınır).${M.butceUsd ? ` Aylık bütçe: ${d(M.butceUsd)}.` : ""}</p>
+    <p class="small muted">Soru fabrikası robotu (üretim + kör denetim): bu ay ${d(M.fabrikaUsd)} · ${M.fabrikaCagri || 0} çağrı · ${((M.fabrikaToken && M.fabrikaToken.giris) || 0).toLocaleString("tr-TR")} giriş / ${((M.fabrikaToken && M.fabrikaToken.cikis) || 0).toLocaleString("tr-TR")} çıkış token (kayıtlı token × liste fiyatı; gerçek fatura Anthropic panelindedir).</p>
     ${asim ? `<p class="note">Aylık bütçenin %80'ine ulaşıldı.</p>` : ""}</div>`;
 }
 const YON_TABS = [["ozet", "Genel Bakış"], ["ogrenci", "Öğrenciler"], ["uye", "Üyelikler"], ["siparis", "Siparişler"], ["kod", "Erişim Kodları"], ["analitik", "Analitik"], ["veli", "Veli Raporları"]];
@@ -9579,7 +9580,7 @@ function vYonetim() {
     uye: () => aboneKarti(),
     siparis: () => yonSiparisler(V),
     kod: () => yonKodGonder(),
-    analitik: () => `${YON.analitikHata ? `<div class="note" role="alert">Bazı analitik verileri yüklenemedi. <button type="button" class="btn sm" data-a="yonYenile">Tekrar dene</button></div>` : ""}${maliyetKarti()}${bildirimYonKarti()}${soruBolumu()}${hataYonetim()}`,
+    analitik: () => `${YON.analitikHata ? `<div class="note" role="alert">Bazı analitik verileri yüklenemedi. <button type="button" class="btn sm" data-a="yonYenile">Tekrar dene</button></div>` : ""}${maliyetKarti()}${bildirimYonKarti()}${soruBolumu()}${fabrikaBolumu()}${hataYonetim()}`,
     veli: () => yonVeli()
   };
   return `<div class="view yn"><header class="yn-hero"><span class="yn-eb">Yönetim paneli</span><h1>AKE Akademi</h1><p>Satışlar, üyelikler ve site kurulumu. Bu sayfa yalnızca sana görünür.</p></header>
@@ -9693,7 +9694,7 @@ function soruBolumu() {
   if (!SORU.veri && !SORU.err) { setTimeout(soruYukle, 0); return `<div class="card"><h2>Soru üretimi</h2><div class="empty">Yükleniyor…</div></div>`; }
   const V = SORU.veri || { bekleyen: [], sayi: {} }, eks = eksikKonular();
   return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru üretimi</h2><span class="small muted">${V.sayi.onayli || 0} AI sorusu eklendi</span></div>
-    <p class="small muted">Hazır sorusu az olan konular aşağıda. "5 soru üret"e basınca AI soruları yazar; bozuk biçimli olanlar otomatik atılır, kalanlar onay beklemeden birkaç dakika içinde tüm öğrencilere gider. Bu düğme yalnızca yönetici hesabında görünür; günlük en fazla 20 üretim yapılır.</p>
+    <p class="small muted">Hazır sorusu az olan konular aşağıda. "5 soru üret"e basınca AI soruları TASLAK olarak yazar; bozuk biçimli olanlar atılır. Taslaklar öğrencilere gitmez: robot kör denetiminden geçip aşağıdaki Soru Fabrikası kuyruğunda senin yayım kararını bekler. Bu düğme yalnızca yönetici hesabında görünür; günlük en fazla 20 üretim yapılır.</p>
     ${SORU.err ? `<p class="small" style="color:var(--bad)">${esc(SORU.err)}</p>` : ""}
     <select class="in" data-c="soruDers" style="max-width:240px"><option value="">Tüm dersler</option>${Object.keys(SUBJ).map(k => `<option value="${k}"${SORU.s === k ? " selected" : ""}>${esc(SUBJ[k].n)}</option>`).join("")}</select>
     <div class="list">${eks.length ? eks.map(x => { const k = x.s + "|" + x.t, b = SORU.busy[k]; return `<div class="li"><div class="grow"><div class="t">${esc(x.t)}</div><div class="s">${esc(SUBJ[x.s].n)} · ${x.n} hazır soru</div></div><button class="btn sm" data-a="soruUret" data-s="${x.s}" data-t="${esc(x.t)}"${b ? " disabled" : ""}>${b ? "Üretiliyor…" : "5 soru üret"}</button></div>`; }).join("") : `<div class="empty">Bu derste sorusu az olan konu kalmadı.</div>`}</div></div>`;
@@ -9721,6 +9722,67 @@ Object.assign(OZ_ACT, {
   soruHepsi() { const ids = ((SORU.veri && SORU.veri.bekleyen) || []).slice(0, 30).map(q => q.id); if (ids.length) soruKarar(ids, "onay"); }
 });
 Object.assign(OZ_CHG, { soruDers(el) { SORU.s = el.value; render(); } });
+/* ===== Yönetim: Soru Fabrikası robotu (taslak → kör model denetimi → inceleme kuyruğu → yönetici yayım kararı) =====
+   Tarayıcı yalnız /api/yonetim/fabrika-* uçlarını çağırır; model çağrısı ve Claude anahtarı SUNUCUDADIR (ayrı Worker + Secret). */
+const FAB = { veri: null, adaylar: null, cagrilar: null, err: "", busy: "", zaman: 0 };
+async function fabIstek(yol, govde) {
+  const o = { credentials: "same-origin" }; if (govde !== undefined) { o.method = "POST"; o.headers = { "content-type": "application/json" }; o.body = JSON.stringify(govde); }
+  const r = await fetch("/api/yonetim/" + yol, o).catch(() => null); const j = r ? await r.json().catch(() => ({})) : {};
+  return { ok: !!r && r.ok, j };
+}
+async function fabrikaYukle() {
+  const [d, a, c] = await Promise.all([fabIstek("fabrika-durum"), fabIstek("fabrika-adaylar"), fabIstek("fabrika-cagrilar")]);
+  if (d.ok) FAB.veri = d.j; else FAB.err = d.j.message || "Fabrika durumu alınamadı.";
+  if (a.ok) FAB.adaylar = a.j.adaylar || []; if (c.ok) FAB.cagrilar = c.j.cagrilar || [];
+  clearTimeout(FAB.zaman); if (FAB.veri && FAB.veri.pilot && FAB.veri.pilot.durum === "calisiyor") FAB.zaman = setTimeout(fabrikaYukle, 15000);   // pilot sürerken 15 sn'de bir tazele
+  render();
+}
+const FAB_MODEL = { gecti: ["ok", "Model kontrolünden geçti"], revizyon: ["bad", "Revizyon gerekli"], ret: ["bad", "Ret önerisi"], belirsiz: ["bad", "Belirsiz"], bekliyor: ["", "Denetim bekliyor"] };
+function fabAdayKart(q) {
+  const [c, l] = FAB_MODEL[q.model_durum] || ["", q.model_durum], yayimlanabilir = q.model_durum === "gecti" && q.denetim_tam === 1 && !q.tekrar, den = q.denetim || {};
+  return `<div class="card sunk stack" style="gap:8px"><div class="small muted">${esc(SUBJ[q.s] ? SUBJ[q.s].n : q.s)} · ${esc(q.t)} · ${DIFF[q.d] || ""} · sürüm ${q.surum}</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${c}">${l}</span>${q.denetim_tam ? "" : `<span class="pill bad">Denetim tamamlanmadı</span>`}${q.tekrar ? `<span class="pill bad">Tekrar</span>` : ""}<span class="pill">Sayısal doğrulama: ${q.sayisal === "yapilmadi" ? "yapılmadı" : esc(q.sayisal)}</span></div>
+    ${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}<b>${fq(q.q || "")}</b>
+    <ol type="A" style="margin:0;padding-left:22px">${(q.o || []).map((o, i) => `<li style="${i === q.a ? "color:var(--ok);font-weight:700" : ""}">${fq(o)}${i === q.a ? " ✓ (üretici anahtarı)" : ""}${den.cevap === i ? " ◀ kör denetçinin seçimi" : ""}</li>`).join("")}</ol>
+    <p class="small">${fq(q.x || "")}</p>
+    ${(den.sorunlar || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorunlar.map(esc).join(" · ")}</p>` : ""}
+    <div class="row"><button class="btn sm pri" data-a="fabYayin" data-id="${esc(q.id)}"${yayimlanabilir && !FAB.busy ? "" : " disabled"} title="${yayimlanabilir ? "" : "Yalnızca model denetiminden tam geçen, tekrar olmayan soru yayımlanabilir"}">Yayımla</button><button class="btn sm ghost" data-a="fabRed" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Reddet</button></div></div>`;
+}
+function fabrikaBolumu() {
+  if (!FAB.veri && !FAB.err) { setTimeout(fabrikaYukle, 0); return `<div class="card"><h2>Soru Fabrikası robotu</h2><div class="empty">Yükleniyor…</div></div>`; }
+  const V = FAB.veri || { sayilar: {}, cagri: {}, kuyruk: {} }, S = V.sayilar, P = V.pilot, calisiyor = P && P.durum === "calisiyor";
+  const cg = (FAB.cagrilar || []).slice(0, 15), n = x => (x || 0).toLocaleString("tr-TR");
+  return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru Fabrikası robotu</h2><span class="pill ${V.robot ? "ok" : ""}">${V.robot ? "Robot AÇIK" : "Robot KAPALI"}</span></div>
+    <p class="small muted">Akış: taslak → kör model denetimi → inceleme kuyruğu → senin yayım kararın. <b>Hiçbir robot sorusu doğrudan canlı bankaya girmez.</b> "Model kontrolünden geçti" yayıma onay değildir; yayım yalnız aşağıdaki "Yayımla" düğmesiyle olur. İnsan uzman onayı sayısı ayrıdır ve bu ekrandan artmaz.</p>
+    ${FAB.err ? `<p class="small" style="color:var(--bad)">${esc(FAB.err)}</p>` : ""}
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <button class="btn sm${V.robot ? " ghost" : ""}" data-a="fabRobot" data-acik="${V.robot ? "0" : "1"}"${FAB.busy ? " disabled" : ""}>${V.robot ? "Robotu kapat" : "Robotu aç"}</button>
+      <button class="btn sm pri" data-a="fabPilotBaslat"${!V.robot || calisiyor || FAB.busy ? " disabled" : ""}>10 soruluk pilotu başlat</button>
+      <button class="btn sm ghost" data-a="fabPilotDurdur"${!calisiyor || FAB.busy ? " disabled" : ""}>Pilotu durdur</button>
+      <button class="btn sm ghost" data-a="fabYenile">Yenile</button></div>
+    <p class="small muted">Pilot: ${P ? `${esc(P.durum)} · hedef ${P.hedef} soru` : "henüz başlatılmadı"} · kuyruk: ${n(V.kuyruk.bekliyor)} bekliyor, ${n(V.kuyruk.calisiyor)} çalışıyor, ${n(V.kuyruk.olu)} başarısız, ${n(V.kuyruk.iptal)} iptal. Üretimi ayrı Worker yapar; robot kapalıyken hiçbir model çağrısı olmaz. Günlük model çağrısı: ${n(V.gunlukCagri)}/${n(V.gunlukLimit)}.</p>
+    <div class="tiles">${tile(S.uretilen || 0, "üretilen")}${tile(S.model_gecti || 0, "model denetiminden geçti")}${tile(S.insan_onayli || 0, "yönetici yayım kararı")}${tile(0, "insan uzman onayı")}</div>
+    <p class="small muted">Revizyon gerekli: ${n(S.revizyon)} · Ret önerisi: ${n(S.ret)} · Belirsiz: ${n(S.belirsiz)} · Denetimi tamamlanmayan: ${n(S.denetim_eksik)} · Tekrar: ${n(S.tekrar)} · Reddedilen: ${n(S.red)}. Sayısal doğrulama: <b>yapılmadı</b> (model çıktısından kod çalıştırılmaz).</p>
+    <p class="small muted">Robot çağrıları: ${n(V.cagri.toplam)} (hatalı ${n(V.cagri.hata)}) · ${n(V.cagri.giris)} giriş / ${n(V.cagri.cikis)} çıkış token · liste fiyatıyla ≈ $${(V.cagri.usd || 0).toFixed(4)} (kayıtlı token × fiyat; gerçek fatura Anthropic panelindedir).</p>
+    <h3 style="margin:8px 0 0">İnceleme kuyruğu (${(FAB.adaylar || []).length})</h3>
+    ${(FAB.adaylar || []).length ? `<div class="stack">${FAB.adaylar.map(fabAdayKart).join("")}</div>` : `<div class="empty">İncelenecek aday yok.</div>`}
+    <h3 style="margin:8px 0 0">Son model çağrıları</h3>
+    ${cg.length ? `<div class="list">${cg.map(x => `<div class="li"><div class="grow"><div class="t">${esc(x.tur)} · ${esc(x.model)}${x.hata ? ` · <span style="color:var(--bad)">hata: ${esc(x.hata)}</span>` : ""}</div><div class="s">${n(x.giris)} giriş / ${n(x.cikis)} çıkış token · ${n(x.sure_ms)} ms · soru ${esc(x.soru_id || "—")} sürüm ${x.surum || "—"}</div></div></div>`).join("")}</div>` : `<div class="empty">Henüz model çağrısı yok.</div>`}</div>`;
+}
+async function fabEylem(ad, yol, govde, basari) {
+  if (FAB.busy) return; FAB.busy = ad; FAB.err = ""; render();
+  const r = await fabIstek(yol, govde); FAB.busy = "";
+  if (!r.ok) FAB.err = (r.j.hatalar && r.j.hatalar.length ? r.j.hatalar.map(h => h.id + ": " + h.neden).join(" · ") : r.j.message) || "İşlem yapılamadı."; else toast(basari);
+  await fabrikaYukle();
+}
+Object.assign(OZ_ACT, {
+  fabYenile() { fabrikaYukle(); },
+  fabRobot(d) { return fabEylem("robot", "fabrika-robot", { acik: d.acik === "1" }, d.acik === "1" ? "Robot açıldı." : "Robot kapatıldı."); },
+  fabPilotBaslat() { return fabEylem("pilot", "fabrika-pilot-baslat", {}, "Pilot başlatıldı."); },
+  fabPilotDurdur() { return fabEylem("pilot", "fabrika-pilot-durdur", {}, "Pilot durduruldu."); },
+  fabYayin(d) { return fabEylem("karar", "fabrika-karar", { id: [d.id], karar: "yayin" }, "Soru yayımlandı."); },
+  fabRed(d) { return fabEylem("karar", "fabrika-karar", { id: [d.id], karar: "red" }, "Soru reddedildi."); }
+});
 /* ===== Sosyal: arkadaş ligi, canlı deneme, sınıf (öğretmen paneli), odak odası (akeakademi.com, hesapla) ===== */
 const SOS = { ben: null, lig: null, sinif: null, canli: null, sinifAc: {}, sinifDetay: {}, sonuc: {}, t: {}, busy: "", err: {}, oda: null, odaT: 0, odaBusy: 0 };
 const sosAktif = () => !IN_CLAUDE && typeof HESAP !== "undefined" && !!HESAP.user && !HESAP.yok;

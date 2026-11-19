@@ -1,0 +1,17 @@
+# AKE Soru Fabrikası Worker'ı. DEPLOY EDİLMEDİ — aşağıdaki YER TUTUCULAR doldurulmadan çalışmaz (worker/README.md).
+name = "ake-fabrika-worker"
+main = "fabrika-worker.js"
+compatibility_date = "2025-01-01"
+
+[triggers]
+crons = ["* * * * *"]   # her dakika; robot anahtarı kapalıysa hiçbir şey yapmaz
+
+[[d1_databases]]
+binding = "DB"
+database_name = "AKE_D1_ADI_YER_TUTUCU"      # Pages projesindeki DB ile AYNI veritabanı
+database_id = "AKE_D1_ID_YER_TUTUCU"
+
+[vars]
+AKE_SORU_V2 = "1"                 # kanonik soru şeması (yayım kapısı buna dayanır)
+AKE_FABRIKA_GUNLUK_CAGRI = "40"   # günlük model çağrısı üst sınırı (pilot için yeterli; 20.000/gün döngüsü KAPALI)
+# Secret (burada YAZILMAZ): ANTHROPIC_API_KEY

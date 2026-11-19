@@ -9,7 +9,11 @@
 //   POST abone-iptal {kid}  abonenin paketini iptal eder (hesabı silmez); kullanıcı/aktif paket yoksa 404
 //   Durum değiştiren (GET/HEAD/OPTIONS dışı) tüm istekler aynı kaynaktan (same-origin) gelmek zorundadır; aksi halde 403 "origin".
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
+//   Fabrika robotu (lib/fabrika.js; modeli ayrı Worker çağırır, bu uçlar yalnız durumu yönetir, ASLA model çağırmaz):
+//   GET  fabrika-durum | fabrika-adaylar | fabrika-cagrilar
+//   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
+import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdHesapla } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -55,7 +59,7 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
       const aday = { s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
       if (typeof o.p === "string" && o.p.trim()) aday.p = o.p.trim();
       const r = await soruYazKanonik(env, aday);
-      if (r.durum === "yazildi" || r.durum === "kopya") say.yazilan++;
+      if (r.durum === "yazildi" || r.durum === "kopya") { say.yazilan++; await taslagiKuyrugaAl(env, { id: r.id, ders: s, konu: t }); }   // taslak → kör denetim kuyruğu (canlıya yazılmaz)
       if (r.durum === "kopya") say.kopya++; else if (r.durum === "gecersiz") say.gecersiz++; else if (r.durum === "catisma") say.catisma++; else if (r.durum === "idCakisma") say.idCakisma++;
       continue;
     }
@@ -96,7 +100,7 @@ export async function onRequest({ request, env, params }) {
   if (!u || !yoneticiMi(env, u)) return fail(403, "yetki");
   const ad = [].concat(params.yol || [])[0] || "", m = request.method, origin = new URL(request.url).origin;
   /* Soru göçü sırasında yazma kilidi (varsayılan KAPALI; AKE_SORU_V2'den bağımsız): yalnız soru yazan iki uç 503 verir, okuma/ödeme/hesap etkilenmez. */
-  if (env.AKE_SORU_MIGRATION_LOCK === "1" && m === "POST" && (ad === "soru-uret" || ad === "soru-karar")) return fail(503, "bakim", "Soru yazımı geçici olarak durduruldu (bakım). Biraz sonra tekrar dene.", { "retry-after": "300" });
+  if (env.AKE_SORU_MIGRATION_LOCK === "1" && m === "POST" && (ad === "soru-uret" || ad === "soru-karar" || ad === "fabrika-pilot-baslat" || ad === "fabrika-karar")) return fail(503, "bakim", "Soru yazımı geçici olarak durduruldu (bakım). Biraz sonra tekrar dene.", { "retry-after": "300" });
 
   if (ad === "durum" && m === "GET") {
     /* inceleme bekleyenler: doğrulanamayan ödeme/tutar/para, kod üretim hatası, yarım kalmış (5 dk+) kod üretimi, takılmış (10 dk+) e-posta gönderimi */
@@ -136,10 +140,17 @@ export async function onRequest({ request, env, params }) {
     const ay = gunTR().slice(0, 7);
     let rows = []; try { rows = (await env.DB.prepare("SELECT gun, kaynak, model, adet, giris, cikis FROM gider WHERE gun >= ? ORDER BY gun DESC").bind(ay + "-01").all()).results || []; } catch (e) { }
     const tipf = m => /guclu|sonnet|opus/i.test(m) ? fy.guclu : fy.hizli;
-    const usd = r => r.kaynak === "soru-uret" ? 0 : (r.giris * tipf(r.model)[0] + r.cikis * tipf(r.model)[1]) / 1e6;
+    const usd = r => (r.giris * tipf(r.model)[0] + r.cikis * tipf(r.model)[1]) / 1e6;
     const bugun = gunTR(); let ayUsd = 0, bugunUsd = 0, ayCagri = 0, bugunCagri = 0; const kaynak = {};
     rows.forEach(r => { const u = usd(r); ayUsd += u; if (r.gun === bugun) bugunUsd += u; if (r.kaynak !== "soru-uret") { ayCagri += r.adet; if (r.gun === bugun) bugunCagri += r.adet; } kaynak[r.kaynak] = (kaynak[r.kaynak] || 0) + u; });
-    return json(200, { ay, ayUsd, bugunUsd, ayCagri, bugunCagri, kaynak, soruUretBugun: rows.filter(r => r.gun === bugun && r.kaynak === "soru-uret").reduce((s, r) => s + r.adet, 0), soruUretLimit: +env.AKE_SORU_GUNLUK || 20, butceUsd: +env.AKE_AYLIK_BUTCE_USD || 0 });
+    /* Fabrika robotu: gerçek token kaydı (fabrika_cagri). Liste fiyatı × kayıtlı token; gerçek fatura Anthropic Console'dadır. */
+    let fabrikaUsd = 0, fabrikaCagri = 0, fabrikaToken = { giris: 0, cikis: 0 };
+    try {
+      const fr = (await env.DB.prepare("SELECT gun, model, giris, cikis FROM fabrika_cagri WHERE gun >= ?").bind(ay + "-01").all()).results || [];
+      fr.forEach(r => { const u2 = usdHesapla(env, r.model, r.giris, r.cikis); fabrikaUsd += u2; fabrikaCagri++; fabrikaToken.giris += r.giris; fabrikaToken.cikis += r.cikis; if (r.gun === bugun) { bugunUsd += u2; bugunCagri++; } });
+      ayUsd += fabrikaUsd; ayCagri += fabrikaCagri; if (fabrikaCagri) kaynak.fabrika = fabrikaUsd;
+    } catch (e) { }
+    return json(200, { ay, ayUsd, bugunUsd, ayCagri, bugunCagri, kaynak, fabrikaUsd, fabrikaCagri, fabrikaToken, soruUretBugun: rows.filter(r => r.gun === bugun && r.kaynak === "soru-uret").reduce((s, r) => s + r.adet, 0), soruUretLimit: +env.AKE_SORU_GUNLUK || 20, butceUsd: +env.AKE_AYLIK_BUTCE_USD || 0 });
   }
   if (ad === "shopier-kur" && m === "POST") {
     if (!env.SHOPIER_PAT) return fail(400, "pat_yok", "Cloudflare'e SHOPIER_PAT eklenmemiş.");
@@ -161,6 +172,23 @@ export async function onRequest({ request, env, params }) {
     const o = { id: "deneme-" + Date.now(), paymentStatus: "paid", billingInfo: { email: (typeof b.eposta === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.eposta.trim()) ? b.eposta.trim().toLowerCase() : u.eposta), firstName: "Deneme" }, lineItems: [{ productId: urun, title: "AKE Akademi deneme", quantity: 1 }], totals: { total: "0" } };
     const r = await siparisIsle(env, o, true);
     return json(200, r);
+  }
+  if (ad.startsWith("fabrika-")) {
+    const gov = async () => { try { return (await request.json()) || {}; } catch (e) { return {}; } };
+    if (ad === "fabrika-durum" && m === "GET") return json(200, await fabrikaDurum(env));
+    if (ad === "fabrika-adaylar" && m === "GET") return json(200, { adaylar: await fabrikaAdaylar(env) });
+    if (ad === "fabrika-cagrilar" && m === "GET") return json(200, { cagrilar: await fabrikaCagrilar(env) });
+    if (ad === "fabrika-robot" && m === "POST") { const b = await gov(), r = await robotAyarla(env, b.acik === true); return r.ok ? json(200, r) : fail(409, r.neden, "AKE_SORU_V2=1 ayarı olmadan robot açılamaz."); }
+    if (ad === "fabrika-pilot-baslat" && m === "POST") {
+      const b = await gov(), r = await pilotBaslat(env, { hedef: b.hedef, ders: typeof b.ders === "string" ? b.ders : undefined, konu: typeof b.konu === "string" ? b.konu : undefined });
+      return r.ok ? json(200, r) : fail(409, r.neden, r.neden === "robot_kapali" ? "Robot kapalı. Önce robotu aç." : "Zaten çalışan bir pilot var.");
+    }
+    if (ad === "fabrika-pilot-durdur" && m === "POST") return json(200, await pilotDurdur(env));
+    if (ad === "fabrika-karar" && m === "POST") {
+      const b = await gov(), r = await yayimKarari(env, b.id, b.karar === "yayin" ? "yayin" : "red", u.eposta);
+      return r.ok ? json(200, r) : json(409, { error: "yayim_kapisi", message: "Hiçbir soru işlenmedi: yayım şartları sağlanmıyor.", hatalar: r.hatalar });
+    }
+    return fail(404, "yok");
   }
   if (ad === "soru-uret" && m === "POST") {
     if (!env.ANTHROPIC_API_KEY) return fail(500, "yapilandirma");

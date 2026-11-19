@@ -43,3 +43,13 @@ test("eski soru-karar 'onay' taslağı yayımlayamaz (satır 'taslak' kalır)", 
   assert.ok(r.s === 200 || r.s === 409);
   assert.equal(DB.db.prepare("SELECT durum FROM soru WHERE id = ?").get(id).durum, "taslak");
 });
+
+test("soru-uret taslağı denetim hattına girer: fabrika kaydı + 'denetle' işi; model_durum 'bekliyor' olduğundan yayımlanamaz", async () => {
+  const { yayimKarari } = await import("../lib/fabrika.js");
+  temizle(); for (const t of ["fabrika_soru", "fabrika_is"]) { try { DB.db.exec("DELETE FROM " + t); } catch (e) { } }
+  const r = await uret([sentetik(51), sentetik(52)]); assert.equal(r.s, 200);
+  assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM fabrika_soru WHERE asama = 'denetim_bekliyor' AND model_durum = 'bekliyor' AND denetim_tam = 0").get().n, 2);
+  assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM fabrika_is WHERE tur = 'denetle' AND durum = 'bekliyor'").get().n, 2);
+  const id = DB.db.prepare("SELECT soru_id FROM fabrika_soru").get().soru_id;
+  const k = await yayimKarari(T.env, [id], "yayin", "y"); assert.equal(k.ok, false); assert.equal(DB.db.prepare("SELECT durum FROM soru WHERE id = ?").get(id).durum, "taslak");
+});

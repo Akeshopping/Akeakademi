@@ -397,3 +397,12 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
   .plan-main{display:contents}
   .plan-main>.plan-bugun{order:1}.plan-side{order:2}.plan-main>.plan-ozet{order:3}.plan-main>form{order:4}
 }
+
+/* ---- 30. plan: boş durumda belirgin eylem; dar ekranda kompakt Odak odası (dokunma hedefleri 44 px kalır) ---- */
+.durum.bos .ilk-gorev{align-self:flex-start;margin-top:8px}
+@media (max-width:600px){
+  .pomo{padding:14px 16px;gap:8px}
+  .pomo .clock{font-size:44px;line-height:1.05}
+  .pomo .oda{margin:0;font-size:13px;line-height:1.4}
+  .pomo>.small.muted{max-width:none;margin:0;font-size:13px;line-height:1.45}
+}

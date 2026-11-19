@@ -121,6 +121,12 @@ rep('/* ===== 9 · Sesli koç: konuşarak sor, cevabı dinle ===== */\n', r'''Ob
   renkAc() { UI.renkAcik = !UI.renkAcik; render(); },
   renkSec(d) { if (d.v === "pal") renkKaydet(d.k, null); else if (rkHex(d.v)) renkKaydet(d.k, "#" + rkHex(d.v)); render(); },
   renkSifirla() { ERISIM.pal = "mercan"; LS.set("ake.pal", "mercan"); LS.del("ake.ozel"); LS.del("ake.ozelcss"); renkUygula(); render(); toast("Renkler varsayılana döndü."); },
+  planIlkGorev() {
+    const f = document.querySelector('form[data-s="addTask"]'); if (!f) return;
+    const az = matchMedia("(prefers-reduced-motion: reduce)").matches || ERISIM.hareket === "off";
+    f.scrollIntoView({ block: "center", behavior: az ? "auto" : "smooth" });
+    const g = f.querySelector('input[name="text"]'); if (g) setTimeout(() => g.focus({ preventScroll: true }), az ? 0 : 350);
+  },
   rzHepsi() { UI.rzHepsi = !UI.rzHepsi; render(); }
 });
 /* ===== 9 · Sesli koç: konuşarak sor, cevabı dinle ===== */
@@ -139,7 +145,7 @@ rep('const CHG = {\n', r'''const CHG = {
 # 6) Çalışma planı: bugün + ilerleme + görev ekleme solda, odak odası sağda; hafta altta
 rep('''  return `<div class="plan-hero"><section class="card plan-bugun">''', '''  return `<section class="card plan-bugun">''')
 rep('''<span>Aşağıdan bir görev ekle ya da haftalık planını oluştur.</span></div>`}</section>${pomoKart()}</div>`;''',
-    '''<span>Aşağıdan bir görev ekle ya da haftalık planını oluştur.</span></div>`}</section>`;''')
+    '''<span>Aşağıdan bir görev ekle ya da haftalık planını oluştur.</span><button type="button" class="btn pri ilk-gorev" data-a="planIlkGorev">İlk görevini ekle</button></div>`}</section>`;''')
 rep('''  return `<div class="view">
   <div class="vhead"><span class="eyebrow">Haftalık düzen</span><h1>Çalışma planım</h1>''',
     '''  return `<div class="view plan-glass">

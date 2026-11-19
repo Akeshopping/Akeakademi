@@ -1618,6 +1618,15 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
   .plan-main>.plan-bugun{order:1}.plan-side{order:2}.plan-main>.plan-ozet{order:3}.plan-main>form{order:4}
 }
 
+/* ---- 30. plan: boş durumda belirgin eylem; dar ekranda kompakt Odak odası (dokunma hedefleri 44 px kalır) ---- */
+.durum.bos .ilk-gorev{align-self:flex-start;margin-top:8px}
+@media (max-width:600px){
+  .pomo{padding:14px 16px;gap:8px}
+  .pomo .clock{font-size:44px;line-height:1.05}
+  .pomo .oda{margin:0;font-size:13px;line-height:1.4}
+  .pomo>.small.muted{max-width:none;margin:0;font-size:13px;line-height:1.45}
+}
+
 </style>
 <script>
 "use strict";
@@ -8383,7 +8392,7 @@ const deckName = d => d === "mine" ? "Benim kartlarım" : (DECKS.find(x => x.id 
 function planBugun(T, ti) {
   const ts = T.filter(t => t.day === ti), dn = ts.filter(t => t.done).length;
   return `<section class="card plan-bugun"><div class="card-h"><h2>Bugün · ${DAYS[ti]}</h2><span class="small muted">${dn}/${ts.length} tamam</span></div>
-    ${ts.length ? `<div class="bar ok"><i style="width:${pct(dn, ts.length)}%"></i></div><div class="list">${ts.map(taskRow).join("")}</div>` : `<div class="durum bos"><b>Bugün için görev yok</b><span>Aşağıdan bir görev ekle ya da haftalık planını oluştur.</span></div>`}</section>`;
+    ${ts.length ? `<div class="bar ok"><i style="width:${pct(dn, ts.length)}%"></i></div><div class="list">${ts.map(taskRow).join("")}</div>` : `<div class="durum bos"><b>Bugün için görev yok</b><span>Aşağıdan bir görev ekle ya da haftalık planını oluştur.</span><button type="button" class="btn pri ilk-gorev" data-a="planIlkGorev">İlk görevini ekle</button></div>`}</section>`;
 }
 function vPlan() {
   const T = S.plan.tasks, done = T.filter(t => t.done).length, ti = todayIdx();
@@ -9697,6 +9706,12 @@ Object.assign(OZ_ACT, {
   renkAc() { UI.renkAcik = !UI.renkAcik; render(); },
   renkSec(d) { if (d.v === "pal") renkKaydet(d.k, null); else if (rkHex(d.v)) renkKaydet(d.k, "#" + rkHex(d.v)); render(); },
   renkSifirla() { ERISIM.pal = "mercan"; LS.set("ake.pal", "mercan"); LS.del("ake.ozel"); LS.del("ake.ozelcss"); renkUygula(); render(); toast("Renkler varsayılana döndü."); },
+  planIlkGorev() {
+    const f = document.querySelector('form[data-s="addTask"]'); if (!f) return;
+    const az = matchMedia("(prefers-reduced-motion: reduce)").matches || ERISIM.hareket === "off";
+    f.scrollIntoView({ block: "center", behavior: az ? "auto" : "smooth" });
+    const g = f.querySelector('input[name="text"]'); if (g) setTimeout(() => g.focus({ preventScroll: true }), az ? 0 : 350);
+  },
   rzHepsi() { UI.rzHepsi = !UI.rzHepsi; render(); }
 });
 /* ===== 9 · Sesli koç: konuşarak sor, cevabı dinle ===== */

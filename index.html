@@ -8205,6 +8205,28 @@ function studyoKocCek(s, t) {
   startRun(studyoCfg({ kind: "practice", title: `Sana özel · ${t}`, mode: "study", qs: shuffle(qs) }));
 }
 function studyoKocGiris(s, t) { if (!SUBJ[s]) return; studyoGirisCalistir(() => studyoKocCek(s, t)); }
+/* 3C-4f: yanlış tekrarı (ACT.mistOne / mistStart / mistDue), bayrak AÇIKKEN. Mevcut seçim (açık yanlış, ders filtresi, ts azalan, en çok 30) AYNEN korunur; seçim ÖNCE sınırlanır, eleme SONRA yapılır.
+   Her yanlış KİMLİKLE ilgili dersin katalog havuzunda aranır; RUN'a KATALOGDAKİ cevapsız nesne girer (S.mistakes[].q — a/x/sv dâhil — KOPYALANMAZ). Katalogda olmayan, g:, AI (src), eski ya da görselli (fig) yanlışlar elenir ve sayısı bildirilir;
+   yanlış KAYITLARI silinmez/değişmez. Hiç uygun soru yoksa RUN açılmaz. BANK/EKQ/AI/GENS dolgusu ve yerel kota/fallback YOK; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu (svAdaylar istisnası), kind="mistakes" korunur. KAPSAM DIŞI: vMistakes ve koç "Senin yanlışların" (cevaplı yerel gösterim). */
+function studyoMistCek(idler, baslik) {
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
+  const l = idler.map(id => [id, S.mistakes[id]]).filter(([, m]) => m && m.q);
+  if (!l.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
+  const kat = new Map(), qs = [], gor = new Set(); let at = 0;
+  const havuz = s => { if (!kat.has(s)) { const h = SUBJ[s] ? stHavuzG(s, {}) : null; kat.set(s, h ? new Map(h.havuz.map(q => [q.id, q])) : new Map()); } return kat.get(s); };
+  for (const [id, m] of l) {
+    const k = (m.q.fig || m.q.gen || m.q.src === "ai" || /^g:/.test(String(id))) ? null : havuz(m.q.s).get(String(id));
+    if (!k) { at++; continue; }
+    if (gor.has(k.id)) continue;
+    gor.add(k.id); qs.push(k);
+  }
+  const nt = at ? `${at} yanlış katalogda bulunamadığı (üretilmiş, AI, görselli, eski ya da kaldırılmış) için tekrara alınmadı.` : "";
+  if (!qs.length) { toast((nt ? nt + " " : "") + "Tekrar edilecek uygun soru kalmadı."); return; }
+  if (nt) toast(nt);
+  startRun(studyoCfg({ kind: "mistakes", title: baslik, mode: "study", qs }));
+}
+function studyoMistGiris(l, baslik) { const ids = l.map(([id]) => id); studyoGirisCalistir(() => studyoMistCek(ids, baslik)); }
 function vStudio() {
   const G = studyoGuvenliMi(); if (G) { const dur = bankaDurum(); if (dur !== "hazir") return stDurumGorunumu(dur); }
   const St = UI.studio;
@@ -8826,7 +8848,7 @@ const SV = { kapali: false };
 const svKullan = () => sunucuKota() && !SV.kapali && HESAP.hazir && !HESAP.hata && !!HESAP.user && !(window.SV_KAPAT === true);
 const svAday = q => q && typeof q.id === "string" && !q.gen && q.src !== "ai" && !/^g:/.test(q.id);
 function svAdaylar(cfg) {
-  if (cfg.canli || cfg.kind === "mistakes") return [];
+  if (cfg.canli || (cfg.kind === "mistakes" && !cfg.studyoGuvenli)) return [];   /* 3C-4f: yalnız güvenli (studyoGuvenli) yanlış tekrarı sunucu oturumu alır; bayrak kapalı mistakes yerel kalır */
   const gor = new Set(), out = [];
   for (const q of cfg.qs) if (svAday(q) && !gor.has(q.id)) { gor.add(q.id); out.push(q); }
   return out;
@@ -9847,7 +9869,7 @@ const OZ_ACT = {
   benzerEkle() { if (!UI.benzerBusy) benzerEkle(); },
   benzerAIGo() { benzerAI(); },
   benzerMist(d) { const m = S.mistakes[d.id]; if (m) benzerBaslat(m.q); },
-  mistDue() { const l = tekrarBekleyen().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); if (!l.length) { toast("Bugün tekrar zamanı gelen yanlış yok."); return; } startRun({ kind: "mistakes", title: "Bugünün yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); }
+  mistDue() { const l = tekrarBekleyen().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); if (!l.length) { toast("Bugün tekrar zamanı gelen yanlış yok."); return; } if (studyoGuvenliMi()) { studyoMistGiris(l, "Bugünün yanlış tekrarı"); return; } startRun({ kind: "mistakes", title: "Bugünün yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); }
 };
 
 /* ===== Ders/konu yardımcıları ve ısı renkleri (5) ===== */
@@ -12914,8 +12936,8 @@ Bu sonucu 6-10 satırda yorumla: güçlü yanı, en acil 3 konu ve gelecek hafta
   },
   paraOne(d) { if (paragrafGuvenliMi()) { paragrafBaslat(d && d.id); return; } const P = allQ().filter(q => q.s === "turkce" && q.p), i = Math.max(0, P.findIndex(q => q.id === d.id)); startRun({ kind: "para", title: "Paragraf antrenmanı", mode: "study", qs: P.slice(i).concat(P.slice(0, i)) }); },
   mistTab(d) { UI.mist.tab = d.k; render(); },
-  mistStart() { const l = openMistakes().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); },
-  mistOne(d) { const m = S.mistakes[d.id]; if (m) startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: [m.q] }); },
+  mistStart() { const l = openMistakes().filter(([, m]) => !UI.mist.s || m.q.s === UI.mist.s).sort((a, b) => b[1].ts - a[1].ts).slice(0, 30); if (studyoGuvenliMi()) { studyoMistGiris(l, "Yanlış tekrarı"); return; } startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: l.map(([, m]) => m.q) }); },
+  mistOne(d) { const m = S.mistakes[d.id]; if (m && studyoGuvenliMi()) { studyoMistGiris([[d.id, m]], "Yanlış tekrarı"); return; } if (m) startRun({ kind: "mistakes", title: "Yanlış tekrarı", mode: "study", qs: [m.q] }); },
   mistLearn(d) { const m = S.mistakes[d.id]; if (m) { m.learned = true; touch("mistakes"); render(); } },
   deckStart(d) {
     const cs = deckCards(d.d), now = Date.now();

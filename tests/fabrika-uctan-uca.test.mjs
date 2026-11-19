@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
 import worker from "../worker/fabrika-worker.js";
 
-const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", ANTHROPIC_API_KEY: "sk-ant-TEST-SAHTE", AKE_FABRIKA_GUNLUK_CAGRI: "100" } });
+const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", ANTHROPIC_API_KEY: "test-anahtar-sahte-uctan-uca", AKE_FABRIKA_GUNLUK_CAGRI: "100" } });
 await T.hazirla(); const yon = await T.giris("yonetici@ornek.com"), DB = T.DB;
 const yon_ = (yol, m = "POST", govde) => yonetimIstek(T, yol, { m, cookie: yon.cookie, govde });
 const say = w => DB.db.prepare(`SELECT COUNT(*) n FROM soru WHERE ${w}`).get().n;
@@ -20,7 +20,7 @@ test("uçtan uca: robot kapalı → aç → pilot → Worker turları → 10 ada
   /* sahte Anthropic: üretim → sıradaki sentetik soru, denetim → soruyu kör çözer (3 soruyu bilerek yanlış çözer) */
   const orijinal = globalThis.fetch; let uretilen = 0, ag = 0;
   globalThis.fetch = async (url, init) => {
-    ag++; assert.match(String(url), /^https:\/\/api\.anthropic\.com\/v1\/messages$/); assert.equal(init.headers["x-api-key"], "sk-ant-TEST-SAHTE");
+    ag++; assert.match(String(url), /^https:\/\/api\.anthropic\.com\/v1\/messages$/); assert.equal(init.headers["x-api-key"], "test-anahtar-sahte-uctan-uca");
     const g = JSON.parse(init.body).messages[0].content; let metin;
     if (/soru yaz/.test(g)) { const s = sentetik(++uretilen); metin = JSON.stringify([{ p: s.p, q: s.q, o: s.o, a: s.a, x: s.x }]); }
     else { const i = +/SENTETIK-SORU-(\d+)/.exec(g)[1], dogru = sentetik(i).a; metin = JSON.stringify({ cevap: i >= 8 ? (dogru + 1) % 5 : dogru, tek_dogru: true, belirsiz: false, sorunlar: [] }); }

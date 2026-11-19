@@ -6,7 +6,7 @@ import worker, { tur } from "../worker/fabrika-worker.js";
 import { kur } from "./yardim/soru-v2.mjs";
 import { robotAyarla, pilotBaslat, fabrikaSema } from "../lib/fabrika.js";
 
-const SAHTE_ANAHTAR = "sk-ant-TEST-SAHTE-ANAHTAR-123";
+const SAHTE_ANAHTAR = "test-anahtar-sahte-fabrika-123";
 function fetchStub(yanit) { const o = globalThis.fetch, c = []; globalThis.fetch = async (url, init) => { c.push({ url: String(url), init }); return yanit(url, init); }; return { c, geriAl: () => { globalThis.fetch = o; } }; }
 
 test("istemci: anahtar yoksa ağ çağrısı yapılmaz", async () => {

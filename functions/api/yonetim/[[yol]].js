@@ -48,7 +48,7 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
   const nmr = o => (((o.p || "") + "\n" + o.q).match(/(^|\n)\s*(I{1,3}|IV|V)[.)]\s|\((I{1,3}|IV|V)\)/g) || []).length >= 2, rmz = o => o.o.filter(x => /^(yalnız\s+)?(I{1,3}|IV|V)(\s|,|$)/i.test(String(x).trim())).length;
   arr = arr.filter(o => !nmr(o) || rmz(o) >= 3);
   if (!arr.length) return { hata: "uretim" };
-  const tut = arr; /* ikinci AI kontrolü kaldırıldı (token tasarrufu); sorular onay kuyruğunda elle kontrol edilir */
+  const tut = arr; /* sorular 'taslak' yazılır; canlıya yalnızca denetim hattı + yönetici yayım kararı ile geçer (lib/fabrika.js) */
   const v2 = bayrakAcik(env), say = { yazilan: 0, gecersiz: 0, kopya: 0, catisma: 0, idCakisma: 0 };   // AKE_SORU_V2=1: legacy json + kanonik kolonlar tek INSERT'te (lib/soru-yaz.js)
   for (const o of tut) {
     if (v2) {
@@ -61,7 +61,7 @@ ${ornek.length ? "Üslup için bu konudaki mevcut örnekler (kopyalama, aynı ta
     }
     const q = { id: "ok-" + rastgele(5), s, t, d, q: o.q.trim(), o: o.o.map(x => x.trim()), a: o.a, x: String(o.x || "").trim() || "Açıklama eklenmedi." };
     if (typeof o.p === "string" && o.p.trim()) q.p = o.p.trim();
-    await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'onayli', ?, ?)").bind(q.id, s, t, d, JSON.stringify(q), Date.now(), Date.now()).run();
+    await env.DB.prepare("INSERT INTO soru (id, s, t, d, json, durum, tarih, karar) VALUES (?, ?, ?, ?, ?, 'taslak', ?, ?)").bind(q.id, s, t, d, JSON.stringify(q), Date.now(), Date.now()).run();
   }
   return v2 ? { uretilen: arr.length, gecen: say.yazilan, gecersiz: say.gecersiz, kopya: say.kopya, catisma: say.catisma, idCakisma: say.idCakisma } : { uretilen: arr.length, gecen: tut.length };
 }

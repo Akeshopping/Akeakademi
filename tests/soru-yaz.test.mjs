@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { kur, yonetimIstek, aiStub, sentetik, tohumla, sizintiBul } from "./yardim/soru-v2.mjs";
-import { soruYazKanonik } from "../lib/soru-yaz.js";
+import { canliYaz as soruYazKanonik } from "./yardim/soru-v2.mjs";
 import { kanonikHash, govdeOf } from "../lib/soru-kanonik.js";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", ANTHROPIC_API_KEY: "test-anahtar-sahte", AKE_SORU_GUNLUK: "1000" } });
@@ -20,7 +20,7 @@ test("3) bayrak açık: dual-write — legacy alanlar aynen + kaynak/rk/h/govde/
   for (const w of rows) {
     const q = JSON.parse(w.json);   // 15) legacy json parse edilir; p/q/o/a/x korunur
     assert.deepEqual(Object.keys(q).slice(0, 8), ["id", "s", "t", "d", "q", "o", "a", "x"]); assert.equal(q.id, w.id); assert.equal(q.o.length, 5); assert.ok(q.x.startsWith("SENTETIK-COZUM-")); assert.equal(typeof q.a, "number");
-    assert.equal(w.durum, "onayli"); assert.equal(w.s, "mat"); assert.equal(w.d, 2);
+    assert.equal(w.durum, "taslak"); assert.equal(w.s, "mat"); assert.equal(w.d, 2);
     assert.equal(w.kaynak, "ai"); assert.ok(Number.isInteger(w.rk) && w.rk >= 0 && w.rk <= 2147483647);
     assert.equal(w.h, await kanonikHash(q)); assert.equal(w.govde, govdeOf(q)); assert.equal(w.a, q.a); assert.equal(w.x, q.x);
     assert.equal(w.grup, null); assert.equal(w.kopya_of, null);

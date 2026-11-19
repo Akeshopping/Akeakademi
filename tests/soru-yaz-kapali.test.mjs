@@ -13,12 +13,12 @@ const sutunlar = () => DB.db.prepare("PRAGMA table_info(soru)").all().map(r => r
 const KANONIK = ["kaynak", "rk", "h", "govde", "a", "x", "grup", "kopya_of"];
 const uret = async (sorular, b = {}) => { const st = aiStub(sorular); try { return { ...(await yonetimIstek(T, "soru-uret", { cookie: yonetici.cookie, govde: { s: "mat", t: "Sentetik Konu", d: 2, n: sorular.length, ...b } })), ai: st.cagri.n }; } finally { st.geriAl(); } };
 
-test("1) bayrak kapalı: soru-uret eski legacy davranışı (8 kolon, durum='onayli', json içinde a/x, yanıt {uretilen, gecen})", async () => {
+test("1) bayrak kapalı: soru-uret legacy biçimi (8 kolon, durum='taslak' — artık canlıya yazmaz, json içinde a/x, yanıt {uretilen, gecen})", async () => {
   const r = await uret([sentetik(1), sentetik(2, { p: "SENTETIK-PASAJ" })]);
   assert.equal(r.s, 200); assert.deepEqual(r.j, { uretilen: 2, gecen: 2 }); assert.equal(r.ai, 1);   // yalnız sahte AI çağrıldı
   const rows = DB.db.prepare("SELECT * FROM soru ORDER BY tarih, id").all(); assert.equal(rows.length, 2);
   for (const row of rows) {
-    assert.match(row.id, /^ok-[0-9a-f]{10}$/); assert.equal(row.s, "mat"); assert.equal(row.t, "Sentetik Konu"); assert.equal(row.d, 2); assert.equal(row.durum, "onayli"); assert.ok(row.tarih > 0 && row.karar > 0);
+    assert.match(row.id, /^ok-[0-9a-f]{10}$/); assert.equal(row.s, "mat"); assert.equal(row.t, "Sentetik Konu"); assert.equal(row.d, 2); assert.equal(row.durum, "taslak"); assert.ok(row.tarih > 0 && row.karar > 0);
     const q = JSON.parse(row.json); assert.deepEqual(Object.keys(q).slice(0, 8), ["id", "s", "t", "d", "q", "o", "a", "x"]); assert.equal(q.id, row.id); assert.equal(typeof q.a, "number"); assert.ok(q.x.startsWith("SENTETIK-COZUM-"));
   }
   assert.deepEqual(Object.keys(JSON.parse(rows.find(r => r.json.includes("PASAJ")).json)).slice(-1), ["p"]);
@@ -43,6 +43,7 @@ test("kapalıyken soru-karar: onay/red eski tek-UPDATE davranışı; kanonik kol
 });
 test("19-24) üretim garantisi: bayrak yokken V2 API 404 ve D1 şeması dokunulmaz; /api/sorular legacy satırı okur; legacy yazım sürer", async () => {
   for (const [y, m] of [["ozet", "GET"], ["oturum", "POST"], ["cevap", "POST"], ["bitir", "POST"]]) assert.equal((await api(y, { m, cookie: yonetici.cookie, govde: m === "POST" ? {} : undefined })).s, 404, y);
+  DB.db.exec("UPDATE soru SET durum = 'onayli'");   // yayımlanmış legacy satırları taklit (okuma uyumluluğu testi; robot bunu yapamaz)
   const mod = await import("../functions/api/sorular.js");
   const r = await mod.onRequest({ request: new Request("https://akeakademi.com/api/sorular"), env: T.env });
   const j = await r.json(); const liste = Array.isArray(j) ? j : (j.sorular || j.q || []);

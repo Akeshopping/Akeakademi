@@ -2,7 +2,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
-import { soruYazKanonik, kanonikAlanlar } from "../lib/soru-yaz.js";
+import { kanonikAlanlar } from "../lib/soru-yaz.js";
+import { canliYaz as soruYazKanonik } from "./yardim/soru-v2.mjs";
 import { kanonikHash } from "../lib/soru-kanonik.js";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com" } });

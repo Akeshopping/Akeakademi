@@ -53,3 +53,25 @@ test("V2 kapalıyken robot açılamaz (kanonik şema yoksa hat çalışmaz)", as
   try { const r = await robotAyarla(T.env, true); assert.equal(r.ok, false); assert.equal(r.neden, "v2_kapali"); } finally { T.env.AKE_SORU_V2 = eski; }
   assert.equal((await robotAyarla(T.env, false)).ok, true);   // kapatmak her zaman serbest
 });
+
+/* ---- önizleme kurulumu: robot kapalıyken Worker'ın bağlantı/limit doğrulama günlüğü ---- */
+test("worker günlüğü: robot kapalıyken D1 bağlantısını, robot durumunu ve günlük limiti (40) tek satırda yazar; sır içermez", async () => {
+  await robotAyarla(T.env, false);
+  const satirlar = []; const orijinal = console.log; console.log = (...a) => { satirlar.push(a.join(" ")); };
+  const s = fetchStub(() => { throw new Error("çağrılmamalı"); });
+  try { const ps = []; await worker.scheduled({}, { ...T.env, AKE_FABRIKA_GUNLUK_CAGRI: "40" }, { waitUntil: p => ps.push(p) }); await Promise.all(ps); assert.equal(s.c.length, 0); } finally { console.log = orijinal; s.geriAl(); }
+  const l = satirlar.find(x => x.startsWith("fabrika-worker ")); assert.ok(l, "günlük satırı yok");
+  const j = JSON.parse(l.slice("fabrika-worker ".length));
+  assert.deepEqual([j.neden, j.islenen, j.robot, j.gunlukLimit, j.d1], ["robot_kapali", 0, false, 40, "baglandi"]);
+  assert.ok(!l.includes(SAHTE_ANAHTAR));
+});
+test("worker günlüğü: limit ayarlanmamışsa varsayılan 40; D1 bağlantısı yoksa 'd1_yok' hatası günlüğe düşer (sessiz geçmez)", async () => {
+  const satirlar = []; const o1 = console.log, o2 = console.error; console.log = (...a) => satirlar.push(a.join(" ")); console.error = (...a) => satirlar.push("ERR " + a.join(" "));
+  try {
+    let ps = []; const { AKE_FABRIKA_GUNLUK_CAGRI, ...ayarsiz } = T.env; await worker.scheduled({}, ayarsiz, { waitUntil: p => ps.push(p) }); await Promise.all(ps);
+    ps = []; await worker.scheduled({}, { ANTHROPIC_API_KEY: SAHTE_ANAHTAR }, { waitUntil: p => ps.push(p) }); await Promise.all(ps);
+  } finally { console.log = o1; console.error = o2; }
+  const ok = JSON.parse(satirlar.find(x => x.startsWith("fabrika-worker ")).slice(15)); assert.equal(ok.gunlukLimit, 40);
+  assert.ok(satirlar.some(x => x.startsWith("ERR fabrika-worker") && /d1_yok/.test(x)), satirlar.join("|"));
+  assert.ok(!satirlar.join("").includes(SAHTE_ANAHTAR));
+});

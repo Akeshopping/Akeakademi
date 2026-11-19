@@ -1,17 +1,23 @@
-# AKE Soru Fabrikası Worker'ı. DEPLOY EDİLMEDİ — aşağıdaki YER TUTUCULAR doldurulmadan çalışmaz (worker/README.md).
+# AKE Soru Fabrikası Worker'ı.
+# DEPLOY EDİLMEDİ. Yalnız ÖNİZLEME ortamı tanımlıdır: üst düzeyde (production) D1 bağlantısı, cron ya da değişken YOKTUR,
+# bu yüzden `wrangler deploy` (--env olmadan) hiçbir şeyi canlıya bağlayamaz. Önizleme için: npx wrangler deploy --env onizleme
+# D1 adı/ID Cloudflare bağlayıcısıyla bulundu (akeakademi-preview-test); Pages Preview "DB" bağlantısının AYNI D1 olduğunu panelden sen doğrula (worker/README.md 1. adım).
 name = "ake-fabrika-worker"
 main = "fabrika-worker.js"
 compatibility_date = "2025-01-01"
 
-[triggers]
-crons = ["* * * * *"]   # her dakika; robot anahtarı kapalıysa hiçbir şey yapmaz
+[env.onizleme]
+name = "ake-fabrika-worker-onizleme"
 
-[[d1_databases]]
+[env.onizleme.triggers]
+crons = ["* * * * *"]   # her dakika; robot anahtarı kapalıysa model çağrısı yapmaz, yalnız bir günlük satırı yazar
+
+[[env.onizleme.d1_databases]]
 binding = "DB"
-database_name = "AKE_D1_ADI_YER_TUTUCU"      # Pages projesindeki DB ile AYNI veritabanı
-database_id = "AKE_D1_ID_YER_TUTUCU"
+database_name = "akeakademi-preview-test"   # Pages > Settings > Bindings > Preview > DB ile AYNI D1 (production D1 DEĞİL)
+database_id = "2b62c1d6-63a1-4abe-8d5a-4313af30e789"
 
-[vars]
+[env.onizleme.vars]
 AKE_SORU_V2 = "1"                 # kanonik soru şeması (yayım kapısı buna dayanır)
-AKE_FABRIKA_GUNLUK_CAGRI = "40"   # günlük model çağrısı üst sınırı (pilot için yeterli; 20.000/gün döngüsü KAPALI)
+AKE_FABRIKA_GUNLUK_CAGRI = "40"   # günlük model çağrısı üst sınırı; 20.000/gün döngüsü KAPALI
 # Secret (burada YAZILMAZ): ANTHROPIC_API_KEY

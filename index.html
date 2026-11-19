@@ -8495,6 +8495,7 @@ const plainQ = s => String(s || "").replace(/\^\{([^}]*)\}/g, "^$1").replace(/_\
 
 function startRun(cfg) {
   if (!cfg.qs || !cfg.qs.length) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
+  if (cfg.kind === "benzer" && !cfgGuvenli(cfg) && benzerYerelEngel()) { toast(BENZER_ENGEL); return; }   /* 3C-4g: son savunma; yerel/AI cevaplı "benzer" RUN'ı bayrak açıkken YA DA açık güvenli RUN (gvn) varken (bayrak sonradan kapansa/sayfa yenilense de) HİÇBİR yoldan açılmaz */
   if (cfgGuvenli(cfg) && RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (yerel/başka) oturum güvenli #paragraf/#banka tarafından ASLA ezilmez; force olsa bile */
   if (RUN && !cfg.force) {
     UI.pendingRun = cfg;
@@ -9764,8 +9765,12 @@ function benzerYerlestir(add) {
   toast(`${k} benzer soru sıraya eklendi.`);
   moveTo(at);
 }
+/* 3C-4g: yerel "benzer" oturumu engeli: AKE_KATALOG_STUDYO açıkken ya da açık RUN güvenli işaretliyse (RUN.gvn; bayrak sonradan kapansa veya sayfa yenilense de ake.run'da kalır) */
+const benzerYerelEngel = () => studyoGuvenliMi() || !!(RUN && RUN.gvn);
+const BENZER_ENGEL = "Güvenli oturum ya da güvenli mod açıkken benzer sorular yalnız katalogdan açılır; açık oturumun korundu.";
 function benzerYok(q, yer) {
   if (yer === "run" && RUN && RUN.gvn) { toast("Güvenli oturuma yerel soru eklenemez."); return; }
+  if (yer === "mist" && benzerYerelEngel()) { toast(studyoGuvenliMi() ? "Bu konuda başka hazır soru yok." : BENZER_ENGEL); return; }   /* 3C-4g: güvenli modda AI ile benzer soru üretilmez (hak harcanmaz) */
   if (!aiOn()) { toast("Bu konuda başka hazır soru yok."); return; }
   UI.benzerQ = { q: snap(q), yer };
   openModal("AI ile benzer soru üretilsin mi?", `<p>"${esc(q.t)}" konusunda hazır benzer soru yok. AI bu sorunun mantığında 3 yeni soru yazsın, cevaplarını ikinci kez kontrol etsin.</p>${IN_CLAUDE ? "" : `<p class="small muted">Bu işlem 2 AI mesaj hakkı kullanır.</p>`}`,
@@ -9779,7 +9784,19 @@ function benzerEkle() {
   benzerYerlestir(add);
 }
 /* Yanlış defterinden: o sorunun benzerleriyle yeni kısa test */
+/* 3C-4g: AKE_KATALOG_STUDYO açıkken "Benzerini çöz": kaynak yanlışın YALNIZ ders/konusu (cevap/çözüm/anlık görüntü kullanılmaz); katalogdan (KHAVUZ) aynı ders+konu, kaynak kimliği HARİÇ, en çok 5 CEVAPSIZ soru;
+   zorunlu sunucu oturumu (RUN.gvn="studyo", kind="benzer"). GENS/BANK/EKQ/S.aiQs/AI yok; uygun soru yoksa açık mesaj (AI ve yerel kota yok). */
+function studyoBenzerCek(id, s, t) {
+  if (!studyoGuvenliMi()) { toast("Güvenli mod kapandı; bekleyen benzer soru oturumu iptal edildi."); return; }   /* bekleme sırasında bayrak kapandıysa güvenli cfg sessizce yerel cfg'ye (studyoCfg işaretsiz döner) DÖNÜŞMEZ */
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }
+  if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
+  const h = SUBJ[s] && typeof t === "string" && t ? stHavuzG(s, { topic: t }) : null, qs = h ? h.havuz.filter(q => q.id !== String(id)).slice(0, 5) : [];
+  if (!qs.length) { toast("Bu konuda başka hazır soru yok."); return; }
+  startRun(studyoCfg({ kind: "benzer", title: "Benzer sorular · " + t, mode: "study", qs }));
+}
 function benzerBaslat(q) {
+  if (studyoGuvenliMi()) { const id = q && q.id, s = q && q.s, t = q && q.t; studyoGirisCalistir(() => studyoBenzerCek(id, s, t)); return; }
+  if (RUN && RUN.gvn) { toast(BENZER_ENGEL); return; }   /* bayrak kapalı ama açık güvenli RUN var: yerel benzer üretilmez, AI modalı açılmaz */
   const qs = benzerSorular(q, 5);
   if (!qs.length) { benzerYok(q, "mist"); return; }
   startRun({ kind: "benzer", title: "Benzer sorular · " + q.t, mode: "study", qs });
@@ -9787,6 +9804,8 @@ function benzerBaslat(q) {
 async function benzerAI() {
   const _n = OT.nesil;   /* AI yanıtı hesap değiştikten sonra gelirse yeni hesabın S'sine yazılmaz */
   const B = UI.benzerQ; UI.modal = null; if (!B || UI.benzerBusy) { render(); return; }
+  const gDur = () => { if (B.yer === "run" || !benzerYerelEngel()) return false; UI.benzerBusy = false; UI.benzerQ = null; render(); toast(BENZER_ENGEL); return true; };   /* 3C-4g: bayrak (modal açıkken ya da AI beklenirken) açılırsa AI/yerel yazım yapılmaz */
+  if (gDur()) return;
   if (B.yer === "run" && RUN && RUN.gvn) { UI.benzerQ = null; render(); toast("Güvenli oturuma yerel soru eklenemez."); return; }   /* AI çağrısı yapılmaz, hak harcanmaz */
   const q = B.q, s = q.s, en = s === "ingilizce", sj = SUBJ[s] || { n: s, e: "" };
   UI.benzerBusy = true; render(); toast("AI benzer soruları hazırlıyor…");
@@ -9813,6 +9832,7 @@ Yalnızca JSON dizisi döndür. Biçim örneği:
     if (!Array.isArray(arr)) arr = [];
     arr = arr.map(o => o && Object.assign({}, o, { a: Number(o.a) })).filter(o => o && typeof o.q === "string" && o.q.trim() && Array.isArray(o.o) && o.o.length === 5 && o.o.every(x => typeof x === "string" && x.trim()) && new Set(o.o.map(x => x.trim())).size === 5 && Number.isInteger(o.a) && o.a >= 0 && o.a <= 4).slice(0, 3);
     if (!arr.length) throw { code: "invalid_json" };
+    if (gDur()) return;
     const vp = `Aşağıdaki çoktan seçmeli soruları bağımsız olarak, dikkatle çöz. Her soru için doğru seçeneğin 0-4 arası sırasını ver (A=0 … E=4). Bir soruda birden fazla doğru seçenek varsa, hiç doğru seçenek yoksa ya da soru hatalıysa -1 yaz.
 
 ${arr.map((o, i) => `Soru ${i + 1}:\n${o.p && o.p.trim() ? o.p.trim() + "\n" : ""}${o.q}\n${o.o.map((x, j) => LET[j] + ") " + x).join("\n")}`).join("\n\n")}
@@ -9826,6 +9846,7 @@ Yalnızca ${arr.length} sayıdan oluşan bir JSON dizisi döndür. Örnek: [2,0,
     });
     if (!kept.length) throw { code: "empty_completion" };
     if (_n !== OT.nesil) { UI.benzerBusy = false; UI.benzerQ = null; render(); return; }
+    if (gDur()) return;
     kept.forEach(x => S.aiQs.push(x)); touch("ai");
     UI.benzerBusy = false; UI.benzerQ = null;
     if (B.yer === "run" && RUN) benzerYerlestir(kept.map(snap));
@@ -12834,6 +12855,7 @@ const ACT = {
   resume() { if (guvenliEkranMi() && RUN && !RUN.gvn) { paragrafEskiUyari(); return; } UI.pendingRun = null; UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
   svTekrar() { if (BK.cikis) return; const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },
   runReplace() { const c = UI.pendingRun, onay = !!(c && UI.modal && UI.modal.runOnay); UI.pendingRun = null; if (!onay) return;   /* bekleyen cfg + açık onay penceresi yoksa HİÇBİR ŞEY yapma (RUN ve ake.run korunur) */
+    if (c && c.kind === "benzer" && !cfgGuvenli(c) && benzerYerelEngel()) { UI.modal = null; toast(BENZER_ENGEL); render(); return; }   /* 3C-4g: eski (bayrak kapalıyken kurulmuş) yerel benzer cfg güvenli RUN'ı silip yerel RUN'a çeviremez */
     if (RUN && !RUN.gvn && cfgGuvenli(c)) { UI.pendingRun = null; UI.modal = null; paragrafEskiUyari(); return; }
     if (cfgGuvenli(c)) { UI.modal = null; startRun(Object.assign(c, { force: true })); return; }   /* güvenli değiştirme: eski RUN sunucu yeni soruları BAŞARIYLA döndürmeden silinmez (500/402/404/ağ hatasında korunur, yerel fallback yok); başarıda baslatRun yerine geçer */
     RUN = null; saveRun(); if (c) startRun(Object.assign(c, { force: true })); },

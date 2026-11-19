@@ -13,7 +13,7 @@
 //   GET  fabrika-durum | fabrika-adaylar | fabrika-cagrilar
 //   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
-import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdHesapla } from "../../../lib/fabrika.js";
+import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -144,13 +144,15 @@ export async function onRequest({ request, env, params }) {
     const bugun = gunTR(); let ayUsd = 0, bugunUsd = 0, ayCagri = 0, bugunCagri = 0; const kaynak = {};
     rows.forEach(r => { const u = usd(r); ayUsd += u; if (r.gun === bugun) bugunUsd += u; if (r.kaynak !== "soru-uret") { ayCagri += r.adet; if (r.gun === bugun) bugunCagri += r.adet; } kaynak[r.kaynak] = (kaynak[r.kaynak] || 0) + u; });
     /* Fabrika robotu: gerçek token kaydı (fabrika_cagri). Liste fiyatı × kayıtlı token; gerçek fatura Anthropic Console'dadır. */
-    let fabrikaUsd = 0, fabrikaCagri = 0, fabrikaToken = { giris: 0, cikis: 0 };
+    let fabrikaUsd = 0, fabrikaCagri = 0, fabrikaToken = { giris: 0, cikis: 0 }, fabrikaFiyatsizCagri = 0, fabrikaFiyatsizModeller = [];
     try {
       const fr = (await env.DB.prepare("SELECT gun, model, giris, cikis FROM fabrika_cagri WHERE gun >= ?").bind(ay + "-01").all()).results || [];
-      fr.forEach(r => { const u2 = usdHesapla(env, r.model, r.giris, r.cikis); fabrikaUsd += u2; fabrikaCagri++; fabrikaToken.giris += r.giris; fabrikaToken.cikis += r.cikis; if (r.gun === bugun) { bugunUsd += u2; bugunCagri++; } });
-      ayUsd += fabrikaUsd; ayCagri += fabrikaCagri; if (fabrikaCagri) kaynak.fabrika = fabrikaUsd;
+      fr.forEach(r => { fabrikaCagri++; fabrikaToken.giris += r.giris; fabrikaToken.cikis += r.cikis; });
+      const ft = usdToplam(env, fr), bt = usdToplam(env, fr.filter(r => r.gun === bugun));   // fiyatı bilinmeyen model USD'ye KATILMAZ (ayrıca sayılır)
+      fabrikaUsd = ft.usd; fabrikaFiyatsizCagri = ft.fiyatsizCagri; fabrikaFiyatsizModeller = ft.fiyatsizModeller;
+      bugunUsd += bt.usd; bugunCagri += fr.filter(r => r.gun === bugun).length; ayUsd += fabrikaUsd; ayCagri += fabrikaCagri; if (fabrikaCagri) kaynak.fabrika = fabrikaUsd;
     } catch (e) { }
-    return json(200, { ay, ayUsd, bugunUsd, ayCagri, bugunCagri, kaynak, fabrikaUsd, fabrikaCagri, fabrikaToken, soruUretBugun: rows.filter(r => r.gun === bugun && r.kaynak === "soru-uret").reduce((s, r) => s + r.adet, 0), soruUretLimit: +env.AKE_SORU_GUNLUK || 20, butceUsd: +env.AKE_AYLIK_BUTCE_USD || 0 });
+    return json(200, { ay, ayUsd, bugunUsd, ayCagri, bugunCagri, kaynak, fabrikaUsd, fabrikaCagri, fabrikaToken, fabrikaFiyatsizCagri, fabrikaFiyatsizModeller, soruUretBugun: rows.filter(r => r.gun === bugun && r.kaynak === "soru-uret").reduce((s, r) => s + r.adet, 0), soruUretLimit: +env.AKE_SORU_GUNLUK || 20, butceUsd: +env.AKE_AYLIK_BUTCE_USD || 0 });
   }
   if (ad === "shopier-kur" && m === "POST") {
     if (!env.SHOPIER_PAT) return fail(400, "pat_yok", "Cloudflare'e SHOPIER_PAT eklenmemiş.");
@@ -185,7 +187,9 @@ export async function onRequest({ request, env, params }) {
     }
     if (ad === "fabrika-pilot-durdur" && m === "POST") return json(200, await pilotDurdur(env));
     if (ad === "fabrika-karar" && m === "POST") {
-      const b = await gov(), r = await yayimKarari(env, b.id, b.karar === "yayin" ? "yayin" : "red", u.eposta);
+      const b = await gov();
+      if (b.karar !== "yayin" && b.karar !== "red") return fail(400, "karar_gecersiz", 'karar "yayin" ya da "red" olmalı; başka değer işlenmez.');
+      const r = await yayimKarari(env, b.id, b.karar, u.eposta);
       return r.ok ? json(200, r) : json(409, { error: "yayim_kapisi", message: "Hiçbir soru işlenmedi: yayım şartları sağlanmıyor.", hatalar: r.hatalar });
     }
     return fail(404, "yok");

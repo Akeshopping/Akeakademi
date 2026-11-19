@@ -41,7 +41,7 @@ test("7) _routes.json: tüm istekler Function'a gider; dışlananlar YALNIZ tam 
   const r = JSON.parse(fs.readFileSync(path.join(KOK, "_routes.json"), "utf8"));
   assert.equal(r.version, 1); assert.deepEqual(r.include, ["/*"]); assert.ok(r.exclude.length + 1 <= 100);
   for (const e of r.exclude) { assert.ok(!e.includes("*"), "joker dışlama atlatma açığı yaratır (/dizin/..%2ffabrika): " + e); assert.ok(e === "/" || izlenen.includes(e.slice(1)), "izlenmeyen dosya: " + e); assert.equal(korunanMi(e), false, "korunan yol dışlanamaz: " + e); }
-  assert.ok(!r.exclude.some(e => /^\/(api|fabrika|docs|tests|lib|migrations|functions)\b/.test(e)));
+  assert.ok(!r.exclude.some(e => /^\/(api|fabrika|docs|tests|lib|migrations|functions|worker)\b/.test(e)));
 });
 test("8) B4 uyumu: functions/sorular varsa (B4 kapatma rotası) /sorular/ dışlanamaz — yoksa kapatma sessizce çalışmaz", () => {
   if (!fs.existsSync(path.join(KOK, "functions", "sorular"))) return;
@@ -51,4 +51,12 @@ test("9) hassas dosya taraması: izlenen dosyalarda sır/özel anahtar/.env/sqli
   const ad = izlenen.filter(f => /(^|\/)\.env|\.dev\.vars$|\.pem$|\.key$|\.sqlite|\.db$|\.bak$|\.log$|\.zip$/i.test(f)); assert.deepEqual(ad, []);
   const sir = /(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|xox[bp]-[A-Za-z0-9-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY|AIza[0-9A-Za-z_-]{30,})/;
   for (const f of izlenen.filter(f => /\.(js|mjs|json|md|html|sql|txt|css|webmanifest)$/.test(f) && !f.startsWith("acilis/vendor/"))) assert.ok(!sir.test(fs.readFileSync(path.join(KOK, f), "utf8")), "sır benzeri içerik: " + f);
+});
+
+test("10) /worker (Soru Fabrikası Worker kaynağı + wrangler.toml) web'den sunulmaz: korunan + 404 rota + middleware", async () => {
+  for (const y of ["/worker/wrangler.toml", "/worker/fabrika-worker.js", "/worker/README.md", "/%77orker/wrangler.toml", "//worker/x"]) assert.equal(korunanMi(y), true, y);
+  const { onRequest } = await mod("functions/_middleware.js"); let gecti = 0;
+  for (const y of ["/worker/wrangler.toml", "/worker/fabrika-worker.js"]) { const r = await onRequest({ request: new Request("https://x.test" + y), next: () => { gecti++; return new Response("sizdi"); } }); assert.equal(r.status, 404, y); }
+  assert.equal(gecti, 0);
+  const rota = await mod("functions/worker/[[yol]].js"); assert.equal(rota.onRequest().status, 404);
 });

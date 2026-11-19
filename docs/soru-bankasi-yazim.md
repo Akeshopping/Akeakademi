@@ -47,3 +47,11 @@ Production migration, remote D1 apply, bayrak açma, `index.html` V2 entegrasyon
 - Kuyruk D1'dedir (`fabrika_is`: kilit/lease, en çok 3 deneme, geri çekilme, `olu` = dead-letter). İşi ayrı Worker (`worker/`) yapar; yönetim uçları model ÇAĞIRMAZ. Her model çağrısı `fabrika_cagri`'ya (model, giriş/çıkış token, süre, hata, soru sürümü) yazılır.
 - Robot anahtarı varsayılan KAPALI (`fabrika_ayar.robot`); açmak için `AKE_SORU_V2=1` gerekir. Pilot en çok 10 soru; günlük model çağrısı `AKE_FABRIKA_GUNLUK_CAGRI` (varsayılan 40). 20.000/gün döngüsü kurulmadı.
 - Sayısal doğrulama `yapilmadi`dır (model kodu çalıştırılmaz). Özgünlük kontrolü de yapılmadı.
+
+### Fabrika robotu: sıkı geçit, fiyat, durdurma (PR #33 düzeltmeleri)
+- **Model geçidi:** `model_durum='gecti'` yalnız denetçi JSON'unda `tek_dogru === true`, `belirsiz === false` (boolean, açıkça), `sorunlar` dizisi bulunup **boşsa** ve `cevap` üretici anahtarıyla aynıysa verilir. Eksik/yanlış tipli alan → `belirsiz`; `tek_dogru:false` → `ret`; farklı cevap ya da bildirilen herhangi bir kalite sorunu → `revizyon` (sorunlar `denetim_json`'da saklanır).
+- **Fiyat:** yalnız bilinen modeller hesaplanır (`claude-sonnet-5-5`: 2 $ giriş / 10 $ çıkış, milyon token). Bilinmeyen model → `usd=null`; toplam USD'ye katılmaz, `fiyatsizCagri`/`fiyatsizModeller` ile ayrıca gösterilir. Başka model için fiyatı operatör açıkça verir: `AKE_FABRIKA_FIYATLAR='{"model":[giris,cikis]}'`.
+- **Çağrı ↔ soru:** üretim çağrısı, soru oluşunca `soru_id` + sürüme bağlanır; soru oluşmayan üretim çağrısı bağsız (NULL) kalır. Denetim çağrıları baştan bağlıdır.
+- **Karar:** `fabrika-karar` yalnız `"yayin"`/`"red"` kabul eder; başka değer 400 `karar_gecersiz`, hiçbir satır değişmez.
+- **Pilot durdurma:** bekleyen işler `iptal`; model yanıtı beklenen (`calisiyor`) işler iptal edilemez. Yanıt gelirse kaydedilir (çağrı günlüğü + gider) ama yeni denetim başlatılmaz; üretimden doğan taslak `denetim_bekliyor` kalır, yayımlanamaz, panelde listelenir ve reddedilebilir. Hata ile dönen iş yeniden denenmez (`iptal`). Durmuş pilotun süresi dolmuş kilitli işi yeniden alınmaz.
+- `worker/` klasörü web'den sunulmaz (`KORUNAN_KLASORLER` + `functions/worker/[[yol]].js`).

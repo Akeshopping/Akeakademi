@@ -308,7 +308,7 @@ for (const [mod, bek] of [["ilkEksik", 9], ["kismi5", 5]]) {
   t("KAPSAM", "kocOrnekler (kapsam dışı, GÜVENLİ İLAN EDİLMEZ): 'Konu çalışması' bayrak açıkken sunucu oturumu/kota İSTEMEZ; örnekler yerel kaynaktan CEVAPLI (a/x dolu) gösterilir", D.istekler.length === 0 && D.kota === 0 && ex.every(e => e.a && e.x), JSON.stringify({ ist: D.istekler.length, kota: D.kota, ornek: ex.length }));
   bilgi("KAPSAM kocOrnekler örnek sayısı (cevaplı, yerel BANK/EKQ/GENS)", String(ex.length));
   sifirla(); await p.evaluate(() => { RUN = null; saveRun(); }); await p.evaluate(() => { ACT.mistOne({ id: "kat-a-koc-a02" }); }); const rm = await ozet(p);
-  t("KAPSAM", "mist* (kapsam dışı): 'Yanlış tekrarı' bayrak açıkken DEĞİŞMEZ: kind='mistakes', yerel (gvn yok), sunucu oturumu yok; anlık görüntü CEVAPLI kaynak", rm.run && rm.kind === "mistakes" && rm.gvn === null && D.istekler.length === 0 && rm.aVar >= 1, JSON.stringify({ run: rm.run, kind: rm.kind, gvn: rm.gvn, ist: D.istekler.length, aVar: rm.aVar }));
+  t("KAPSAM", "mist* (3C-4f ile GÜNCELLENDİ — önceki sözleşme 'yerel, gvn yok' idi): bayrak açıkken 'Yanlış tekrarı' artık güvenli: kind='mistakes', gvn='studyo', sunucu oturumlu, cevap/çözüm yok (ayrıntı: tests/studyo-mist-istemci.mjs)", rm.run && rm.kind === "mistakes" && rm.gvn === "studyo" && D.istekler.length === 1 && rm.aVar === 0 && rm.xVar === 0, JSON.stringify({ run: rm.run, kind: rm.kind, gvn: rm.gvn, ist: D.istekler.length, aVar: rm.aVar }));
   await c.close(); }
 
 console.log(`\nTOPLAM: ${gecen} geçti, ${kalan} kaldı`); if (kirmizi.length) { console.log("KIRMIZI:"); kirmizi.forEach(k => console.log("  - " + k)); }

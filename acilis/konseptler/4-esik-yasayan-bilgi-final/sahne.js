@@ -5,6 +5,8 @@
    açılışta zamanla (yaklaşık 5 sn), sonrasında kaydırmayla ilerler. */
 import { baslat, yumusak, kolay, clamp, KREM, GECE, isikDokusu } from "../../ortak/ortak.js";
 import { SAYFA, sayfaCiz, sonSayfaCiz } from "../../ortak/sayfalar.js";
+/* ışık renkleri: Ayarlar'daki palet / özel açılış ışığı (ortak/renk.js); yoksa varsayılan mercan */
+const R = window.AKE_ACILIS || {}, _rk = (h, d) => /^#[0-9a-f]{6}$/i.test(h || "") ? parseInt(h.slice(1), 16) : d;
 
 function huzmeDokusu(THREE) {
   const c = document.createElement("canvas"); c.width = 64; c.height = 256; const x = c.getContext("2d");
@@ -27,7 +29,7 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   const dw = 30, dh = 14, kal = .6;
   [-(KG / 2 + dw / 2), KG / 2 + dw / 2].forEach(x => { const m = new THREE.Mesh(new THREE.BoxGeometry(dw, dh, kal), duvarMat); m.position.set(x, dh / 2, 0); scene.add(m); });
   const ustDuvar = new THREE.Mesh(new THREE.BoxGeometry(KG, dh - KY, kal), duvarMat); ustDuvar.position.set(0, KY + (dh - KY) / 2, 0); scene.add(ustDuvar);
-  const kasaMat = new THREE.MeshPhysicalMaterial({ color: 0xd94f43, metalness: 1, roughness: .32, clearcoat: .3, envMapIntensity: 1.2 });
+  const kasaMat = new THREE.MeshPhysicalMaterial({ color: _rk(R.cizgi, 0xd94f43), metalness: 1, roughness: .32, clearcoat: .3, envMapIntensity: 1.2 });
   const ka = .09;
   [[-KG / 2 - ka / 2, KY / 2, ka, KY + ka], [KG / 2 + ka / 2, KY / 2, ka, KY + ka], [0, KY + ka / 2, KG + ka * 2, ka]].forEach(([x, y, w, h]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, kal + .06), kasaMat); m.position.set(x, y, 0); scene.add(m); });
   const kanatMat = new THREE.MeshPhysicalMaterial({ color: 0x3a3340, metalness: .4, roughness: .5, envMapIntensity: .8 });
@@ -39,10 +41,10 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   });
   const sutunMat = new THREE.MeshStandardMaterial({ color: 0x221e27, roughness: .6, metalness: .3, envMapIntensity: .08 });
   for (let i = 0; i < 4; i++) [-1, 1].forEach(y => { const s = new THREE.Mesh(new THREE.BoxGeometry(.55, 9, .55), sutunMat); s.position.set(y * (3.2 + i * .15), 4.5, 2.2 + i * 3.2); scene.add(s); });
-  const kenarIsik = new THREE.DirectionalLight(0xf27d6d, .5); kenarIsik.position.set(-6, 5, 8); scene.add(kenarIsik);
+  const kenarIsik = new THREE.DirectionalLight(_rk(R.isik, 0xf27d6d), .5); kenarIsik.position.set(-6, 5, 8); scene.add(kenarIsik);
 
   /* kapıdan sızan sıcak ışık: nokta ışık, parıltı, zemine yayılan huzmeler */
-  const kapiIsik = new THREE.PointLight(0xfad6d0, 0, 14, 1.8); kapiIsik.position.set(0, 1.8, 1.2); scene.add(kapiIsik);
+  const kapiIsik = new THREE.PointLight(_rk(R.pale, 0xfad6d0), 0, 14, 1.8); kapiIsik.position.set(0, 1.8, 1.2); scene.add(kapiIsik);
   const parilti = new THREE.Sprite(new THREE.SpriteMaterial({ map: isikDokusu(THREE), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
   parilti.position.set(0, 1.7, .5); parilti.scale.set(4.5, 6, 1); scene.add(parilti);
   const hd = huzmeDokusu(THREE), HUZME = [];
@@ -99,7 +101,7 @@ baslat({ kavram: "final", sure: 5, fov: 38, yolculuk: true, kur({ THREE, scene, 
   const toz = new THREE.Points(tg, new THREE.PointsMaterial({ size: .035, map: isikDokusu(THREE, "250,214,208", 64), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(toz);
 
   /* koridorda kamerayı izleyen yumuşak ışık ve son karelerde ekranı örten krem katman */
-  const fener = new THREE.PointLight(0xfad6d0, 0, 10, 1.4); scene.add(fener);
+  const fener = new THREE.PointLight(_rk(R.pale, 0xfad6d0), 0, 10, 1.4); scene.add(fener);
   const ortu = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0xf8f5f0, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false }));
   ortu.renderOrder = 999; ortu.frustumCulled = false; ortu.position.z = -.4; camera.add(ortu); scene.add(camera);
 

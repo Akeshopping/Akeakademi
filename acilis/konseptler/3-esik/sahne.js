@@ -5,7 +5,7 @@ import { baslat, yumusak, kolay, clamp, KREM, GECE, isikDokusu } from "../../ort
 
 function huzmeDokusu(THREE) {
   const c = document.createElement("canvas"); c.width = 64; c.height = 256; const x = c.getContext("2d");
-  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "rgba(255,236,205,.9)"); g.addColorStop(.35, "rgba(255,230,195,.35)"); g.addColorStop(1, "rgba(255,225,190,0)");
+  const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "rgba(250,214,208,.9)"); g.addColorStop(.35, "rgba(250,214,208,.35)"); g.addColorStop(1, "rgba(250,214,208,0)");
   x.fillStyle = g; x.fillRect(0, 0, 64, 256);
   const h = x.createLinearGradient(0, 0, 64, 0); h.addColorStop(0, "rgba(0,0,0,1)"); h.addColorStop(.2, "rgba(0,0,0,0)"); h.addColorStop(.8, "rgba(0,0,0,0)"); h.addColorStop(1, "rgba(0,0,0,1)");
   x.globalCompositeOperation = "destination-out"; x.fillStyle = h; x.fillRect(0, 0, 64, 256);
@@ -58,7 +58,7 @@ baslat({ kavram: "esik", sure: 3.0, fov: 40, kur({ THREE, scene, camera, rendere
   const N = mobil ? 220 : 480, pos = new Float32Array(N * 3), hiz = new Float32Array(N);
   for (let i = 0; i < N; i++) { pos.set([(Math.random() - .5) * 2.6, Math.random() * 3.4, Math.random() * 6.5], i * 3); hiz[i] = .03 + Math.random() * .08; }
   const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const toz = new THREE.Points(tg, new THREE.PointsMaterial({ size: .03, map: isikDokusu(THREE, "255,240,215", 64), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(toz);
+  const toz = new THREE.Points(tg, new THREE.PointsMaterial({ size: .03, map: isikDokusu(THREE, "250,214,208", 64), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(toz);
   /* soğuk kenar ışığı: sütunların hatlarını çizer */
   const kenar = new THREE.DirectionalLight(0x5f86ff, .5); kenar.position.set(-6, 5, 8); scene.add(kenar);
 

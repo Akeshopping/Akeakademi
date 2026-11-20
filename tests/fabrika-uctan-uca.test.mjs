@@ -17,13 +17,13 @@ test("uçtan uca: robot kapalı → aç → pilot → Worker turları → 10 ada
   assert.equal((await yon_("fabrika-robot", "POST", { acik: true })).j.robot, true);
   assert.equal((await yon_("fabrika-pilot-baslat")).s, 200);
 
-  /* sahte Anthropic: üretim → sıradaki sentetik soru, denetim → soruyu kör çözer (3 soruyu bilerek yanlış çözer) */
+  /* sahte Anthropic: üretim → sıradaki sentetik soru, denetim → soruyu kör çözer (3 soruyu bilerek yanlış çözer). Worker şık konumunu karıştırır: doğru şık metinden bulunur. */
   const orijinal = globalThis.fetch; let uretilen = 0, ag = 0;
   globalThis.fetch = async (url, init) => {
     ag++; assert.match(String(url), /^https:\/\/api\.anthropic\.com\/v1\/messages$/); assert.equal(init.headers["x-api-key"], "test-anahtar-sahte-uctan-uca");
     const g = JSON.parse(init.body).messages[0].content; let metin;
     if (/soru yaz/.test(g)) { const s = sentetik(++uretilen); metin = JSON.stringify([{ p: s.p, q: s.q, o: s.o, a: s.a, x: s.x }]); }
-    else { const i = +/SENTETIK-SORU-(\d+)/.exec(g)[1], dogru = sentetik(i).a; metin = JSON.stringify({ cevap: i >= 8 ? (dogru + 1) % 5 : dogru, tek_dogru: true, belirsiz: false, sorunlar: [] }); }
+    else { const i = +/SENTETIK-SORU-(\d+)/.exec(g)[1], dogru = g.split("\n").filter(l => /^[A-E]\) /.test(l)).findIndex(l => l.endsWith(`SENTETIK-SIK-${i}-${sentetik(i).a}`)); metin = JSON.stringify({ cevap: i >= 8 ? (dogru + 1) % 5 : dogru, tek_dogru: true, belirsiz: false, sorunlar: [] }); }
     return new Response(JSON.stringify({ content: [{ type: "text", text: metin }], usage: { input_tokens: 200, output_tokens: 80 } }), { status: 200 });
   };
   try { for (let i = 0; i < 12; i++) { const ps = []; await worker.scheduled({}, T.env, { waitUntil: p => ps.push(p) }); await Promise.all(ps); } } finally { globalThis.fetch = orijinal; }   // her cron tikinde en çok 3 iş

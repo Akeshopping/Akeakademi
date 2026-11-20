@@ -11,9 +11,10 @@
 //   POST soru-karar {id|[id], karar:"onay"|"red"}
 //   Fabrika robotu (lib/fabrika.js; modeli ayrı Worker çağırır, bu uçlar yalnız durumu yönetir, ASLA model çağırmaz):
 //   GET  fabrika-durum | fabrika-adaylar | fabrika-cagrilar
+//   POST fabrika-not {soru_id, tur:"uzman_bekliyor", mesaj} | {not_id, kapat:true, gerekce}   (inceleme notu; soru kaydına dokunmaz)
 //   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
-import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam } from "../../../lib/fabrika.js";
+import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam, notEkle, notKapat } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -186,10 +187,15 @@ export async function onRequest({ request, env, params }) {
       return r.ok ? json(200, r) : fail(409, r.neden, r.neden === "robot_kapali" ? "Robot kapalı. Önce robotu aç." : "Zaten çalışan bir pilot var.");
     }
     if (ad === "fabrika-pilot-durdur" && m === "POST") return json(200, await pilotDurdur(env));
+    if (ad === "fabrika-not" && m === "POST") {
+      const b = await gov();
+      const r = b.kapat === true ? await notKapat(env, { notId: b.not_id, kim: u.eposta, gerekce: b.gerekce }) : await notEkle(env, { soruId: b.soru_id, tur: b.tur, mesaj: b.mesaj, kim: u.eposta });
+      return r.ok ? json(200, r) : fail(400, r.neden, "Not işlenemedi: " + r.neden);
+    }
     if (ad === "fabrika-karar" && m === "POST") {
       const b = await gov();
       if (b.karar !== "yayin" && b.karar !== "red") return fail(400, "karar_gecersiz", 'karar "yayin" ya da "red" olmalı; başka değer işlenmez.');
-      const r = await yayimKarari(env, b.id, b.karar, u.eposta);
+      const r = await yayimKarari(env, b.id, b.karar, u.eposta, { uyariKabul: b.uyariKabul === true });
       return r.ok ? json(200, r) : json(409, { error: "yayim_kapisi", message: "Hiçbir soru işlenmedi: yayım şartları sağlanmıyor.", hatalar: r.hatalar });
     }
     return fail(404, "yok");

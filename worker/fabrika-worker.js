@@ -5,11 +5,13 @@ import { isIsle, gunlukLimit } from "../lib/fabrika.js";
 import { fabrikaClaude } from "../lib/fabrika-claude.js";
 
 export const TUR_AZAMI_IS = 3;
+/* Şık konumu: üretilen sorunun şıkları (uygunsa) tek seferlik rastgele karıştırılır; harf atıflı/sıralı sayısal/"hiçbiri" soruları atlanır (lib/fabrika-inceleme.js). */
+const rastgele01 = () => { const u = new Uint32Array(1); crypto.getRandomValues(u); return u[0] / 4294967296; };
 /* Her tik tek bir günlük satırı yazar ("fabrika-worker {json}"): D1 bağlantısı, robot durumu ve günlük limit buradan doğrulanır.
    Satırda sır YOK (anahtar yalnız istemciye gider). D1 bağlı değilse sessiz geçilmez: d1_yok hatası fırlatılır. */
 export async function tur(env) {
   if (!env.DB || typeof env.DB.prepare !== "function") throw new Error("d1_yok: DB bağlantısı tanımlı değil");
-  const sonuc = await isIsle(env, { claudeFn: fabrikaClaude(env), azami: TUR_AZAMI_IS });
+  const sonuc = await isIsle(env, { claudeFn: fabrikaClaude(env), azami: TUR_AZAMI_IS, karistir: rastgele01 });
   console.log("fabrika-worker " + JSON.stringify({ d1: "baglandi", robot: sonuc.neden !== "robot_kapali", islenen: sonuc.islenen, neden: sonuc.neden || null, gunlukLimit: gunlukLimit(env), anahtar: env.ANTHROPIC_API_KEY ? "tanimli" : "yok" }));
   return sonuc;
 }

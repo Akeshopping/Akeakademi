@@ -10265,14 +10265,17 @@ async function fabrikaYukle() {
 }
 const FAB_MODEL = { gecti: ["ok", "Model kontrolünden geçti"], revizyon: ["bad", "Revizyon gerekli"], ret: ["bad", "Ret önerisi"], belirsiz: ["bad", "Belirsiz"], bekliyor: ["", "Denetim bekliyor"] };
 function fabAdayKart(q) {
-  const [c, l] = FAB_MODEL[q.model_durum] || ["", q.model_durum], yayimlanabilir = q.model_durum === "gecti" && q.denetim_tam === 1 && !q.tekrar, den = q.denetim || {};
+  const [c, l] = FAB_MODEL[q.model_durum] || ["", q.model_durum], uyarilar = q.uyarilar || [], notlar = (q.notlar || []).filter(n => n.durum === "acik"), engel = uyarilar.length > 0 || notlar.length > 0,
+    yayimlanabilir = q.model_durum === "gecti" && q.denetim_tam === 1 && !q.tekrar && !engel, den = q.denetim || {};
   return `<div class="card sunk stack" style="gap:8px"><div class="small muted">${esc(SUBJ[q.s] ? SUBJ[q.s].n : q.s)} · ${esc(q.t)} · ${DIFF[q.d] || ""} · sürüm ${q.surum}</div>
     <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${c}">${l}</span>${q.denetim_tam ? "" : `<span class="pill bad">Denetim tamamlanmadı</span>`}${q.tekrar ? `<span class="pill bad">Tekrar</span>` : ""}<span class="pill">Sayısal doğrulama: ${q.sayisal === "yapilmadi" ? "yapılmadı" : esc(q.sayisal)}</span></div>
     ${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}<b>${fq(q.q || "")}</b>
     <ol type="A" style="margin:0;padding-left:22px">${(q.o || []).map((o, i) => `<li style="${i === q.a ? "color:var(--ok);font-weight:700" : ""}">${fq(o)}${i === q.a ? " ✓ (üretici anahtarı)" : ""}${den.cevap === i ? " ◀ kör denetçinin seçimi" : ""}</li>`).join("")}</ol>
     <p class="small">${fq(q.x || "")}</p>
-    ${(den.sorunlar || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorunlar.map(esc).join(" · ")}</p>` : ""}
-    <div class="row"><button class="btn sm pri" data-a="fabYayin" data-id="${esc(q.id)}"${yayimlanabilir && !FAB.busy ? "" : " disabled"} title="${yayimlanabilir ? "" : "Yalnızca model denetiminden tam geçen, tekrar olmayan soru yayımlanabilir"}">Yayımla</button><button class="btn sm ghost" data-a="fabRed" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Reddet</button></div></div>`;
+    ${(den.sorun_turleri || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorun_turleri.map(x => `[${esc(x.tur)}/${esc(x.agirlik)}${x.kaynak === "kural" ? "/kural" : ""}] ${esc(x.metin)}`).join(" · ")}</p>` : (den.sorunlar || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorunlar.map(esc).join(" · ")}</p>` : ""}
+    ${uyarilar.length ? `<div class="small" style="color:var(--bad)"><b>İnceleme uyarısı</b> (otomatik; soru silinmedi, özgünlük doğrulanmadı):<ul style="margin:2px 0 0;padding-left:18px">${uyarilar.map(u => `<li>[${esc(u.tur)}] ${esc(u.mesaj)}</li>`).join("")}</ul></div>` : ""}
+    ${notlar.length ? `<div class="small" style="color:var(--bad)"><b>Uzman kararı bekliyor:</b> ${notlar.map(n => esc(n.mesaj)).join(" · ")}</div>` : ""}
+    <div class="row"><button class="btn sm pri" data-a="fabYayin" data-id="${esc(q.id)}"${yayimlanabilir && !FAB.busy ? "" : " disabled"} title="${yayimlanabilir ? "" : "Yalnızca model denetiminden tam geçen, tekrar olmayan, uyarısı ve açık uzman notu olmayan soru yayımlanabilir"}">Yayımla</button><button class="btn sm ghost" data-a="fabRed" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Reddet</button></div></div>`;
 }
 function fabrikaBolumu() {
   if (!FAB.veri && !FAB.err) { setTimeout(fabrikaYukle, 0); return `<div class="card"><h2>Soru Fabrikası robotu</h2><div class="empty">Yükleniyor…</div></div>`; }

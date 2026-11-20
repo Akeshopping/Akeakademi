@@ -1689,6 +1689,51 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 /* 35. 320 px: yıldız haritası kutusu min-yükseklik yüzünden taşıp kırpılmasın */
 @media (max-width:400px){.atl-core{min-height:0;width:100%}}
 
+/* 36. Erken erişim listesi ("Açıldığında haber ver"): ödeme yok */
+.liste{gap:12px;scroll-margin-top:84px}
+.liste .lbl{font-weight:600;font-size:14px;color:var(--ink)}
+.liste-not{margin:0;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--line);font-size:14px;line-height:1.5}
+.liste-web{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+.liste-pk{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:0;min-width:0}
+.liste-pk legend{padding:0;margin:0 0 6px}
+.liste-r{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1.5px solid var(--line-strong);border-radius:999px;background:var(--card);color:var(--ink);cursor:pointer;font-size:14px}
+.liste-r input{accent-color:var(--coral);width:16px;height:16px;margin:0}
+.liste-r:has(input:checked){border-color:var(--coral);background:var(--coral-soft)}
+.liste-r:has(input:focus-visible){outline:2px solid var(--coral);outline-offset:2px}
+.liste-kvkk{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);font-size:13px;line-height:1.55;color:var(--ink2)}
+.liste-kvkk a{color:var(--coral-ink);text-decoration:underline}
+.liste-h{margin:0;min-height:0;color:var(--bad);font-size:14px;line-height:1.45}
+.liste-h:empty{display:none}
+.liste .in[aria-invalid="true"],.liste input[aria-invalid="true"]{border-color:var(--bad);outline-color:var(--bad)}
+.liste .lnk,.lnk{background:none;border:0;padding:0;color:var(--coral-ink);text-decoration:underline;font:inherit;cursor:pointer}
+.liste-sil{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.liste-ok h2{margin:0}
+.liste-fiyat b{font-size:26px;letter-spacing:0}
+.liste-fiyat span{display:block;font-size:13px}
+@media (max-width:420px){.liste-r{flex:1 1 auto;justify-content:center;padding:0 10px}}
+
+/* 37. Eşik açılışı (yerel, ~3,3 sn): perde tıklamayı tutmaz, yalnız "Animasyonu geç" düğmesi tıklanır */
+.ake-esik{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 38%,#3a3340 0%,#28232C 55%,#1d1a21 100%);color:#F8F5F0;pointer-events:none;opacity:1;transition:opacity .42s ease}
+.ake-esik.out{opacity:0}
+.ake-esik-isik{position:absolute;left:50%;top:44%;width:min(70vw,520px);aspect-ratio:1;margin:calc(min(70vw,520px)/-2) 0 0 calc(min(70vw,520px)/-2);border-radius:50%;background:radial-gradient(circle,rgba(var(--coral-light-rgb),.34),rgba(var(--coral-light-rgb),.08) 45%,transparent 70%);opacity:0;animation:akeEsIsik 3.1s ease-out forwards}
+.ake-esik-sahne{position:relative;display:grid;justify-items:center;gap:18px;transform:translateY(-3vh)}
+.ake-esik-k{width:min(34vw,132px);min-width:84px;height:auto;overflow:visible;filter:drop-shadow(0 14px 28px rgba(0,0,0,.45));animation:akeEsK 3s cubic-bezier(.2,.7,.2,1) both}
+.ake-esik-g{stroke-dasharray:100;stroke-dashoffset:100;animation:akeEsCiz 1.1s .1s ease-out forwards}
+.ake-esik-d{opacity:0;animation:akeEsDol .7s .75s ease-out forwards}
+.ake-esik-s{transform-box:fill-box;animation:akeEsSup 1s 1.45s ease-in-out both}
+.ake-esik-yazi{font:700 clamp(20px,5.2vw,30px)/1 var(--f-display,inherit);letter-spacing:.14em;text-transform:uppercase;opacity:0;animation:akeEsYazi .7s 1.7s ease-out forwards}
+.ake-esik-yazi span{color:#F27D6D}
+.ake-esik-atla{position:absolute;right:16px;bottom:max(16px,env(safe-area-inset-bottom));pointer-events:auto;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid rgba(248,245,240,.55);background:rgba(248,245,240,.08);color:#F8F5F0;font:600 14px/1 inherit;cursor:pointer}
+.ake-esik-atla:hover{background:rgba(248,245,240,.18)}
+.ake-esik-atla:focus-visible{outline:2px solid #F27D6D;outline-offset:3px}
+@keyframes akeEsK{from{transform:translateY(10px)}to{transform:none}}
+@keyframes akeEsCiz{to{stroke-dashoffset:0}}
+@keyframes akeEsDol{to{opacity:1}}
+@keyframes akeEsSup{from{transform:translateX(0)}to{transform:translateX(150px)}}
+@keyframes akeEsYazi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes akeEsIsik{0%{opacity:0}45%{opacity:1}100%{opacity:.75}}
+@media (prefers-reduced-motion:reduce){.ake-esik{display:none}}
+
 </style>
 <script>
 "use strict";
@@ -8118,7 +8163,7 @@ function navHTML(r) {
   if (!IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.user && HESAP.user.yonetici) groups[2][1].unshift(["yonetim", "Yönetim", "inbox"]);
   const paketli = !IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.paket, premium = IN_CLAUDE ? "" : paketli
     ? `<a class="side-pro on-pro" href="#premium"><b>${esc(planAd(HESAP.paket.plan))} paket</b><span>Paketini yönet</span></a>`
-    : `<a class="side-pro" href="#premium"><i>${icon("star")}</i><b>AKE Premium</b><span>AI öğretmen, daha fazla soru ve deneme</span><em>Paketleri gör</em></a>`;
+    : `<a class="side-pro" href="#premium"><i>${icon("star")}</i><b>AKE Premium · yakında</b><span>AI öğretmen, daha fazla soru ve deneme</span><em>Açıldığında haber ver</em></a>`;
   const bilgi = `<nav class="side-info" aria-label="Bilgi"><a href="#sss">Yardım ve SSS</a><a href="#hakkimizda">Hakkımızda</a><a href="#yasal">Yasal</a></nav>`;
   return groups.map(([h, items]) => `<h4>${h}</h4><nav class="nav">${items.map(([k, l, ic]) => `<a href="#${k}" title="${l}" class="${r === k ? "on" : ""}"${r === k ? ' aria-current="page"' : ""}>${icon(ic)}<span>${l}</span>${cnt[k] ? `<span class="cnt">${cnt[k]}</span>` : ""}</a>`).join("")}</nav>`).join("") + premium + bilgi;
 }
@@ -8182,7 +8227,7 @@ function uyelikKart() {
   const H = HESAP; if (!H || !H.user) return "";
   const pk = H.paket, ad = pk ? planAd(pk.plan) : "Ücretsiz";
   const bit = pk && pk.bitis ? new Date(pk.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
-  return `<section class="card uyelik glass-d glow" aria-label="Paketler ve Üyelik"><div class="uy-i"><span class="eyebrow">Paketler ve Üyelik</span><b class="uy-ad">${esc(ad)} paket</b><span class="small uy-s">${pk ? (bit ? `Bitiş: ${esc(bit)}` : "Aktif") : "AI öğretmen ve daha yüksek haklar için paketleri incele"}</span></div><a class="btn ${pk ? "" : "pri"}" href="#premium">${pk ? "Üyeliği yönet" : "Paketleri gör"}</a></section>
+  return `<section class="card uyelik glass-d glow" aria-label="Paketler ve Üyelik"><div class="uy-i"><span class="eyebrow">Paketler ve Üyelik</span><b class="uy-ad">${esc(ad)} paket</b><span class="small uy-s">${pk ? (bit ? `Bitiş: ${esc(bit)}` : "Aktif") : "Ücretli paketler henüz satışta değil"}</span></div><a class="btn ${pk ? "" : "pri"}" href="#premium">${pk ? "Üyeliği yönet" : "Açıldığında haber ver"}</a></section>
   `;
 }
 function vHome() {
@@ -9031,7 +9076,7 @@ function vAdmOverview() {
     });
     return Object.assign(d, { v: a, q, tip: `${a} kişi · ${q.toLocaleString("tr-TR")} soru` });
   });
-  const recent = all.slice().sort((a, b) => b.last - a.last).slice(0, 6), miss = SITE.db ? AYAR_F.filter(f => f[3] && !AYAR[f[0]]).concat(["linkOrtaAy", "linkOrtaYil", "linkPremiumAy", "linkPremiumYil"].some(k => AYAR[k]) ? [] : [["", "en az bir ödeme linki"]]) : [];
+  const recent = all.slice().sort((a, b) => b.last - a.last).slice(0, 6), miss = SITE.db ? AYAR_F.filter(f => f[3] && !AYAR[f[0]]) : [];
   return `<div class="view">${head}
   ${ADM.err ? `<p class="note">${esc(ADM.err)}</p>` : ""}
   ${miss.length ? `<div class="banner"><div class="grow"><b>Site bilgilerin eksik.</b> Premium ödemesi ve yasal metinler için ${miss.length} bilgi bekleniyor: ${miss.map(f => esc(f[1])).join(", ")}.</div><button class="btn sm pri" data-a="admTab" data-k="ayarlar">Şimdi doldur</button></div>` : ""}
@@ -9201,7 +9246,7 @@ function vAdmSettings() {
   const head = `<div class="vhead"><span class="eyebrow">Yalnızca sen görüyorsun</span><h1>Duyuru ve site ayarları</h1><p>Öğrencilere duyuru gönder; Premium ve yasal metinlerde görünen bilgilerini buradan doldur. Kaydettiğin anda sitede güncellenir.</p></div>`;
   if (!SITE.db) return `<div class="view">${head}<div class="empty">Ayarları değiştirmek için sayfayı Claude hesabınla açman gerekir.</div></div>`;
   const d = SITE.duyuru && SITE.duyuru.on ? SITE.duyuru : null, A = ADM.ad || SITE.ayarDoc || {}, base = SITE.base || {}, dv = ADM.dd || d || {};
-  const miss = AYAR_F.filter(f => f[3] && !AYAR[f[0]]).concat(["linkOrtaAy", "linkOrtaYil", "linkPremiumAy", "linkPremiumYil"].some(k => AYAR[k]) ? [] : [["", "en az bir ödeme linki"]]);
+  const miss = AYAR_F.filter(f => f[3] && !AYAR[f[0]]);
   return `<div class="view">${head}
   <div class="card stack"><h2>Öğrencilere duyuru</h2>
     ${d ? `<div class="note"><b>Şu an yayında:</b> ${esc(String(d.t || "").slice(0, 80))}${d.m ? " — " + esc(String(d.m).slice(0, 140)) : ""} <span class="muted">(${esc(relT(d.ts))})</span></div>` : `<p class="small muted">Şu an yayında duyuru yok.</p>`}
@@ -9987,7 +10032,7 @@ function paketKart() {
       ${L ? `<div class="stack" style="gap:6px"><div class="row" style="justify-content:space-between"><span class="small">Bu ay AI mesajı</span><span class="small mono">${k.mesaj} / ${L.mesaj}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.mesaj, L.mesaj))}%"></i></div>
       <div class="row" style="justify-content:space-between"><span class="small">Gelişmiş soru çözümü</span><span class="small mono">${k.guclu} / ${L.guclu}</span></div><div class="bar"><i style="width:${Math.min(100, pct(k.guclu, L.guclu))}%"></i></div></div>` : ""}
       <div class="row"><a class="btn pri" href="#ogretmen">AI öğretmene git</a></div>`
-    : `<p class="muted">Şu an ücretsiz paketi kullanıyorsun. AI öğretmen Atılım ve Premium paketlerde var.</p><div class="row"><a class="btn pri" href="#premium">Paketleri incele</a></div>`}
+    : `<p class="muted">Şu an ücretsiz paketi kullanıyorsun. AI öğretmen, Atılım ve Premium paketler açıldığında gelecek; paketler henüz satışta değil.</p><div class="row"><a class="btn pri" href="#premium">Açıldığında haber ver</a></div>`}
     <form data-s="kodBagla" class="stack" style="gap:8px;border-top:1px solid var(--line2);padding-top:12px"><b class="small">${p ? "Yeni ya da yenileme kodun mu var?" : "Erişim kodun var mı?"}</b>
       <div class="row"><input class="in" name="kod" placeholder="AKE-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Erişim kodu" style="flex:1;min-width:200px"><button class="btn"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Hesabıma ekle"}</button></div>
       ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}<p class="xs muted">Kod hesabına bağlanır; başka bir hesapta kullanılamaz.</p></form></div>`;
@@ -10009,7 +10054,7 @@ function vHesap() {
 function hesapOzetKart() {
   if (IN_CLAUDE) return "";
   const H = HESAP;
-  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${planAd(WEBAI.plan)}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Paketleri incele</a></div>`}</div>`;
+  if (H.yok) return `<div class="card stack"><h2>AI öğretmen erişimi</h2>${WEBAI.code ? `<p><b>Paket:</b> ${planAd(WEBAI.plan)}${WEBAI.bitis ? ` · <b>Bitiş:</b> ${esc(new Date(WEBAI.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }))}` : ""} · <b>Bu ay:</b> ${aiUsage()}${aiLimit() ? " / " + aiLimit() : ""} AI mesajı${gucluLimit() ? ` · ${Math.min(gucluUsage(), gucluLimit())} / ${gucluLimit()} gelişmiş çözüm` : ""}</p><div class="row"><a class="btn" href="#ogretmen">AI öğretmene git</a><button class="btn ghost" data-a="aiKodSil">Kodu bu cihazdan kaldır</button></div>` : `<p class="small muted">Orta ya da Premium paket aldıysan sana verilen erişim kodunu AI öğretmen sayfasına gir.</p><div class="row"><a class="btn" href="#ogretmen">Kodu gir</a><a class="btn ghost" href="#premium">Açıldığında haber ver</a></div>`}</div>`;
   return `<div class="card stack"><h2>Hesabım</h2>${H.user ? `<p><b>${esc(H.user.eposta)}</b> ile giriş yaptın${H.paket ? ` · ${planAd(H.paket.plan)} paket` : " · Ücretsiz"}.</p><div class="row"><a class="btn" href="#hesap">Hesabı aç</a></div>`
     : `<p class="small muted">Giriş yaparsan ilerlemen hesabında saklanır ve telefonunu değiştirsen de kaybolmaz.</p><div class="row"><a class="btn pri" href="#hesap">Giriş yap</a></div>`}</div>`;
 }
@@ -10018,8 +10063,8 @@ function tutorGirisKapisi() {
   if (HESAP.yok) return null;
   if (!HESAP.hazir) return `<div class="empty">Yükleniyor…</div>`;
   if (HESAP.hata) return hesapHataKart();
-  if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Atılım ve Premium</span><h2>AI öğretmen için giriş yap</h2>
-    <p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularını bilen AI öğretmen paketlerle açılır. Önce giriş yap; paket kodun hesabına bağlanır.</p>${girisFormu(true)}<a class="btn ghost" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
+  if (!HESAP.user) return `<div class="card stack" style="max-width:560px"><span class="pill form" style="align-self:flex-start">Atılım ve Premium · yakında</span><h2>AI öğretmen için giriş yap</h2>
+    <p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularını bilen AI öğretmen, ücretli paketler açıldığında gelecek; paketler henüz satışta değil ve ödeme alınmaz. Erişim kodun varsa önce giriş yap; kodun hesabına bağlanır.</p>${girisFormu(true)}<a class="btn ghost" style="align-self:flex-start" href="#premium">Açıldığında haber ver</a></div>`;
   if (!HESAP.paket) return paketKart();
   return null;
 }
@@ -11274,15 +11319,15 @@ const HRK = (() => {
 /* ===== Sık sorulan sorular ve geri bildirim formu ===== */
 var SSS = [
   ["AKE Akademi nedir?", "YKS'ye hazırlanan öğrenciler için soru bankası, TYT-AYT denemeleri, her pazar canlı Türkiye denemesi, kişisel AI öğretmen, yanlış defteri ve çalışma planını tek yerde toplayan bağımsız bir çalışma sitesidir."],
-  ["Ücretsiz mi?", "Evet, ücretsiz başlarsın: ücretsiz pakette günde 20 soru ve ayda 1 deneme çözebilir, canlı denemelere katılabilir, yanlış defterini, tekrar kartlarını ve çalışma planını kullanabilirsin. Sınırsız soru ve deneme, AI öğretmen ve gelişmiş çözümler ücretli paketlerde (Atılım ve Premium) bulunur. Güncel fiyatlar <a href=\"#premium\">Paketler</a> sayfasındadır."],
+  ["Ücretsiz mi?", "Evet, ücretsiz başlarsın: ücretsiz pakette günde 20 soru ve ayda 1 deneme çözebilir, canlı denemelere katılabilir, yanlış defterini, tekrar kartlarını ve çalışma planını kullanabilirsin. Sınırsız soru ve deneme, AI öğretmen ve gelişmiş çözümler için ücretli paketler (Atılım ve Premium) planlanıyor; henüz satışta değil ve ödeme alınmıyor. Açıldığında haber almak için <a href=\"#premium\">Paketler</a> sayfasındaki listeye yazılabilirsin."],
   ["Hesap açmam şart mı?", "Siteyi gezmek, konulara ve paketlere bakmak için hayır. Soru ya da deneme çözmek için ücretsiz giriş yapman gerekir, çünkü ücretsiz haklar (günde 20 soru, ayda 1 deneme) hesabına bağlıdır. Giriş e-postayla ya da Google ile bir dakikada olur; ilerlemen de cihazlar arasında (telefon, tablet, bilgisayar) eşitlenir."],
   ["İlerlemem silinir mi?", "Tarayıcı verilerini temizlersen hesapsız kullanımdaki kayıtlar silinir. Bunu önlemek için hesap aç ya da <a href=\"#ayarlar\">Hedefler ve ayarlar</a> bölümünden düzenli yedek al."],
   ["Sorular nereden geliyor?", "Soru bankasındaki sorular bu site için özgün hazırlanır ve cevapları kontrol edilir. Yapay zekâ ile üretilen sorular da bankaya eklenebilir; hatalı bulduğun her soruyu aşağıdaki formdan bildirebilirsin. Gerçek ÖSYM soruları kullanılmaz, kullanıma uygun olmayan telif içerikleri alınmaz."],
   ["Bir soruda hata gördüm, ne yapmalıyım?", "Aşağıdaki formdan \"Soru hatası\" seçip soruyu ve ne düşündüğünü yaz. Her bildirimi okuyoruz ve doğrulanan hataları hemen düzeltiyoruz."],
   ["AI öğretmen yanılabilir mi?", "Evet. AI öğretmen güçlü bir yardımcıdır ama her yapay zekâ gibi hata yapabilir. Özellikle hesaplamalı çözümleri kendin kontrol et; emin değilsen soruyu bir öğretmene danış."],
   ["Canlı deneme nasıl işliyor?", "Her pazar 20:00'de (Türkiye saati) herkes aynı denemeyi aynı anda çözer. Sınav bitince net ve Türkiye geneli sıralaman çıkar. Katılmak için hesap gerekir, sıralamada yalnızca seçtiğin görünen ad yer alır."],
-  ["Ödemeyi nasıl yaparım?", "Paket ödemesi Shopier üzerinden yapılır. Ödemeden sonra sana bir erişim kodu gelir; bu kodu hesabına bağlayınca paketin açılır."],
-  ["İade yapabilir miyim?", "Dijital ürünlerde iade ve cayma koşulları yasal metinlerde açıkça yazılıdır: <a href=\"#iade\">İptal ve iade</a> ve <a href=\"#mesafeli\">Mesafeli satış sözleşmesi</a> sayfalarına bak."],
+  ["Paket satın alabilir miyim?", "Şu an hayır: ücretli paketler henüz satışta değil, ödeme alınmıyor ve sipariş oluşmuyor. Paket ya da fiyat garantisi verilmiyor. Açıldığında haber almak için <a href=\"#premium\">Paketler</a> sayfasındaki listeye yazılabilirsin. Daha önce aldığın erişim kodu çalışmaya devam eder."],
+  ["İade yapabilir miyim?", "Şu an ödeme alınmadığı için yeni bir iade söz konusu değil. Daha önce alınmış erişim kodları için iade ve cayma koşulları yasal metinlerde yazılıdır: <a href=\"#iade\">İptal ve iade</a> ve <a href=\"#mesafeli\">Mesafeli satış sözleşmesi</a>."],
   ["Verilerim güvende mi?", "Kişisel verilerin yalnızca hizmeti sunmak için işlenir, üçüncü kişilere satılmaz. Ayrıntılar <a href=\"#kvkk\">KVKK Aydınlatma Metni</a>'nde. Hesabını Hesabım sayfasından istediğin zaman silebilirsin."]
 ];
 var GB = { durum: "", mesaj: "" };
@@ -11911,10 +11956,10 @@ function vTanitim() {
 
   /* 7 · paketler (fiyatlar yönetim panelindeki gerçek ayarlardan) */
   const P = planlar();
-  const s7 = sec("paket", "Abonelik seçenekleri", "Ücretsiz başla. İhtiyacın olursa yükselt.", "Yıllık ödemede bir ay bedava. Ödemeden sonra gelen kodu hesabına bağlayınca paketin açılır.", `<div class="atl-pl">${P.map(p => `<div class="atl-card atl-rv${p.k === "orta" ? " hi" : ""}"><div class="pt"><h3>${p.n}</h3><span class="atl-tag${p.k === "ucretsiz" ? " f" : " g"}">${esc(p.tag)}</span></div>
-    ${p.k === "ucretsiz" ? `<div class="fi">0 <small>TL</small></div><div class="yi">Ücretsiz girişle</div>` : `<div class="fi">${tl(p.ay)} <small>TL / ay</small></div><div class="yi">ya da yıllık ${tl(p.yil)} TL</div>`}
+  const s7 = sec("paket", "Paketler", "Ücretsiz başla. Ücretli paketler yakında.", "Atılım ve Premium henüz satışta değil. Ödeme alınmaz, sipariş oluşmaz; paket ya da fiyat garantisi verilmez. Açıldığında haber almak için listeye yazılabilirsin.", `<div class="atl-pl">${P.map(p => `<div class="atl-card atl-rv${p.k === "orta" ? " hi" : ""}"><div class="pt"><h3>${p.n}</h3><span class="atl-tag${p.k === "ucretsiz" ? " f" : " g"}">${esc(p.tag)}</span></div>
+    ${p.k === "ucretsiz" ? `<div class="fi">0 <small>TL</small></div><div class="yi">Ücretsiz girişle</div>` : `<div class="fi">Yakında</div><div class="yi">fiyat açıldığında netleşir</div>`}
     <ul>${p.feats.slice(0, 5).map(f => `<li>${f}</li>`).join("")}</ul>
-    ${p.k === "ucretsiz" ? `<a class="atl-b" href="#hesap">Ücretsiz hesap aç</a>` : `<a class="atl-b${p.k === "orta" ? " p" : ""}" href="#premium">${p.n} paketini incele</a>`}</div>`).join("")}</div>`);
+    ${p.k === "ucretsiz" ? `<a class="atl-b" href="#hesap">Ücretsiz hesap aç</a>` : `<a class="atl-b${p.k === "orta" ? " p" : ""}" href="#premium">Açıldığında haber ver</a>`}</div>`).join("")}</div>`);
 
   /* 8 · sss */
   const s8 = sec("sss", "Sık sorulan sorular", "Aklındaki sorular.", "", `<div class="atl-faq atl-rv">${SSS.slice(0, 6).map(s => `<details><summary>${esc(s[0])}</summary><p>${s[1]}</p></details>`).join("")}</div><a class="atl-link" href="#sss">Tüm soruları gör ${ATL_IC.ok}</a>`);
@@ -12140,6 +12185,31 @@ function akeAlternatifAcilis(tur) {
   const zaman = setTimeout(kapat, 3400);
   return true;
 }
+/* Eşik açılışı (yeni): K logosu çizilir, ışık süpürür, derinlik için üç katman; ~3,3 sn */
+function akeEsikAcilis(zorla) {
+  window.__atl3d = 1;
+  if (document.getElementById("atlIntro") || atlHareketAz()) return true;
+  let goruldu = false; try { goruldu = !!LS.get("ake.esik"); LS.set("ake.esik", "1"); } catch (e) { }
+  if (goruldu && !zorla) return true;
+  const K = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
+  const ov = document.createElement("div"); ov.id = "atlIntro"; ov.className = "ake-esik"; ov.setAttribute("role", "status"); ov.setAttribute("aria-label", "AKE Akademi açılışı");
+  ov.innerHTML = `<div class="ake-esik-isik" aria-hidden="true"></div><div class="ake-esik-sahne" aria-hidden="true">
+    <svg class="ake-esik-k" viewBox="0 0 64 64"><defs><linearGradient id="akeEsG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F27D6D"/><stop offset="1" stop-color="#B73F36"/></linearGradient>
+      <clipPath id="akeEsC"><path d="${K}" fill-rule="evenodd"/></clipPath></defs>
+      <path class="ake-esik-g" d="${K}" fill="none" stroke="#F27D6D" stroke-width="1" pathLength="100"/>
+      <path class="ake-esik-d" d="${K}" fill="url(#akeEsG)" fill-rule="evenodd"/>
+      <g clip-path="url(#akeEsC)"><rect class="ake-esik-s" x="-30" y="-10" width="16" height="90" fill="#F8F5F0" opacity=".55" transform="skewX(-20)"/></g></svg>
+    <div class="ake-esik-yazi">AKE <span>Akademi</span></div></div>
+    <button type="button" class="ake-esik-atla">Animasyonu geç</button>`;
+  document.body.appendChild(ov);
+  let bitti = false;
+  const kapat = () => { if (bitti) return; bitti = true; clearTimeout(zt); document.removeEventListener("keydown", kd); document.removeEventListener("pointerdown", pd, true); window.removeEventListener("hashchange", kapat); ov.classList.add("out"); setTimeout(() => ov.remove(), 420); };
+  const kd = () => kapat(), pd = () => kapat();
+  ov.querySelector(".ake-esik-atla").addEventListener("click", kapat);
+  document.addEventListener("keydown", kd); document.addEventListener("pointerdown", pd, true); window.addEventListener("hashchange", kapat);
+  const zt = setTimeout(kapat, 3300);
+  return true;
+}
 function atl3dAcilis() {
   window.__atl3d = 1; /* sayfa her yenilendiğinde bir kez oynar; uygulama içi gezintide tekrarlanmaz */
   try {
@@ -12164,8 +12234,8 @@ function atlIntro(zorla) {
   if (document.getElementById("atlIntro")) return;
   if (!atlHareketAz() && (zorla || !window.__atl3d) && ERISIM.acilis !== "esik" && akeAlternatifAcilis(ERISIM.acilis)) return;
   let goru3d = false, gorduyse = false; try { goru3d = !!LS.get("ake.intro3d"); gorduyse = !!LS.get("ake.intro"); } catch (e) { }
-  if (!atlHareketAz() && (zorla || !window.__atl3d) && atl3dAcilis()) return;
-  if (!zorla && atlHareketAz()) return;
+  if (!atlHareketAz() && (zorla || !window.__atl3d) && akeEsikAcilis(zorla)) return;
+  if (!zorla && (window.__atl3d || atlHareketAz())) return;
   try { LS.set("ake.intro", "1"); } catch (e) { }
   const mob = atlMobil(), T = mob ? 2.3 : 2.9, N = mob ? 46 : 90;
   const ov = document.createElement("div"); ov.className = "atl-intro"; ov.id = "atlIntro";
@@ -12204,7 +12274,7 @@ function atlIntro(zorla) {
   raf = requestAnimationFrame(step);
 }
 /* ana sayfa dahil her sayfada: sayfa her yenilendiğinde 3B açılışı oynat */
-function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro") || atlHareketAz()) return; if (ERISIM.acilis !== "esik" && akeAlternatifAcilis(ERISIM.acilis)) return; atl3dAcilis(); }
+function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro") || atlHareketAz()) return; if (ERISIM.acilis !== "esik" && akeAlternatifAcilis(ERISIM.acilis)) return; akeEsikAcilis(false); }
 function atlKur() { if (route() !== "tanitim") return; ATLAS.mount(); atlIntro(false); }
 
 Object.assign(OZ_ACT, {
@@ -12238,15 +12308,15 @@ if (!IN_CLAUDE) { NAVG[2][1].unshift(["hesap", "Hesabım", "users"], ["sinif", "
 function premNote(orig, feat, cls) {
   const c = cls || "small muted";
   if (IN_CLAUDE || aiOn()) return `<p class="${c}">${orig}</p>`;
-  return `<p class="${c}">${feat} AKE Akademi Premium ile açılıyor. <a href="#premium">Premium'u incele →</a></p>`;
+  return `<p class="${c}">${feat} paketler açıldığında gelecek. <a href="#premium">Açıldığında haber ver →</a></p>`;
 }
 function tutorOff() {
   const kapi = !IN_CLAUDE && tutorGirisKapisi(); if (kapi) return kapi;
   if (IN_CLAUDE) return `<div class="card"><h2>AI öğretmen şu an kapalı</h2><p class="muted" style="margin-top:8px">Bu bölüm Claude ile çalışır. Sayfayı Claude hesabınla açtığında ilk soruda izin istenir. İzin vermezsen ya da hesabında Claude kullanılamıyorsa diğer tüm bölümler çalışmaya devam eder.</p></div>`;
-  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Atılım ve Premium</span><h2>AI öğretmen paketlerle açılıyor</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen Atılım ve Premium paketlerde var. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor.</p>
+  return `<div class="card stack"><span class="pill form" style="align-self:flex-start">Atılım ve Premium · yakında</span><h2>AI öğretmen paketlerle gelecek</h2><p class="muted">Takıldığın soruyu yazdığında ya da fotoğrafını çektiğinde adım adım çözen, konu anlatan ve zayıf konularına göre öneri veren AI öğretmen, Atılım ve Premium paketler açıldığında gelecek. Paketler henüz satışta değil; ödeme alınmaz. Soru bankası, denemeler ve diğer bölümler ücretsiz kalmaya devam ediyor. Erişim kodun varsa aşağıdan etkinleştirebilirsin.</p>
     <form data-s="aiKod" class="row"><input class="in" name="kod" placeholder="Erişim kodun" autocomplete="off" autocapitalize="characters" spellcheck="false" style="max-width:240px" aria-label="Erişim kodu"><button class="btn pri"${UI.kodBusy ? " disabled" : ""}>${UI.kodBusy ? "Kontrol ediliyor…" : "Kodu etkinleştir"}</button></form>
     ${UI.kodErr ? `<p class="small" style="color:var(--bad)">${esc(UI.kodErr)}</p>` : ""}
-    <a class="btn acc" style="align-self:flex-start" href="#premium">Paketleri incele</a></div>`;
+    <a class="btn acc" style="align-self:flex-start" href="#premium">Açıldığında haber ver</a></div>`;
 }
 
 /* Premium: Ücretsiz, Atılım ve Premium paketleri; aylık ya da yıllık (yıllıkta 1 ay bedava) */
@@ -12263,54 +12333,82 @@ function planlar() {
 }
 function uyelikOzet() {
   const H = HESAP, pk = H.paket;
-  if (!H.user) return `<div class="card glass-d glow uy-ozet"><div class="uy-i"><span class="eyebrow">Üyeliğin</span><b class="uy-ad">Giriş yapmadın</b><span class="small uy-s">Paket satın almadan önce giriş yap; ödeme, giriş yaptığın e-postaya tanımlanır.</span></div><a class="btn pri" href="#hesap">Giriş yap</a></div>`;
+  if (!H.user) return `<div class="card glass-d glow uy-ozet"><div class="uy-i"><span class="eyebrow">Üyeliğin</span><b class="uy-ad">Giriş yapmadın</b><span class="small uy-s">Ücretsiz üyelik için giriş yap. Ücretli paketler henüz satışta değil; ödeme alınmaz.</span></div><a class="btn pri" href="#hesap">Giriş yap</a></div>`;
   const k = H.kullanim || { mesaj: 0, guclu: 0 }, L = H.limit;
   const bit = pk && pk.bitis ? new Date(pk.bitis + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
   return `<div class="card glass-d glow uy-ozet"><div class="uy-i"><span class="eyebrow">Mevcut üyeliğin</span><b class="uy-ad">${esc(pk ? planAd(pk.plan) : "Ücretsiz")} paket</b><span class="small uy-s">${esc(H.user.eposta || "")}${bit ? " · Bitiş: " + esc(bit) : ""}</span>
     ${pk && L ? `<span class="small uy-s">Bu ay AI mesajı: <b>${k.mesaj} / ${L.mesaj}</b> · Gelişmiş çözüm: <b>${k.guclu} / ${L.guclu}</b></span>` : ""}</div>
     ${pk ? `<a class="btn" href="#hesap">Hesabımda yönet</a>` : ""}</div>`;
 }
+/* ---- Erken erişim listesi: ücretli paketler henüz satışta değil, ödeme alınmaz ---- */
+const LISTE_NOT = "Ödeme alınmaz, sipariş oluşmaz; paket ya da fiyat garantisi verilmez.";
+const LISTE_RE = /^[^\s@,;<>()[\]\\"]{1,64}@[^\s@,;<>()[\]\\"]{1,190}\.[A-Za-z]{2,24}$/;
+const LISTE_HATA = { eposta_gecersiz: "E-posta adresi geçerli görünmüyor. Örnek: ad@ornek.com", izin_yok: "Haber verilmesi için onay kutusunu işaretlemelisin.", cok_istek: "Çok fazla deneme yaptın. Biraz sonra tekrar dene.", eposta_gitmedi: "Onay e-postası gönderilemedi. Biraz sonra tekrar dene.", yapilandirma: "Liste şu an kullanılamıyor. Biraz sonra tekrar dene." };
+function listeDurum() { return UI.liste || (UI.liste = { eposta: "", paket: "ikisi", izin: false, busy: false, err: "", alan: "", ok: false, gonderilen: "", sil: false, silE: "", silBusy: false, silMsg: "", silErr: "" }); }
+function listeKart() {
+  if (IN_CLAUDE) return "";
+  const L = listeDurum();
+  if (L.ok) return `<div class="card stack liste liste-ok" id="liste" role="status"><span class="pill ok" style="align-self:flex-start">Son adım</span><h2>Kaydını aldık</h2>
+    <p><b>${esc(L.gonderilen)}</b> için isteğini aldık. Onay gerekiyorsa adrese bir e-posta gönderdik; içindeki “İsteğimi onayla” düğmesine basınca kaydın tamamlanır. Gelmediyse spam klasörüne de bak. Daha önce onayladıysan başka bir şey yapma.</p>
+    <p class="xs muted">Onaylamazsan hiçbir şey olmaz ve kaydın silinir. ${LISTE_NOT}</p><div class="row"><button type="button" class="btn" data-a="listeYeni">Başka adres ekle</button></div></div>`;
+  const pk = (v, ad) => `<label class="liste-r"><input type="radio" name="paket" value="${v}" data-c="listePaket"${L.paket === v ? " checked" : ""}><span>${ad}</span></label>`;
+  return `<form class="card stack liste" id="liste" data-s="liste" novalidate aria-labelledby="liste-b">
+    <span class="eyebrow">Erken erişim listesi</span><h2 id="liste-b">Açıldığında haber ver</h2>
+    <p class="muted">Atılım ve Premium paketler henüz satışta değil. E-postanı bırak; paketler açıldığında sana <b>bir kez</b> haber verelim.</p>
+    <p class="liste-not" role="note"><b>Ödeme alınmaz, sipariş oluşmaz.</b> Paket ya da fiyat garantisi verilmez.</p>
+    <label class="lbl" for="liste-e">E-posta adresin</label>
+    <input class="in" id="liste-e" name="eposta" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="ad@ornek.com" maxlength="254" value="${esc(L.eposta)}" data-i="listeE"${L.alan === "eposta" ? ` aria-invalid="true"` : ""} aria-describedby="liste-h" required>
+    <input class="liste-web" name="web" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <fieldset class="liste-pk"><legend class="lbl">Hangi paketle ilgileniyorsun?</legend>${pk("atilim", "Atılım")}${pk("premium", "Premium")}${pk("ikisi", "İkisi de")}</fieldset>
+    <div class="liste-kvkk" role="group" aria-label="Kişisel verilerin işlenmesi (aydınlatma)"><b>Aydınlatma (KVKK)</b><br>E-posta adresin, yalnızca ücretli paketler açıldığında sana haber vermek ve onay/silme işlemlerini yürütmek için saklanır; üçüncü kişilere satılmaz. Kaydını istediğin zaman silebilirsin. Ayrıntılar: <a href="#erken-aydinlatma">Erken Erişim Listesi Aydınlatma Metni</a>. Bu kayıt <b>kampanya ya da reklam izni değildir</b>.</div>
+    <label class="check multi"><input type="checkbox" id="liste-izin" name="izin" data-c="listeIzin"${L.izin ? " checked" : ""}${L.alan === "izin" ? ` aria-invalid="true"` : ""} aria-describedby="liste-h"><span>Ücretli paketler açıldığında bana <b>bir kez</b> e-posta ile haber verilmesini istiyorum.</span></label>
+    <p class="liste-h" id="liste-h" role="alert" aria-live="assertive">${L.err ? esc(L.err) : ""}</p>
+    <button class="btn acc wide"${L.busy ? " disabled" : ""}>${L.busy ? "Gönderiliyor…" : "Açıldığında haber ver"}</button>
+    <p class="xs muted">${LISTE_NOT} Kaydını silmek ya da iznini geri çekmek için her e-postadaki bağlantıyı kullan ya da <button type="button" class="lnk" data-a="listeSilAc" aria-expanded="${L.sil}">kaydımı sil</button>.</p>
+    ${L.sil ? `<div class="liste-sil"><label class="lbl" for="liste-se">Silmek istediğin e-posta adresi</label><div class="row"><input class="in" id="liste-se" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="ad@ornek.com" maxlength="254" value="${esc(L.silE)}" data-i="listeSilE" style="flex:1;min-width:200px"><button type="button" class="btn" data-a="listeSilGonder"${L.silBusy ? " disabled" : ""}>${L.silBusy ? "Gönderiliyor…" : "Silme bağlantısı gönder"}</button></div><p class="xs muted" role="status" aria-live="polite">${L.silMsg ? esc(L.silMsg) : "Adres listedeyse, kendisine bir silme bağlantısı yollarız. Başkası senin adresini silemez."}</p>${L.silErr ? `<p class="liste-h" role="alert">${esc(L.silErr)}</p>` : ""}</div>` : ""}
+  </form>`;
+}
 function vPremium() {
-  const Y = UI.prem.yil, P = planlar(), satici = !!(AYAR.adSoyad && AYAR.eposta);
-  const li = t => `<li class="pf"><span class="pf-i on" aria-hidden="true"></span>${t}</li>`;
-  const fiyat = p => {
-    if (!p.ay) return `<div class="price"><b>0<small> TL</small></b><span>ücretsiz girişle</span></div>`;
-    const num = v => Number(String(v || "").replace(/[^\d]/g, "")) || 0, m = tl(p.ay), y = tl(p.yil), am = num(p.ay), yn = num(p.yil), ym = yn / 12;
-    const free = am ? 12 - yn / am : 0, fr = Math.round(free), kaz = am * 12 - yn;
-    const avantaj = kaz <= 0 ? "" : Math.abs(free - fr) < 0.05 && fr >= 1 ? `${fr} ay bedava` : `${tl(kaz)} TL kazançlı`;
-    return Y && y ? `<div class="price"><b>${y}<small> TL</small></b><span>/ yıl</span></div><p class="xs muted">Aylık ${Math.round(ym).toLocaleString("tr-TR")} TL'ye gelir${avantaj ? " · " + (Math.abs(free - fr) < 0.05 && fr >= 1 ? `12 ay yerine ${12 - fr} ay öde` : avantaj) : ""}</p>`
-      : `<div class="price"><b>${m}<small> TL</small></b><span>/ ay</span></div><p class="xs muted">Yıllık alırsan ${y ? y + " TL" + (avantaj ? ", " + avantaj : "") : "daha avantajlı"}</p>`;
-  };
-  const acik = p => p.link && okLink(Y ? p.link.yil : p.link.ay) && satici;
+  const P = planlar(), li = t => `<li class="pf"><span class="pf-i on" aria-hidden="true"></span>${t}</li>`;
   const mevcut = k => !IN_CLAUDE && typeof HESAP !== "undefined" && HESAP.user && (HESAP.paket ? HESAP.paket.plan === k : k === "ucretsiz");
-  const kart = p => `<div class="card stack glow${p.k === "premium" ? " prem" : ""}${UI.prem.sel === p.k ? " sel" : ""}${mevcut(p.k) ? " cur" : ""}">
-      <div class="card-h" style="margin:0"><h2>${p.n}</h2><span class="pill${p.k === "ucretsiz" ? "" : " form"}">${mevcut(p.k) ? "Mevcut paketin" : p.tag}</span></div>${fiyat(p)}
+  const kart = p => `<div class="card stack glow${p.k === "premium" ? " prem" : ""}${mevcut(p.k) ? " cur" : ""}">
+      <div class="card-h" style="margin:0"><h2>${p.n}</h2><span class="pill${p.k === "ucretsiz" ? "" : " form"}">${mevcut(p.k) ? "Mevcut paketin" : p.k === "ucretsiz" ? p.tag : "Yakında"}</span></div>
+      ${p.k === "ucretsiz" ? `<div class="price"><b>0<small> TL</small></b><span>ücretsiz girişle</span></div>` : `<div class="price liste-fiyat"><b>Yakında</b><span>fiyat ve içerik açıldığında netleşir</span></div>`}
       <ul class="pfl">${p.feats.map(li).join("")}</ul>
-      ${p.k === "ucretsiz" ? `<a class="btn" href="#bugun">Hemen başla</a>` : acik(p) ? `<button class="btn ${p.k === "premium" ? "acc" : "pri"}" data-a="premSec" data-k="${p.k}">${UI.prem.sel === p.k ? "Seçildi" : "Bu paketi seç"}</button>` : `<button class="btn" disabled>Çok yakında</button>`}
+      ${p.k === "ucretsiz" ? `<a class="btn" href="#bugun">Hemen başla</a>` : `<button type="button" class="btn ${p.k === "premium" ? "acc" : "pri"}" data-a="listeGit" data-k="${p.k === "orta" ? "atilim" : "premium"}">Açıldığında haber ver</button>`}
     </div>`;
-  const S2 = P.find(p => p.k === UI.prem.sel && acik(p));
-  const buy = S2 ? `<div class="card stack" id="odeme">
-      <h2>${S2.n} paket · ${Y ? "yıllık" : "aylık"} · ${tl(Y ? S2.yil : S2.ay)} TL</h2>
-      <label class="check multi"><input type="checkbox" data-c="premOk" data-k="a"${UI.prem.a ? " checked" : ""}><span><a href="#on-bilgi">Ön Bilgilendirme Formu</a>'nu ve <a href="#mesafeli">Mesafeli Satış Sözleşmesi</a>'ni okudum, onaylıyorum.</span></label>
-      <label class="check multi"><input type="checkbox" data-c="premOk" data-k="b"${UI.prem.b ? " checked" : ""}><span>Hizmetin ödemeden hemen sonra başlamasını onaylıyorum; bu nedenle cayma hakkımın bulunmadığını biliyorum.</span></label>
-      <button class="btn acc wide" data-a="premBuy"${UI.prem.a && UI.prem.b ? "" : " disabled"}>Ödemeye geç</button>
-      <p class="xs muted">Ödeme ${AYAR.odemeAracisi ? esc(AYAR.odemeAracisi) + " " : ""}güvenli ödeme sayfasında yapılır, kart bilgilerin bize ulaşmaz. Ödemen onaylanınca erişim kodun, ödeme sırasında yazdığın e-posta adresine birkaç dakika içinde otomatik gönderilir (en geç 24 saat). Siteye aynı e-postayla giriş yaptığında paket hesabına kendiliğinden tanımlanır; kodu Hesabım sayfasından da girebilirsin. Paket seçtiğin süre boyunca geçerlidir ve kendiliğinden yenilenmez; kartından otomatik çekim yapılmaz. 18 yaşından küçüksen ödemeyi velinle birlikte yap.</p>
-    </div>` : P.some(acik) ? "" : `<div class="card sunk stack"><h2>Ücretli paketler çok yakında açılıyor</h2><p class="muted">Ödeme sistemi hazırlanıyor. Açıldığında Atılım ve Premium paketleri buradan satın alabileceksin; ücretsiz bölümler her zaman ücretsiz kalacak.${AYAR.eposta ? " İlk haber alanlardan olmak istersen bize yaz." : ""}</p>${AYAR.eposta ? `<a class="btn" style="align-self:flex-start" href="mailto:${esc(AYAR.eposta)}?subject=${encodeURIComponent("AKE Akademi paketleri haber ver")}">Bana haber ver</a>` : ""}</div>`;
   return `<div class="view wide">
-    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, AI öğretmenle hızlan</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Atılım ve Premium paketler bunların üstüne seni tanıyan bir AI öğretmen ekler.</p></div>
+    <div class="vhead"><span class="eyebrow">AKE Akademi paketleri</span><h1>Ücretsiz başla, paketler yakında</h1><p>Soru bankası, canlı denemeler, arkadaş ligi ve takip araçları herkese ücretsiz. Atılım ve Premium paketler henüz satışta değil; açıldığında haber almak için aşağıdaki listeye yazılabilirsin.</p></div>
+    <p class="liste-not" role="note"><b>Ödeme alınmaz, sipariş oluşmaz.</b> Paket ya da fiyat garantisi verilmez. Aşağıdaki içerik planlanandır ve açıldığında değişebilir.</p>
     ${(!IN_CLAUDE && typeof HESAP !== "undefined") ? uyelikOzet() : ""}
-    <div class="segs" role="group" aria-label="Ödeme dönemi"><button type="button" class="${Y ? "" : "on"}" data-a="premDonem" data-k="ay" aria-pressed="${!Y}">Aylık</button><button type="button" class="${Y ? "on" : ""}" data-a="premDonem" data-k="yil" aria-pressed="${Y}">Yıllık${(() => { const a = Number(String(AYAR.fiyatOrta).replace(/[^\d]/g, "")), y = Number(String(AYAR.yillikOrta).replace(/[^\d]/g, "")), f = a && y ? 12 - y / a : 0; return f >= 0.95 && Math.abs(f - Math.round(f)) < 0.05 ? " · " + Math.round(f) + " ay bedava" : ""; })()}</button></div>
     <div class="grid3 plans">${P.map(kart).join("")}</div>
-    ${buy}
+    ${listeKart()}
+    ${IN_CLAUDE ? "" : `<p class="small muted">Daha önce erişim kodu aldıysan kodun çalışmaya devam eder; <a href="#hesap">Hesabım</a> sayfasından ekleyebilirsin.</p>`}
   </div>`;
 }
 
 /* Yasal metinler */
 const LEGAL = {
+  "erken-aydinlatma": { t: "Erken Erişim Listesi Aydınlatma Metni", d: "“Açıldığında haber ver” listesi için kişisel verilerin nasıl işlendiği", h: () => `
+    <p><b>Veri sorumlusu:</b> ${ay("adSoyad", "AD SOYAD")}, Adres: ${ay("adres", "ADRES")}, E-posta: ${ay("eposta", "E-POSTA")}</p>
+    <p class="note">Ücretli paketler (Atılım ve Premium) henüz satışta değildir. Ödeme alınmaz, sipariş oluşmaz; paket ya da fiyat garantisi verilmez. Bu liste yalnızca paketler açıldığında sana haber vermek içindir.</p>
+    <h2>İşlenen veriler</h2>
+    <ul><li>E-posta adresin ve ilgilendiğin paket (Atılım, Premium ya da ikisi)</li><li>Kaydın ve e-posta onayının zamanı, gösterilen izin metninin sürümü</li><li>Kötüye kullanımı incelemek için IP adresinin kısaltılmış, geri döndürülemeyen özeti (IP adresin açık yazılmaz)</li></ul>
+    <h2>Amaç ve hukuki sebep</h2>
+    <p>Verilerin yalnızca ücretli paketler açıldığında sana bir kez haber vermek ve onay, silme işlemlerini yürütmek için işlenir. Hukuki sebep, bu amaçla verdiğin açık rızadır (KVKK m.5/1). Onay kutusunu işaretlemeden ve e-postadaki bağlantıyı onaylamadan kaydın tamamlanmaz.</p>
+    <p><b>Bu kayıt kampanya ya da reklam amaçlı ticari elektronik ileti izni değildir.</b> Açılış haberi dışında bu adrese ticari ileti gönderilmesi için ayrıca, açık ve ayrı bir izin istenir.</p>
+    <h2>Kimlere aktarılır</h2>
+    <ul><li>Barındırma ve veritabanı hizmeti (${ay("barindirma", "BARINDIRMA")}): kaydın saklanması için</li><li>E-posta gönderim hizmeti (Resend): onay ve silme e-postalarının iletilmesi için</li></ul>
+    <p>Verilerin satılmaz ve başka amaçla paylaşılmaz. Bu hizmet sağlayıcıların sunucuları yurt dışında olabilir; aktarım KVKK m.9'a uygun güvencelerle yapılır.</p>
+    <h2>Saklama ve silme</h2>
+    <p>Onaylamadığın kayıt 48 saat sonra silinir. Onayladığın kayıt, paketler açılıp haber verilene ya da listenin amacı ortadan kalkana kadar saklanır. Kaydını ve iznini istediğin zaman silebilir ya da geri çekebilirsin: her e-postadaki “kaydımı sil” bağlantısı ya da Paketler sayfasındaki “kaydımı sil” formu yeterlidir. Silme, adresinin ve izin kaydının listeden tamamen kaldırılması demektir.</p>
+    <h2>Hakların (KVKK m.11)</h2>
+    <p>Verilerinin işlenip işlenmediğini öğrenme, bilgi isteme, düzeltilmesini ya da silinmesini isteme ve itiraz etme haklarına sahipsin. Başvuru için ${ay("eposta", "E-POSTA")} adresine yazabilirsin.</p>
+    <p class="small">İzin ve aydınlatma metni sürümü: 2026-11-21.</p>` },
   "kvkk": { t: "KVKK Aydınlatma Metni", d: "Kişisel verilerinin nasıl işlendiği ve hakların", h: () => `
     <p><b>Veri sorumlusu:</b> ${ay("adSoyad", "AD SOYAD")} ("AKE Akademi"), Adres: ${ay("adres", "ADRES")}, E-posta: ${ay("eposta", "E-POSTA")}</p>
     <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, AKE Akademi internet sitesi ve uygulaması ("Site") kullanıcılarının kişisel verilerinin nasıl işlendiğini aşağıda açıklıyoruz.</p>
-    ${IN_CLAUDE ? "" : `<p class="note">Site'yi hesap açmadan yalnızca gezebilirsin; soru ve deneme çözmek için giriş gerekir. Giriş yapmadan tarayıcında oluşan geçici veriler yalnızca kendi tarayıcında kalır. Giriş yaparsan e-posta adresin (Google ile girersen Google hesabındaki adın ve hesap kimliğin), bu çalışma verilerin, aylık AI kullanım sayıların, günlük soru ve aylık deneme hak sayaçların (ücretsiz hakların hesabına bağlı olduğu için) ve hesabına bağlanan paket kodun, hesabını her cihazda kullanabilmen için sunucumuzda (${ay("barindirma", "BARINDIRMA")}) saklanır. Giriş kodları e-posta gönderim hizmeti (Resend) aracılığıyla gönderilir. Hesabını Hesabım sayfasından istediğin zaman silebilirsin; silindiğinde hesabındaki çalışma verilerin kalıcı olarak silinir. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Arkadaş ligine katılırsan seçtiğin görünen ad ve haftalık puanın o ligin üyelerine; canlı denemeye katılırsan görünen adın, netin ve sıralaman diğer katılımcılara görünür. Bir sınıfa katılırsan o sınıfın öğretmeni çalışma özetini (son 7 gündeki soru sayısı, doğru oranı, zayıf konular, deneme netleri, son çalışma günü) görür; sınıftan ayrıldığında bu özet silinir. Odak odasındaki kişi sayısı için yalnızca rastgele bir cihaz numarası kullanılır. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
+    ${IN_CLAUDE ? "" : `<p class="note">Site'yi hesap açmadan yalnızca gezebilirsin; soru ve deneme çözmek için giriş gerekir. Giriş yapmadan tarayıcında oluşan geçici veriler yalnızca kendi tarayıcında kalır. Giriş yaparsan e-posta adresin (Google ile girersen Google hesabındaki adın ve hesap kimliğin), bu çalışma verilerin, aylık AI kullanım sayıların, günlük soru ve aylık deneme hak sayaçların (ücretsiz hakların hesabına bağlı olduğu için) ve hesabına bağlanan paket kodun, hesabını her cihazda kullanabilmen için sunucumuzda (${ay("barindirma", "BARINDIRMA")}) saklanır. Giriş kodları e-posta gönderim hizmeti (Resend) aracılığıyla gönderilir. Hesabını Hesabım sayfasından istediğin zaman silebilirsin; silindiğinde hesabındaki çalışma verilerin kalıcı olarak silinir. AI öğretmeni kullandığında yazdığın mesajlar ve eklediğin fotoğraf, cevap üretilmesi için sunucumuz üzerinden yapay zekâ sağlayıcısına (${ay("yapayZeka", "YAPAY ZEKÂ")}) iletilir; bu yazışmalar sunucumuzda saklanmaz. Sesle soru sorma özelliğini kullanırsan konuşman, cihazının ya da tarayıcının ses tanıma hizmeti (ör. Apple, Google) tarafından yazıya çevrilir; ses kaydı AKE Akademi'ye gönderilmez. Arkadaş ligine katılırsan seçtiğin görünen ad ve haftalık puanın o ligin üyelerine; canlı denemeye katılırsan görünen adın, netin ve sıralaman diğer katılımcılara görünür. Bir sınıfa katılırsan o sınıfın öğretmeni çalışma özetini (son 7 gündeki soru sayısı, doğru oranı, zayıf konular, deneme netleri, son çalışma günü) görür; sınıftan ayrıldığında bu özet silinir. Odak odasındaki kişi sayısı için yalnızca rastgele bir cihaz numarası kullanılır. Veli raporu yalnızca senin seçtiğin kişiye, senin paylaşmanla iletilir. Ücretli paket satışı açıldığında ve paket aldığında ödeme ve iletişim bilgilerin ${ay("odemeAracisi", "ÖDEME ARACISI")} üzerinden alınır ve yalnızca erişim kodunun teslimi ve yasal yükümlülükler için kullanılır.</p>`}
     ${!IN_CLAUDE ? "" : `<p class="note">Şu an Site'de ücretli üyelik yoktur. Site'yi Claude hesabınla açtığında ve hesabına kayıt iznin olduğunda ilerlemen, yalnızca sana açık ayrı bir alanda saklanır. Bu durumda çalışma özetin (Site'de yazdığın ad, alanın ve hedefin, çözdüğün soru sayısı ve başarı oranın, deneme sonuçların, giriş zamanların, gezdiğin bölümler, cihaz ve tarayıcı türün) ile Claude hesabındaki adın Site yöneticisinin panelinde görünür. Yanlış defterin, tekrar kartların, çalışma planın ve AI öğretmenle yazışmaların yöneticiye gönderilmez. Kayıt iznin yoksa ilerlemen yalnızca kendi tarayıcında saklanır; Site'yi açık tuttuğun sürece hangi bölümde olduğun ve cihaz türün yöneticiye anlık görünebilir. Aşağıda sayılan üyelik ve ödeme verileri bu özellikler açıldığında işlenecektir.</p>`}
     <h2>İşlenen kişisel veriler</h2>
     <ul><li><b>Kimlik:</b> ad, soyad</li><li><b>İletişim:</b> e-posta adresi, varsa telefon numarası</li><li><b>Müşteri işlem:</b> abonelik planı, ödeme tarihi ve tutarı, fatura bilgileri. Kart bilgilerin bizde tutulmaz, doğrudan ödeme kuruluşu tarafından işlenir.</li><li><b>Kullanım:</b> çalışılan dersler, deneme sonuçları, ilerleme kayıtları, AI öğretmene yazdığın sorular ve aldığın cevaplar</li><li><b>İşlem güvenliği:</b> IP adresi, giriş kayıtları, cihaz ve tarayıcı bilgisi</li></ul>
@@ -12407,7 +12505,7 @@ const LEGAL = {
       <li><b>İstisnalar:</b> Hatalı veya mükerrer çekim olursa ya da teknik bir sorun nedeniyle hizmete hiç erişemediysen ${ay("eposta", "E-POSTA")} adresine yazman yeterli. İnceleme sonrası ücret 14 gün içinde ödeme yaptığın karta iade edilir.</li>
     </ul>` }
 };
-const LEGAL_ORDER = ["kvkk", "cerez", "kosullar", "on-bilgi", "mesafeli", "iade"];
+const LEGAL_ORDER = ["kvkk", "erken-aydinlatma", "cerez", "kosullar", "on-bilgi", "mesafeli", "iade"];
 function vLegalIndex() {
   return `<div class="view">
     <div class="vhead"><span class="eyebrow">Şeffaflık</span><h1>Yasal metinler</h1><p>AKE Akademi'yi kullanırken hakların ve kurallar. Son güncelleme: ${ay("guncelleme", "TARİH")}</p></div>
@@ -12418,6 +12516,7 @@ function vLegal(k) {
   const L = LEGAL[k];
   return `<div class="view">
     <div class="vhead"><a class="btn ghost sm" style="align-self:flex-start;margin-left:-10px" href="#yasal">${icon("back")} Yasal metinler</a><h1>${L.t}</h1><p class="small">Son güncelleme: ${ay("guncelleme", "TARİH")}</p></div>
+    ${["on-bilgi", "mesafeli", "iade"].includes(k) ? `<p class="note">Şu an ücretli paket satışı yoktur ve ödeme alınmaz. Bu metin, daha önce alınmış erişim kodları ve paketler satışa açıldığında geçerli olacak koşullar içindir.</p>` : ""}
     <article class="card legal">${L.h()}</article>
   </div>`;
 }
@@ -12827,12 +12926,40 @@ const SUB = {
 
 /* ---------- Premium eylemleri ---------- */
 Object.assign(ACT, {
-  premBuy() {
-    const p = planlar().find(x => x.k === UI.prem.sel), u = p && p.link ? (UI.prem.yil ? p.link.yil : p.link.ay) : "";
-    if (!(UI.prem.a && UI.prem.b) || !okLink(u)) return; window.open(u, "_blank", "noopener");
-  },
-  premSec(d) { UI.prem.sel = d.k; UI.prem.a = UI.prem.b = false; render(); const el = document.getElementById("odeme"); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); },
-  premDonem(d) { UI.prem.yil = d.k === "yil"; render(); }
+  /* Satış kapalı: ödeme sayfasına yönlendiren eylem YOK (eski premBuy/premSec/premDonem kaldırıldı). */
+  listeGit(d) { const L = listeDurum(); L.paket = d.k === "premium" ? "premium" : "atilim"; L.ok = false; render(); const el = document.getElementById("liste-e"); const f = document.getElementById("liste"); if (f) f.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion:reduce)").matches ? "auto" : "smooth", block: "center" }); if (el) el.focus({ preventScroll: true }); },
+  listeYeni() { const L = listeDurum(); L.ok = false; L.eposta = ""; L.izin = false; L.err = ""; L.alan = ""; render(); const el = document.getElementById("liste-e"); if (el) el.focus(); },
+  listeSilAc() { const L = listeDurum(); L.sil = !L.sil; L.silMsg = ""; L.silErr = ""; render(); const el = document.getElementById("liste-se"); if (L.sil && el) el.focus(); },
+  async listeSilGonder() {
+    const L = listeDurum(); if (L.silBusy) return; L.silErr = ""; L.silMsg = "";
+    if (!LISTE_RE.test(L.silE.trim())) { L.silErr = LISTE_HATA.eposta_gecersiz; render(); return; }
+    L.silBusy = true; render();
+    try {
+      const r = await fetch("/api/liste/sil-iste", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ eposta: L.silE.trim() }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) L.silMsg = "Adres listedeyse silme bağlantısını e-postana yolladık. Gelmezse spam klasörüne bak."; else L.silErr = LISTE_HATA[j.error] || "Şu an yapılamadı. Biraz sonra tekrar dene.";
+    } catch (e) { L.silErr = "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene."; }
+    L.silBusy = false; render();
+  }
+});
+Object.assign(INP, { listeE(el) { const L = listeDurum(); L.eposta = el.value; }, listeSilE(el) { listeDurum().silE = el.value; } });
+Object.assign(CHG, { listeIzin(el) { const L = listeDurum(); L.izin = el.checked; if (el.checked && L.alan === "izin") { L.alan = ""; L.err = ""; render(); } }, listePaket(el) { listeDurum().paket = el.value; } });
+Object.assign(SUB, {
+  async liste(fd) {
+    const L = listeDurum(); if (L.busy) return;
+    L.eposta = String(fd.get("eposta") || "").trim(); L.izin = fd.get("izin") === "on"; L.paket = fd.get("paket") || L.paket; L.err = ""; L.alan = "";
+    if (!LISTE_RE.test(L.eposta)) { L.err = LISTE_HATA.eposta_gecersiz; L.alan = "eposta"; }
+    else if (!L.izin) { L.err = LISTE_HATA.izin_yok; L.alan = "izin"; }
+    if (L.err) { render(); const el = document.getElementById(L.alan === "izin" ? "liste-izin" : "liste-e"); if (el) el.focus(); return; }
+    L.busy = true; render();
+    try {
+      const r = await fetch("/api/liste/kaydet", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ eposta: L.eposta, izin: true, paket: L.paket, web: String(fd.get("web") || "") }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) { L.ok = true; L.gonderilen = L.eposta; L.izin = false; }
+      else { L.err = LISTE_HATA[j.error] || "Kayıt şu an yapılamadı. Biraz sonra tekrar dene."; L.alan = j.error === "izin_yok" ? "izin" : j.error === "eposta_gecersiz" ? "eposta" : ""; }
+    } catch (e) { L.err = "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene."; }
+    L.busy = false; render();
+  }
 });
 Object.assign(CHG, { premOk(el) { UI.prem[el.dataset.k] = el.checked; render(); } });
 /* Android ve masaüstü Chrome: "Uygulamayı yükle" düğmesi */

@@ -12438,7 +12438,7 @@ function chatScrollToLatest() {
   chatScroll.pending = true;
   requestAnimationFrame(() => {
     chatScroll.pending = false;
-    if (route() !== "ogretmen") return;
+    if (!chatScroll.follow || route() !== "ogretmen") return;
     const last = document.querySelector("#chat > .msg:last-child");
     if (!last) return;
     const composer = document.querySelector(".composer");
@@ -12447,6 +12447,19 @@ function chatScrollToLatest() {
     if (overflow > 0) window.scrollBy({ top: overflow, behavior: "auto" });
   });
 }
+/* Takip: yukarı kaydırma (belge yüksekliği değişmeden scrollY azalması) takibi bırakır; alt kenara yaklaşınca geri açılır. Programatik kaydırma yalnız aşağı gider. */
+let chatScrollY = 0, chatScrollH = 0;
+addEventListener("scroll", () => {
+  const y = scrollY, h = document.documentElement.scrollHeight;
+  if (UI.chatBusy && route() === "ogretmen") {
+    if (y < chatScrollY - 2 && Math.abs(h - chatScrollH) <= 1) chatScroll.follow = false;
+    else if (!chatScroll.follow) {
+      const el = document.getElementById("chat-live") || document.querySelector("#chat > .msg:last-child"), c = document.querySelector(".composer");
+      if (el && el.getBoundingClientRect().bottom <= (c ? Math.min(innerHeight, c.getBoundingClientRect().top) : innerHeight) + 40) chatScroll.follow = true;
+    }
+  }
+  chatScrollY = y; chatScrollH = h;
+}, { passive: true });
 function render() {
   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;
   sayfaBasligi(r);
@@ -12497,10 +12510,8 @@ async function sendChat(text) {
   const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => {
     const el = document.getElementById("chat-live");
     if (!el) return;
-    const composer = document.querySelector(".composer");
-    const visibleBottom = composer ? Math.min(innerHeight, composer.getBoundingClientRect().top) : innerHeight;
-    chatScroll.follow = chatScroll.pending || el.getBoundingClientRect().bottom <= visibleBottom + 180;
     el.innerHTML = md(t);
+    chatScrollH = document.documentElement.scrollHeight;
     if (chatScroll.follow) chatScrollToLatest();
   } };
   if (img) opts.images = [img];

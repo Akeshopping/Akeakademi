@@ -20,6 +20,8 @@ Yol sabit değildir; her şey bu klasöre göre bulunur. Aynı girdiyle aynı ç
 | `jsedits_renk.py` | Palet, özel renk (kontrast denetimli), şeffaf kartlar, plan ve rozet düzeni |
 | `jsedits_tanitim.py` | Tanıtım ilk ekran: somut ürün cümlesi, gerçek sayılar (atlVeri), harita açıklaması |
 | `jsedits_studyo.py` | Stüdyo yapışkan "Teste başla" çubuğu (mobil/tablet) |
+| `jsedits_aiakis.py` | AI öğretmen akış kaydırması: takip yalnız kullanıcının kaydırma yönüne bağlı (yarış giderildi) |
+| `ai_akis_test/` | AI öğretmen akış testi: sahte SSE sunucusu + playwright betiği (gerçek hesaba istek atmaz) |
 | `giris_ai.patch` | Giriş yolu (tanıtım/ilk kart/üst çubuk), Gelişim boş ısı haritası durumu, AI sohbet akışında akıllı kaydırma; özgün tabana, diğer düzenlemelerden önce uygulanır |
 | `jsedits_video.py` | Mevcut serinin haftalık görsel zinciri (seri hesabı ve rozet koşulları değişmez) |
 | `acilis_recolor.py`, `gen_icons.py` | Açılış/ikon yeniden renklendirme (gerekirse; varsayılan yol = depo kökü) |

@@ -428,3 +428,6 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 .seri-gun.kor .seri-isaret{border-style:dashed;border-color:var(--coral);color:var(--coral-ink)}
 .seri-gun.bugun .seri-isaret{border-color:var(--coral)}
 @media (max-width:360px){.seri-hafta{padding:12px 3px}.seri-gun{font-size:10px}}
+
+/* 32. dar telefon: Giriş yap düğmesi görünür kalsın, marka yazısı kırpılmasın (logo kutusu aynı) */
+@media (max-width:430px){.top-in .brand .wm span{display:none}}

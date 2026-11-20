@@ -2,7 +2,7 @@
 """AKE Ritmi görsel katmanını yeniden üretir: main'deki index.html -> tasarım dalındaki index.html.
 
 Kullanım (depo kökünden):  python3 docs/tasarim/uret.py [--base origin/main] [--out index.html]
-Taban sürüm (--base) varsayılan olarak origin/main, o yoksa main. Başka hiçbir yere yazmaz.
+Taban sürüm (--base) varsayılan olarak 870e057 (görsel yenilemeden önceki özgün main); o yoksa origin/main, main. NOT: main artık üretilmiş dosyayı içerir, tabanı main yapmayın (çift uygulanır). Başka hiçbir yere yazmaz.
 Sabit yerel yol yok: betik kendi klasörünü (docs/tasarim/) ve iki üst klasörü (depo kökü) kullanır.
 Ayrıntı: docs/tasarim/README.md"""
 import re,subprocess,sys,pathlib,os,argparse
@@ -10,13 +10,31 @@ T=pathlib.Path(__file__).resolve().parent
 ap=argparse.ArgumentParser(); ap.add_argument('--base'); ap.add_argument('--out',default='index.html'); ap.add_argument('--repo',default=str(T.parent.parent)); A=ap.parse_args()
 W=pathlib.Path(A.repo).resolve()
 def _ref():
-    for r in ([A.base] if A.base else [])+['origin/main','main']:
+    for r in ([A.base] if A.base else [])+['870e057','origin/main','main']:
         if subprocess.run(['git','rev-parse','--verify','-q',r+':index.html'],cwd=W,capture_output=True).returncode==0: return r
     sys.exit('taban sürüm bulunamadı: --base verin (örn. origin/main)')
 REF=_ref()
 raw=subprocess.check_output(['git','show',REF+':index.html'],cwd=W)
 CRLF=raw.count(b'\r\n')==raw.count(b'\n')
 src=raw.decode('utf8').replace('\r\n','\n')
+
+# ---- 0a. GÜVENLİK: taban zaten üretilmiş dosya ise dur (aksi hâlde tasarım iki kez uygulanır)
+_URETILMIS=[k for k in ('?v=ritim1','AKE Rakam','data-pal=') if k in src]
+if _URETILMIS:
+    sys.exit('HATA: taban '+REF+' zaten üretilmiş bir index.html içeriyor ('+', '.join(_URETILMIS)+'). '
+             'Tasarım iki kez uygulanmaz. Özgün tabanı verin: --base 870e057 (görsel yenilemeden önceki main).')
+
+# ---- 0. giriş/ilk kullanım + AI sohbet kaydırma yaması (taban: özgün main; diğer düzenlemelerden ÖNCE uygulanır)
+import tempfile,shutil
+def _yama(metin,yama):
+    d=tempfile.mkdtemp()
+    try:
+        (pathlib.Path(d)/'index.html').write_text(metin,encoding='utf8',newline='\n')
+        r=subprocess.run(['git','apply','--unsafe-paths','--directory=.','-p1',str(yama)],cwd=d,capture_output=True,text=True)
+        if r.returncode: sys.exit('giris_ai.patch uygulanamadı (taban değişmiş olabilir): '+r.stderr[:400])
+        return (pathlib.Path(d)/'index.html').read_text(encoding='utf8')
+    finally: shutil.rmtree(d,ignore_errors=True)
+src=_yama(src,T/'giris_ai.patch')
 
 # ---- 1. token blocks
 a=src.index(':root{\n  --paper:#f5f1e8;')
@@ -137,7 +155,7 @@ def _stil_rgb(m):
     return m.group(1)+m.group(2).replace('rgba(217,79,67,','rgba(var(--coral-deco-rgb),').replace('rgba(242,125,109,','rgba(var(--coral-light-rgb),')+m.group(3)
 src=re.sub(r'(<style[^>]*>)(.*?)(</style>)',_stil_rgb,src,flags=re.S)
 src=src.replace('?v=cb84d327ff','?v=ritim1')
-for _f in ('jsedits_acilis.py','jsedits_renk.py','jsedits_video.py'):
+for _f in ('jsedits_acilis.py','jsedits_renk.py','jsedits_video.py','jsedits_tanitim.py','jsedits_studyo.py'):
     if (T/_f).exists(): exec((T/_f).read_text(encoding='utf8'))
 (W/A.out).write_bytes((src.replace('\n','\r\n') if CRLF else src).encode('utf8'))
 print('taban:',REF,'| mapped hex',stats['hex'],'rgba',stats['rgba'],'size',len(src))

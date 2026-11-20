@@ -428,3 +428,42 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 .seri-gun.kor .seri-isaret{border-style:dashed;border-color:var(--coral);color:var(--coral-ink)}
 .seri-gun.bugun .seri-isaret{border-color:var(--coral)}
 @media (max-width:360px){.seri-hafta{padding:12px 3px}.seri-gun{font-size:10px}}
+
+/* 32. dar telefon: Giriş yap düğmesi görünür kalsın, marka yazısı kırpılmasın (logo kutusu aynı) */
+@media (max-width:430px){.top-in .brand .wm span{display:none}}
+
+/* 33. Tanıtım ilk ekran: gerçek sayılar çağrının yanında + harita açıklaması */
+.atl-say{display:grid;grid-template-columns:repeat(3,minmax(0,auto));justify-content:start;gap:8px clamp(18px,3vw,34px);margin:22px 0 4px}
+.atl-say>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.atl-say b{font:650 clamp(24px,3.2vw,32px)/1 var(--f-disp);letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.atl-say span{font-size:12.5px;color:var(--ink3);line-height:1.25}
+.atl-say+.atl-cta{margin-top:18px}
+.atl-harita-not{margin:10px 2px 0;font-size:13px;line-height:1.5;color:var(--ink3);max-width:46em}
+@media (max-width:360px){.atl-say{gap:8px 14px}.atl-say b{font-size:22px}}
+
+/* 34. Stüdyo: mobilde kompakt üst alan + yapışkan "Teste başla" (alt menüyle çakışmaz) */
+.sc3-yap{display:none}
+@media (max-width:1023.98px){
+  .sc3-yap{display:flex;align-items:center;gap:12px;position:sticky;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:30;padding:10px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line-strong);box-shadow:0 10px 28px -12px rgba(20,16,24,.45)}
+  .sc3-yap-o{flex:1 1 auto;min-width:0;font-size:13.5px;line-height:1.3;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .sc3-yap .btn{flex:none;min-height:46px;padding-inline:18px;white-space:nowrap}
+  .sc3-yap .btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+  .sc3-sum .sc3-go,.sc3-sum .sc3-go-h{display:none}
+}
+@media (min-width:900px) and (max-width:1023.98px){.sc3-yap{bottom:14px}}
+@media (max-width:640px){
+  .sc3{gap:12px}
+  .sc3-hero{padding:14px 16px;border-radius:16px}
+  .sc3-hero h1{font-size:21px;line-height:1.15}
+  .sc3-sub{display:none}
+  .sc3-prog{margin-top:10px;padding:10px 12px 11px;border-radius:12px}
+  .sc3-prog-h{font-size:13px}.sc3-prog-h b{font-size:15px}
+  .sc3-bar{height:6px;margin:7px 0 6px}
+  .sc3-prog-s{font-size:12.5px}
+  .sc3-step{padding:14px}
+  .sc3-sh{margin-bottom:10px}
+}
+@media (prefers-reduced-motion:reduce){.sc3-yap{transition:none}}
+
+/* 35. 320 px: yıldız haritası kutusu min-yükseklik yüzünden taşıp kırpılmasın */
+@media (max-width:400px){.atl-core{min-height:0;width:100%}}

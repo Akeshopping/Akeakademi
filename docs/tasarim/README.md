@@ -1,6 +1,6 @@
 # docs/tasarim/ — AKE Ritmi görünüm üretim süreci
 
-`index.html` (görsel yenileme) elle yazılmaz; `main` dalındaki `index.html`'den bu klasördeki betikle **yeniden üretilir**. Böylece `main` güncellense bile tasarım kaybolmaz.
+`index.html` (görsel yenileme) elle yazılmaz; özgün taban (`870e057`, yenilemeden önceki main) `index.html`'inden bu klasördeki betikle **yeniden üretilir**. `main` artık üretilmiş dosyayı içerir: tabanı `main` yapmayın, `--base 870e057` (varsayılan) kullanın. Taban yeni bir özgün sürüme taşınırsa `--base` ile verin.
 
 ## Çalıştırma (Python 3, ek paket yok)
 
@@ -18,6 +18,9 @@ Yol sabit değildir; her şey bu klasöre göre bulunur. Aynı girdiyle aynı ç
 | `jsedits.py` | Ana görünüm kodu düzenlemeleri (`rep(eski, yeni, adet)`; adet tutmazsa durur) |
 | `jsedits_acilis.py` | Açılış seçenekleri ve Ayarlar seçimi |
 | `jsedits_renk.py` | Palet, özel renk (kontrast denetimli), şeffaf kartlar, plan ve rozet düzeni |
+| `jsedits_tanitim.py` | Tanıtım ilk ekran: somut ürün cümlesi, gerçek sayılar (atlVeri), harita açıklaması |
+| `jsedits_studyo.py` | Stüdyo yapışkan "Teste başla" çubuğu (mobil/tablet) |
+| `giris_ai.patch` | Giriş yolu (tanıtım/ilk kart/üst çubuk), Gelişim boş ısı haritası durumu, AI sohbet akışında akıllı kaydırma; özgün tabana, diğer düzenlemelerden önce uygulanır |
 | `jsedits_video.py` | Mevcut serinin haftalık görsel zinciri (seri hesabı ve rozet koşulları değişmez) |
 | `acilis_recolor.py`, `gen_icons.py` | Açılış/ikon yeniden renklendirme (gerekirse; varsayılan yol = depo kökü) |
 | `rakam.woff2` | Rakam yazı tipi alt kümesi |

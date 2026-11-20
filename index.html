@@ -1653,6 +1653,44 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 /* 32. dar telefon: Giriş yap düğmesi görünür kalsın, marka yazısı kırpılmasın (logo kutusu aynı) */
 @media (max-width:430px){.top-in .brand .wm span{display:none}}
 
+/* 33. Tanıtım ilk ekran: gerçek sayılar çağrının yanında + harita açıklaması */
+.atl-say{display:grid;grid-template-columns:repeat(3,minmax(0,auto));justify-content:start;gap:8px clamp(18px,3vw,34px);margin:22px 0 4px}
+.atl-say>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.atl-say b{font:650 clamp(24px,3.2vw,32px)/1 var(--f-disp);letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.atl-say span{font-size:12.5px;color:var(--ink3);line-height:1.25}
+.atl-say+.atl-cta{margin-top:18px}
+.atl-harita-not{margin:10px 2px 0;font-size:13px;line-height:1.5;color:var(--ink3);max-width:46em}
+@media (max-width:360px){.atl-say{gap:8px 14px}.atl-say b{font-size:22px}}
+
+/* 34. Stüdyo: mobilde kompakt üst alan + yapışkan "Teste başla" (alt menüyle çakışmaz) */
+.sc3-yap{display:none}
+@media (max-width:1023.98px){
+  .sc3-yap{display:flex;align-items:center;gap:12px;position:sticky;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:30;padding:10px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line-strong);box-shadow:0 10px 28px -12px rgba(20,16,24,.45)}
+  .sc3-yap-o{flex:1 1 auto;min-width:0;font-size:13.5px;line-height:1.3;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .sc3-yap .btn{flex:none;min-height:46px;padding-inline:18px;white-space:nowrap}
+  .sc3-yap .btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
+  .sc3-sum .sc3-go,.sc3-sum .sc3-go-h{display:none}
+}
+@media (min-width:900px) and (max-width:1023.98px){.sc3-yap{bottom:14px}}
+@media (max-width:640px){
+  .sc3{gap:12px}
+  .sc3-hero{padding:14px 16px;border-radius:16px}
+  .sc3-hero h1{font-size:21px;line-height:1.15}
+  .sc3-sub{display:none}
+  .sc3-prog{margin-top:10px;padding:10px 12px 11px;border-radius:12px}
+  .sc3-prog-h{font-size:13px}.sc3-prog-h b{font-size:15px}
+  .sc3-bar{height:6px;margin:7px 0 6px}
+  .sc3-prog-s{font-size:12.5px}
+  .sc3-step{padding:14px}
+  .sc3-sh{margin-bottom:10px}
+}
+@media (prefers-reduced-motion:reduce){.sc3-yap{transition:none}}
+
+/* 35. 320 px: yıldız haritası kutusu min-yükseklik yüzünden taşıp kırpılmasın */
+@media (max-width:400px){.atl-core{min-height:0;width:100
+/* 35. 320 px: yıldız haritası kutusu min-yükseklik yüzünden taşıp kırpılmasın */
+@media (max-width:400px){.atl-core{min-height:0;width:100%}}
+
 </style>
 <script>
 "use strict";
@@ -8326,6 +8364,7 @@ function vStudio() {
     ${s ? sec(3, `Konuyu seç <span class="sc3-opt-tag">${esc(dn)}</span>`, "sc3-s3", yeni("konu"), konu) : ""}
     ${s ? `<div class="sc3-pair${yeni("opt")}">${sec(4, "Zorluk", "sc3-s4", "", zorluk)}${sec(5, "Soru sayısı", "sc3-s5", "", adet)}</div>` : ""}
   </div>${ozet}</div>
+    <div class="sc3-yap" role="region" aria-label="Teste başla"><span class="sc3-yap-o" aria-live="polite">${s ? esc(e + " · " + dn + (t ? " · " + t : "") + " · " + o.n + " soru") : "Önce bir ders seç"}</span><button type="button" class="btn pri" data-a="stBasla"${s ? "" : " disabled"}>Teste başla</button></div>
   </div>`;
 }
 function uretKartlari(s, gs, G2) {
@@ -11893,12 +11932,14 @@ function vTanitim() {
     <div>
       <div class="atl-eb">YKS 2027${gun ? " · " + gun + " gün kaldı" : ""}</div>
       <h1 id="atl-h">Geleceğini ezberleme. <span>Onu inşa et.</span></h1>
-      <p class="atl-lead">Yapay zekâ destekli kişisel öğrenme deneyimiyle sınav hazırlığını bir adım ileri taşı.</p>
+      <p class="atl-lead">YKS için çözümlü soru, yanlış defteri ve kişisel plan tek yerde. Konunu seç, çöz, yanlışlarını tekrar et.</p>
+      <div class="atl-say" role="list" aria-label="Platformda neler var"><div role="listitem"><b>${fmtN(V.soru)}</b><span>çözümlü soru</span></div><div role="listitem"><b>${V.konu}</b><span>konu</span></div><div role="listitem"><b>${V.reg.length}</b><span>ders grubu</span></div></div>
       <div class="atl-cta"><a class="atl-b p lg" href="#hesap">Ücretsiz hesap aç</a><button type="button" class="atl-b lg" data-a="atlKes" data-k="nasil">Platformu keşfet</button></div>
-      <div class="atl-note"><span>Giriş ücretsiz</span><span>Çözümlü ${fmtN(V.soru)} soru</span><span>${V.konu} konu</span></div>
+      <div class="atl-note"><span>Giriş ücretsiz</span></div>
     </div>
     <div>
       <div class="atl-core" id="atlCore"><span class="cap">Her nokta bir konu</span><canvas id="atlCv" role="img" aria-label="Konu haritası: ${V.reg.length} ders bölgesinde ${V.konu} konu. Bir noktanın üzerine gelince konu adı ve soru sayısı görünür."></canvas><div class="atl-tip" id="atlTip" aria-hidden="true"></div></div>
+      <p class="atl-harita-not">Her nokta bir konu, renkler dersleri gösterir. Bir noktaya gelince ya da dokununca konu adı ve soru sayısı açılır.</p>
       <div class="atl-leg" aria-label="Ders bölgeleri">${V.reg.map(r => `<button type="button" data-a="atlDers" data-k="${r.s[0]}" data-reg="${r.k}" style="--c:${r.c}"><i></i>${r.n}<small>${r.konular.length} konu</small></button>`).join("")}</div>
     </div>
   </div></section>

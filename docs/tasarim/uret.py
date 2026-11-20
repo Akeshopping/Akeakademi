@@ -18,6 +18,12 @@ raw=subprocess.check_output(['git','show',REF+':index.html'],cwd=W)
 CRLF=raw.count(b'\r\n')==raw.count(b'\n')
 src=raw.decode('utf8').replace('\r\n','\n')
 
+# ---- 0a. GÜVENLİK: taban zaten üretilmiş dosya ise dur (aksi hâlde tasarım iki kez uygulanır)
+_URETILMIS=[k for k in ('?v=ritim1','AKE Rakam','data-pal=') if k in src]
+if _URETILMIS:
+    sys.exit('HATA: taban '+REF+' zaten üretilmiş bir index.html içeriyor ('+', '.join(_URETILMIS)+'). '
+             'Tasarım iki kez uygulanmaz. Özgün tabanı verin: --base 870e057 (görsel yenilemeden önceki main).')
+
 # ---- 0. giriş/ilk kullanım + AI sohbet kaydırma yaması (taban: özgün main; diğer düzenlemelerden ÖNCE uygulanır)
 import tempfile,shutil
 def _yama(metin,yama):
@@ -149,7 +155,7 @@ def _stil_rgb(m):
     return m.group(1)+m.group(2).replace('rgba(217,79,67,','rgba(var(--coral-deco-rgb),').replace('rgba(242,125,109,','rgba(var(--coral-light-rgb),')+m.group(3)
 src=re.sub(r'(<style[^>]*>)(.*?)(</style>)',_stil_rgb,src,flags=re.S)
 src=src.replace('?v=cb84d327ff','?v=ritim1')
-for _f in ('jsedits_acilis.py','jsedits_renk.py','jsedits_video.py'):
+for _f in ('jsedits_acilis.py','jsedits_renk.py','jsedits_video.py','jsedits_tanitim.py','jsedits_studyo.py'):
     if (T/_f).exists(): exec((T/_f).read_text(encoding='utf8'))
 (W/A.out).write_bytes((src.replace('\n','\r\n') if CRLF else src).encode('utf8'))
 print('taban:',REF,'| mapped hex',stats['hex'],'rgba',stats['rgba'],'size',len(src))

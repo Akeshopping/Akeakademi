@@ -8209,6 +8209,7 @@ function studyoKocGiris(s, t) { if (!SUBJ[s]) return; studyoGirisCalistir(() => 
    Her yanlış KİMLİKLE ilgili dersin katalog havuzunda aranır; RUN'a KATALOGDAKİ cevapsız nesne girer (S.mistakes[].q — a/x/sv dâhil — KOPYALANMAZ). Katalogda olmayan, g:, AI (src), eski ya da görselli (fig) yanlışlar elenir ve sayısı bildirilir;
    yanlış KAYITLARI silinmez/değişmez. Hiç uygun soru yoksa RUN açılmaz. BANK/EKQ/AI/GENS dolgusu ve yerel kota/fallback YOK; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu (svAdaylar istisnası), kind="mistakes" korunur. KAPSAM DIŞI: vMistakes ve koç "Senin yanlışların" (cevaplı yerel gösterim). */
 function studyoMistCek(idler, baslik) {
+  if (!studyoGuvenliMi()) { toast("Güvenli mod kapandı; bekleyen yanlış tekrarı oturumu iptal edildi."); return; }   /* bekleme sırasında bayrak kapandıysa güvenli cfg sessizce yerel cfg'ye (studyoCfg işaretsiz döner) DÖNÜŞMEZ; 3C-4g benzer akışıyla aynı koruma */
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
   if (bankaDurum() !== "hazir") { bankaHazirDegil(); return; }
   const l = idler.map(id => [id, S.mistakes[id]]).filter(([, m]) => m && m.q);

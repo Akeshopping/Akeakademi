@@ -8109,6 +8109,7 @@ function studyoBaslat() {
 }
 /* güvenli çekirdek (#studyo "Teste başla" ve 3C-4a dış girişleri ortak): katalog hazır varsayılır; yine de eski RUN ve havuz yeniden denetlenir */
 function studyoCek(s, t, o) {
+  if (studyoKapaliIptal()) return;
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
   const f = {}; if (t) f.topic = t; if (o.d) f.diff = o.d;
   const r = stHavuzG(s, f); if (!r) { bankaHazirDegil(); return; }
@@ -8121,6 +8122,8 @@ function studyoCek(s, t, o) {
    Katalog henüz yüklenmemişse yükleme EYLEM SIRASINDA başlar; beklerken yerel RUN açılmaz. Yükleme/oturum/çıkış/hesap nesli her bekleyişten sonra denetlenir (geç yanıt yeni hesaba RUN açamaz). */
 function studyoGiris(s, t, o) { if (!SUBJ[s]) return; studyoGirisCalistir(() => studyoCek(s, t, o)); }
 /* 3C-4b: ortak giriş (yükleme/bekletme/çıkış/hesap-nesil koruması): ACT.topicStart, OZ_ACT.dersKarisik ve karma test aynı kapıdan geçer */
+/* 3C-4h: bayrak (AKE_KATALOG_STUDYO) bekleme sırasında kapandıysa güvenli çekirdek ÇALIŞMAZ; studyoCfg işaretsiz cfg döndüreceği için güvenli eylem sessizce yerel RUN'a DÖNÜŞMEZ */
+function studyoKapaliIptal() { if (studyoGuvenliMi()) return false; toast("Güvenli mod kapandı; bekleyen test oturumu iptal edildi."); return true; }
 function studyoGirisCalistir(calistir) {
   if (BK.cikis) { toast("Çıkış yapılıyor."); return; }
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski işaretsiz RUN: yükleme de başlatılmaz, değiştirme penceresi de açılmaz */
@@ -8131,6 +8134,7 @@ function studyoGirisCalistir(calistir) {
     const nesil = OT.nesil, sn = SV_N.n, kim = hesapKimlikAnahtar(HESAP.user);
     BK.sonra = () => {
       if (nesil !== OT.nesil || sn !== SV_N.n || BK.cikis || !HESAP.user || hesapKimlikAnahtar(HESAP.user) !== kim) return;   /* hesap/çıkış/nesil değişti: eski bekleyen eylem RUN açamaz */
+      if (studyoKapaliIptal()) return;   /* bayrak beklerken kapandı: bekleyen güvenli eylem iptal (tüm çağıranlar için ortak nokta) */
       if (bankaDurum() === "hazir") calistir(); else toast("Soru kataloğu yüklenemedi. Biraz sonra tekrar dene.");
     };
     if (BK.d === "bos") bankaYukle(false);
@@ -8142,6 +8146,7 @@ function studyoGirisCalistir(calistir) {
 /* 3C-4b: karma test (ACT.quick mix), bayrak AÇIKKEN: mixParts() ders/adet dağılımı korunur; her ders için KHAVUZ'dan önce taze, sonra eski sorular; eksik DOLDURULMAZ (BANK/EKQ/AI/GENS yok);
    eksik dersler açıkça bildirilir, toplam 0 ise RUN açılmaz; seçimden SONRA mevcut karma test karıştırması korunur; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu, yerel fallback/kota yok. */
 function studyoKarmaCek() {
+  if (studyoKapaliIptal()) return;
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
   const qs = [], eksik = [];
   for (const [s, n] of mixParts()) {
@@ -8159,6 +8164,7 @@ function studyoKarmaGiris() { studyoGirisCalistir(studyoKarmaCek); }
    toplam 0 ise RUN açılmaz; sınav modu + otomatik süre (ex.min · seçilen/tam; katalog tamsa mevcut yerel mini ile aynı); güvenli cfg (studyoGuvenli) → sunucu sınav oturumu zorunlu, yerel fallback/kota yok.
    Deneme merkezinden başlatılan tam/yarım/çeyrek/özel denemeler (startExamFromUI) DEĞİŞMEZ. */
 function studyoMiniCek() {
+  if (studyoKapaliIptal()) return;
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
   const E = UI.exam, type = E.type || defaultExam(), ex = EXAMS[type], rows = examRows(type), qs = [], secs = [], eksik = [], gor = new Set();
   for (const r of rows) {
@@ -8179,6 +8185,7 @@ function studyoMiniGiris() { studyoGirisCalistir(studyoMiniCek); }
    katalogdaki cevapsız nesneyle girer (S.mistakes[].q anlık görüntüsü KOPYALANMAZ); katalogda olmayan, g: ya da görselli eski yanlışlar elenir ve bildirilir. Konu yetmezse aynı dersten katalogla 10'a tamamlanır; yine yetmezse eksik sayıyla açılır ve bildirilir.
    BANK/EKQ/AI/GENS dolgusu ve yerel kota/fallback YOK; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu. KAPSAM DIŞI (DEĞİŞMEZ, cevaplı yerel kaynak): kocOrnekler ve mist* yolları. */
 function studyoKocCek(s, t) {
+  if (studyoKapaliIptal()) return;
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
   if (!SUBJ[s]) return;
   const hT = stHavuzG(s, { topic: t }), hS = stHavuzG(s, {}); if (!hT || !hS) { bankaHazirDegil(); return; }

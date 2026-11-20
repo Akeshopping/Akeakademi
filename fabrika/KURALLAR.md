@@ -26,4 +26,8 @@ Her soru turundan önce bu dosya okunur. Amaç: ÖSYM kalitesinde, özgün, doğ
 - Sayısal sorularda doğru şık ve açıklamadaki sayılar kodla hesaplanır; elle yazılmaz.
 - dogrula.mjs: 5 farklı şık, geçerli a/d/s, tekrar eden/çok benzeyen soru, şık uzunluğu yanlılığı, yasak şıklar, cevap konumu dağılımı, açıklama boş mu.
 - Sözel sorular (Türkçe, tarih, coğrafya, edebiyat, din, felsefe, İngilizce vb.) kodla doğrulanamaz: incelenecek.json listesine yazılır, öğretmen bakar.
-- Yapay zeka ile ikinci kontrol YOK (token tasarrufu). Her şey Alfa'nın onayından geçer.
+- Robot (yapay zeka) sorusu ASLA doğrudan canlı bankaya girmez. Akış: **taslak → kör model denetimi → inceleme kuyruğu → Alfa'nın yayım kararı** (`lib/fabrika.js`).
+- Kör denetçi yalnız soru metnini (varsa pasajı) ve 5 seçeneği görür; cevap anahtarı, çözüm ve üretici notu verilmez.
+- "Model kontrolünden geçti" ile "yayıma onaylandı" AYRI durumlardır. Hatalı (revizyon/ret), belirsiz, tekrarlı ya da denetimi tamamlanmamış soru yayımlanamaz; yayım şartı SQL'de (atomik) denetlenir.
+- Model kontrolü insan uzman onayı değildir. Yönetici yayım kararı da uzman onayı sayılmaz; uzman onayı sayısı ayrı raporlanır.
+- Sayısal doğrulama: model çıktısından kod çalıştırılmaz; güvenilir bağımsız doğrulama yoksa durum "yapılmadı" yazılır.

@@ -122,3 +122,12 @@ export function aiStub(sorular) {
   return { cagri, geriAl: () => { globalThis.fetch = orijinal; } };
 }
 export const sentetik = (i, ek = {}) => ({ p: "", q: `SENTETIK-SORU-${i}`, o: [0, 1, 2, 3, 4].map(k => `SENTETIK-SIK-${i}-${k}`), a: i % 5, x: `SENTETIK-COZUM-${i}`, ...ek });
+
+/* TEST YARDIMCISI: canlı bankada bir AI-kaynaklı satır gerektiren testler için. Üretimde böyle bir yol YOKTUR (soruYazKanonik 'onayli' yazmayı reddeder);
+   burada önce taslak yazılır, sonra yayımı taklit etmek için doğrudan SQL ile 'onayli' yapılır. */
+export async function canliYaz(env, aday, opt = {}) {
+  const { soruYazKanonik } = await import("../../lib/soru-yaz.js");
+  const r = await soruYazKanonik(env, aday, opt);
+  if (!opt.durum && r.id && (r.durum === "yazildi" || r.durum === "kopya")) env.DB.db.prepare("UPDATE soru SET durum = 'onayli' WHERE id = ?").run(r.id);
+  return r;
+}

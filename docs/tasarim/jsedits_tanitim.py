@@ -9,3 +9,11 @@ rep('''      <p class="atl-lead">Yapay zekâ destekli kişisel öğrenme deneyim
       <div class="atl-note"><span>Giriş ücretsiz</span></div>''', 1)
 rep('''<div class="atl-leg" aria-label="Ders bölgeleri">''', '''<p class="atl-harita-not">Her nokta bir konu, renkler dersleri gösterir. Bir noktaya gelince ya da dokununca konu adı ve soru sayısı açılır.</p>
       <div class="atl-leg" aria-label="Ders bölgeleri">''', 1)
+
+# Yıldız haritası: bölge adları (ör. EDEBİYAT) kutu dışına taşıp kırpılmasın; sığmıyorsa karşı tarafa alınır, o da sığmıyorsa kenara yaslanır.
+rep('''      const right = p[0] >= cx, x = right ? p[0] + 14 * DPR : p[0] - 14 * DPR;
+      ctx.textAlign = right ? "left" : "right";''', '''      let right = p[0] >= cx, x = right ? p[0] + 14 * DPR : p[0] - 14 * DPR;
+      { const pad = 6 * DPR, tw = ctx.measureText(lab).width, gap = 14 * DPR;
+        if (!right && x - tw < pad) { if (p[0] + gap + tw <= W - pad) { right = true; x = p[0] + gap; } else x = pad + tw; }
+        else if (right && x + tw > W - pad) { if (p[0] - gap - tw >= pad) { right = false; x = p[0] - gap; } else x = W - pad - tw; } }
+      ctx.textAlign = right ? "left" : "right";''', 1)

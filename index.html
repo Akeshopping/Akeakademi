@@ -12043,7 +12043,10 @@ const ATLAS = (function () {
     hubs.forEach((h, i) => {
       const p = P[h]; if (p[2] < -.35) return;
       const a = Math.min(1, (p[2] + .35) * 1.6) * (hiReg != null && hiReg !== i ? .35 : 1), lab = V.reg[i].n.toLocaleUpperCase("tr-TR");
-      const right = p[0] >= cx, x = right ? p[0] + 14 * DPR : p[0] - 14 * DPR;
+      let right = p[0] >= cx, x = right ? p[0] + 14 * DPR : p[0] - 14 * DPR;
+      { const pad = 6 * DPR, tw = ctx.measureText(lab).width, gap = 14 * DPR;
+        if (!right && x - tw < pad) { if (p[0] + gap + tw <= W - pad) { right = true; x = p[0] + gap; } else x = pad + tw; }
+        else if (right && x + tw > W - pad) { if (p[0] - gap - tw >= pad) { right = false; x = p[0] - gap; } else x = W - pad - tw; } }
       ctx.textAlign = right ? "left" : "right"; ctx.lineJoin = "round"; ctx.lineWidth = 4 * DPR; ctx.strokeStyle = col.bg; ctx.strokeText(lab, x, p[1]);
       ctx.fillStyle = rgba(ink, .92 * a); ctx.fillText(lab, x, p[1]);
     });

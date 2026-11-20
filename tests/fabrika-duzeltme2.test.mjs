@@ -7,10 +7,11 @@ import { readFileSync } from "node:fs";
 import { kur } from "./yardim/soru-v2.mjs";
 import { PILOT10 } from "./yardim/pilot10.mjs";
 import {
-  fabrikaSema, robotAyarla, pilotBaslat, isIsle, adaylar, yayimKarari, uretimIstemi, denetimIstemi,
+  fabrikaSema, robotAyarla, pilotBaslat, isIsle, adaylar, uretimIstemi, denetimIstemi,
   pasajDegerlendir, bicimSorunlari, benzerlikUyarilari, siklariKaristir, notEkle, notKapat, taslagiKuyrugaAl, fabrikaDurum
 } from "../lib/fabrika.js";
 import { soruYazKanonik } from "../lib/soru-yaz.js";
+import { yayimKarariUzmanli as yayimKarari } from "./yardim/uzman.mjs";   // yayım artık kayıtlı uzman kabulü ister; bu yardımcı önce sentetik kabul kaydeder
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", AKE_FABRIKA_GUNLUK_CAGRI: "500" } });
 const { DB, env } = T; await T.hazirla();
@@ -161,15 +162,15 @@ test("yayım kapısı: benzerlik uyarılı 'gecti' soru, açık kabul olmadan YA
   sifirla(); await fabrikaSema(env); const a = await gectiKaydi(PILOT10[1]), b = await gectiKaydi(PILOT10[7]);
   let r = await yayimKarari(env, [a], "yayin", "yonetici"); assert.equal(r.ok, false); assert.ok(r.hatalar.some(h => h.neden === "inceleme_uyarisi:benzerlik")); assert.equal(say("soru", "durum = 'onayli'"), 0);
   r = await yayimKarari(env, [a], "yayin", "yonetici", { uyariKabul: true }); assert.equal(r.ok, true);   // yönetici bilerek kabul eder
-  assert.equal(say("fabrika_soru", "yayim_durum = 'onayli'"), 1);   // sayaç yönetici kararıdır; insan UZMAN onayı sayacı ayrıdır ve artmaz
-  assert.equal((await fabrikaDurum(env)).sayilar.insan_onayli, 1); void b;
+  assert.equal(say("fabrika_soru", "yayim_durum = 'onayli'"), 1);   // sayaç yönetici kararıdır; uzman kabulü ayrı tabloda ve ayrı sayaçta (testteki kabul kaydı sentetiktir)
+  const sy = (await fabrikaDurum(env)).sayilar; assert.equal(sy.yonetici_yayimladi, 1); assert.ok(!("insan_onayli" in sy)); void b;
 });
 test("yayım kapısı: biçim hatası ve p etiketi uyarıyı kabul etsen bile ENGELLER (sert)", async () => {
   sifirla(); await fabrikaSema(env); const a = await gectiKaydi(PILOT10[9], "gecti"), b = await gectiKaydi(PILOT10[4], "gecti");
   const r = await yayimKarari(env, [a, b], "yayin", "yonetici", { uyariKabul: true }); assert.equal(r.ok, false);
   assert.ok(r.hatalar.some(h => h.id === a && h.neden === "inceleme_uyarisi:isaret_eksik")); assert.ok(r.hatalar.some(h => h.id === b && h.neden === "inceleme_uyarisi:p_pasaj_degil")); assert.equal(say("soru", "durum = 'onayli'"), 0);
 });
-test("uzman notu: açık 'uzman_bekliyor' notu varken yayım HİÇBİR bayrakla açılmaz; not kapanınca (kim+gerekçe) açılır", async () => {
+test("uzman notu: açık 'uzman_bekliyor' notu varken yayım HİÇBİR bayrakla açılmaz; not kapanınca (kim+gerekçe) yalnız not engeli kalkar (uzman kabulü ayrı kayıttır)", async () => {
   sifirla(); await fabrikaSema(env); const id = await gectiKaydi({ ...PILOT10[1], id: "ok-uzman-1" });
   DB.db.prepare("UPDATE fabrika_soru SET model_durum = 'gecti' WHERE soru_id = ?").run(id);
   const n = await notEkle(env, { soruId: id, tur: "uzman_bekliyor", mesaj: "E şıkkı kaside için de savunulabilir mi?", kim: "yonetici" }); assert.equal(n.ok, true);

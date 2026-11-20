@@ -4,7 +4,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
-import { fabrikaSema, robotAyarla, pilotBaslat, pilotDurdur, isIsle, fabrikaDurum, adaylar, yayimKarari, usdHesapla } from "../lib/fabrika.js";
+import { fabrikaSema, robotAyarla, pilotBaslat, pilotDurdur, isIsle, fabrikaDurum, adaylar, usdHesapla } from "../lib/fabrika.js";
+import { yayimKarariUzmanli as yayimKarari } from "./yardim/uzman.mjs";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", AKE_FABRIKA_GUNLUK_CAGRI: "500" } });
 const { DB, env } = T; await T.hazirla(); const yon = await T.giris("yonetici@ornek.com");

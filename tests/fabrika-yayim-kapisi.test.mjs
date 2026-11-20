@@ -45,7 +45,7 @@ test("eski soru-karar 'onay' taslağı yayımlayamaz (satır 'taslak' kalır)", 
 });
 
 test("soru-uret taslağı denetim hattına girer: fabrika kaydı + 'denetle' işi; model_durum 'bekliyor' olduğundan yayımlanamaz", async () => {
-  const { yayimKarari } = await import("../lib/fabrika.js");
+  const { yayimKarariUzmanli: yayimKarari } = await import("./yardim/uzman.mjs");
   temizle(); for (const t of ["fabrika_soru", "fabrika_is"]) { try { DB.db.exec("DELETE FROM " + t); } catch (e) { } }
   const r = await uret([sentetik(51), sentetik(52)]); assert.equal(r.s, 200);
   assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM fabrika_soru WHERE asama = 'denetim_bekliyor' AND model_durum = 'bekliyor' AND denetim_tam = 0").get().n, 2);

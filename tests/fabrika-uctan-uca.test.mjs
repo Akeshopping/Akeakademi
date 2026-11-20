@@ -30,12 +30,13 @@ test("uçtan uca: robot kapalı → aç → pilot → Worker turları → 10 ada
 
   const d = (await yon_("fabrika-durum", "GET")).j;
   assert.equal(d.sayilar.uretilen, 10); assert.equal(d.sayilar.model_gecti, 7); assert.equal(d.sayilar.revizyon, 3);   // kör denetçi 3 soruyu (8,9,10) farklı çözdü
-  assert.equal(d.sayilar.yayinda, 0); assert.equal(d.sayilar.insan_onayli, 0); assert.equal(d.pilot.durum, "bitti"); assert.equal(d.cagri.toplam, 20); assert.equal(ag, 20);
+  assert.equal(d.sayilar.yayinda, 0); assert.equal(d.sayilar.yonetici_yayimladi, 0); assert.equal(d.sayilar.uzman_kabul, 0); assert.equal(d.pilot.durum, "bitti"); assert.equal(d.cagri.toplam, 20); assert.equal(ag, 20);
   assert.equal(say("durum IN ('onayli','banka','bekliyor')"), 0); assert.equal(say("durum = 'taslak'"), 10);
   const m = (await yon_("maliyet", "GET")).j; assert.ok(m.fabrikaUsd > 0); assert.equal(m.fabrikaToken.giris, 4000);
 
   /* yönetici: revizyon gerekli olan yayımlanamaz; geçen yayımlanır */
   const a = (await yon_("fabrika-adaylar", "GET")).j.adaylar, kotu = a.find(x => x.model_durum === "revizyon"), iyi = a.find(x => x.model_durum === "gecti");
+  assert.equal((await yon_("fabrika-uzman", "POST", { soru_id: iyi.id, karar: "kabul", uzman_ad: "Test Uzmanı", brans: "Test branşı", gerekce: "Test için sentetik uzman kabulü kaydı.", tarih: new Date().toISOString().slice(0, 10) })).s, 200);   // uzman kabulü AYRI kayıt; yönetici yayımı ondan sonra
   assert.equal((await yon_("fabrika-karar", "POST", { id: [kotu.id], karar: "yayin" })).s, 409);
   assert.equal((await yon_("fabrika-karar", "POST", { id: [iyi.id], karar: "yayin" })).s, 200);
   assert.equal(say("durum = 'onayli'"), 1);
@@ -44,6 +45,6 @@ test("uçtan uca: robot kapalı → aç → pilot → Worker turları → 10 ada
   const sorular = await import("../functions/api/sorular.js");
   const j = await (await sorular.onRequest({ request: new Request("https://akeakademi.com/api/sorular"), env: T.env })).json(); const L = Array.isArray(j) ? j : (j.sorular || []);
   assert.deepEqual(L.map(q => q.id), [iyi.id]);
-  const d2 = (await yon_("fabrika-durum", "GET")).j; assert.equal(d2.sayilar.model_gecti, 7); assert.equal(d2.sayilar.insan_onayli, 1);
+  const d2 = (await yon_("fabrika-durum", "GET")).j; assert.equal(d2.sayilar.model_gecti, 7); assert.equal(d2.sayilar.yonetici_yayimladi, 1);
   console.log("# UÇTAN UCA ÖZET:", JSON.stringify({ uretilen: d2.sayilar.uretilen, model_gecti: d2.sayilar.model_gecti, revizyon: d2.sayilar.revizyon, yayinda: d2.sayilar.yayinda, ogrenciye_gorunen: L.length, model_cagrisi: d2.cagri.toplam, token: [d2.cagri.giris, d2.cagri.cikis], sayisal: d2.sayisalDogrulama }));
 });

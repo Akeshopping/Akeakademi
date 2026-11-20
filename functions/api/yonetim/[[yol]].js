@@ -14,7 +14,7 @@
 //   POST fabrika-not {soru_id, tur:"uzman_bekliyor", mesaj} | {not_id, kapat:true, gerekce}   (inceleme notu; soru kaydına dokunmaz)
 //   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
-import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam, notEkle, notKapat } from "../../../lib/fabrika.js";
+import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam, notEkle, notKapat, uzmanKarari } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -191,6 +191,11 @@ export async function onRequest({ request, env, params }) {
       const b = await gov();
       const r = b.kapat === true ? await notKapat(env, { notId: b.not_id, kim: u.eposta, gerekce: b.gerekce }) : await notEkle(env, { soruId: b.soru_id, tur: b.tur, mesaj: b.mesaj, kim: u.eposta });
       return r.ok ? json(200, r) : fail(400, r.neden, "Not işlenemedi: " + r.neden);
+    }
+    if (ad === "fabrika-uzman" && m === "POST") {   // branş uzmanı kararı KAYDI: yönetici beyanı; kaydeden = oturumdaki yönetici (istemci değeri alınmaz)
+      const b = await gov();
+      const r = await uzmanKarari(env, { soruId: b.soru_id, karar: b.karar, uzmanAd: b.uzman_ad, brans: b.brans, gerekce: b.gerekce, tarih: b.tarih, kaydeden: u.eposta });
+      return r.ok ? json(200, r) : fail(r.neden === "uzman_reddetmis" || r.neden === "karar_verilmis" ? 409 : 400, r.neden, "Uzman kararı kaydedilemedi: " + r.neden);
     }
     if (ad === "fabrika-karar" && m === "POST") {
       const b = await gov();

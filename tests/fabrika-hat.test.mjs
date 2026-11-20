@@ -3,7 +3,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
-import { fabrikaSema, robotAyarla, pilotBaslat, pilotDurdur, isIsle, fabrikaDurum, adaylar, yayimKarari, PILOT_AZAMI } from "../lib/fabrika.js";
+import { fabrikaSema, robotAyarla, pilotBaslat, pilotDurdur, isIsle, fabrikaDurum, adaylar, PILOT_AZAMI } from "../lib/fabrika.js";
+import { yayimKarariUzmanli as yayimKarari } from "./yardim/uzman.mjs";
 import { soruOnayla } from "../lib/soru-yaz.js";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", AKE_FABRIKA_GUNLUK_CAGRI: "500" } });
@@ -48,7 +49,7 @@ test("uçtan uca: 10 soru taslak → kör denetim → inceleme; HİÇBİRİ canl
   sifirla(); await fabrikaSema(env); await robotAyarla(env, true); await pilotBaslat(env, {});
   const f = sahte(); await calistir(f);
   const d = await fabrikaDurum(env);
-  assert.equal(d.sayilar.uretilen, 10); assert.equal(d.sayilar.model_gecti, 10); assert.equal(d.sayilar.yayinda, 0); assert.equal(d.sayilar.insan_onayli, 0);
+  assert.equal(d.sayilar.uretilen, 10); assert.equal(d.sayilar.model_gecti, 10); assert.equal(d.sayilar.yayinda, 0); assert.equal(d.sayilar.yonetici_yayimladi, 0); assert.equal(d.sayilar.uzman_kabul, 0);
   assert.equal(say("soru", "durum IN ('onayli','banka','bekliyor')"), 0); assert.equal(say("soru", "durum = 'taslak'"), 10);
   assert.equal(say("fabrika_soru", "asama = 'inceleme' AND model_durum = 'gecti' AND denetim_tam = 1 AND sayisal = 'yapilmadi'"), 10);
   /* çağrı kaydı: model, token, süre, hata alanı, soru sürümü */
@@ -109,7 +110,7 @@ test("yönetici yayım kararı: yalnız denetimi geçen soru canlıya geçer; ö
   const r = await yayimKarari(env, [ids[0]], "yayin", "yonetici@ornek.com"); assert.equal(r.ok, true, JSON.stringify(r));
   assert.equal(DB.db.prepare("SELECT durum FROM soru WHERE id = ?").get(ids[0]).durum, "onayli");
   assert.equal(say("soru", "durum = 'onayli'"), 1); assert.equal(say("soru", "durum = 'taslak'"), 2);
-  const d = await fabrikaDurum(env); assert.equal(d.sayilar.model_gecti, 3); assert.equal(d.sayilar.yayinda, 1); assert.equal(d.sayilar.insan_onayli, 1);
+  const d = await fabrikaDurum(env); assert.equal(d.sayilar.model_gecti, 3); assert.equal(d.sayilar.yayinda, 1); assert.equal(d.sayilar.yonetici_yayimladi, 1);
   assert.equal(DB.db.prepare("SELECT yayim_durum, yayim_kim FROM fabrika_soru WHERE soru_id = ?").get(ids[0]).yayim_kim, "yonetici@ornek.com");
   const red = await yayimKarari(env, [ids[1]], "red", "yonetici@ornek.com"); assert.equal(red.ok, true); assert.equal(DB.db.prepare("SELECT durum FROM soru WHERE id = ?").get(ids[1]).durum, "red");
 });
@@ -154,10 +155,11 @@ test("yönetim uçları: anonim/öğrenci 403; yönetici durum+aday+çağrı gö
   for (const [yol, m] of [["fabrika-durum", "GET"], ["fabrika-adaylar", "GET"], ["fabrika-cagrilar", "GET"], ["fabrika-pilot-baslat", "POST"], ["fabrika-pilot-durdur", "POST"], ["fabrika-robot", "POST"], ["fabrika-karar", "POST"]]) {
     assert.equal((await yonetimIstek(T, yol, { m })).s, 403, yol + " anonim"); assert.equal((await yonetimIstek(T, yol, { m, cookie: ogr.cookie })).s, 403, yol + " öğrenci");
   }
-  const d = await yonetimIstek(T, "fabrika-durum", { m: "GET", cookie: yon.cookie }); assert.equal(d.s, 200); assert.equal(d.j.sayilar.model_gecti, 2); assert.equal(d.j.sayilar.insan_onayli, 0);
+  const d = await yonetimIstek(T, "fabrika-durum", { m: "GET", cookie: yon.cookie }); assert.equal(d.s, 200); assert.equal(d.j.sayilar.model_gecti, 2); assert.equal(d.j.sayilar.yonetici_yayimladi, 0);
   const a = await yonetimIstek(T, "fabrika-adaylar", { m: "GET", cookie: yon.cookie }); assert.equal(a.s, 200); assert.equal(a.j.adaylar.length, 2); assert.ok(a.j.adaylar[0].q && Array.isArray(a.j.adaylar[0].o) && a.j.adaylar[0].model_durum === "gecti");
   const c = await yonetimIstek(T, "fabrika-cagrilar", { m: "GET", cookie: yon.cookie }); assert.equal(c.j.cagrilar.length, 4);
   const mal = await yonetimIstek(T, "maliyet", { m: "GET", cookie: yon.cookie }); assert.ok(mal.j.kaynak.fabrika > 0, "fabrika USD 0 gösterildi"); assert.ok(mal.j.fabrikaUsd > 0);
+  assert.equal((await yonetimIstek(T, "fabrika-uzman", { cookie: yon.cookie, govde: { soru_id: a.j.adaylar[0].id, karar: "kabul", uzman_ad: "Test Uzmanı", brans: "Test branşı", gerekce: "Test için sentetik uzman kabulü kaydı.", tarih: new Date().toISOString().slice(0, 10) } })).s, 200);
   const k = await yonetimIstek(T, "fabrika-karar", { cookie: yon.cookie, govde: { id: [a.j.adaylar[0].id], karar: "yayin" } }); assert.equal(k.s, 200); assert.equal(say("soru", "durum = 'onayli'"), 1);
   const bad = await yonetimIstek(T, "fabrika-karar", { cookie: yon.cookie, govde: { id: ["yok-id"], karar: "yayin" } }); assert.equal(bad.s, 409);
 });

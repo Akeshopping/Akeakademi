@@ -10263,26 +10263,30 @@ async function fabrikaYukle() {
   clearTimeout(FAB.zaman); if (FAB.veri && FAB.veri.pilot && FAB.veri.pilot.durum === "calisiyor") FAB.zaman = setTimeout(fabrikaYukle, 15000);   // pilot sürerken 15 sn'de bir tazele
   render();
 }
-const FAB_MODEL = { gecti: ["ok", "Model kontrolünden geçti"], revizyon: ["bad", "Revizyon gerekli"], ret: ["bad", "Ret önerisi"], belirsiz: ["bad", "Belirsiz"], bekliyor: ["", "Denetim bekliyor"] };
+const FAB_MODEL = { gecti: ["ok", "Modelden geçti"], revizyon: ["bad", "Revizyon gerekli"], ret: ["bad", "Ret önerisi"], belirsiz: ["bad", "Belirsiz"], bekliyor: ["", "Denetim bekliyor"] };
+const FAB_UZMAN = { kabul: ["ok", "Uzman kabul etti"], red: ["bad", "Uzman reddetti"], yok: ["", "Uzman kararı bekleniyor"] };
 function fabAdayKart(q) {
-  const [c, l] = FAB_MODEL[q.model_durum] || ["", q.model_durum], uyarilar = q.uyarilar || [], notlar = (q.notlar || []).filter(n => n.durum === "acik"), engel = uyarilar.length > 0 || notlar.length > 0,
-    yayimlanabilir = q.model_durum === "gecti" && q.denetim_tam === 1 && !q.tekrar && !engel, den = q.denetim || {};
+  const [c, l0] = FAB_MODEL[q.model_durum] || ["", q.model_durum], l = q.model_durum === "gecti" ? "Modelden geçti" : l0, uz = q.uzman || { durum: "yok" }, [uc, ul] = FAB_UZMAN[uz.durum] || FAB_UZMAN.yok, uyarilar = q.uyarilar || [], notlar = (q.notlar || []).filter(n => n.durum === "acik"), engel = uyarilar.length > 0 || notlar.length > 0,
+    yayimlanabilir = q.model_durum === "gecti" && q.denetim_tam === 1 && !q.tekrar && !engel && uz.durum === "kabul", den = q.denetim || {};
   return `<div class="card sunk stack" style="gap:8px"><div class="small muted">${esc(SUBJ[q.s] ? SUBJ[q.s].n : q.s)} · ${esc(q.t)} · ${DIFF[q.d] || ""} · sürüm ${q.surum}</div>
-    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${c}">${l}</span>${q.denetim_tam ? "" : `<span class="pill bad">Denetim tamamlanmadı</span>`}${q.tekrar ? `<span class="pill bad">Tekrar</span>` : ""}<span class="pill">Sayısal doğrulama: ${q.sayisal === "yapilmadi" ? "yapılmadı" : esc(q.sayisal)}</span></div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill ${c}">${l}</span><span class="pill ${uc}">${ul}</span><span class="pill">Yayımlandı: hayır</span>${q.denetim_tam ? "" : `<span class="pill bad">Denetim tamamlanmadı</span>`}${q.tekrar ? `<span class="pill bad">Tekrar</span>` : ""}<span class="pill">Sayısal doğrulama: ${q.sayisal === "yapilmadi" ? "yapılmadı" : esc(q.sayisal)}</span></div>
     ${q.p ? `<div class="passage">${fq(q.p)}</div>` : ""}<b>${fq(q.q || "")}</b>
     <ol type="A" style="margin:0;padding-left:22px">${(q.o || []).map((o, i) => `<li style="${i === q.a ? "color:var(--ok);font-weight:700" : ""}">${fq(o)}${i === q.a ? " ✓ (üretici anahtarı)" : ""}${den.cevap === i ? " ◀ kör denetçinin seçimi" : ""}</li>`).join("")}</ol>
     <p class="small">${fq(q.x || "")}</p>
     ${(den.sorun_turleri || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorun_turleri.map(x => `[${esc(x.tur)}/${esc(x.agirlik)}${x.kaynak === "kural" ? "/kural" : ""}] ${esc(x.metin)}`).join(" · ")}</p>` : (den.sorunlar || []).length ? `<p class="small" style="color:var(--bad)">Denetçi notları: ${den.sorunlar.map(esc).join(" · ")}</p>` : ""}
     ${uyarilar.length ? `<div class="small" style="color:var(--bad)"><b>İnceleme uyarısı</b> (otomatik; soru silinmedi, özgünlük doğrulanmadı):<ul style="margin:2px 0 0;padding-left:18px">${uyarilar.map(u => `<li>[${esc(u.tur)}] ${esc(u.mesaj)}</li>`).join("")}</ul></div>` : ""}
     ${notlar.length ? `<div class="small" style="color:var(--bad)"><b>Uzman kararı bekliyor:</b> ${notlar.map(n => esc(n.mesaj)).join(" · ")}</div>` : ""}
-    <div class="row"><button class="btn sm pri" data-a="fabYayin" data-id="${esc(q.id)}"${yayimlanabilir && !FAB.busy ? "" : " disabled"} title="${yayimlanabilir ? "" : "Yalnızca model denetiminden tam geçen, tekrar olmayan, uyarısı ve açık uzman notu olmayan soru yayımlanabilir"}">Yayımla</button><button class="btn sm ghost" data-a="fabRed" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Reddet</button></div></div>`;
+    ${uz.durum === "yok" ? `<div class="stack" style="gap:4px"><div class="small"><b>Branş uzmanı kararı</b> (uzmanın kendi beyanı; kimliği doğrulanmaz, kaydı sen yaparsın):</div>
+      <input class="inp" data-uz="ad-${esc(q.id)}" placeholder="Uzmanın adı soyadı"><input class="inp" data-uz="br-${esc(q.id)}" placeholder="Branşı (ör. Matematik öğretmeni)"><input class="inp" data-uz="tr-${esc(q.id)}" type="date"><textarea class="inp" data-uz="ge-${esc(q.id)}" rows="2" placeholder="Gerekçe (en az 15 karakter)"></textarea>
+      <div class="row"><button class="btn sm" data-a="fabUzman" data-karar="kabul" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Uzman kabul etti olarak kaydet</button><button class="btn sm ghost" data-a="fabUzman" data-karar="red" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Uzman reddetti olarak kaydet</button></div></div>` : `<div class="small">${uz.durum === "kabul" ? "Uzman kabul etti" : "Uzman reddetti"}: ${esc(uz.uzman_ad)} (${esc(uz.brans)}) · ${new Date(uz.tarih).toLocaleDateString("tr-TR")} · ${esc(uz.gerekce)} · kaydeden: ${esc(uz.kaydeden)}</div>`}
+    <div class="row"><button class="btn sm pri" data-a="fabYayin" data-id="${esc(q.id)}"${yayimlanabilir && !FAB.busy ? "" : " disabled"} title="${yayimlanabilir ? "" : "Yayım için: modelden geçmiş + kayıtlı uzman kabulü + uyarı/açık uzman notu yok"}">Yönetici olarak yayımla</button><button class="btn sm ghost" data-a="fabRed" data-id="${esc(q.id)}"${FAB.busy ? " disabled" : ""}>Reddet</button></div></div>`;
 }
 function fabrikaBolumu() {
   if (!FAB.veri && !FAB.err) { setTimeout(fabrikaYukle, 0); return `<div class="card"><h2>Soru Fabrikası robotu</h2><div class="empty">Yükleniyor…</div></div>`; }
   const V = FAB.veri || { sayilar: {}, cagri: {}, kuyruk: {} }, S = V.sayilar, P = V.pilot, calisiyor = P && P.durum === "calisiyor";
   const cg = (FAB.cagrilar || []).slice(0, 15), n = x => (x || 0).toLocaleString("tr-TR");
   return `<div class="card stack"><div class="card-h" style="margin:0"><h2>Soru Fabrikası robotu</h2><span class="pill ${V.robot ? "ok" : ""}">${V.robot ? "Robot AÇIK" : "Robot KAPALI"}</span></div>
-    <p class="small muted">Akış: taslak → kör model denetimi → inceleme kuyruğu → senin yayım kararın. <b>Hiçbir robot sorusu doğrudan canlı bankaya girmez.</b> "Model kontrolünden geçti" yayıma onay değildir; yayım yalnız aşağıdaki "Yayımla" düğmesiyle olur. İnsan uzman onayı sayısı ayrıdır ve bu ekrandan artmaz.</p>
+    <p class="small muted">Akış: taslak → kör model denetimi → inceleme kuyruğu → senin yayım kararın. <b>Hiçbir robot sorusu doğrudan canlı bankaya girmez.</b> "Modelden geçti", "Uzman kabul etti" ve "Yayımlandı" üç AYRI kayıttır. Yayım için modelden geçmek yetmez: kayıtlı bir uzman kabulü de gerekir (veritabanı bunu zorlar). Uzman kabulü yalnızca aşağıdan; uzman adı, branş, tarih ve gerekçeyle kaydedilir.</p>
     ${FAB.err ? `<p class="small" style="color:var(--bad)">${esc(FAB.err)}</p>` : ""}
     <div class="row" style="gap:8px;flex-wrap:wrap">
       <button class="btn sm${V.robot ? " ghost" : ""}" data-a="fabRobot" data-acik="${V.robot ? "0" : "1"}"${FAB.busy ? " disabled" : ""}>${V.robot ? "Robotu kapat" : "Robotu aç"}</button>
@@ -10290,8 +10294,8 @@ function fabrikaBolumu() {
       <button class="btn sm ghost" data-a="fabPilotDurdur"${!calisiyor || FAB.busy ? " disabled" : ""}>Pilotu durdur</button>
       <button class="btn sm ghost" data-a="fabYenile">Yenile</button></div>
     <p class="small muted">Pilot: ${P ? `${esc(P.durum)} · hedef ${P.hedef} soru` : "henüz başlatılmadı"} · kuyruk: ${n(V.kuyruk.bekliyor)} bekliyor, ${n(V.kuyruk.calisiyor)} çalışıyor, ${n(V.kuyruk.olu)} başarısız, ${n(V.kuyruk.iptal)} iptal. Üretimi ayrı Worker yapar; robot kapalıyken hiçbir model çağrısı olmaz.${P && P.durum === "durdu" ? " Pilot durduruldu: sırada bekleyen işler iptal edildi." : ""}${V.kuyruk.calisiyor ? ` <b>${n(V.kuyruk.calisiyor)} işin model yanıtı beklenen durumda (çağrı zaten gitti, iptal edilemez).</b>` : ""} Günlük model çağrısı: ${n(V.gunlukCagri)}/${n(V.gunlukLimit)}.</p>
-    <div class="tiles">${tile(S.uretilen || 0, "üretilen")}${tile(S.model_gecti || 0, "model denetiminden geçti")}${tile(S.insan_onayli || 0, "yönetici yayım kararı")}${tile(0, "insan uzman onayı")}</div>
-    <p class="small muted">Revizyon gerekli: ${n(S.revizyon)} · Ret önerisi: ${n(S.ret)} · Belirsiz: ${n(S.belirsiz)} · Denetimi tamamlanmayan: ${n(S.denetim_eksik)} · Tekrar: ${n(S.tekrar)} · Reddedilen: ${n(S.red)}. Sayısal doğrulama: <b>yapılmadı</b> (model çıktısından kod çalıştırılmaz).</p>
+    <div class="tiles">${tile(S.uretilen || 0, "üretilen")}${tile(S.model_gecti || 0, "modelden geçti")}${tile(S.uzman_kabul || 0, "uzman kabul etti")}${tile(S.yonetici_yayimladi || 0, "yayımlandı (yönetici yayımladı)")}</div>
+    <p class="small muted">Revizyon gerekli: ${n(S.revizyon)} · Ret önerisi: ${n(S.ret)} · Belirsiz: ${n(S.belirsiz)} · Denetimi tamamlanmayan: ${n(S.denetim_eksik)} · Tekrar: ${n(S.tekrar)} · Uzman reddetti: ${n(S.uzman_red)} · Yönetici reddetti: ${n(S.red)}. Sayısal doğrulama: <b>yapılmadı</b> (model çıktısından kod çalıştırılmaz).</p>
     <p class="small muted">Robot çağrıları: ${n(V.cagri.toplam)} (hatalı ${n(V.cagri.hata)}) · ${n(V.cagri.giris)} giriş / ${n(V.cagri.cikis)} çıkış token · ${V.cagri.toplam && V.cagri.fiyatsizCagri === V.cagri.toplam ? "USD hesaplanamadı" : "liste fiyatıyla ≈ $" + (V.cagri.usd || 0).toFixed(4)} (kayıtlı token × fiyat; gerçek fatura Anthropic panelindedir).${V.cagri.fiyatsizCagri ? ` <b>${V.cagri.fiyatsizCagri} çağrının modeli fiyatı bilinmeyen (${(V.cagri.fiyatsizModeller || []).map(esc).join(", ")}); USD'ye dahil değil, fiyat uydurulmaz.</b>` : ""}</p>
     <p class="small muted"><b>Durdurma nasıl çalışır:</b> "Pilotu durdur" bekleyen işleri iptal eder ve yeni model çağrısı başlatmaz. O sırada model yanıtı beklenen işler iptal edilemez; yanıt gelirse kaydedilir (çağrı günlüğünde ve giderde görünür) ama yeni denetim başlatılmaz. Böyle bir soru "Denetim bekliyor" olarak aşağıda listelenir, yayımlanamaz; yalnızca reddedebilirsin. Hata ile dönen iş yeniden denenmez.</p>
     <h3 style="margin:8px 0 0">İnceleme kuyruğu (${(FAB.adaylar || []).length})</h3>
@@ -10310,6 +10314,8 @@ Object.assign(OZ_ACT, {
   fabRobot(d) { return fabEylem("robot", "fabrika-robot", { acik: d.acik === "1" }, d.acik === "1" ? "Robot açıldı." : "Robot kapatıldı."); },
   fabPilotBaslat() { return fabEylem("pilot", "fabrika-pilot-baslat", {}, "Pilot başlatıldı."); },
   fabPilotDurdur() { return fabEylem("pilot", "fabrika-pilot-durdur", {}, "Pilot durduruldu."); },
+  fabUzman(d) { const g = k => (document.querySelector(`[data-uz="${k}-${CSS.escape(d.id)}"]`) || {}).value || "";
+    return fabEylem("uzman", "fabrika-uzman", { soru_id: d.id, karar: d.karar, uzman_ad: g("ad"), brans: g("br"), tarih: g("tr"), gerekce: g("ge") }, d.karar === "kabul" ? "Uzman kabulü kaydedildi." : "Uzman reddi kaydedildi."); },
   fabYayin(d) { return fabEylem("karar", "fabrika-karar", { id: [d.id], karar: "yayin" }, "Soru yayımlandı."); },
   fabRed(d) { return fabEylem("karar", "fabrika-karar", { id: [d.id], karar: "red" }, "Soru reddedildi."); }
 });

@@ -21,7 +21,7 @@ test("tarayıcı kodu yalnız /api/yonetim/fabrika-* çağırır; model, anahtar
 });
 test("panel işlevleri: başlat, durdur, ilerleme, aday inceleme, yayım/red, çağrı günlüğü; model-geçti ile yayım ayrı etiketli", () => {
   for (const a of ["fabPilotBaslat", "fabPilotDurdur", "fabYayin", "fabRed", "fabRobot", "fabYenile"]) assert.ok(ui.includes(a), a);
-  assert.match(ui, /Model kontrolünden geçti/); assert.match(ui, /yönetici yayım kararı/); assert.match(ui, /insan uzman onayı/); assert.match(ui, /yapılmadı/);
+  assert.match(ui, /Modelden geçti/); assert.match(ui, /yönetici yayımladı/); assert.match(ui, /Uzman kabul etti/); assert.match(ui, /yapılmadı/);
   assert.match(ui, /disabled/); assert.match(ui, /yayimlanabilir/);   // Yayımla düğmesi şart sağlanmazsa pasif
 });
 test("maliyet kartı robot giderini ayrı satırda gösterir (sıfır varsayımı yok)", () => {

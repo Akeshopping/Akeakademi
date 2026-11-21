@@ -1,0 +1,71 @@
+:root{
+  /* ============================================================
+     AKE RİTMİ — tasarım token'ları (tek kaynak)
+     Açık tema hedef oranı: ~%60 sıcak zemin · ~%30 koyu mürekkep · ~%10 mercan
+     ============================================================ */
+  /* sabit sabitler (temadan etkilenmez) */
+  --porcelain-fixed:#F8F5F0; --ink-fixed:#28232C; --ink-lift:#3A3340;
+  --on-dark:#F8F5F0; --on-dark-2:#D2CAD4; --on-dark-3:#B3AAB8;
+  --d-card:#322C37; --d-sunk:#2F2933; --white:#FFFFFF;
+  /* yüzeyler */
+  --paper:#F8F5F0; --card:#FFFFFF; --sunk:#F0EBE3; --raised:#FFFFFF;
+  /* metin */
+  --ink:#28232C; --ink2:#5C5560; --ink3:#6B6370;
+  /* sınırlar: --line süs ayırıcı, --line-strong form kontrolü (>=3:1) */
+  --line:#E8E1D9; --line2:#F0EBE3; --line-strong:#8A8290;
+  /* marka mercanı */
+  --coral:#B73F36; --coral-hover:#A0352D; --coral-deco:#D94F43; --coral-light:#F27D6D;
+  --coral-soft:#F9E5E1; --coral-ink:#B73F36; --on-coral:#FFFFFF; --coral-pale:#FAD6D0;
+  --coral-deco-rgb:217,79,67; --coral-light-rgb:242,125,109; --ink-rgb:40,35,44;
+  /* durum renkleri: hata mercanla karışmasın diye ayrı (ahududu) tonda */
+  --ok:#54745F; --ok-ink:#476650; --ok-soft:#E6EEE8;
+  --bad:#9E1B4B; --bad-soft:#FBE9EE;
+  --warn:#7A4300; --warn-soft:#FBEBD6;
+  /* ders etiketi renkleri (metin / açık zemin) */
+  --s-tr:#7B4A9B;  --s-tr-bg:#F2EDF5;
+  --s-mat:#2F5FA7; --s-mat-bg:#EAEFF6;
+  --s-fen:#17717A; --s-fen-bg:#E8F1F2;
+  --s-sos:#7C5A0B; --s-sos-bg:#F2EEE7;
+  --s-dil:#A33C73; --s-dil-bg:#F6ECF1;
+  /* eski ad uyumluluğu (mevcut kurallar bu adları kullanır) */
+  --form:var(--coral); --form-ink:var(--coral-ink); --form-soft:var(--coral-soft); --brand:var(--coral);
+  --c1:var(--coral); --c2:var(--coral-deco); --c3:var(--ok);
+  --grad:linear-gradient(var(--coral),var(--coral));
+  --wm:linear-gradient(180deg,#3A3340 0%,#28232C 100%);
+  --gold:var(--coral-deco); --gold-ink:var(--coral-ink); --navy:var(--ink-fixed); --ocean:var(--ink-lift); --ivory:var(--porcelain-fixed);
+  --pencil:#28232C; --on-ink:#F8F5F0; --on-pri:#FFFFFF;
+  /* cam/üst çubuk */
+  --glass:rgba(255,255,255,.94); --glass-line:rgba(40,35,44,.08); --top-bg:rgba(40,35,44,.96);
+  /* tipografi */
+  --f-disp:"AKE Rakam","AKE Sans","Atkinson Hyperlegible Next","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-body:"AKE Rakam","AKE Sans","Atkinson Hyperlegible Next","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"AKE Rakam","AKE Sans",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-serif:"AKE Serif","Newsreader",Georgia,"Times New Roman",serif;
+  /* şekil, hareket */
+  --r:12px; --r-s:8px;
+  --ease:cubic-bezier(.2,.7,.2,1); --t-btn:160ms; --t-card:240ms; --t-page:320ms;
+  --shadow:0 1px 2px rgba(40,35,44,.05),0 10px 28px -18px rgba(40,35,44,.28);
+  --aura:radial-gradient(60vmax 40vmax at 104% -6%,rgba(217,79,67,.06),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(40,35,44,.04),transparent 62%);
+}
+
+:root[data-theme="dark"]{
+  --paper:#1E1A21; --card:#28232C; --sunk:#221D26; --raised:#322C37;
+  --ink:#F8F5F0; --ink2:#D2CAD4; --ink3:#B3AAB8;
+  --line:#3C3541; --line2:#2F2933; --line-strong:#8B8290;
+  --coral:#F27D6D; --coral-hover:#F59487; --coral-deco:#F27D6D; --coral-light:#F27D6D;
+  --coral-soft:rgba(242,125,109,.14); --coral-ink:#F27D6D; --on-coral:#28232C;
+  --ok:#8FBF9F; --ok-ink:#8FBF9F; --ok-soft:rgba(143,191,159,.14);
+  --bad:#F28AA8; --bad-soft:rgba(242,138,168,.14);
+  --warn:#E8B65A; --warn-soft:rgba(232,182,90,.14);
+  --s-tr:#C79BE0;  --s-tr-bg:#413649;
+  --s-mat:#8FB4F0; --s-mat-bg:#383A4B;
+  --s-fen:#5FC4CC; --s-fen-bg:#313D46;
+  --s-sos:#E0B050; --s-sos-bg:#453A32;
+  --s-dil:#EE8FBF; --s-dil-bg:#483444;
+  --grad:linear-gradient(var(--coral),var(--coral));
+  --wm:linear-gradient(180deg,#F8F5F0 0%,#D2CAD4 100%);
+  --pencil:#E9E3EA; --on-ink:#28232C; --on-pri:#28232C;
+  --glass:rgba(40,35,44,.94); --glass-line:rgba(248,245,240,.08); --top-bg:rgba(30,26,33,.92);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 32px -18px rgba(0,0,0,.7);
+  --aura:radial-gradient(60vmax 40vmax at 104% -6%,rgba(242,125,109,.07),transparent 62%),radial-gradient(55vmax 40vmax at -10% 106%,rgba(248,245,240,.03),transparent 62%);
+  color-scheme:dark}

@@ -1,0 +1,162 @@
+From 010494961e2907d01f18d0226c9aa6fd664065e5 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Fri, 20 Nov 2026 11:13:09 +0000
+Subject: [PATCH] fix: make sign-in discoverable and follow AI replies
+
+---
+ index.html | 50 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
+
+diff --git a/index.html b/index.html
+index 345d21a..eebc9d2 100644
+--- a/index.html
++++ b/index.html
+@@ -436,7 +436,7 @@ code.kod{font:700 14px/1 var(--f-mono);letter-spacing:.14em;background:var(--for
+ .kod-in{max-width:160px;font-size:20px;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums}
+ .hesap-btn{padding:4px}
+ .giris-btn svg{width:17px;height:17px}
+-@media (max-width:440px){.giris-btn span{display:none}.giris-btn{padding:6px 8px}.top-in{gap:8px}}
++@media (max-width:440px){.giris-btn{padding:7px 10px}.top-in{gap:8px}.top-in .save .lbl,.top-in .chip-cd span{display:none}}
+ .hesap-btn .av{width:28px;height:28px;border-radius:50%;background:var(--form);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+ /* ---------- AKE krom görünüm: arka plan, giriş, logo, rozet yıldızı ---------- */
+ #krom-bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block}
+@@ -632,6 +632,7 @@ main.adm-main{padding-block:18px calc(48px + env(safe-area-inset-bottom,0px))}
+ /* ---- dar ekran güvenliği: giriş düğmesi ve sayaç logo yazısının üstüne binmesin ---- */
+ .brand{flex:0 1 auto;overflow:hidden}.top-in>.giris-btn,.top-in>.tema-btn,.top-in>.chip-cd{flex-shrink:0}
+ @media (max-width:350px){.brand .wm span{display:none}}
++@media (max-width:360px){.top-in .brand .wm,.top-in .tema-btn{display:none}}
+ .hak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+ .veri-uyari{display:flex;gap:12px;align-items:flex-start}
+ 
+@@ -8066,7 +8067,7 @@ function vProgress() {
+     <div class="card"><h2 style="margin-bottom:10px">Ders bazında doğruluk</h2>${subs.length ? subs.map(x => `<div class="hbar"><span>${esc(SUBJ[x.s].n)}</span><span class="tr"><i style="width:${x.acc}%;background:${x.acc >= 70 ? "var(--ok)" : x.acc >= 50 ? "var(--warn)" : "var(--bad)"}"></i></span><span class="v">%${x.acc}</span></div>`).join("") : `<div class="empty">Henüz veri yok.</div>`}</div>
+     <div class="card"><h2 style="margin-bottom:10px">Öncelikli konular</h2>${weak.length ? `<div class="list">${weak.map(w => `<div class="li"><div class="grow"><div class="t">${esc(w.t)}</div><div class="s">${esc(SUBJ[w.s].n)} · ${w.n} soru</div><div class="wbar ${w.acc < 50 ? "bad" : "warn"}" aria-hidden="true"><i style="width:${Math.max(4, Math.min(100, w.acc))}%"></i></div></div><span class="pill ${w.acc < 50 ? "bad" : w.acc < 70 ? "warn" : "ok"}">%${w.acc}</span><button class="btn sm" data-a="topicStart" data-s="${w.s}" data-t="${esc(w.t)}">Çalış</button></div>`).join("")}</div>` : `<div class="empty">Her konuda en az 3 soru çözünce sıralama oluşur.</div>`}</div>
+   </div>${rozetKart()}${yolHaritasi()}${netTahminKart()}
+-  ${isiHaritasi()}
++  ${tot.q ? isiHaritasi() : `<div class="card stack"><h2>Konu ısı haritası</h2><p class="small muted">İlk sorunu çözdüğünde konu başarın burada görünmeye başlar.</p><a class="btn pri sm" style="align-self:flex-start" href="#studyo">İlk soruyu çöz</a></div>`}
+   ${veliRaporKart()}
+   </div>`;
+ }
+@@ -10410,6 +10411,7 @@ function obKart(goal) {
+     : A === 2 ? `<div class="f"><span>Hedef YKS puanın ne? <small class="muted">(sonra değiştirebilirsin)</small></span><div class="ob-chips">${[350, 400, 450, 480].map(v => chip("obSec", "hedef", v, v, OB.hedef === v)).join("")}${chip("obSec", "hedef", 0, "Bilmiyorum", !OB.hedef)}</div></div><p class="small muted" style="margin:0">Hedefine göre her ders için kaç net gerektiğini Gelişimim sayfasında göstereceğiz.</p>`
+     : `<div class="f"><span>Günde kaç soru çözmek istersin?</span><div class="ob-chips">${[20, 40, 60, 100].map(v => chip("obSec", "gunluk", v, v + " soru", gun === v)).join("")}</div></div><p class="small muted" style="margin:0">Alışkanlık oluşturmak için küçük başla; hedefi istediğin zaman değiştirebilirsin.</p>`;
+   return `<div class="card stack ob"><div class="card-h" style="margin:0"><h2>${A === 1 ? "Seni tanıyalım" : A === 2 ? "Hedefin ne?" : "Günlük hedefin"}</h2><span class="ob-nokta"><small>Adım ${A}/3</small>${[1, 2, 3].map(i => `<i class="${i < A ? "on" : i === A ? "on cur" : ""}"></i>`).join("")}</span></div>
++    ${A === 1 && !IN_CLAUDE && !HESAP.yok && !HESAP.user ? `<p class="small muted" style="margin:0">Önce uygulamayı keşfedebilirsin. Sorularını ve ilerlemeni cihazların arasında saklamak için <a href="#hesap" style="font-weight:700;text-decoration:underline">ücretsiz hesap aç veya giriş yap</a>.</p>` : ""}
+     ${govde}<div class="row">${A > 1 ? `<button type="button" class="btn ghost" data-a="obAdim" data-v="-1">Geri</button>` : ""}<button type="button" class="btn pri" data-a="obAdim" data-v="1">${A === 3 ? "Başla" : "Devam"}</button></div></div>`;
+ }
+ Object.assign(KART_ACT, {
+@@ -11222,8 +11224,9 @@ const ATL_CSS = `
+ .atl-skip:hover{background:rgba(245,240,230,.14)}
+ .atl-skip:focus-visible{outline:2px solid #c9a86a;outline-offset:3px}
+ @media (max-width:1000px){.atl-nav{display:none}.atl-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.atl-step:nth-child(3){padding-left:0;border-left:0}.atl-ex{grid-template-columns:repeat(2,minmax(0,1fr))}.atl-fe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+-@media (max-width:820px){.atl-hero .atl-w,.atl-2{grid-template-columns:minmax(0,1fr)}.atl-pl{grid-template-columns:minmax(0,1fr)}.atl-core{aspect-ratio:1/0.95;max-height:440px}.atl-top .giris{display:none}}
+-@media (max-width:560px){.atl-steps,.atl-ex,.atl-fe{grid-template-columns:minmax(0,1fr)}.atl-step,.atl-step+.atl-step{padding-left:0;border-left:0}.atl-step+.atl-step{border-top:1px solid var(--line2)}.atl-kpi b{font-size:21px}.atl-meter div{grid-template-columns:86px minmax(0,1fr) 46px}.atl-top .atl-w{gap:10px}.atl-top .wm span{display:none}}
++@media (max-width:820px){.atl-hero .atl-w,.atl-2{grid-template-columns:minmax(0,1fr)}.atl-pl{grid-template-columns:minmax(0,1fr)}.atl-core{aspect-ratio:1/0.95;max-height:440px}}
++@media (max-width:560px){.atl-steps,.atl-ex,.atl-fe{grid-template-columns:minmax(0,1fr)}.atl-step,.atl-step+.atl-step{padding-left:0;border-left:0}.atl-step+.atl-step{border-top:1px solid var(--line2)}.atl-kpi b{font-size:21px}.atl-meter div{grid-template-columns:86px minmax(0,1fr) 46px}.atl-top .atl-w{gap:8px}.atl-top .wm span,.atl-top .atl-ic{display:none}.atl-top .atl-b{padding:0 12px;font-size:13px}}
++@media (max-width:360px){.atl-top .wm{display:none}.atl-top .atl-b{padding:0 10px}}
+ `;
+ (function () { try { const st = document.createElement("style"); st.id = "atl-css"; st.textContent = ATL_CSS; document.head.appendChild(st); } catch (e) { } })();
+ 
+@@ -11328,7 +11331,7 @@ function vTanitim() {
+   const s7 = sec("paket", "Abonelik seçenekleri", "Ücretsiz başla. İhtiyacın olursa yükselt.", "Yıllık ödemede bir ay bedava. Ödemeden sonra gelen kodu hesabına bağlayınca paketin açılır.", `<div class="atl-pl">${P.map(p => `<div class="atl-card atl-rv${p.k === "orta" ? " hi" : ""}"><div class="pt"><h3>${p.n}</h3><span class="atl-tag${p.k === "ucretsiz" ? " f" : " g"}">${esc(p.tag)}</span></div>
+     ${p.k === "ucretsiz" ? `<div class="fi">0 <small>TL</small></div><div class="yi">Ücretsiz girişle</div>` : `<div class="fi">${tl(p.ay)} <small>TL / ay</small></div><div class="yi">ya da yıllık ${tl(p.yil)} TL</div>`}
+     <ul>${p.feats.slice(0, 5).map(f => `<li>${f}</li>`).join("")}</ul>
+-    ${p.k === "ucretsiz" ? `<a class="atl-b" href="#bugun">Ücretsiz başla</a>` : `<a class="atl-b${p.k === "orta" ? " p" : ""}" href="#premium">${p.n} paketini incele</a>`}</div>`).join("")}</div>`);
++    ${p.k === "ucretsiz" ? `<a class="atl-b" href="#hesap">Ücretsiz hesap aç</a>` : `<a class="atl-b${p.k === "orta" ? " p" : ""}" href="#premium">${p.n} paketini incele</a>`}</div>`).join("")}</div>`);
+ 
+   /* 8 · sss */
+   const s8 = sec("sss", "Sık sorulan sorular", "Aklındaki sorular.", "", `<div class="atl-faq atl-rv">${SSS.slice(0, 6).map(s => `<details><summary>${esc(s[0])}</summary><p>${s[1]}</p></details>`).join("")}</div><a class="atl-link" href="#sss">Tüm soruları gör ${ATL_IC.ok}</a>`);
+@@ -11337,7 +11340,7 @@ function vTanitim() {
+   <header class="atl-top"><div class="atl-w">
+     <a class="brand" href="#tanitim" aria-label="AKE Akademi tanıtım">${logoTile("atl")}${WORDMARK}</a>
+     <nav class="atl-nav" aria-label="Sayfa bölümleri"><button type="button" data-a="atlKes" data-k="nasil">Platform</button><button type="button" data-a="atlKes" data-k="ai">Yapay zekâ</button><button type="button" data-a="atlKes" data-k="alan">Sınavlar</button><button type="button" data-a="atlKes" data-k="paket">Paketler</button><button type="button" data-a="atlKes" data-k="sss">SSS</button></nav>
+-    <div class="atl-act"><button type="button" class="atl-ic" data-a="atlTema" aria-label="${tema[1]} (değiştirmek için dokun)" title="${tema[1]}">${ATL_IC[tema[0]]}</button><a class="atl-b giris" href="#hesap">Giriş yap</a><a class="atl-b p" href="#bugun">Ücretsiz başla</a></div>
++    <div class="atl-act"><button type="button" class="atl-ic" data-a="atlTema" aria-label="${tema[1]} (değiştirmek için dokun)" title="${tema[1]}">${ATL_IC[tema[0]]}</button><a class="atl-b giris" href="#hesap">Giriş yap</a><a class="atl-b p" href="#bugun">Keşfet</a></div>
+   </div></header>
+   <main id="main">
+   <section class="atl-hero" aria-labelledby="atl-h"><div class="atl-w">
+@@ -11345,7 +11348,7 @@ function vTanitim() {
+       <div class="atl-eb">YKS 2027${gun ? " · " + gun + " gün kaldı" : ""}</div>
+       <h1 id="atl-h">Geleceğini ezberleme. <span>Onu inşa et.</span></h1>
+       <p class="atl-lead">Yapay zekâ destekli kişisel öğrenme deneyimiyle sınav hazırlığını bir adım ileri taşı.</p>
+-      <div class="atl-cta"><a class="atl-b p lg" href="#bugun">Ücretsiz başla</a><button type="button" class="atl-b lg" data-a="atlKes" data-k="nasil">Platformu keşfet</button></div>
++      <div class="atl-cta"><a class="atl-b p lg" href="#hesap">Ücretsiz hesap aç</a><button type="button" class="atl-b lg" data-a="atlKes" data-k="nasil">Platformu keşfet</button></div>
+       <div class="atl-note"><span>Giriş ücretsiz</span><span>Çözümlü ${fmtN(V.soru)} soru</span><span>${V.konu} konu</span></div>
+     </div>
+     <div>
+@@ -11354,7 +11357,7 @@ function vTanitim() {
+     </div>
+   </div></section>
+   ${s1}${s2}${s3}${s4}${s5}${s6}${s7}${s8}
+-  <section class="atl-end" aria-labelledby="atl-son"><div class="atl-w atl-rv"><div class="atl-eb">Bugün</div><h2 id="atl-son">İlk soruyu bugün çöz. Gerisi gelir.</h2><p class="atl-lead" style="margin:14px auto 0">Ücretsiz girişle başla. Hakların ve ilerlemen telefon, tablet ve bilgisayar arasında aynı kalır.</p><div class="atl-cta"><a class="atl-b p lg" href="#bugun">Ücretsiz başla</a><a class="atl-b lg" href="#hesap">Hesap aç</a></div></div></section>
++  <section class="atl-end" aria-labelledby="atl-son"><div class="atl-w atl-rv"><div class="atl-eb">Bugün</div><h2 id="atl-son">İlk soruyu bugün çöz. Gerisi gelir.</h2><p class="atl-lead" style="margin:14px auto 0">Ücretsiz girişle başla. Hakların ve ilerlemen telefon, tablet ve bilgisayar arasında aynı kalır.</p><div class="atl-cta"><a class="atl-b p lg" href="#hesap">Ücretsiz hesap aç</a><a class="atl-b lg" href="#bugun">Uygulamayı keşfet</a></div></div></section>
+   </main>
+   <footer class="atl-ft"><div class="atl-w">
+     <nav aria-label="Alt bağlantılar"><a href="#hakkimizda">Hakkımızda</a><a href="#sss">SSS</a><a href="/matematik-yks-sorulari/">YKS matematik soruları</a><a href="#premium">Paketler</a><a href="#yasal">Yasal metinler</a><a href="#bugun">Uygulamaya geç</a></nav>
+@@ -11815,6 +11818,21 @@ LEGAL_ORDER.forEach(k => { ROUTES[k] = () => vLegal(k); });
+ function route() { const h = decodeURIComponent((location.hash || "").slice(1)).split("?")[0]; return ROUTES[h] ? h : "bugun"; }
+ const SAYFA_BASLIK = { koc: "Sana özel", bugun: "Ana sayfa", ogretmen: "AI öğretmen", deneme: "Denemeler", banka: "Soru bankası", studyo: "Stüdyo", paragraf: "Paragraf", osym: "ÖSYM tarzı", tanitim: "Tanıtım", yanlislar: "Yanlış defteri", kartlar: "Kartlar", plan: "Çalışma planı", gelisim: "Gelişim", ayarlar: "Hedefler ve ayarlar", sonuc: "Sonuç", sss: "Sık sorulan sorular", hakkimizda: "Hakkımızda", premium: "Paketler", yasal: "Yasal metinler", hesap: "Hesabım", lig: "Arkadaş ligi", sinif: "Sınıfım", canli: "Canlı Türkiye denemesi" };
+ function sayfaBasligi(r) { try { const t = SAYFA_BASLIK[r] || (LEGAL[r] && LEGAL[r].t) || ""; document.title = t && r !== "bugun" ? t + " · AKE Akademi" : "AKE Akademi · YKS 2027"; } catch (e) { } }
++const chatScroll = { pending: false, follow: true };
++function chatScrollToLatest() {
++  if (chatScroll.pending) return;
++  chatScroll.pending = true;
++  requestAnimationFrame(() => {
++    chatScroll.pending = false;
++    if (route() !== "ogretmen") return;
++    const last = document.querySelector("#chat > .msg:last-child");
++    if (!last) return;
++    const composer = document.querySelector(".composer");
++    const visibleBottom = composer ? Math.min(innerHeight, composer.getBoundingClientRect().top) : innerHeight;
++    const overflow = last.getBoundingClientRect().bottom - visibleBottom + 12;
++    if (overflow > 0) window.scrollBy({ top: overflow, behavior: "auto" });
++  });
++}
+ function render() {
+   const r = route(), act = document.activeElement, aid = act && act.id, sel = act && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd] : null;
+   sayfaBasligi(r);
+@@ -11834,7 +11852,7 @@ function render() {
+   if (!adminMode() && r !== "tanitim" && !(RUN && UI.inRun)) setTimeout(atl3dIlk, 0);
+   if (aid) { const el = document.getElementById(aid); if (el && el !== document.activeElement) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) { } } }
+   const ci = document.getElementById("chatIn"); if (ci) { ci.style.height = "auto"; ci.style.height = Math.min(160, ci.scrollHeight) + "px"; }
+-  if (UI.scrollChat) { UI.scrollChat = false; const c = document.getElementById("chat"); if (c) c.lastElementChild && c.lastElementChild.scrollIntoView({ block: "end" }); }
++  if (UI.scrollChat) { UI.scrollChat = false; chatScrollToLatest(); }
+   HRK.sync(r, !!(RUN && UI.inRun));
+   presSoon();
+ }
+@@ -11856,13 +11874,21 @@ async function sendChat(text) {
+   if ((!text && !UI.chatImg) || UI.chatBusy || !aiOn()) return;
+   const img = UI.chatImg;
+   UI.chat.push({ role: "user", content: text || "Bu soruyu çözer misin?", img: !!img });
+-  UI.chatDraft = ""; UI.chatImg = null; UI.chatBusy = true; UI.scrollChat = true; render(); memLog("ai", "");
++  UI.chatDraft = ""; UI.chatImg = null; UI.chatBusy = true; UI.scrollChat = true; chatScroll.follow = true; render(); memLog("ai", "");
+   const hist = UI.chat.slice(-16).map(m => ({ role: m.role, content: m.img && m.role === "user" ? "[Öğrenci bir soru fotoğrafı ekledi.] " + m.content : m.content }));
+   while (hist.length && hist[0].role !== "user") hist.shift();
+   const prevU = UI.chat.filter(m => m.role === "user").slice(-2).map(m => m.content).join("\n");
+   const input = [{ role: "user", content: AI_RULES + "\n\n" + studentCtx() + bilgiBlok(prevU) + "\n\nÖğrencinin mesajları aşağıda. Fotoğraf eklenmişse önce sorudaki metni ve seçenekleri oku, sonra çöz." }].concat(hist);
+   chatCtl = new AbortController();
+-  const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => { const el = document.getElementById("chat-live"); if (el) el.innerHTML = md(t); } };
++  const opts = { cache: false, signal: chatCtl.signal, modelTier: soruMu(text, img) ? (IN_CLAUDE ? "complex" : "solve") : "default", onText: ({ text: t }) => {
++    const el = document.getElementById("chat-live");
++    if (!el) return;
++    const composer = document.querySelector(".composer");
++    const visibleBottom = composer ? Math.min(innerHeight, composer.getBoundingClientRect().top) : innerHeight;
++    chatScroll.follow = chatScroll.pending || el.getBoundingClientRect().bottom <= visibleBottom + 180;
++    el.innerHTML = md(t);
++    if (chatScroll.follow) chatScrollToLatest();
++  } };
+   if (img) opts.images = [img];
+   try {
+     const r = await AI.fn(input, opts);
+@@ -11872,7 +11898,7 @@ async function sendChat(text) {
+     if (e && e.text) UI.chat.push({ role: "assistant", content: e.text + (msg ? "\n\n(" + msg + ")" : "") });
+     else if (msg) toast(msg);
+   }
+-  UI.chatBusy = false; chatCtl = null; UI.scrollChat = true;
++  UI.chatBusy = false; chatCtl = null; UI.scrollChat = chatScroll.follow;
+   UI.chat = UI.chat.slice(-30); LS.set("ake.chat", JSON.stringify(UI.chat)); render(); sesliCevap();
+ }
+ async function genRun() {
+-- 
+2.56.1
+

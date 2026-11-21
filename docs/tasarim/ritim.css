@@ -526,7 +526,9 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 @keyframes akeDol{to{opacity:1}}
 /* seçilen yol: önce diğerleri gibi (nokta ve ince bağlantı) 1. köşeye kadar uzar, bekler (seçim), sonra K hattına dönüşerek sürer */
 @keyframes akeYolCiz{0%{stroke-dashoffset:100;animation-timing-function:cubic-bezier(.3,.7,.2,1)}44%{stroke-dashoffset:var(--p0,32)}66%{stroke-dashoffset:var(--p0,32);animation-timing-function:cubic-bezier(.5,0,.2,1)}100%{stroke-dashoffset:0}}
-@keyframes akeYolTon{0%,44%{stroke:#F8F5F0;stroke-opacity:.55;stroke-width:.4}62%,100%{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
+@keyframes akeYolTon{0%,44%{stroke:#F8F5F0;stroke-opacity:var(--so,.55);stroke-width:.4}62%,100%{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
 @keyframes akeYolCiz2{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 @keyframes akeYolTon2{from{stroke:#F8F5F0;stroke-opacity:.55;stroke-width:.4}to{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
 html.ake-yol-on .brand .logo-tile{visibility:hidden}
+/* mobilde üç yol biraz daha belirgin: çizgi kalınlaşmaz (≈1,2 px), noktalar ve halkalar büyür, yollar biraz daha uzar */
+@media (max-width:600px){.ake-yol{--so:.75}.ake-yol .br,.ake-yol-yol{stroke-opacity:.75}.ake-yol .br{stroke-width:.5}.ake-yol .nd{r:1.6px}.ake-yol .nr{r:4.2px;stroke-opacity:.7}.ake-yol .org-d{r:2.1px}}

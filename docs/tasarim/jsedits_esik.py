@@ -18,8 +18,8 @@ function akeEsikAcilis(zorla) {
   ov.setAttribute("role", "status"); ov.setAttribute("aria-label", "AKE Akademi açılışı");
   const fond = document.createElement("div"); fond.className = "ake-yol-fond"; fond.setAttribute("aria-hidden", "true");
   ov.innerHTML = `<svg class="ake-yol-svg" viewBox="-64 -64 192 192" aria-hidden="true"><defs><linearGradient id="akeYolG" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="58" y2="60"><stop offset="0" style="stop-color:var(--logo-a,#F27D6D)"/><stop offset="1" style="stop-color:var(--logo-b,#B73F36)"/></linearGradient></defs>
-      <g class="alt"><path class="br" d="M6 60L-8 49L-30 52" pathLength="100"/>${nd(-8, 49, .5)}${nd(-30, 52, .85)}${rg(-30, 52, .85)}
-        <path class="br" d="M6 60L20 76L50 72" pathLength="100" style="--d:.06s"/>${nd(20, 76, .52)}${nd(50, 72, .9)}${rg(50, 72, .9)}</g>
+      <g class="alt"><path class="br" d="M6 60L-10 48L-46 54" pathLength="100"/>${nd(-10, 48, .45)}${nd(-46, 54, .85)}${rg(-46, 54, .85)}
+        <path class="br" d="M6 60L22 80L62 76" pathLength="100" style="--d:.06s"/>${nd(22, 80, .5)}${nd(62, 76, .9)}${rg(62, 76, .9)}</g>
       <g class="sec">${nd(6, 32, .55)}${nd(32, 6, .88)}${rg(32, 6, .88)}</g>
       <path class="ake-yol-yol" d="${KD}" pathLength="100" fill="none" style="--p0:${p0.toFixed(2)}"/><path class="ake-yol-harf" d="${KG}" pathLength="100" fill="none"/>
       <path class="ake-yol-dolgu" d="${K}" fill="url(#akeYolG)" fill-rule="evenodd"/>
@@ -63,5 +63,6 @@ rep('akeEsikAcilis(zorla)) return;\n  if (!zorla && atlHareketAz()) return;', 'a
 rep('function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro") || atlHareketAz()) return;', 'function atl3dIlk() { if (window.__atl3d || document.getElementById("atlIntro")) return;', 1)
 rep('if (!atlHareketAz() && (zorla || !window.__atl3d) && akeEsikAcilis(zorla)) return;', 'if ((zorla || !window.__atl3d) && akeEsikAcilis(zorla)) return;', 1)
 
-# ilk ziyarette sayfa, açılış perdesi gelmeden önce bir kare görünmesin (3 sn güvenlik zamanlayıcısı: açılış hata verse bile site açılır)
-rep('<script src="/ayar.js"></script>\n<link rel="stylesheet" href="/acilis/alternatifler.css?v=6">', '<script>(function(){try{if(!localStorage.getItem("ake.esik")&&(localStorage.getItem("ake.acilis")||"esik")==="esik"){var d=document.documentElement;d.classList.add("ake-pre");setTimeout(function(){d.classList.remove("ake-pre")},3000)}}catch(e){}})();</script>\n<style>html.ake-pre{background:#28232C}html.ake-pre #app{visibility:hidden}</style>\n<script src="/ayar.js"></script>\n<link rel="stylesheet" href="/acilis/alternatifler.css?v=6">', 1)
+# ilk ziyarette sayfa, açılış perdesi gelmeden önce açık (krem) bir kare görünmesin: <head>'in en başında, ilk boyamadan önce koyu zemin.
+# 3 sn güvenlik zamanlayıcısı: açılış hata verse bile site açılır.
+rep('<meta charset="utf-8">\n', '<meta charset="utf-8">\n<script>(function(){try{if(!localStorage.getItem("ake.esik")&&(localStorage.getItem("ake.acilis")||"esik")==="esik"){var d=document.documentElement;d.classList.add("ake-pre");setTimeout(function(){d.classList.remove("ake-pre")},3000)}}catch(e){}})();</script>\n<style>html.ake-pre,html.ake-pre body{background:#28232C!important}html.ake-pre #app{visibility:hidden}</style>\n', 1)

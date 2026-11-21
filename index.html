@@ -2,6 +2,8 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<script>(function(){try{if(!localStorage.getItem("ake.esik")&&(localStorage.getItem("ake.acilis")||"esik")==="esik"){var d=document.documentElement;d.classList.add("ake-pre");setTimeout(function(){d.classList.remove("ake-pre")},3000)}}catch(e){}})();</script>
+<style>html.ake-pre,html.ake-pre body{background:#28232C!important}html.ake-pre #app{visibility:hidden}</style>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı.">
 <script>try{var t=localStorage.getItem("ake.tema"),f=localStorage.getItem("ake.yazi"),d=document.documentElement;if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(f==="l"||f==="xl")d.setAttribute("data-fs",f);var p=localStorage.getItem("ake.pal");if(p==="zumrut"||p==="lavanta"||p==="bakir")d.setAttribute("data-pal",p);var sy=localStorage.getItem("ake.saydam"),sv=localStorage.getItem("ake.saydamSv");d.setAttribute("data-saydam",sy==="off"?"off":(sv==="belirgin"?"belirgin":"dengeli"));var oc=JSON.parse(localStorage.getItem("ake.ozelcss")||"null");if(oc&&oc[t==="dark"?"d":"l"])d.style.cssText+=oc[t==="dark"?"d":"l"];}catch(e){}</script>
@@ -28,8 +30,6 @@
 <link rel="canonical" href="https://akeakademi.com/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AKE Akademi","url":"https://akeakademi.com/","inLanguage":"tr","description":"YKS 2027'ye hazırlanan öğrenciler için soru bankası, canlı TYT-AYT denemeleri, arkadaş ligi, kişisel AI öğretmen, yanlış defteri ve çalışma planı."}</script>
 <title>AKE Akademi · YKS 2027 soru bankası, deneme ve çalışma planı</title>
-<script>(function(){try{if(!localStorage.getItem("ake.esik")&&(localStorage.getItem("ake.acilis")||"esik")==="esik"){var d=document.documentElement;d.classList.add("ake-pre");setTimeout(function(){d.classList.remove("ake-pre")},3000)}}catch(e){}})();</script>
-<style>html.ake-pre{background:#28232C}html.ake-pre #app{visibility:hidden}</style>
 <script src="/ayar.js"></script>
 <link rel="stylesheet" href="/acilis/alternatifler.css?v=6">
 <style>
@@ -1749,10 +1749,12 @@ html:root .btn:not(.pri):not(.acc):not(.ghost):not(:disabled):not(._1):not(._2):
 @keyframes akeDol{to{opacity:1}}
 /* seçilen yol: önce diğerleri gibi (nokta ve ince bağlantı) 1. köşeye kadar uzar, bekler (seçim), sonra K hattına dönüşerek sürer */
 @keyframes akeYolCiz{0%{stroke-dashoffset:100;animation-timing-function:cubic-bezier(.3,.7,.2,1)}44%{stroke-dashoffset:var(--p0,32)}66%{stroke-dashoffset:var(--p0,32);animation-timing-function:cubic-bezier(.5,0,.2,1)}100%{stroke-dashoffset:0}}
-@keyframes akeYolTon{0%,44%{stroke:#F8F5F0;stroke-opacity:.55;stroke-width:.4}62%,100%{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
+@keyframes akeYolTon{0%,44%{stroke:#F8F5F0;stroke-opacity:var(--so,.55);stroke-width:.4}62%,100%{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
 @keyframes akeYolCiz2{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 @keyframes akeYolTon2{from{stroke:#F8F5F0;stroke-opacity:.55;stroke-width:.4}to{stroke:var(--logo-a,#F27D6D);stroke-opacity:1;stroke-width:.8}}
 html.ake-yol-on .brand .logo-tile{visibility:hidden}
+/* mobilde üç yol biraz daha belirgin: çizgi kalınlaşmaz (≈1,2 px), noktalar ve halkalar büyür, yollar biraz daha uzar */
+@media (max-width:600px){.ake-yol{--so:.75}.ake-yol .br,.ake-yol-yol{stroke-opacity:.75}.ake-yol .br{stroke-width:.5}.ake-yol .nd{r:1.6px}.ake-yol .nr{r:4.2px;stroke-opacity:.7}.ake-yol .org-d{r:2.1px}}
 
 </style>
 <script>
@@ -12221,8 +12223,8 @@ function akeEsikAcilis(zorla) {
   ov.setAttribute("role", "status"); ov.setAttribute("aria-label", "AKE Akademi açılışı");
   const fond = document.createElement("div"); fond.className = "ake-yol-fond"; fond.setAttribute("aria-hidden", "true");
   ov.innerHTML = `<svg class="ake-yol-svg" viewBox="-64 -64 192 192" aria-hidden="true"><defs><linearGradient id="akeYolG" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="58" y2="60"><stop offset="0" style="stop-color:var(--logo-a,#F27D6D)"/><stop offset="1" style="stop-color:var(--logo-b,#B73F36)"/></linearGradient></defs>
-      <g class="alt"><path class="br" d="M6 60L-8 49L-30 52" pathLength="100"/>${nd(-8, 49, .5)}${nd(-30, 52, .85)}${rg(-30, 52, .85)}
-        <path class="br" d="M6 60L20 76L50 72" pathLength="100" style="--d:.06s"/>${nd(20, 76, .52)}${nd(50, 72, .9)}${rg(50, 72, .9)}</g>
+      <g class="alt"><path class="br" d="M6 60L-10 48L-46 54" pathLength="100"/>${nd(-10, 48, .45)}${nd(-46, 54, .85)}${rg(-46, 54, .85)}
+        <path class="br" d="M6 60L22 80L62 76" pathLength="100" style="--d:.06s"/>${nd(22, 80, .5)}${nd(62, 76, .9)}${rg(62, 76, .9)}</g>
       <g class="sec">${nd(6, 32, .55)}${nd(32, 6, .88)}${rg(32, 6, .88)}</g>
       <path class="ake-yol-yol" d="${KD}" pathLength="100" fill="none" style="--p0:${p0.toFixed(2)}"/><path class="ake-yol-harf" d="${KG}" pathLength="100" fill="none"/>
       <path class="ake-yol-dolgu" d="${K}" fill="url(#akeYolG)" fill-rule="evenodd"/>

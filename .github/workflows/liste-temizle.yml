@@ -1,0 +1,30 @@
+# "Açıldığında haber ver" listesi: süresi (48 sa) dolan, onaylanmamış kayıtları siler.
+# Onaylı kayıtlara dokunmaz. Uç: POST /api/liste/temizle (lib/liste.js, temizle). Yanıtta yalnızca silinen sayısı vardır.
+# Gerekli GitHub Secrets (Settings > Secrets and variables > Actions):
+#   AKE_TEMIZLIK_URL : tam adres, örn. https://akeakademi.com/api/liste/temizle  (Preview için ilgili pages.dev adresi)
+#   AKE_TEMIZLIK     : en az 24 karakterli rastgele anahtar; Cloudflare Pages'te AYNI adla Secret olarak tanımlı olmalı
+# Not: GitHub zamanlanmış iş akışlarını yalnızca varsayılan daldan (main) çalıştırır; geç kalabilir. Depo 60 gün etkinliksiz kalırsa GitHub
+#      zamanlanmış işleri kapatabilir; "Actions" sekmesinden yeniden açılır. İstenirse "Run workflow" ile elle de çalıştırılır.
+name: liste-temizle
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: liste-temizle
+  cancel-in-progress: false
+jobs:
+  temizle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Süresi dolan bekleyen kayıtları sil
+        env:
+          URL: ${{ secrets.AKE_TEMIZLIK_URL }}
+          ANAHTAR: ${{ secrets.AKE_TEMIZLIK }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$ANAHTAR" ]; then echo "AKE_TEMIZLIK_URL veya AKE_TEMIZLIK tanımlı değil"; exit 1; fi
+          curl --silent --show-error --fail-with-body --max-time 60 --retry 2 --retry-delay 5 \
+            -X POST -H "Authorization: Bearer $ANAHTAR" "$URL"
+          echo

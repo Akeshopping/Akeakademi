@@ -24,8 +24,8 @@ test.beforeEach(() => {
   globalThis.fetch = async (u, o) => { if (String(u).includes("api.resend.com")) { if (EPOSTA_BASARISIZ) return new Response("x", { status: 500 }); MAILLER.push(JSON.parse(o.body)); return new Response("{}", { status: 200 }); } throw new Error("beklenmeyen ağ: " + u); };
 });
 let ipSayac = 0;
-const istek = (yol, { method = "POST", body, form, ip, origin, ek } = {}) => {
-  const h = { "cf-connecting-ip": ip || "198.51.100." + (++ipSayac % 250 + 1) };
+const istek = (yol, { method = "POST", body, form, ip, origin, ek, baslik } = {}) => {
+  const h = Object.assign({ "cf-connecting-ip": ip || "198.51.100." + (++ipSayac % 250 + 1) }, baslik || {});
   let b; if (form) { h["content-type"] = "application/x-www-form-urlencoded"; b = new URLSearchParams(form).toString(); } else if (body !== undefined) { h["content-type"] = "application/json"; b = JSON.stringify(body); }
   if (origin !== null) h.origin = origin || ORIGIN;
   const p = yol.split("?")[0].split("/").filter(Boolean);
@@ -199,4 +199,36 @@ test("17) süresi dolan BEKLEYEN kayıtlar silinir; onaylı ve süresi açık ol
   await kayit("tetik17@ornek.com"); assert.ok(!satir("dolmus3@ornek.com"), "kayıt isteği süresi dolanları temizler"); assert.ok(satir("tetik17@ornek.com"));
   ekle("dolmus4@ornek.com", "bekliyor", Date.now() - 1000);
   await yeniOnayIste("hic17@ornek.com"); assert.ok(!satir("dolmus4@ornek.com"), "yeni-onay isteği de temizler");
+});
+
+const ANAHTAR = "k".repeat(40), temizleIste = (anahtar, o) => istek("temizle", Object.assign({ origin: null, ek: { AKE_TEMIZLIK: ANAHTAR }, baslik: anahtar === undefined ? {} : { authorization: "Bearer " + anahtar } }, o || {}));
+test("18) zamanlanmış temizlik ucu: yetkisiz/kapalıysa silmez; yetkiliyken istek gelmese de süresi dolan BEKLEYENLER silinir, onaylılar kalır", async () => {
+  await kayit("ilk18@ornek.com");
+  const ekle = (e, durum, onaySon) => DB.db.prepare("INSERT INTO bekleme (eposta, durum, paket, kayit, onay_hash, onay_son, son_gonderim, izin_surum, izin_zaman) VALUES (?, ?, 'ikisi', 1, ?, ?, 1, 'x', 1)").run(e, durum, "h" + e, onaySon);
+  const simdi = Date.now();
+  for (let i = 0; i < 230; i++) ekle("d" + i + "@ornek.com", "bekliyor", simdi - 1000 - i);
+  ekle("acik18@ornek.com", "bekliyor", simdi + 3600e3); ekle("onayli18@ornek.com", "onayli", simdi - 30 * 86400e3);
+  const once = say();
+  /* kapalı: anahtar tanımsız ya da zayıf → 404, hiçbir şey silinmez */
+  assert.equal((await istek("temizle", { origin: null, baslik: { authorization: "Bearer " + ANAHTAR } })).status, 404);
+  assert.equal((await istek("temizle", { origin: null, ek: { AKE_TEMIZLIK: "kisa" }, baslik: { authorization: "Bearer kisa" } })).status, 404);
+  /* yetkisiz: anahtarsız / yanlış / GET */
+  assert.equal((await temizleIste(undefined)).status, 401); assert.equal((await temizleIste("y".repeat(40))).status, 401); assert.equal((await temizleIste(ANAHTAR.slice(0, -1))).status, 401);
+  assert.equal((await istek("temizle", { method: "GET", ek: { AKE_TEMIZLIK: ANAHTAR }, baslik: { authorization: "Bearer " + ANAHTAR } })).status, 404);
+  assert.equal(say(), once, "yetkisiz çağrılar hiçbir şey silmez");
+  /* yetkili: 230 süresi dolmuş silinir (3 tur), diğerleri kalır; yanıtta yalnızca sayı */
+  const r = await temizleIste(ANAHTAR); assert.equal(r.status, 200); const g = await r.json(); assert.deepEqual(g, { ok: true, silinen: 230 });
+  assert.ok(!JSON.stringify(g).includes(ANAHTAR));
+  assert.ok(satir("acik18@ornek.com")); assert.ok(satir("onayli18@ornek.com")); assert.ok(satir("ilk18@ornek.com")); assert.equal(say(), once - 230);
+  assert.deepEqual(await (await temizleIste(ANAHTAR)).json(), { ok: true, silinen: 0 });   // tekrar zarar vermez
+  /* yanıtlar ve günlük anahtarı/adresi göstermez */
+  const satirlar = [], eski = console.warn; console.warn = (...a) => satirlar.push(a.join(" "));
+  try { await temizleIste(ANAHTAR); await temizleIste("y".repeat(40)); } finally { console.warn = eski; }
+  for (const l of satirlar) assert.match(l, /^liste temizle neden=(temizlendi|yetkisiz)$/); assert.ok(!satirlar.join("").includes(ANAHTAR));
+});
+test("19) temizlik iş akışı: 30 dk'lık zamanlama, sırrı komut satırında/yanıtta açık yazmaz, izinsiz (permissions {})", () => {
+  const y = fs.readFileSync(new URL("../.github/workflows/liste-temizle.yml", import.meta.url), "utf8");
+  assert.match(y, /cron: "\*\/30 \* \* \* \*"/); assert.match(y, /permissions: \{\}/); assert.match(y, /workflow_dispatch/);
+  assert.match(y, /secrets\.AKE_TEMIZLIK_URL/); assert.match(y, /secrets\.AKE_TEMIZLIK\b/); assert.ok(!/run:[\s\S]*\$\{\{\s*secrets/.test(y), "sır run içinde doğrudan ifade edilmez, env ile verilir");
+  assert.match(y, /Authorization: Bearer \$ANAHTAR/); assert.ok(!/\?.*ANAHTAR|token=/.test(y.split("run:")[1] || ""), "anahtar adreste gitmez");
 });

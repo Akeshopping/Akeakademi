@@ -5,10 +5,11 @@
 //   GET  cik?e=&t=  silme sayfası (durum değiştirmez); düğme POST /cik yapar
 //   POST cik        {e, t}                         kaydı ve izni siler (imzalı bağlantı)
 //   POST sil-iste   {eposta}                       adrese silme bağlantısı gönderir
+//   POST temizle                                   zamanlanmış temizlik (Bearer AKE_TEMIZLIK): süresi dolan BEKLEYEN satırları siler; sayı döner
 //   GET/POST yeni-onay {eposta}                    BEKLEYEN kayıt için yeni onay e-postası (eskisi geçersiz; kayıtla aynı hız sınırları; yanıt adresi sızdırmaz)
 // Gerekenler: DB (D1), AKE_GIZLI (Secret), RESEND_API_KEY (Secret; onay e-postası için). Ödeme/sipariş koduna dokunmaz.
 import { fail } from "../../../lib/ortak.js";
-import { kaydet, onayla, yeniOnay, cik, silIste, sayfa, onayFormu, cikFormu, yeniOnayFormu, epostaTemizle, cikisBelirteci } from "../../../lib/liste.js";
+import { kaydet, onayla, yeniOnay, temizle, cik, silIste, sayfa, onayFormu, cikFormu, yeniOnayFormu, epostaTemizle, cikisBelirteci } from "../../../lib/liste.js";
 
 const SONUC = {
   onaylandi: ["Kaydın onaylandı", "Ücretli paketler açıldığında sana bir kez e-posta ile haber vereceğiz. İstediğin zaman her e-postadaki bağlantıdan kaydını silebilirsin."],
@@ -36,6 +37,7 @@ export async function onRequest({ request, env, params }) {
       if (m === "GET") { const t = url.searchParams.get("t") || ""; return /^[0-9a-f]{32}$/.test(t) ? sayfa("Onayını tamamla", "Açıldığında haber verme isteğini onaylamak için düğmeye bas.", onayFormu(t)) : onayHata("gecersiz"); }
       if (m === "POST") return await bitir(await onayla(env, request.clone()), request);
     }
+    if (ad === "temizle" && m === "POST") return await temizle(env, request);
     if (ad === "yeni-onay") {
       if (m === "GET") return sayfa("Yeni onay e-postası iste", "Adresini yaz; onay bekleyen bir kaydın varsa yeni bir onay e-postası göndeririz. Yeni e-posta eskisini geçersiz kılar.", yeniOnayFormu());
       if (m === "POST") return await bitir(await yeniOnay(env, request.clone()), request);

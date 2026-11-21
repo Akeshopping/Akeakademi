@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { onRequest } from "../functions/api/liste/[[yol]].js";
-import { _semaSifirla, epostaTemizle, cikisBelirteci } from "../lib/liste.js";
+import { _semaSifirla, epostaTemizle, cikisBelirteci, suresiDolanlariTemizle } from "../lib/liste.js";
 import { _yedekSifirla } from "../lib/hiz.js";
 
 const GIZLI = "t".repeat(40), ORIGIN = "https://onizleme.example";
@@ -113,5 +113,90 @@ test("10) AKE_GIZLI yoksa 503 (zayıf varsayılan yok); farklı Origin 403; bili
 });
 test("11) toplu gönderim yok: modülde döngüyle e-posta gönderen kod bulunmaz; her gönderim tek alıcı", () => {
   const k = fs.readFileSync(new URL("../lib/liste.js", import.meta.url), "utf8") + fs.readFileSync(new URL("../functions/api/liste/[[yol]].js", import.meta.url), "utf8");
-  assert.equal((k.match(/epostaGonder\(/g) || []).length, 2); assert.ok(!/for\s*\([^)]*\)\s*\{?[^}]*epostaGonder/.test(k)); assert.ok(!/\.map\([^)]*epostaGonder/.test(k));
+  assert.equal((k.match(/epostaGonder\(/g) || []).length, 3);   /* kayıt, silme bağlantısı, yeni onay: hepsi tek alıcı */ assert.ok(!/for\s*\([^)]*\)\s*\{?[^}]*epostaGonder/.test(k)); assert.ok(!/\.map\([^)]*epostaGonder/.test(k));
+});
+
+/* ---- onay güvenilirliği: neden ayrımı, yeni onay e-postası, günlük, temizlik ---- */
+const eskiyeAl = (e, dk) => DB.db.prepare("UPDATE bekleme SET son_gonderim = ? WHERE eposta = ?").run(Date.now() - dk * 60e3, e);
+const yeniOnayIste = (e, o) => istek("yeni-onay", Object.assign({ body: { eposta: e } }, o || {}));
+const sayfaMetni = async r => (await r.text());
+
+test("12) başarısız onay: neden ayrı (süresi dolmuş / eski-bilinmeyen / bozuk); satır bozulmaz; sayfada yeni e-posta formu", async () => {
+  await kayit("a12@ornek.com"); const t = tokenAl(MAILLER[0]);
+  let r = await istek("onayla", { body: { t: "0".repeat(32) } }); assert.equal(r.status, 400); assert.equal((await r.json()).error, "eski_baglanti");
+  r = await istek("onayla", { body: { t: "zzz" } }); assert.equal(r.status, 400); assert.equal((await r.json()).error, "gecersiz");
+  DB.db.prepare("UPDATE bekleme SET onay_son = ? WHERE eposta = 'a12@ornek.com'").run(Date.now() - 1000);
+  r = await istek("onayla", { body: { t } }); assert.equal(r.status, 400); assert.equal((await r.json()).error, "suresi_doldu"); assert.equal(satir("a12@ornek.com").durum, "bekliyor");
+  /* insan sayfaları (form POST) */
+  let h = await sayfaMetni(await istek("onayla", { form: { t: "0".repeat(32) } })); assert.match(h, /Bu bağlantı artık geçerli değil/); assert.match(h, /action="\/api\/liste\/yeni-onay"/);
+  h = await sayfaMetni(await istek("onayla", { form: { t } })); assert.match(h, /süresi dolmuş/); assert.ok(!/yeni-onay/.test(h), "süresi dolanda e-posta formu yok; formu yeniden doldur"); assert.match(h, /href="\/#premium"/);
+  h = await sayfaMetni(await istek("onayla?t=zz", { method: "GET" })); assert.match(h, /Bağlantı geçersiz/); assert.match(h, /yeni-onay/);
+  assert.ok(!h.includes("a12@ornek.com"));
+});
+test("13) yeni onay e-postası: eski bağlantı çalışmaz, yeni çalışır; 10 dk içinde ikinci e-posta yok; yanıt hep aynı", async () => {
+  await kayit("a13@ornek.com"); const eski = tokenAl(MAILLER[0]); assert.equal(MAILLER.length, 1);
+  const yakin = await yeniOnayIste("a13@ornek.com"); assert.equal(yakin.status, 200); const govdeYakin = await yakin.json(); assert.equal(MAILLER.length, 1, "10 dk içinde yeni e-posta yok");
+  eskiyeAl("a13@ornek.com", 11);
+  const gitti = await yeniOnayIste("a13@ornek.com"); assert.equal(gitti.status, 200); assert.deepEqual(await gitti.json(), govdeYakin); assert.equal(MAILLER.length, 2);
+  assert.deepEqual(MAILLER[1].to, ["a13@ornek.com"]); const yeni = tokenAl(MAILLER[1]); assert.ok(yeni && yeni !== eski);
+  assert.equal(satir("a13@ornek.com").durum, "bekliyor");
+  let r = await istek("onayla", { body: { t: eski } }); assert.equal((await r.json()).error, "eski_baglanti", "eski bağlantı geçersiz");
+  r = await istek("onayla", { body: { t: yeni } }); assert.deepEqual(await r.json(), { ok: true, durum: "onaylandi" }); assert.equal(satir("a13@ornek.com").durum, "onayli");
+  /* tekrar deneme: yeni bağlantıya tekrar basmak hata vermez; onaylı adrese yeni e-posta gitmez */
+  assert.deepEqual(await (await istek("onayla", { body: { t: yeni } })).json(), { ok: true, durum: "zaten_onayli" });
+  await kayit("b13@ornek.com"); await istek("onayla", { body: { t: tokenAl(MAILLER[MAILLER.length - 1]) } }); assert.equal(satir("b13@ornek.com").durum, "onayli");
+  eskiyeAl("b13@ornek.com", 30); const n = MAILLER.length; const o = await yeniOnayIste("b13@ornek.com"); assert.deepEqual(await o.json(), govdeYakin); assert.equal(MAILLER.length, n); assert.equal(satir("b13@ornek.com").durum, "onayli");
+  /* kaydı olmayan adres: aynı yanıt, e-posta yok, satır oluşmaz */
+  const hic = await yeniOnayIste("yok@ornek.com"); assert.deepEqual(await hic.json(), govdeYakin); assert.equal(MAILLER.length, n); assert.equal(satir("yok@ornek.com"), undefined);
+  /* geçersiz adres 400; form (insan) sayfası adres göstermez */
+  assert.equal((await yeniOnayIste("bozuk")).status, 400);
+  const sayfa1 = await sayfaMetni(await istek("yeni-onay", { form: { eposta: "c13@ornek.com" } })); assert.match(sayfa1, /Kontrol et/); assert.ok(!sayfa1.includes("c13@ornek.com"));
+  assert.match(await sayfaMetni(await istek("yeni-onay", { method: "GET" })), /action="\/api\/liste\/yeni-onay"/);
+});
+test("14) yeni onay mevcut hız sınırlarını AŞMAZ: kayıtla aynı adres kovası (3/sa) ve IP kovası (10/sa)", async () => {
+  await kayit("a14@ornek.com");                                           // adres kovası: 1
+  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200);   // 2
+  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200);   // 3
+  const r = await yeniOnayIste("a14@ornek.com"); assert.equal(r.status, 429); assert.ok(r.headers.get("retry-after")); assert.equal(MAILLER.length, 3);
+  const ip = "203.0.113.9";
+  for (let i = 0; i < 10; i++) assert.equal((await yeniOnayIste("ip" + i + "@ornek.com", { ip })).status, 200);
+  assert.equal((await yeniOnayIste("ip10@ornek.com", { ip })).status, 429);
+});
+test("15) yeni onay e-postası gönderilemezse 502 ve ESKİ bağlantı çalışmaya devam eder (belirteç geri alınır)", async () => {
+  await kayit("a15@ornek.com"); const eski = tokenAl(MAILLER[0]); eskiyeAl("a15@ornek.com", 11);
+  const once = satir("a15@ornek.com"); EPOSTA_BASARISIZ = true;
+  const r = await yeniOnayIste("a15@ornek.com"); assert.equal(r.status, 502); assert.equal((await r.json()).error, "eposta_gitmedi");
+  const sonra = satir("a15@ornek.com"); assert.equal(sonra.onay_hash, once.onay_hash); assert.equal(sonra.onay_son, once.onay_son); assert.equal(sonra.son_gonderim, once.son_gonderim);
+  EPOSTA_BASARISIZ = false; assert.deepEqual(await (await istek("onayla", { body: { t: eski } })).json(), { ok: true, durum: "onaylandi" });
+});
+test("16) günlük: yalnızca genel neden kodu; adres, belirteç, özet, IP yok", async () => {
+  const satirlar = [], eski = console.warn; console.warn = (...a) => satirlar.push(a.join(" "));
+  try {
+    await kayit("gizli16@ornek.com"); const t = tokenAl(MAILLER[0]);
+    await istek("onayla", { body: { t: "0".repeat(32) } }); await istek("onayla", { body: { t: "zzz" } });
+    eskiyeAl("gizli16@ornek.com", 11); await yeniOnayIste("gizli16@ornek.com"); await yeniOnayIste("gizli16@ornek.com"); await yeniOnayIste("yok16@ornek.com"); await yeniOnayIste("bozuk");
+    await istek("onayla", { body: { t } }); await istek("onayla", { body: { t: tokenAl(MAILLER[1]) } });
+    EPOSTA_BASARISIZ = true; await kayit("b16@ornek.com"); eskiyeAl("b16@ornek.com", 11);
+  } finally { console.warn = eski; }
+  assert.ok(satirlar.length >= 6, "günlük yazılıyor");
+  const tum = satirlar.join("\n");
+  for (const l of satirlar) assert.match(l, /^liste (onayla|yeni-onay) neden=[a-z_]+$/, l);
+  assert.ok(!/@|ornek\.com|gizli16/.test(tum), "adres yok"); assert.ok(!/[0-9a-f]{32}/.test(tum), "belirteç/özet yok"); assert.ok(!/198\.51|203\.0/.test(tum), "IP yok");
+  for (const n of ["eski_baglanti", "bicim", "gonderildi", "kayit_yok", "adres_gecersiz", "onaylandi"]) assert.ok(tum.includes("neden=" + n), n);
+});
+test("17) süresi dolan BEKLEYEN kayıtlar silinir; onaylı ve süresi açık olanlara dokunulmaz; kayıt isteği de temizler", async () => {
+  const ekle = (e, durum, onaySon) => DB.db.prepare("INSERT INTO bekleme (eposta, durum, paket, kayit, onay_hash, onay_son, son_gonderim, izin_surum, izin_zaman) VALUES (?, ?, 'ikisi', 1, ?, ?, 1, 'x', 1)").run(e, durum, "h" + e, onaySon);
+  await kayit("ilk17@ornek.com");                                          // tabloyu kurar
+  const simdi = Date.now();
+  ekle("dolmus1@ornek.com", "bekliyor", simdi - 1000); ekle("dolmus2@ornek.com", "bekliyor", simdi - 5 * 86400e3);
+  ekle("acik@ornek.com", "bekliyor", simdi + 3600e3); ekle("onayli-eski@ornek.com", "onayli", simdi - 9 * 86400e3);
+  assert.equal(await suresiDolanlariTemizle({ DB }, simdi), 2);
+  assert.ok(!satir("dolmus1@ornek.com") && !satir("dolmus2@ornek.com")); assert.ok(satir("acik@ornek.com")); assert.ok(satir("onayli-eski@ornek.com")); assert.ok(satir("ilk17@ornek.com"));
+  assert.equal(await suresiDolanlariTemizle({ DB }, simdi), 0, "tekrar çalıştırmak zarar vermez");
+  for (let i = 0; i < 130; i++) ekle("t" + i + "@ornek.com", "bekliyor", simdi - 1000);
+  assert.equal(await suresiDolanlariTemizle({ DB }, simdi), 100, "bir seferde en çok 100"); assert.equal(await suresiDolanlariTemizle({ DB }, simdi), 30);
+  ekle("dolmus3@ornek.com", "bekliyor", Date.now() - 1000);
+  await kayit("tetik17@ornek.com"); assert.ok(!satir("dolmus3@ornek.com"), "kayıt isteği süresi dolanları temizler"); assert.ok(satir("tetik17@ornek.com"));
+  ekle("dolmus4@ornek.com", "bekliyor", Date.now() - 1000);
+  await yeniOnayIste("hic17@ornek.com"); assert.ok(!satir("dolmus4@ornek.com"), "yeni-onay isteği de temizler");
 });

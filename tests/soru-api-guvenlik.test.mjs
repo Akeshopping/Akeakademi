@@ -46,8 +46,11 @@ test("18.5-6) başka oturumun / rastgele soru kimliğiyle cevap anahtarı çekil
   const k = await yeni(true), a = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 5, ders: "mat" } });
   const b = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 5, ders: "fizik" } });
   const bununDisinda = b.j.sorular[0].id;                       // b oturumunun sorusu, a oturumunda sorulamaz
+  const aIdler = new Set(a.j.sorular.map(q => q.id));           // a'nın 5 sorusu 300 mat sorusundan RASTGELE çekilir; sabit "g-299" ~%1,7 olasılıkla a'nın kendi sorusu olur (200 döner) → a'nın dışında kalan bir mat kimliği seç
+  const matDisi = Array.from({ length: 300 }, (_, i) => "g-" + i).find(id => !aIdler.has(id));
+  assert.ok(matDisi, "a oturumu dışında mat sorusu bulunamadı");
   const cevap = (oturum, soru) => api("cevap", { cookie: k.cookie, govde: { oturum, soru, secim: 0 } });
-  for (const [o, s] of [[a.j.oturum, bununDisinda], [a.j.oturum, "g-299"], [a.j.oturum, "h-99"], [a.j.oturum, "olmayan-id"], [a.j.oturum, "' OR 1=1 --"], [a.j.oturum, "x".repeat(500)]]) {
+  for (const [o, s] of [[a.j.oturum, bununDisinda], [a.j.oturum, matDisi], [a.j.oturum, "h-99"], [a.j.oturum, "olmayan-id"], [a.j.oturum, "' OR 1=1 --"], [a.j.oturum, "x".repeat(500)]]) {
     const r = await cevap(o, s); assert.ok([404].includes(r.s), `${s}: ${r.s}`); assert.ok(!sahip(r)); assert.deepEqual(sizintiBul(r.j), []);
   }
   assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM soru_oturum_soru WHERE oturum = ? AND secim IS NOT NULL").get(a.j.oturum).n, 0);   // hiçbir şey yazılmadı

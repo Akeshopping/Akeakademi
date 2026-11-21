@@ -8,7 +8,7 @@ const D = document.documentElement;
 export const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 export const yumusak = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 export const kolay = t => 1 - Math.pow(1 - clamp(t), 3);
-export const KREM = new THREE.Color("#F5F1E8"), GECE = new THREE.Color("#171715");
+export const KREM = new THREE.Color("#f8f5f0"), GECE = new THREE.Color("#28232c");
 
 function depo(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
@@ -25,7 +25,7 @@ function panelYaz() {
         <a class="btn" href="../../calisma/soru.html">Devam et</a></section>
       <section class="blok hedef" aria-labelledby="hd-b"><div class="k-bas" id="hd-b">Günlük hedef</div><div class="buyuk">26 <small>/ 40 soru</small></div><div class="cubuk" aria-hidden="true"><u style="width:65%"></u></div><p class="aciklama">Bir set daha çözersen hedef tamam.</p></section>
       <section class="blok net" aria-labelledby="nt-b"><div class="k-bas" id="nt-b">TYT net gelişimi</div><div class="buyuk">71,5 <small>net · son 5 deneme</small></div>
-        <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Son beş deneme: 61,25 netten 71,5 nete"><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="#1c1b18" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 5 : 3}" fill="${i === 4 ? "#254236" : "#1c1b18"}"/>`).join("")}</svg></section>
+        <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Son beş deneme: 61,25 netten 71,5 nete"><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="#28232c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === 4 ? 5 : 3}" fill="${i === 4 ? "#b73f36" : "#28232c"}"/>`).join("")}</svg></section>
       <section class="blok zayif" aria-labelledby="zy-b"><div class="k-bas" id="zy-b">Zayıf konular</div><ul class="liste">
         <li><span><b>Fonksiyonlar</b><small>AYT Matematik · 13 soruda 5 doğru</small></span><span class="oran">%38</span></li>
         <li><span><b>Hücre bölünmeleri</b><small>Biyoloji · 9 soruda 4 doğru</small></span><span class="oran">%44</span></li>
@@ -51,7 +51,7 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   const cv = $("#sahne"), ust = $(".ust"), atla = $(".atla"), gyazi = $(".gecis-yazi"), kutu = $(".acilis .metin-kutu");
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: !mobil, powerPreference: "high-performance" }); }
-  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#254236,#171715 70%)"; return; }
+  catch (e) { D.classList.add("webgl-yok"); cv.style.background = "radial-gradient(60% 60% at 60% 45%,#b73f36,#28232c 70%)"; return; }
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(fov, 1, .05, 200);
   const pm = new THREE.PMREMGenerator(renderer); const env = pm.fromScene(new RoomEnvironment(renderer), .04).texture; scene.environment = env;
@@ -82,9 +82,9 @@ export function baslat({ kavram, sure = 2.6, kur, fov = 35, yolculuk = false }) 
   function markaFinali(bitir) {
     const m = document.createElement("div"); m.className = "marka-final"; m.setAttribute("aria-hidden", "true");
     const d = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
-    m.innerHTML = `<div class="mf-in"><svg class="mf-logo" viewBox="0 0 64 64"><defs><linearGradient id="mfg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="0" y2="40"><stop offset="0" stop-color="#b69a68"/><stop offset=".5" stop-color="#f1dfb6"/><stop offset="1" stop-color="#b69a68"/><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="110 0" dur="1.9s" begin="0.5s" fill="freeze"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#mfg)" d="${d}"/><path class="mf-edge" fill="none" stroke="#f1dfb6" stroke-width=".9" stroke-linejoin="round" pathLength="100" d="${d}"/></svg><b class="mf-wm">AKE <span>Akademi</span></b></div>`;
+    m.innerHTML = `<div class="mf-in"><svg class="mf-logo" viewBox="0 0 64 64"><defs><linearGradient id="mfg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="0" y2="40"><stop offset="0" stop-color="${(window.AKE_ACILIS||{}).isik||"#f27d6d"}"/><stop offset=".5" stop-color="${(window.AKE_ACILIS||{}).pale||"#fad6d0"}"/><stop offset="1" stop-color="${(window.AKE_ACILIS||{}).isik||"#f27d6d"}"/><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="110 0" dur="1.9s" begin="0.5s" fill="freeze"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#mfg)" d="${d}"/><path class="mf-edge" fill="none" stroke="${(window.AKE_ACILIS||{}).pale||"#fad6d0"}" stroke-width=".9" stroke-linejoin="round" pathLength="100" d="${d}"/></svg><b class="mf-wm">AKE <span>Akademi</span></b></div>`;
     document.body.appendChild(m); void m.offsetWidth; m.classList.add("on");
-    setTimeout(bitir, 2500);
+    setTimeout(bitir, 3000);
   }
   function acilisBitir(kaydet, hizli) {
     oynuyor = false; D.classList.remove("oynuyor", "kilit"); setTimeout(() => kutu && kutu.classList.add("serbest"), 1000); durum.g = 1; if (kaydet !== false && !sinema) depo(anahtar, "goruldu");
@@ -155,7 +155,7 @@ export function etiketYerlestir(THREE, camera, durum, el, p, gorunurluk = 1) {
 }
 
 /* yumuşak ışık lekesi dokusu (parıltı, toz, ışık huzmesi için) */
-export function isikDokusu(THREE, renk = "255,240,214", boy = 128) {
+export function isikDokusu(THREE, renk = "250,214,208", boy = 128) {
   const c = document.createElement("canvas"); c.width = c.height = boy; const x = c.getContext("2d"), g = x.createRadialGradient(boy / 2, boy / 2, 0, boy / 2, boy / 2, boy / 2);
   g.addColorStop(0, `rgba(${renk},1)`); g.addColorStop(.25, `rgba(${renk},.55)`); g.addColorStop(.6, `rgba(${renk},.12)`); g.addColorStop(1, `rgba(${renk},0)`);
   x.fillStyle = g; x.fillRect(0, 0, boy, boy); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;

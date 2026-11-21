@@ -2,39 +2,44 @@
 # Marka renkleri aynı; büyütme/kırpma yok (yalnız opaklık + küçük kayma). "Animasyonu geç" ilk andan görünür.
 # İlk ziyarette bir kez oynar (ake.esik); tekrar gelen beklemez. Azaltılmış hareket/animasyon kapalıysa oynamaz.
 # Perde tıklamayı tutmaz: sayfadaki herhangi bir dokunuş/tuş açılışı hemen kapatır, Giriş yap / Ücretsiz hesap aç gecikmez.
-rep('function atl3dAcilis() {', r'''/* Eşik açılışı: "Bir sorudan bir yola" (~2,4 sn). Işık noktası → farklı yönlere ince çizgiler → tek yol = gerçek K amblem → sitedeki logoya oturur. */
+rep('function atl3dAcilis() {', r'''/* Eşik açılışı "Bir sorudan bir yola" (~2,4 sn): konu haritasının dili (nokta + ince bağlantı); 3 yol, biri K hattına dönüşür; amblem üst çubuktaki logoya tek hareketle oturur. */
 function akeEsikAcilis(zorla) {
   window.__atl3d = 1;
   const pre = () => { try { document.documentElement.classList.remove("ake-pre"); } catch (e) { } };
   if (document.getElementById("atlIntro")) { pre(); return true; }
   let goruldu = false; try { goruldu = !!LS.get("ake.esik"); LS.set("ake.esik", "1"); } catch (e) { }
-  if (goruldu && !zorla) { pre(); return true; }
-  const az = atlHareketAz();
-  const dusuk = !az && ((navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2);
+  if ((goruldu && !zorla) || atlHareketAz()) { pre(); return true; }   /* hareketi azalt: açılış yok, tanıtım doğrudan */
+  const dusuk = (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2;
   const K = "M6 60V32A26 26 0 0 1 32 6H58V60z M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";
-  const ARA = ["M6 60C-6 54 -20 46 -34 48", "M6 60C0 72 -2 86 -14 96", "M6 60C10 44 0 24 -10 6", "M6 60C26 64 50 74 74 76", "M6 60C22 46 44 38 70 24"];
-  const ov = document.createElement("div"); ov.id = "atlIntro"; ov.className = "ake-yol" + (az ? " az" : "") + (dusuk ? " dusuk" : "");
+  const KD = "M6 60V32A26 26 0 0 1 32 6H58V60z", KG = "M25 28v28h6V45.5l14.5 14.5H54L36 41.5 54 22.5v-.1h-8.3L31 38V28z";   /* dış hat ve harf ayrı çizilir (SVG her alt yolda çizgi desenini yeniden başlatır) */
+  let p0 = 66; try { const a = document.createElementNS("http://www.w3.org/2000/svg", "path"), b = a.cloneNode(); a.setAttribute("d", KD); b.setAttribute("d", "M6 60V32A26 26 0 0 1 32 6"); p0 = 100 - 100 * b.getTotalLength() / a.getTotalLength(); } catch (e) { }
+  const nd = (x, y, t) => `<circle class="nd" cx="${x}" cy="${y}" r="1.15" style="--t:${t}s"/>`, rg = (x, y, t) => `<circle class="nr" cx="${x}" cy="${y}" r="3.2" style="--t:${t}s"/>`;
+  const ov = document.createElement("div"); ov.id = "atlIntro"; ov.className = "ake-yol" + (dusuk ? " dusuk" : "");
   ov.setAttribute("role", "status"); ov.setAttribute("aria-label", "AKE Akademi açılışı");
   const fond = document.createElement("div"); fond.className = "ake-yol-fond"; fond.setAttribute("aria-hidden", "true");
-  ov.innerHTML = `<svg class="ake-yol-svg" viewBox="-64 -64 192 192" aria-hidden="true"><defs><linearGradient id="akeYolG" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="58" y2="60"><stop offset="0" style="stop-color:var(--logo-a,#F27D6D)"/><stop offset="1" style="stop-color:var(--logo-b,#B73F36)"/></linearGradient>
-      <radialGradient id="akeYolI"><stop offset="0" stop-color="#F8F5F0" stop-opacity=".55"/><stop offset="1" stop-color="#F8F5F0" stop-opacity="0"/></radialGradient></defs>
-      <g class="ake-yol-aralar">${ARA.map((d, i) => `<path class="ake-yol-ara" style="--d:${i * .04}s" d="${d}" pathLength="100"/>`).join("")}</g>
-      <circle class="ake-yol-isik" cx="6" cy="60" r="10" fill="url(#akeYolI)"/><circle class="ake-yol-nokta" cx="6" cy="60" r="1.5"/>
-      <path class="ake-yol-yol" d="${K}" pathLength="100" fill="none"/>
-      <path class="ake-yol-dolgu" d="${K}" fill="url(#akeYolG)" fill-rule="evenodd"/></svg>
-    <button type="button" class="ake-yol-atla">Animasyonu geç</button>`;
+  ov.innerHTML = `<svg class="ake-yol-svg" viewBox="-64 -64 192 192" aria-hidden="true"><defs><linearGradient id="akeYolG" gradientUnits="userSpaceOnUse" x1="6" y1="6" x2="58" y2="60"><stop offset="0" style="stop-color:var(--logo-a,#F27D6D)"/><stop offset="1" style="stop-color:var(--logo-b,#B73F36)"/></linearGradient></defs>
+      <g class="alt"><path class="br" d="M6 60L-8 49L-30 52" pathLength="100"/>${nd(-8, 49, .5)}${nd(-30, 52, .85)}${rg(-30, 52, .85)}
+        <path class="br" d="M6 60L20 76L50 72" pathLength="100" style="--d:.06s"/>${nd(20, 76, .52)}${nd(50, 72, .9)}${rg(50, 72, .9)}</g>
+      <g class="sec">${nd(6, 32, .55)}${nd(32, 6, .88)}${rg(32, 6, .88)}</g>
+      <path class="ake-yol-yol" d="${KD}" pathLength="100" fill="none" style="--p0:${p0.toFixed(2)}"/><path class="ake-yol-harf" d="${KG}" pathLength="100" fill="none"/>
+      <path class="ake-yol-dolgu" d="${K}" fill="url(#akeYolG)" fill-rule="evenodd"/>
+      <g class="org"><circle class="org-r" cx="6" cy="60" r="5"/><circle class="org-d" cx="6" cy="60" r="1.8"/></g></svg>
+    <a class="ake-yol-giris" href="#hesap">Giriş yap</a><button type="button" class="ake-yol-atla">Animasyonu geç</button>`;
   const svg = ov.querySelector(".ake-yol-svg");
-  let bitti = false, gecti = false, zt = 0, zg = 0, zs = 0;
+  let bitti = false, gecti = false, zt = 0, zg = 0, zs = 0, zw = 0;
   const logoGoster = () => { try { document.documentElement.classList.remove("ake-yol-on"); } catch (e) { } };
-  const temizle = () => { clearTimeout(zt); clearTimeout(zg); clearTimeout(zs); document.removeEventListener("keydown", kd); document.removeEventListener("pointerdown", pd, true); window.removeEventListener("hashchange", son); logoGoster(); ov.remove(); fond.remove(); };
+  const temizle = () => { clearTimeout(zt); clearTimeout(zg); clearTimeout(zs); clearTimeout(zw); document.removeEventListener("keydown", kd); document.removeEventListener("pointerdown", pd, true); window.removeEventListener("hashchange", son); logoGoster(); ov.remove(); fond.remove(); };
+  /* geçiş sırası: (1) amblem koyu zeminde logonun yerine uçar, (2) iner inmez gerçek logo aynı yerde açılır ve zemin çekilir (amblem son kareye kadar yerinde kalır, boşluk olmaz); tanıtım ancak bundan sonra görünür */
   const gec = hizli => {
     if (gecti) return; gecti = true; clearTimeout(zg);
+    const ucus = hizli ? 180 : 380, cek = hizli ? 150 : 230;
     try {
       const logoEl = document.querySelector(".brand .logo-tile"), r = logoEl && logoEl.getBoundingClientRect(), k = svg.getBoundingClientRect();
-      if (!az && r && r.width > 4 && k.width > 4) { const s = r.width / (k.width / 3); svg.style.transform = `translate(${r.left + r.width / 2 - (k.left + k.width / 2)}px,${r.top + r.height / 2 - (k.top + k.height / 2)}px) scale(${s})`; }
+      if (r && r.width > 4 && k.width > 4) { const s = r.width / (k.width / 3); svg.style.transitionDuration = ucus + "ms"; svg.style.transform = `translate(${r.left + r.width / 2 - (k.left + k.width / 2)}px,${r.top + r.height / 2 - (k.top + k.height / 2)}px) scale(${s})`; }
     } catch (e) { }
-    ov.classList.add("gec"); fond.classList.add("gec"); if (hizli) { ov.classList.add("hizli"); fond.classList.add("hizli"); }
-    clearTimeout(zs); zs = setTimeout(temizle, hizli ? 260 : 420);
+    ov.classList.add("gec");
+    clearTimeout(zw); zw = setTimeout(() => { logoGoster(); fond.style.transitionDuration = cek + "ms"; fond.classList.add("ac"); }, ucus - 20);
+    clearTimeout(zs); zs = setTimeout(temizle, ucus - 20 + cek + 30);
   };
   const son = () => { if (bitti) return; bitti = true; gec(true); };
   const kd = () => son(), pd = () => son();
@@ -44,7 +49,7 @@ function akeEsikAcilis(zorla) {
     ov.querySelector(".ake-yol-atla").addEventListener("click", son);
     ov.akeGec = () => { bitti = true; gec(false); }; /* yalnız ölçüm/kayıt betikleri için */
     document.addEventListener("keydown", kd); document.addEventListener("pointerdown", pd, true); window.addEventListener("hashchange", son);
-    zg = setTimeout(() => { bitti = true; gec(false); }, az ? 600 : dusuk ? 1500 : 2000);
+    zg = setTimeout(() => { bitti = true; gec(false); }, dusuk ? 1400 : 1800);
     zt = setTimeout(temizle, 2500);
   } catch (e) { temizle(); pre(); }
   return true;

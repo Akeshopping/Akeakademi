@@ -8328,11 +8328,12 @@ function taskRow(t) {
 }
 
 /* ---------- Deneme merkezi ---------- */
-function examRows(type) {
-  const ex = EXAMS[type], f = { full: 1, half: 0.5, quarter: 0.25 }[UI.exam.size] || 1, rows = [];
+function examRows(type, E) {
+  E = E || UI.exam;   /* 3C-4i: güvenli girişler tıklama anında sabitlenmiş seçimi (denemeSecimAl) verir; varsayılan canlı UI.exam (eski çağıranlar aynı) */
+  const ex = EXAMS[type], f = { full: 1, half: 0.5, quarter: 0.25 }[E.size] || 1, rows = [];
   ex.sec.forEach(sec => sec.p.forEach(([s, n]) => {
     const key = type + ":" + sec.n + ":" + s;
-    const c = UI.exam.size === "custom" ? (UI.exam.custom[key] != null ? UI.exam.custom[key] : Math.max(1, Math.round(n * 0.25))) : Math.max(1, Math.round(n * f));
+    const c = E.size === "custom" ? (E.custom[key] != null ? E.custom[key] : Math.max(1, Math.round(n * 0.25))) : Math.max(1, Math.round(n * f));
     rows.push({ sec: sec.n, s, n: c, full: n, key });
   }));
   return rows;
@@ -8603,11 +8604,11 @@ function studyoKarmaCek() {
 function studyoKarmaGiris() { studyoGirisCalistir(studyoKarmaCek); }
 /* 3C-4c: mini deneme (ACT.quick mini), bayrak AÇIKKEN: bölüm başına KHAVUZ'dan (önce taze, sonra eski) examRows çeyrek adedi kadar soru; eksik DOLDURULMAZ (BANK/EKQ/AI/GENS yok), eksik dersler bildirilir,
    toplam 0 ise RUN açılmaz; sınav modu + otomatik süre (ex.min · seçilen/tam; katalog tamsa mevcut yerel mini ile aynı); güvenli cfg (studyoGuvenli) → sunucu sınav oturumu zorunlu, yerel fallback/kota yok.
-   Deneme merkezinden başlatılan tam/yarım/çeyrek/özel denemeler (startExamFromUI) DEĞİŞMEZ. */
-function studyoMiniCek() {
+   (3C-4i sonrası: deneme merkezinden başlatılan tam/yarım/çeyrek/özel denemeler de bayrak AÇIKKEN studyoDenemeCek ile güvenli; bayrak KAPALIYKEN startExamFromUI aynen.) */
+function studyoMiniCek(sec) {
   if (studyoKapaliIptal()) return;
   if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
-  const E = UI.exam, type = E.type || defaultExam(), ex = EXAMS[type], rows = examRows(type), qs = [], secs = [], eksik = [], gor = new Set();
+  const E = sec || UI.exam, type = E.type || defaultExam(), ex = EXAMS[type], rows = examRows(type, E), qs = [], secs = [], eksik = [], gor = new Set();
   for (const r of rows) {
     const h = stHavuzG(r.s, {}); if (!h) { bankaHazirDegil(); return; }
     const al = h.taze.concat(h.eski).filter(q => !gor.has(q.id)).slice(0, r.n);
@@ -8621,7 +8622,32 @@ function studyoMiniCek() {
   const full = rows.reduce((a, r) => a + r.full, 0), auto = Math.max(5, Math.round(ex.min * qs.length / full));
   startRun(studyoCfg({ kind: "exam", type, title: ex.n + " denemesi · mini", mode: "exam", qs, secs: secs.filter(x => x.to > x.from), dur: auto }));
 }
-function studyoMiniGiris() { studyoGirisCalistir(studyoMiniCek); }
+function studyoMiniGiris() { const sec = denemeSecimAl(); studyoGirisCalistir(() => studyoMiniCek(sec)); }   /* seçim tıklama anında sabitlenir; katalog beklerken UI değişimi bekleyen isteği değiştirmez */
+/* 3C-4i: deneme merkezi (ACT.startExam → tam/yarım/çeyrek/özel; sınav ve çalışma modu), bayrak AÇIKKEN: bölüm/ders adetleri examRows'tan (tıklama anındaki seçimle), sorular YALNIZ KHAVUZ'dan
+   (önce çözülmemiş, "önce çözmediklerimi seç" kapalıysa karışık); eksik DOLDURULMAZ (BANK/EKQ/AI/GENS yok), eksik dersler bildirilir, toplam 0 ise RUN açılmaz; süre/başlık/mod startExamFromUI ile aynı
+   (eksik katalogta otomatik süre gerçek soru sayısına göre: mini sözleşmesi); güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu (sınav modu "exam", çalışma modu "practice" kotası), yerel fallback/kota yok.
+   KAPSAM: bugünkü UI en çok 120 soru üretir (TYT tam); 121+ soruluk kota tasarımı bu adımda DEĞİŞMEDİ. Bayrak kapalıyken startExamFromUI aynen çalışır. */
+const denemeSecimAl = () => { const E = UI.exam; return { type: E.type, size: E.size, custom: Object.assign({}, E.custom), mode: E.mode, dur: E.dur, unsolved: E.unsolved }; };
+function studyoDenemeCek(E) {
+  if (studyoKapaliIptal()) return;
+  if (RUN && !RUN.gvn) { paragrafEskiUyari(); return; }   /* eski (işaretsiz) oturum ASLA ezilmez */
+  const type = E.type || defaultExam(), ex = EXAMS[type], rows = examRows(type, E), qs = [], secs = [], eksik = [], gor = new Set();
+  if (!rows.some(r => r.n > 0)) { toast("Bu seçimle çözülecek soru bulunamadı."); return; }
+  for (const r of rows) {
+    const h = stHavuzG(r.s, {}); if (!h) { bankaHazirDegil(); return; }
+    const al = (E.unsolved ? h.taze.concat(h.eski) : shuffle(h.taze.concat(h.eski))).filter(q => !gor.has(q.id)).slice(0, r.n);
+    if (al.length < r.n) eksik.push(`${SUBJ[r.s].n}: ${al.length}/${r.n}`);
+    let sec = secs[secs.length - 1];
+    if (!sec || sec.n !== r.sec) { sec = { n: r.sec, from: qs.length, to: qs.length }; secs.push(sec); }
+    for (const q of al) { gor.add(q.id); qs.push(q); } sec.to = qs.length;
+  }
+  if (!qs.length) { toast("Katalogda bu deneme için soru bulunamadı."); return; }
+  if (eksik.length) toast("Katalogda bazı derslerde yeterli soru yok: " + eksik.join(", "));
+  const full = rows.reduce((a, r) => a + r.full, 0), auto = Math.max(5, Math.round(ex.min * qs.length / full)), dur = E.dur === "" || E.dur == null ? auto : Math.max(0, +E.dur || 0);
+  const lbl = { full: "", half: " · yarım", quarter: " · mini", custom: " · özel" }[E.size];
+  startRun(studyoCfg({ kind: "exam", type, title: ex.n + " denemesi" + lbl, mode: E.mode, qs, secs: secs.filter(x => x.to > x.from), dur: E.mode === "exam" ? dur : (E.dur === "" ? 0 : dur) }));
+}
+function studyoDenemeGiris() { const sec = denemeSecimAl(); studyoGirisCalistir(() => studyoDenemeCek(sec)); }
 /* 3C-4d: koç testi (ACT.kocTest), bayrak AÇIKKEN: seviye ağırlıkları (kolay/orta/zor) korunur; sorular YALNIZ KHAVUZ'dan (önce taze, sonra eski). Açık yanlışlardan en çok n'li en fazla 2 tanesi KİMLİKLE katalogda aranır ve RUN'a
    katalogdaki cevapsız nesneyle girer (S.mistakes[].q anlık görüntüsü KOPYALANMAZ); katalogda olmayan, g: ya da görselli eski yanlışlar elenir ve bildirilir. Konu yetmezse aynı dersten katalogla 10'a tamamlanır; yine yetmezse eksik sayıyla açılır ve bildirilir.
    BANK/EKQ/AI/GENS dolgusu ve yerel kota/fallback YOK; güvenli cfg (studyoGuvenli) → sunucu oturumu zorunlu. KAPSAM DIŞI (DEĞİŞMEZ, cevaplı yerel kaynak): kocOrnekler ve mist* yolları. */
@@ -13499,7 +13525,7 @@ const ACT = {
   exSize(d) { UI.exam.size = d.k; render(); },
   exMode(d) { UI.exam.mode = d.k; render(); },
   exStep(d) { const type = UI.exam.type || defaultExam(), r = examRows(type).find(x => x.key === d.k); if (!r) return; UI.exam.custom[d.k] = Math.max(0, Math.min(r.full, r.n + (+d.v))); render(); },
-  startExam() { startExamFromUI(); },
+  startExam() { if (studyoGuvenliMi()) { studyoDenemeGiris(); return; } startExamFromUI(); },
   openResult(d) { UI.resultId = d.id; UI.lastResult = null; go("sonuc"); },
   resume() { if (guvenliEkranMi() && RUN && !RUN.gvn) { paragrafEskiUyari(); return; } UI.pendingRun = null; UI.modal = null; UI.inRun = true; render(); window.scrollTo(0, 0); startTick(); },
   svTekrar() { if (BK.cikis) return; const c = UI.svBekleyen; UI.svBekleyen = null; UI.modal = null; if (c) svBaslat(c); },

@@ -190,12 +190,12 @@ for (const [mod, baslik] of [["500", "Sorular şu an açılamadı"], ["402", "Bu
   t("KARAKT", "K3 ağ hatası, bayrak kapalı → RUN açılmaz, 'Sorular şu an açılamadı' penceresi, yerel kota yok", tk && !r.run && r.modal === "Sorular şu an açılamadı" && D.kota === 0, JSON.stringify({ run: r.run, modal: r.modal, kota: D.kota }));
   await c.close(); }
 
-/* =====================  [DIŞ] ortak startExamFromUI: tam / yarım / özel  (bayrak AÇIK iken de yerel/eski yol; mini değişse de AYNI kalmalı → yeşil)  ===================== */
+/* =====================  [DIŞ] ortak startExamFromUI: tam / yarım / özel  (3C-4i SONRASI: bayrak KAPALIYKEN eski yol AYNEN; bayrak AÇIKKEN güvenli yol → tests/studyo-deneme-merkezi-istemci.mjs)  ===================== */
 for (const boyut of ["full", "half", "custom"]) {
-  sifirla(); const { c, p } = await sayfa({ guvenli: true, tuzak: false }); await onYukle(p);
+  sifirla(); const { c, p } = await sayfa({ guvenli: false, tuzak: false });   // bayrak KAPALI: katalog yüklenmez/beklenmez
   await p.evaluate(s => { S.profile.alan = ""; UI.exam.type = defaultExam(); UI.exam.size = s; UI.exam.mode = "exam"; UI.exam.dur = ""; UI.exam.unsolved = false; ACT.startExam(); }, boyut);
   const r = await ozet(p), bek = await p.evaluate(() => { const rows = examRows(defaultExam()), tot = rows.reduce((a, r) => a + r.n, 0), full = rows.reduce((a, r) => a + r.full, 0); return Math.max(5, Math.round(EXAMS[defaultExam()].min * tot / full)) * 60; });
-  t("DIŞ", `${boyut} deneme (ACT.startExam, bayrak AÇIK): yerel/eski yol AYNEN: katalog kimliği yok, gvn yok, sınav modu, auto süre, sunucu oturumu isteği (varsa) mod=exam`, r.run && r.kind === "exam" && r.mode === "exam" && r.gvn === null && r.dur === bek && r.ids.every(i => !KS.has(i)) && D.istekler.every(i => i.mod === "exam") && secsParca(r.secs, r.n), JSON.stringify({ run: r.run, dur: r.dur, bek, gvn: r.gvn, n: r.n }));
+  t("DIŞ", `${boyut} deneme (ACT.startExam, bayrak KAPALI): yerel/eski yol AYNEN: katalog kimliği yok, gvn yok, sınav modu, auto süre, sunucu oturumu isteği (varsa) mod=exam`, r.run && r.kind === "exam" && r.mode === "exam" && r.gvn === null && r.dur === bek && r.ids.every(i => !KS.has(i)) && D.istekler.every(i => i.mod === "exam") && secsParca(r.secs, r.n), JSON.stringify({ run: r.run, dur: r.dur, bek, gvn: r.gvn, n: r.n }));
   await c.close();
 }
 

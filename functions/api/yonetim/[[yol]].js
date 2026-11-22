@@ -16,6 +16,7 @@
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
 import { cevrimdisiIceAl, cevrimdisiInceleme, cevrimdisiDurum } from "../../../lib/fabrika-cevrimdisi.js";
 import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, fabrikaHazirMi, fabrikaHazirla, onizlemeMi, usdToplam, notEkle, notKapat, uzmanKarari } from "../../../lib/fabrika.js";
+import { yoneticiSaltOkunur, taslakOku } from "../../../lib/fabrika-okuma.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -97,6 +98,12 @@ async function shopier(env, path, opt) {
 export async function onRequest({ request, env, params }) {
   if (!env.DB) return fail(500, "yapilandirma");
   if (!ayniKaynak(request)) return fail(403, "origin", "Bu istek farklı bir siteden geldiği için reddedildi.");
+  /* SALT OKUNUR dar uç: sema()/oturum() ÇAĞRILMAZ (örtük tablo kurulumu yok); yalnız SELECT. Yönetici yetkisi şart. */
+  if (request.method === "GET" && [].concat(params.yol || [])[0] === "soru-taslak-oku") {
+    if (!(await yoneticiSaltOkunur(request, env))) return fail(403, "yetki");
+    const q = new URL(request.url).searchParams.get("ids") || "";
+    return json(200, await taslakOku(env, q ? q.split(",") : []));
+  }
   await sema(env);
   const u = await oturum(request, env);
   if (!u || !yoneticiMi(env, u)) return fail(403, "yetki");

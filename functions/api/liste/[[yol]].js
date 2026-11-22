@@ -14,7 +14,7 @@ import { kaydet, onayla, yeniOnay, temizle, cik, silIste, sayfa, onayFormu, cikF
 const SONUC = {
   onaylandi: ["Kaydın onaylandı", "Ücretli paketler açıldığında sana bir kez e-posta ile haber vereceğiz. İstediğin zaman her e-postadaki bağlantıdan kaydını silebilirsin."],
   zaten_onayli: ["Kaydın zaten onaylı", "Başka bir işlem gerekmiyor."],
-  onay_gonderildi: ["Kontrol et", "Bu adres onay bekliyorsa yeni bir onay e-postası gönderdik. E-posta en çok 10 dakikada bir gönderilir; gelmediyse biraz bekleyip spam klasörüne de bak. Yeni e-posta geldiğinde yalnızca <b>en son gelenin</b> bağlantısı çalışır. Kaydın silinmişse ya da süresi dolmuşsa <a href=\"/#premium\">formu yeniden doldur</a>."],
+  onay_gonderildi: ["Kontrol et", "Bu adres onay bekliyorsa ve en son e-postanın üzerinden en az 10 dakika geçtiyse yeni bir onay e-postası gönderdik. Daha erken istemek e-posta çıkarmaz, ama hakkından da düşmez. Gelmediyse biraz bekleyip spam klasörüne de bak. Yeni e-posta geldiğinde yalnızca <b>en son gelenin</b> bağlantısı çalışır. Kaydın silinmişse ya da süresi dolmuşsa <a href=\"/#premium\">formu yeniden doldur</a>."],
   silindi: ["Kaydın silindi", "Adresin ve iznin listeden tamamen kaldırıldı. Bu adrese artık açılış haberi gönderilmez."]
 };
 const HATA = ["Bağlantı geçersiz", "Bağlantının süresi dolmuş ya da bağlantı hatalı olabilir. Sitedeki formu yeniden doldurabilirsin."];

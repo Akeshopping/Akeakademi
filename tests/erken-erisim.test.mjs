@@ -153,21 +153,55 @@ test("13) yeni onay e-postası: eski bağlantı çalışmaz, yeni çalışır; 1
   const sayfa1 = await sayfaMetni(await istek("yeni-onay", { form: { eposta: "c13@ornek.com" } })); assert.match(sayfa1, /Kontrol et/); assert.ok(!sayfa1.includes("c13@ornek.com"));
   assert.match(await sayfaMetni(await istek("yeni-onay", { method: "GET" })), /action="\/api\/liste\/yeni-onay"/);
 });
-test("14) yeni onay mevcut hız sınırlarını AŞMAZ: kayıtla aynı adres kovası (3/sa) ve IP kovası (10/sa)", async () => {
-  await kayit("a14@ornek.com");                                           // adres kovası: 1
-  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200);   // 2
-  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200);   // 3
-  const r = await yeniOnayIste("a14@ornek.com"); assert.equal(r.status, 429); assert.ok(r.headers.get("retry-after")); assert.equal(MAILLER.length, 3);
+test("14) gerçek hız sınırı: adres kotası kayıtla AYNI (3/sa) ve yalnız gönderen isteği sayar; dolunca e-posta yok, yanıt aynı, eski belirteç aynen; IP sınırı her istekte işler", async () => {
+  await kayit("a14@ornek.com"); const eski = tokenAl(MAILLER[0]);        // adres kotası: 1
+  const aynisi = await (await yeniOnayIste("yok14@ornek.com")).json();
+  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200); assert.equal(MAILLER.length, 2);   // 2
+  eskiyeAl("a14@ornek.com", 11); assert.equal((await yeniOnayIste("a14@ornek.com")).status, 200); assert.equal(MAILLER.length, 3);   // 3
+  const son = tokenAl(MAILLER[2]), once = satir("a14@ornek.com");
+  eskiyeAl("a14@ornek.com", 11); const sinir = await yeniOnayIste("a14@ornek.com");                                                   // 4. gerçek istek: kota dolu
+  assert.equal(sinir.status, 200, "yanıt durumu sızdırmaz"); assert.deepEqual(await sinir.json(), aynisi); assert.equal(MAILLER.length, 3, "kota dolunca e-posta yok");
+  const sonra = satir("a14@ornek.com"); assert.equal(sonra.onay_hash, once.onay_hash, "belirteç değişmedi (geri alındı)");
+  assert.deepEqual(await (await istek("onayla", { body: { t: son } })).json(), { ok: true, durum: "onaylandi" }, "son gelen e-postadaki bağlantı hâlâ çalışır");
+  assert.equal((await (await istek("onayla", { body: { t: eski } })).json()).error, "eski_baglanti");
+  /* IP sınırı her istekte işler: kayıtsız adreslere atılan istekler de IP hakkını yer; 11. istek 429 */
   const ip = "203.0.113.9";
   for (let i = 0; i < 10; i++) assert.equal((await yeniOnayIste("ip" + i + "@ornek.com", { ip })).status, 200);
-  assert.equal((await yeniOnayIste("ip10@ornek.com", { ip })).status, 429);
+  const r = await yeniOnayIste("ip10@ornek.com", { ip }); assert.equal(r.status, 429); assert.ok(r.headers.get("retry-after"));
 });
-test("15) yeni onay e-postası gönderilemezse 502 ve ESKİ bağlantı çalışmaya devam eder (belirteç geri alınır)", async () => {
+test("15) yeni onay e-postası gönderilemezse eski belirteç geri alınır, yanıt aynı (200), adres kotasından yalnız o gönderim düşer", async () => {
   await kayit("a15@ornek.com"); const eski = tokenAl(MAILLER[0]); eskiyeAl("a15@ornek.com", 11);
-  const once = satir("a15@ornek.com"); EPOSTA_BASARISIZ = true;
-  const r = await yeniOnayIste("a15@ornek.com"); assert.equal(r.status, 502); assert.equal((await r.json()).error, "eposta_gitmedi");
+  const aynisi = await (await yeniOnayIste("yok15@ornek.com")).json(), once = satir("a15@ornek.com"); EPOSTA_BASARISIZ = true;
+  const r = await yeniOnayIste("a15@ornek.com"); assert.equal(r.status, 200); assert.deepEqual(await r.json(), aynisi);
   const sonra = satir("a15@ornek.com"); assert.equal(sonra.onay_hash, once.onay_hash); assert.equal(sonra.onay_son, once.onay_son); assert.equal(sonra.son_gonderim, once.son_gonderim);
   EPOSTA_BASARISIZ = false; assert.deepEqual(await (await istek("onayla", { body: { t: eski } })).json(), { ok: true, durum: "onaylandi" });
+});
+test("20) erken istek (10 dk dolmadan): e-posta yok, kayıt ve belirteç değişmez, adres kotası TÜKENMEZ; süre dolunca başarılı istek çalışır", async () => {
+  await kayit("a20@ornek.com"); const eski = tokenAl(MAILLER[0]), once = satir("a20@ornek.com");
+  const ilk = await (await yeniOnayIste("a20@ornek.com")).json();
+  for (let i = 0; i < 8; i++) { const r = await yeniOnayIste("a20@ornek.com"); assert.equal(r.status, 200); assert.deepEqual(await r.json(), ilk); }   // eski davranışta 3. istekte 429 olurdu
+  assert.equal(MAILLER.length, 1, "erken isteklerde e-posta yok");
+  const sonra = satir("a20@ornek.com"); assert.deepEqual(sonra, once, "satır hiç değişmedi");
+  eskiyeAl("a20@ornek.com", 11);                                           // 10 dk doldu
+  assert.equal((await yeniOnayIste("a20@ornek.com")).status, 200); assert.equal(MAILLER.length, 2, "süre dolunca başarılı");
+  const yeni = tokenAl(MAILLER[1]); assert.notEqual(yeni, eski); assert.equal((await (await istek("onayla", { body: { t: eski } })).json()).error, "eski_baglanti");
+  assert.deepEqual(await (await istek("onayla", { body: { t: yeni } })).json(), { ok: true, durum: "onaylandi" });
+});
+test("21) eşzamanlı istekler: yalnız biri kazanır, tek e-posta, kaybedenler adres kotası harcamaz", async () => {
+  await kayit("a21@ornek.com"); eskiyeAl("a21@ornek.com", 11); const n = MAILLER.length;
+  const rs = await Promise.all(Array.from({ length: 6 }, () => yeniOnayIste("a21@ornek.com")));
+  assert.ok(rs.every(r => r.status === 200)); assert.equal(MAILLER.length, n + 1, "6 eşzamanlı istek → tek e-posta");
+  assert.equal(new Set(MAILLER.slice(n).map(m => tokenAl(m))).size, 1);
+  /* kota: kayıt (1) + kazanan (2). Kaybedenler harcamadıysa bir gönderim daha hakkı vardır (3), ardından dolar */
+  eskiyeAl("a21@ornek.com", 11); await yeniOnayIste("a21@ornek.com"); assert.equal(MAILLER.length, n + 2, "kaybedenler kotayı harcamadı: 3. hak kullanılabildi");
+  eskiyeAl("a21@ornek.com", 11); await yeniOnayIste("a21@ornek.com"); assert.equal(MAILLER.length, n + 2, "4. gönderim kota dolu");
+});
+test("22) yanıt durumu sızdırmaz: kayıtsız, onaylı, erken, kota dolu, gönderildi — hepsinde aynı durum kodu ve gövde", async () => {
+  await kayit("onayli22@ornek.com"); await istek("onayla", { body: { t: tokenAl(MAILLER[MAILLER.length - 1]) } });
+  await kayit("erken22@ornek.com"); await kayit("gider22@ornek.com"); eskiyeAl("gider22@ornek.com", 11);
+  const gorunum = async e => { const r = await yeniOnayIste(e); return JSON.stringify([r.status, await r.json(), [...r.headers.entries()].filter(([k]) => /content-type|cache-control/i.test(k))]); };
+  const kume = new Set([await gorunum("yok22@ornek.com"), await gorunum("onayli22@ornek.com"), await gorunum("erken22@ornek.com"), await gorunum("gider22@ornek.com")]);
+  assert.equal(kume.size, 1, [...kume].join(" | "));
 });
 test("16) günlük: yalnızca genel neden kodu; adres, belirteç, özet, IP yok", async () => {
   const satirlar = [], eski = console.warn; console.warn = (...a) => satirlar.push(a.join(" "));

@@ -40,9 +40,11 @@ test("Preview taslakları kaynak JSON ile birebir eşleşir (h, a, d, çözüm/g
 test("10 aday içe alınır: mevcut taslak yeni SÜRÜM olur (eski/yeni json saklanır), yeniler taslak yazılır; model_durum asla 'gecti' olmaz", async () => {
   const T = await yeniOrtam(); await previewTaklit(T);
   const sonuc = []; for (const k of ADAY10_V2) sonuc.push(await ice(T, k)); assert.ok(sonuc.every(r => r.ok), JSON.stringify(sonuc.filter(r => !r.ok)));
-  const sv = T.DB.db.prepare("SELECT soru_id, surum, eski_json, yeni_json FROM fabrika_surum").all();
-  assert.deepEqual(sv.map(r => r.soru_id), ["p1v2-mat-06489"]);   // Preview'da olup içeriği DEĞİŞEN tek aday; 04799'un içeriği aynı kaldı
-  assert.notEqual(sv[0].eski_json, sv[0].yeni_json); assert.equal(sv[0].surum, 2); assert.equal(JSON.parse(sv[0].eski_json).d, 3); assert.equal(JSON.parse(sv[0].yeni_json).d, 2);
+  const sv = T.DB.db.prepare("SELECT soru_id, surum, eski_json, yeni_json FROM fabrika_surum ORDER BY soru_id").all();
+  assert.deepEqual(sv.map(r => r.soru_id), ["p1v2-mat-04799", "p1v2-mat-06489"]);   // Preview'da olup içeriği (çözüm metni) DEĞİŞEN iki aday
+  for (const r of sv) { assert.notEqual(r.eski_json, r.yeni_json); assert.equal(r.surum, 2); }
+  assert.equal(JSON.parse(sv[1].eski_json).d, 3); assert.equal(JSON.parse(sv[1].yeni_json).d, 2);   // 06489: güçlük 3 → 2
+  assert.equal(JSON.parse(sv[0].eski_json).d, JSON.parse(sv[0].yeni_json).d); assert.deepEqual(JSON.parse(sv[0].eski_json).o, JSON.parse(sv[0].yeni_json).o);   // 04799: yalnız çözüm metni
   assert.equal(T.DB.db.prepare("SELECT COUNT(*) n FROM soru WHERE id LIKE 'p1v2-%' AND durum = 'taslak'").get().n, 10 + 8);   // 10 Preview taslağı + 8 yeni aday
   for (const k of ADAY10_V2) { const s = satir(T, k.id); assert.equal(s.model_durum, "cevrimdisi_bekliyor"); assert.equal(s.denetim_tam, 0); assert.equal(s.yayim_durum, "yok"); assert.equal(s.durum, "taslak"); }
   assert.equal(onayli(T), 0);

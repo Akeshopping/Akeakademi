@@ -4,6 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { kur, yonetimIstek, sentetik } from "./yardim/soru-v2.mjs";
 import worker from "../worker/fabrika-worker.js";
+import { fabrikaHazirla } from "../lib/fabrika.js";
 
 const T = await kur({ ekEnv: { AKE_YONETICI: "yonetici@ornek.com", ANTHROPIC_API_KEY: "test-anahtar-sahte-uctan-uca", AKE_FABRIKA_GUNLUK_CAGRI: "100" } });
 await T.hazirla(); const yon = await T.giris("yonetici@ornek.com"), DB = T.DB;
@@ -11,6 +12,9 @@ const yon_ = (yol, m = "POST", govde) => yonetimIstek(T, yol, { m, cookie: yon.c
 const say = w => DB.db.prepare(`SELECT COUNT(*) n FROM soru WHERE ${w}`).get().n;
 
 test("uçtan uca: robot kapalı → aç → pilot → Worker turları → 10 aday (hepsi taslak) → ilkini yayımla → öğrenci yalnız onu görür", async () => {
+  /* GET uçları tablo kurmaz: kurulum AÇIK hazırlık adımıdır (eskiden ilk GET'in yan etkisiydi) */
+  assert.equal((await yon_("fabrika-durum", "GET")).j.hazir, false);
+  assert.equal((await fabrikaHazirla(T.env)).sonra.hazir, true);
   /* varsayılan KAPALI; pilot başlamaz */
   assert.equal((await yon_("fabrika-durum", "GET")).j.robot, false);
   assert.equal((await yon_("fabrika-pilot-baslat")).s, 409);

@@ -15,7 +15,7 @@
 //   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
 import { cevrimdisiIceAl, cevrimdisiInceleme, cevrimdisiDurum } from "../../../lib/fabrika-cevrimdisi.js";
-import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam, notEkle, notKapat, uzmanKarari } from "../../../lib/fabrika.js";
+import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, fabrikaHazirMi, fabrikaHazirla, onizlemeMi, usdToplam, notEkle, notKapat, uzmanKarari } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
 const LET = ["A", "B", "C", "D", "E"];
@@ -179,6 +179,16 @@ export async function onRequest({ request, env, params }) {
   }
   if (ad.startsWith("fabrika-")) {
     const gov = async () => { try { return (await request.json()) || {}; } catch (e) { return {}; } };
+    /* GET uçları tablo KURMAZ (DDL yok). Tablolar yoksa boş + hazir:false döner; kurulum AÇIK hazırlık adımıdır (aşağıda). */
+    if (m === "GET" && ["fabrika-durum", "fabrika-adaylar", "fabrika-cagrilar", "fabrika-cevrimdisi-durum"].includes(ad)) {
+      const h = await fabrikaHazirMi(env);
+      if (!h.hazir) return json(200, { hazir: false, eksik: h.eksik, mesaj: "Fabrika tabloları kurulu değil. Okuma uçları tablo kurmaz; önizlemede açık hazırlık adımı (POST fabrika-hazirla) gerekir." });
+    }
+    if (ad === "fabrika-hazirla" && m === "POST") {   // YALNIZ önizleme (pages.dev alt alan adı) + açık onay cümlesi; production'da çalışmaz
+      if (!onizlemeMi(request.url)) return fail(403, "yalniz_onizleme", "Tablo hazırlığı yalnız Preview dağıtımında çalışır.");
+      const b = await gov(); if (b.onay !== "preview-tablolarini-kur") return fail(400, "onay_eksik", 'Gövde {"onay":"preview-tablolarini-kur"} olmalı.');
+      return json(200, await fabrikaHazirla(env));
+    }
     if (ad === "fabrika-durum" && m === "GET") return json(200, await fabrikaDurum(env));
     if (ad === "fabrika-adaylar" && m === "GET") return json(200, { adaylar: await fabrikaAdaylar(env) });
     if (ad === "fabrika-cagrilar" && m === "GET") return json(200, { cagrilar: await fabrikaCagrilar(env) });

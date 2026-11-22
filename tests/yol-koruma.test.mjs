@@ -36,6 +36,7 @@ test("6) yapısal: depodaki her üst düzey öğe 'korunan' ya da 'bilerek herke
   const ust = [...new Set(izlenen.map(f => f.split("/")[0] + (f.includes("/") ? "/" : "")))], bilinen = new Set([...KORUNAN_KLASORLER.map(k => k + "/"), ...HERKESE_ACIK_KLASORLER.map(k => k + "/"), ...HERKESE_ACIK_DOSYALAR, ...YAYIN_DISI_DOSYALAR, "_routes.json"]);
   assert.deepEqual(ust.filter(u => !bilinen.has(u)), [], "sınıflandırılmamış üst düzey öğe: lib/yol-koruma.js içindeki listelere ekleyin");
   for (const f of YAYIN_DISI_DOSYALAR) assert.equal(korunanMi("/" + f), true, f);
+  for (const y of ["/.github/workflows/liste-temizle.yml", "/.github/", "/%2egithub/workflows/liste-temizle.yml"]) assert.equal(korunanMi(y), true, y);
 });
 test("7) _routes.json: tüm istekler Function'a gider; dışlananlar YALNIZ tam dosya yolu (joker yok), hepsi izlenen gerçek dosya; ≤100 kural", () => {
   const r = JSON.parse(fs.readFileSync(path.join(KOK, "_routes.json"), "utf8"));

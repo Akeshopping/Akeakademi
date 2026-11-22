@@ -135,7 +135,7 @@ rep('''const LEGAL = {
     <ul><li>Barındırma ve veritabanı hizmeti (${ay("barindirma", "BARINDIRMA")}): kaydın saklanması için</li><li>E-posta gönderim hizmeti (Resend): onay ve silme e-postalarının iletilmesi için</li></ul>
     <p>Verilerin satılmaz ve başka amaçla paylaşılmaz. Bu hizmet sağlayıcıların sunucuları yurt dışında olabilir; aktarım KVKK m.9'a uygun güvencelerle yapılır.</p>
     <h2>Saklama ve silme</h2>
-    <p>Onaylamadığın kayıt 48 saat sonra silinir. Onayladığın kayıt, paketler açılıp haber verilene ya da listenin amacı ortadan kalkana kadar saklanır. Kaydını ve iznini istediğin zaman silebilir ya da geri çekebilirsin: her e-postadaki “kaydımı sil” bağlantısı ya da Paketler sayfasındaki “kaydımı sil” formu yeterlidir. Silme, adresinin ve izin kaydının listeden tamamen kaldırılması demektir.</p>
+    <p>Onay bağlantısı 48 saat geçerlidir. Onaylamadığın kayıt bu süre dolduktan sonra otomatik temizlikle silinir; temizlik düzenli çalışır ve genellikle bir saat içinde tamamlanır, teknik bir aksaklıkta biraz gecikebilir. Onayladığın kayıt, paketler açılıp haber verilene ya da listenin amacı ortadan kalkana kadar saklanır. Kaydını ve iznini istediğin zaman silebilir ya da geri çekebilirsin: her e-postadaki “kaydımı sil” bağlantısı ya da Paketler sayfasındaki “kaydımı sil” formu yeterlidir. Silme, adresinin ve izin kaydının listeden tamamen kaldırılması demektir.</p>
     <h2>Hakların (KVKK m.11)</h2>
     <p>Verilerinin işlenip işlenmediğini öğrenme, bilgi isteme, düzeltilmesini ya da silinmesini isteme ve itiraz etme haklarına sahipsin. Başvuru için ${ay("eposta", "E-POSTA")} adresine yazabilirsin.</p>
     <p class="small">İzin ve aydınlatma metni sürümü: 2026-11-21.</p>` },

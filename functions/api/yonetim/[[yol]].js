@@ -14,6 +14,7 @@
 //   POST fabrika-not {soru_id, tur:"uzman_bekliyor", mesaj} | {not_id, kapat:true, gerekce}   (inceleme notu; soru kaydına dokunmaz)
 //   POST fabrika-robot {acik}   fabrika-pilot-baslat {hedef?,ders?,konu?}   fabrika-pilot-durdur   fabrika-karar {id|[id], karar:"yayin"|"red"}
 import { bayrakAcik, soruYazKanonik, soruOnayla } from "../../../lib/soru-yaz.js";
+import { cevrimdisiIceAl, cevrimdisiInceleme, cevrimdisiDurum } from "../../../lib/fabrika-cevrimdisi.js";
 import { taslagiKuyrugaAl, robotAyarla, pilotBaslat, pilotDurdur, fabrikaDurum, adaylar as fabrikaAdaylar, cagrilar as fabrikaCagrilar, yayimKarari, usdToplam, notEkle, notKapat, uzmanKarari } from "../../../lib/fabrika.js";
 import { kodKutusu, json, fail, sema, oturum, yoneticiMi, ayarOku, ayarYaz, siparisIsle, epostaGonder, epostaSablon, PAKETLER, claude, jsonAyikla, soruSema, rastgele, giderBugun, giderYaz, gunTR, pushToken } from "../../../lib/ortak.js";
 
@@ -197,10 +198,20 @@ export async function onRequest({ request, env, params }) {
       const r = await uzmanKarari(env, { soruId: b.soru_id, karar: b.karar, uzmanAd: b.uzman_ad, brans: b.brans, gerekce: b.gerekce, tarih: b.tarih, kaydeden: u.eposta });
       return r.ok ? json(200, r) : fail(r.neden === "uzman_reddetmis" || r.neden === "karar_verilmis" ? 409 : 400, r.neden, "Uzman kararı kaydedilemedi: " + r.neden);
     }
+    /* Çevrimdışı inceleme akışı: ücretli model denetimi DEĞİLDİR; kaydeden = oturumdaki yönetici (istemci değeri alınmaz). */
+    if (ad === "fabrika-cevrimdisi-durum" && m === "GET") return json(200, { sorular: await cevrimdisiDurum(env) });
+    if (ad === "fabrika-cevrimdisi-ice-al" && m === "POST") {
+      const b = await gov(), r = await cevrimdisiIceAl(env, { kayit: b.kayit, neden: b.neden, kaydeden: u.eposta });
+      return r.ok ? json(200, r) : fail(r.neden === "karar_verilmis" || r.neden === "taslak_degil" ? 409 : 400, r.neden, "İçe alınamadı: " + r.neden);
+    }
+    if (ad === "fabrika-cevrimdisi" && m === "POST") {
+      const b = await gov(), r = await cevrimdisiInceleme(env, { soruId: b.soru_id, sonuc: b.sonuc, arac: b.arac, kapsam: b.kapsam, bulgular: b.bulgular, kaydeden: u.eposta });
+      return r.ok ? json(200, r) : fail(r.neden === "karar_verilmis" ? 409 : 400, r.neden, "İnceleme kaydedilemedi: " + r.neden);
+    }
     if (ad === "fabrika-karar" && m === "POST") {
       const b = await gov();
       if (b.karar !== "yayin" && b.karar !== "red") return fail(400, "karar_gecersiz", 'karar "yayin" ya da "red" olmalı; başka değer işlenmez.');
-      const r = await yayimKarari(env, b.id, b.karar, u.eposta, { uyariKabul: b.uyariKabul === true });
+      const r = await yayimKarari(env, b.id, b.karar, u.eposta, { uyariKabul: b.uyariKabul === true, cevrimdisiKabul: b.cevrimdisiKabul === true });
       return r.ok ? json(200, r) : json(409, { error: "yayim_kapisi", message: "Hiçbir soru işlenmedi: yayım şartları sağlanmıyor.", hatalar: r.hatalar });
     }
     return fail(404, "yok");

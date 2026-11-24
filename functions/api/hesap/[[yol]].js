@@ -16,8 +16,8 @@
 //   POST kota {tur, adet}             ücretsiz hak ayırır (tur: soru | deneme); biterse 402
 //   POST cikis                        oturumu kapatır
 //   GET  google / google-donus        Google ile giriş
-//   GET  veri                         hesaptaki çalışma verisi (alanlar)
-//   PUT  veri/<alan>                  bir alanı kaydeder
+//   GET  veri                         hesaptaki çalışma verisi (alanlar) + her alanın sürümü (u)
+//   PUT  veri/<alan>                  bir alanı kaydeder; gövdede "_b" (okunan sürüm) varsa KOŞULLU yazar (araya yazma girdiyse 409)
 //   POST kod-bagla {kod}              erişim kodunu hesaba bağlar
 //   POST sil                          hesabı ve verilerini siler
 
@@ -158,14 +158,28 @@ export async function onRequest({ request, env, params }) {
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
   }
   if (ad === "veri" && m === "GET") {
-    const { results } = await env.DB.prepare("SELECT alan, json FROM veri WHERE kid = ?").bind(u.id).all();
-    const alanlar = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); } catch (e) { } });
-    return json(200, { alanlar });
+    const { results } = await env.DB.prepare("SELECT alan, json, u FROM veri WHERE kid = ?").bind(u.id).all();
+    const alanlar = {}, uu = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); uu[r.alan] = r.u; } catch (e) { } });
+    return json(200, { alanlar, u: uu });
   }
   if (ad === "veri" && m === "PUT") {
     const alan = yol[1]; if (!ALANLAR.includes(alan)) return fail(400, "alan");
     const ham = await request.text(); if (ham.length > 262144) return fail(413, "buyuk");
     let o; try { o = JSON.parse(ham); } catch (e) { return fail(400, "json"); }
+    /* KOŞULLU YAZMA (compare-and-swap): gövdede "_b" (istemcinin okuduğu sürüm = veri.u) varsa, kayıt YALNIZCA hâlâ o sürümdeyse yazılır.
+       Aradan başka bir yazma (başka cihaz, mobil sunucu-tarafı ilerleme) girdiyse 409 döner ve istemci yeniden okuyup birleştirir; böylece
+       "yeni" zaman damgasıyla eskimiş bir belgenin üzerine yazıp başkasının ilerlemesini silmek mümkün olmaz. Karşılaştırma ve yazma TEK atomik komuttur.
+       Yeni sürüm sunucuda atanır (>= b+1) ve belgenin _u alanına yazılır. "_b" yoksa eski (son-yazan-kazanır, _u karşılaştırmalı) davranış sürer. */
+    if (o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, "_b")) {
+      const b = o._b; if (!Number.isSafeInteger(b) || b < 0) return fail(400, "_b");
+      const yeni = Math.max(Date.now(), b + 1); delete o._b; o._u = yeni;
+      const ham2 = JSON.stringify(o); if (ham2.length > 262144) return fail(413, "buyuk");
+      const yaz = b === 0
+        ? await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO NOTHING").bind(u.id, alan, ham2, yeni).run()
+        : await env.DB.prepare("UPDATE veri SET json = ?, u = ? WHERE kid = ? AND alan = ? AND u = ?").bind(ham2, yeni, u.id, alan, b).run();
+      if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
+      return json(200, { ok: true, u: yeni });
+    }
     const yeniU = Number(o && o._u) || Date.now();
     /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda). Karşılaştırma ve yazma TEK atomik komuttur (önce oku, sonra yaz yarışı yok):
        eşzamanlı iki yazmadan eskisi, sıralama ne olursa olsun yenisinin üstüne yazamaz. Etkilenen satır 0 ise daha yeni kayıt vardır → 409. */

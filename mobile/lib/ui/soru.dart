@@ -34,6 +34,13 @@ class _SoruEkraniState extends State<SoruEkrani> {
   bool _gonderiliyor = false;
   Object? _cevapHatasi;
 
+  /// Bu soru oturumu denemesinin kimliği: ağ hatasında "Tekrar dene" AYNI kimlikle gider; yanıt kaybolduysa sunucu aynı oturumu döner,
+  /// ikinci kota kullanımı olmaz. Yeni oturum ("Yeni 10 soru") yeni ekran = yeni kimlik.
+  final String _istekKimligi = UygulamaModeli.yeniIstekKimligi();
+
+  /// Kayıtlar, ekran açıldığındaki hesaba bağlanır (oturum başka hesaba geçse bile bu hesap dışında yazılamaz).
+  late final String _hesapId = widget.model.kullanici?.id ?? '';
+
   AkeApi get _api => widget.model.api;
 
   @override
@@ -48,7 +55,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
       _hata = null;
     });
     try {
-      final o = await _api.oturumOlustur(istek: UygulamaModeli.yeniIstekKimligi(), adet: widget.adet, ders: widget.ders, konu: widget.konu);
+      final o = await _api.oturumOlustur(istek: _istekKimligi, adet: widget.adet, ders: widget.ders, konu: widget.konu);
       if (!mounted) return;
       setState(() {
         _oturum = o;
@@ -79,7 +86,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
     try {
       final r = await _api.cevapVer(oturum: o.oturum, soru: soru.id, secim: secim);
       if (!mounted) return;
-      widget.model.senkron.ekle(IlerlemeKaydi(ders: soru.ders, konu: soru.konu, zorluk: soru.zorluk, sonuc: r.dogru ? 1 : 0, zaman: DateTime.now()));
+      if (_hesapId.isNotEmpty) widget.model.senkron.ekle(hesapId: _hesapId, oturum: o.oturum);
       setState(() {
         _sonuc = r;
       });

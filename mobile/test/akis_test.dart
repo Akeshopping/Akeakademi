@@ -68,12 +68,9 @@ void main() {
     expect(find.text('1 / 2'), findsOneWidget);
     expect(find.text('İlerlemen hesabına kaydedildi.'), findsOneWidget);
 
-    // Sunucudaki hesap verisi (web ile aynı alan) gerçekten güncellendi
-    final stats = s.stats!;
-    expect(stats['topic']['mat|Sayılar'], [1, 1, 0]);
-    expect(stats['daily'].values.first['q'], 2);
-    expect(stats['daily'].values.first['c'], 1);
-    expect(stats['td']['mat|Sayılar'], [[1, 0], [0, 0], [0, 1]]);
+    // Sunucu, kendi kaydettiği cevaplardan hesabın ilerlemesini işledi (istemci sayaç göndermedi)
+    expect(s.ilerlemeler['u1']!['mat|Sayılar'], [1, 1, 0]);
+    expect(s.istekler.where((r) => r.url.path.startsWith('/api/hesap/veri/')), isEmpty);
 
     await t.tap(find.text('Hesabımdaki ilerleme'));
     await t.pumpAndSettle();
@@ -141,5 +138,57 @@ void main() {
     expect(find.text('Ücretsiz hakkın bitti'), findsOneWidget);
     expect(find.textContaining('Shopier'), findsNothing);
     expect(find.textContaining('satın'), findsNothing);
+  });
+
+  testWidgets('soru açılırken yanıt kaybolursa "Tekrar dene" AYNI istek kimliğiyle gider: ikinci kota kullanımı olmaz', (t) async {
+    await buyukEkran(t);
+    final s = SahteSunucu()..yanitKaybi = 1, model = kurModel(s, BellekDeposu(SahteSunucu.anahtar));
+    await model.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: model));
+    await t.pumpAndSettle();
+    await t.tap(find.text('TYT'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Matematik'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Sayılar'));
+    await t.pumpAndSettle();
+    expect(find.text('Sorular açılamadı'), findsOneWidget);
+    expect(s.kotaKullanilan, 1); // sunucu işledi, yanıt ulaşmadı
+    await t.tap(find.text('Tekrar dene'));
+    await t.pumpAndSettle();
+    expect(find.text('Soru 1 / 2'), findsOneWidget);
+    expect(s.kotaKullanilan, 1); // ikinci kullanım YOK
+    final kimlikler = s.istekler.where((r) => r.url.path == '/api/soru/oturum').map((r) => RegExp(r'"istek":"([^"]+)"').firstMatch(r.body)!.group(1)).toSet();
+    expect(kimlikler.length, 1);
+  });
+
+  testWidgets('hesap değişimi: u1 oturumu bitti, u2 girdi; u1\'in bekleyen cevabı u2\'ye yazılmaz (arayüz akışı)', (t) async {
+    await buyukEkran(t);
+    final s = SahteSunucu(), model = kurModel(s, BellekDeposu(SahteSunucu.anahtar));
+    await model.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: model));
+    await t.pumpAndSettle();
+    await t.tap(find.text('TYT'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Matematik'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Sayılar'));
+    await t.pumpAndSettle();
+    s.ilerlemeHata500 = 99; // senkron başarısız: kayıt bekleyecek
+    await t.tap(find.text('c'));
+    await t.pump();
+    await t.tap(find.text('Cevapla'));
+    await t.pumpAndSettle();
+    expect(model.senkron.bekleyenSayisi, 1);
+    await model.cikis();
+    s.ilerlemeHata500 = 0;
+    s.hesapId = 'u2';
+    await model.kodDogrula('baska@ornek.com', '12345678');
+    await model.senkron.bosalt();
+    await model.senkron.supur();
+    expect(model.kullanici!.id, 'u2');
+    expect(model.senkron.bekleyenSayisi, 0);
+    expect(s.ilerlemeCagrilari.where((c) => c.$1 == 'u2'), isEmpty);
+    expect(s.ilerlemeler['u2'], isNull);
   });
 }

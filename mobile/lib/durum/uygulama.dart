@@ -18,6 +18,7 @@ class UygulamaModeli extends ChangeNotifier {
   UygulamaModeli(this.api, this.senkron) {
     api.oturumBittiDinleyici = () {
       kullanici = null;
+      senkron.oturumBitti();
       faz = Faz.oturumBitti;
       notifyListeners();
     };
@@ -34,7 +35,7 @@ class UygulamaModeli extends ChangeNotifier {
     try {
       kullanici = await api.ben();
       faz = Faz.ana;
-      senkron.bosalt();
+      _hesabaGec(kullanici!.id);
     } on ApiHata catch (h) {
       if (h.tur == HataTuru.oturum) {
         faz = Faz.oturumBitti; // dinleyici de aynı durumu kurar
@@ -50,11 +51,20 @@ class UygulamaModeli extends ChangeNotifier {
   Future<void> kodDogrula(String eposta, String kod) async {
     kullanici = await api.kodDogrula(eposta.trim().toLowerCase(), kod.replaceAll(RegExp(r'\D'), ''));
     faz = Faz.ana;
+    _hesabaGec(kullanici!.id);
     notifyListeners();
+  }
+
+  /// Aktif hesap bu kimliktir: başka hesabın bekleyen kayıtları silinir; bu hesabın işlenmemiş cevapları sunucudan toparlanır.
+  void _hesabaGec(String id) {
+    senkron.hesapAyarla(id);
+    senkron.supur();
+    senkron.bosalt();
   }
 
   Future<void> cikis() async {
     await api.cikis();
+    senkron.temizle();
     kullanici = null;
     faz = Faz.giris;
     notifyListeners();

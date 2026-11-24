@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../yapilandirma.dart';
 import 'modeller.dart';
 import 'oturum_deposu.dart';
 
@@ -38,12 +37,17 @@ class AkeApi {
   final http.Client _c;
   final OturumDeposu _depo;
   String? _anahtar;
+  String? _hesapId;
+
+  /// Şu an oturumu açık hesabın kimliği (giriş ya da /ben ile öğrenilir; çıkış ve 401'de silinir).
+  String? get hesapId => _hesapId;
 
   /// 401 alındığında (anahtar silindikten sonra) bir kez çağrılır.
   void Function()? oturumBittiDinleyici;
 
-  AkeApi({String? taban, required http.Client istemci, required OturumDeposu depo})
-      : taban = (taban ?? Yapilandirma.api).replaceAll(RegExp(r'/+$'), ''),
+  /// [taban] ZORUNLU: varsayılan adres yoktur; test derlemesi yanlışlıkla Production'a bağlanamaz (bkz. Yapilandirma).
+  AkeApi({required String taban, required http.Client istemci, required OturumDeposu depo})
+      : taban = taban.replaceAll(RegExp(r'/+$'), ''),
         _c = istemci,
         _depo = depo;
 
@@ -55,7 +59,12 @@ class AkeApi {
   }
 
   Future<Map<String, dynamic>> _istek(String yontem, String yol,
-      {Map<String, dynamic>? govde, bool kimlikli = true}) async {
+      {Map<String, dynamic>? govde, bool kimlikli = true, String? beklenenHesap}) async {
+    /// Bir kayıt belirli bir hesap için hazırlandıysa, gönderim anında oturum başka hesaba geçmişse AĞA HİÇ ÇIKMADAN reddedilir
+    /// (kontrol ile gönderim arasında await yok; hesap değişimi araya giremez).
+    if (beklenenHesap != null && beklenenHesap != _hesapId) {
+      throw const ApiHata(HataTuru.oturum, kod: 'hesap_degisti', mesaj: 'Oturum başka bir hesaba geçti.');
+    }
     final uri = Uri.parse('$taban$yol');
     final basliklar = <String, String>{'accept': 'application/json'};
     if (govde != null) basliklar['content-type'] = 'application/json';
@@ -89,6 +98,7 @@ class AkeApi {
     final h = _hata(r.statusCode, m, r.headers);
     if (h.tur == HataTuru.oturum && kimlikli && gonderilenAnahtar != null && _anahtar == gonderilenAnahtar) {
       _anahtar = null;
+      _hesapId = null;
       await _depo.sil();
       oturumBittiDinleyici?.call();
     }
@@ -134,12 +144,16 @@ class AkeApi {
     }
     await _depo.yaz(anahtar);
     _anahtar = anahtar;
-    return Kullanici.fromJson(Map<String, dynamic>.from(y['kullanici'] as Map));
+    final k = Kullanici.fromJson(Map<String, dynamic>.from(y['kullanici'] as Map));
+    _hesapId = k.id;
+    return k;
   }
 
   Future<Kullanici> ben() async {
     final y = await _istek('GET', '/api/hesap/ben');
-    return Kullanici.fromJson(Map<String, dynamic>.from(y['kullanici'] as Map));
+    final k = Kullanici.fromJson(Map<String, dynamic>.from(y['kullanici'] as Map));
+    _hesapId = k.id;
+    return k;
   }
 
   Future<void> cikis() async {
@@ -149,6 +163,7 @@ class AkeApi {
       // sunucuya ulaşılamasa da yerel oturum silinir
     }
     _anahtar = null;
+    _hesapId = null;
     await _depo.sil();
   }
 
@@ -168,13 +183,19 @@ class AkeApi {
   Future<OturumSonucu> bitir(String oturum) async =>
       OturumSonucu.fromJson(await _istek('POST', '/api/soru/bitir', govde: {'oturum': oturum}));
 
-  // ---------- ilerleme (hesap verisi; web ile aynı alan) ----------
+  // ---------- ilerleme ----------
+  /// Hesap verisi (salt okuma): web ile aynı alanlar. İstemci bu belgeye YAZMAZ.
   Future<Map<String, dynamic>> veriOku() async {
     final y = await _istek('GET', '/api/hesap/veri');
     return y['alanlar'] is Map ? Map<String, dynamic>.from(y['alanlar'] as Map) : <String, dynamic>{};
   }
 
-  Future<void> veriYaz(String alan, Map<String, dynamic> icerik) async {
-    await _istek('PUT', '/api/hesap/veri/$alan', govde: icerik);
+  /// Sunucuya "cevaplarımı hesabıma işle" der. [oturum] verilmezse yalnız BU hesabın bekleyen oturumları işlenir (süpürme).
+  /// Dönen sayı: hâlâ işlenmemiş oturum sayısı. İstemci hiçbir sayaç göndermez; sunucu kendi kayıtlarından uygular (tekil, atomik).
+  Future<int> ilerlemeIsle({String? oturum, required int tzDk, String? beklenenHesap}) async {
+    final g = <String, dynamic>{'tz': tzDk};
+    if (oturum != null) g['oturum'] = oturum;
+    final y = await _istek('POST', '/api/soru/ilerleme', govde: g, beklenenHesap: beklenenHesap);
+    return (y['bekleyen'] as num?)?.toInt() ?? 0;
   }
 }

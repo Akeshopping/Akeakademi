@@ -122,6 +122,10 @@ void main() {
 
     Future<void> dokun(String metin) async {
       final f = find.text(metin);
+      if (f.evaluate().isEmpty) {
+        // liste tembel çizilir: ekran dışındaki öğe için kaydır
+        await t.scrollUntilVisible(f.first, 200, scrollable: find.byType(Scrollable).first);
+      }
       expect(f, findsWidgets, reason: '"$metin" ekranda yok');
       await t.ensureVisible(f.first);
       await t.pumpAndSettle();

@@ -236,6 +236,9 @@ void main() {
       await t.pumpAndSettle();
       await t.enterText(find.byKey(const ValueKey('gorev-metin')), 'Paragraf: 25 soru');
       await ek('62-plan-gorev-ekle-$tema');
+      if (find.byKey(const ValueKey('gorev-kaydet')).evaluate().isEmpty) {
+        await t.scrollUntilVisible(find.byKey(const ValueKey('gorev-kaydet')), 200, scrollable: find.byType(Scrollable).last);
+      }
       await t.ensureVisible(find.byKey(const ValueKey('gorev-kaydet')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('gorev-kaydet')));
@@ -244,6 +247,9 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('menu-ayarlar')));
       await ek('70-ayarlar-$tema');
+      if (find.byKey(const ValueKey('hesap-sil')).evaluate().isEmpty) {
+        await t.scrollUntilVisible(find.byKey(const ValueKey('hesap-sil')), 300, scrollable: find.byType(Scrollable).first);
+      }
       await t.ensureVisible(find.byKey(const ValueKey('hesap-sil')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('hesap-sil')));

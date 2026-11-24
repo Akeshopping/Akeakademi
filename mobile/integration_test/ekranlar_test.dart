@@ -200,6 +200,9 @@ void main() {
       await kisa();
       expect(t.takeException(), isNull);
       await binding.takeScreenshot('$g-46-deneme-soru-$tema');
+      await dokunKisa(find.text('Sonraki'));
+      await t.tap(find.byKey(const ValueKey('deneme-sik-1')));
+      await kisa(3);
       await dokunKisa(find.text('Bitir'));
       await dokunKisa(find.byKey(const ValueKey('deneme-bitir-onay')));
       await kisa(12);

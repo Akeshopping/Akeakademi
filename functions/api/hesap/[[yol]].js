@@ -167,10 +167,10 @@ export async function onRequest({ request, env, params }) {
     const ham = await request.text(); if (ham.length > 262144) return fail(413, "buyuk");
     let o; try { o = JSON.parse(ham); } catch (e) { return fail(400, "json"); }
     const yeniU = Number(o && o._u) || Date.now();
-    /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda) */
-    const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first();
-    if (var_ && var_.u > yeniU) return json(409, { error: "eski", u: var_.u });
-    await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u").bind(u.id, alan, ham, yeniU).run();
+    /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda). Karşılaştırma ve yazma TEK atomik komuttur (önce oku, sonra yaz yarışı yok):
+       eşzamanlı iki yazmadan eskisi, sıralama ne olursa olsun yenisinin üstüne yazamaz. Etkilenen satır 0 ise daha yeni kayıt vardır → 409. */
+    const yaz = await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u WHERE veri.u <= excluded.u").bind(u.id, alan, ham, yeniU).run();
+    if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
     return json(200, { ok: true });
   }
   if (ad === "kod-bagla" && m === "POST") {

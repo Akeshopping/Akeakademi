@@ -23,6 +23,8 @@ void ekran(WidgetTester t, double genislik, {double yukseklik = 700}) {
   addTearDown(t.view.resetDevicePixelRatio);
 }
 
+String metinler(WidgetTester t) => t.widgetList<Text>(find.byType(Text)).map((e) => e.data ?? e.textSpan?.toPlainText() ?? '').where((e) => e.isNotEmpty).join(' | ');
+
 Future<void> sekme(WidgetTester t, int i) async {
   await t.tap(find.byKey(ValueKey('sekme-$i')));
   await t.pumpAndSettle();
@@ -99,20 +101,19 @@ void main() {
   }
 
   testWidgets('soru ekranı 320 px: beş şık, uzun açıklamada geri bildirim görünür alana kayar', (t) async {
-    ekran(t, 320, yukseklik: 568);
+    ekran(t, 900, yukseklik: 2200); // gezinme büyük ekranda (akış testiyle aynı); soru ekranına gelince 320 px'e küçülür
     final s = SahteSunucu()..aciklama = List.filled(40, 'Bu çözümde önce verilenler yazılır, sonra işlem sırası kurulur.').join(' ');
     final m = model(s, anahtar: SahteSunucu.anahtar);
     await m.baslat();
     await t.pumpWidget(AkeUygulamasi(model: m));
     await t.pumpAndSettle();
     await sekme(t, 1);
-    await t.tap(find.text('TYT'));
-    await t.pumpAndSettle();
-    await t.scrollUntilVisible(find.text('Matematik'), 120, scrollable: find.byType(Scrollable).first);
-    await t.tap(find.text('Matematik'));
-    await t.pumpAndSettle();
-    await t.scrollUntilVisible(find.text('Sayılar'), 120, scrollable: find.byType(Scrollable).first);
-    await t.tap(find.text('Sayılar'));
+    for (final adim in ['TYT', 'Matematik', 'Sayılar']) {
+      expect(find.text(adim), findsWidgets, reason: '"$adim" yok; ekranda: ${metinler(t)}');
+      await t.tap(find.text(adim));
+      await t.pumpAndSettle();
+    }
+    ekran(t, 320, yukseklik: 568);
     await t.pumpAndSettle();
     for (final harf in ['a', 'b', 'c', 'd', 'e']) {
       expect(find.text(harf), findsOneWidget);

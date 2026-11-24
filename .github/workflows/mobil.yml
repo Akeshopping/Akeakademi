@@ -64,3 +64,66 @@ jobs:
           name: ake-akademi-android-debug
           path: mobile/build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7
+
+  emulator:
+    name: Emülatör ekran kanıtı (320/390 dp ekran yürüyüşü + gerçek zamanlı açılış kaydı)
+    needs: android
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write   # yalnız kanıt dalını yayınlamak için (kanit/pr43-<sha>); main/Production'a yazılmaz
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Platform klasörleri (kur.sh)
+        run: ./kur.sh
+      - uses: actions/download-artifact@v4
+        with:
+          name: ake-akademi-android-debug
+          path: mobile/build/app/outputs/flutter-apk
+      - name: KVM ve ffmpeg
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Emülatörde ekran yürüyüşü + açılış kaydı
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          ram-size: 4096M
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          working-directory: ./mobile
+          script: ./tool/emulator_kanit.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ake-emulator-kanit
+          path: mobile/kanit
+          retention-days: 14
+      - name: Kanıtı ayrı dalda yayınla (yalnız push; main/Production'a dokunmaz, [skip ci])
+        if: always() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          test -d kanit || exit 0
+          rm -rf /tmp/kanit && mkdir /tmp/kanit && cp -r kanit/. /tmp/kanit/
+          cd /tmp/kanit
+          git init -q -b "kanit/pr43-${GITHUB_SHA::7}"
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "Emülatör ekran kanıtı ${GITHUB_SHA::7} [skip ci]"
+          git push -q "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/kanit/pr43-${GITHUB_SHA::7}"

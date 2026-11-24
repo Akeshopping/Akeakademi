@@ -23,6 +23,10 @@ class SahteSunucu {
   bool limitDoldu = false;
   bool agYok = false;
   String aciklama = 'Açıklama metni'; // cevaptan sonra dönen açıklama (uzun açıklama testi için değiştirilebilir)
+  /// Emülatör ekran kanıtı için: doluysa /api/hesap/veri bunu 'alanlar' olarak döndürür (profil/istatistik/plan test verisi).
+  Map<String, dynamic>? veriAlanlari;
+  /// Doluysa /api/soru/ozet bunu döndürür (ders/konu listesi test verisi).
+  Map<String, dynamic>? ozetOzel;
   int cevapSayisi = 0;
   int ilerlemeHata500 = 0; // ilk N /ilerleme isteği 500 dönsün
   final List<Map<String, dynamic>> sorular = [
@@ -54,6 +58,7 @@ class SahteSunucu {
     if (yol == '/api/hesap/ben') return _y(200, {'kullanici': {'id': hesapId, 'eposta': 'ogrenci@ornek.com', 'ad': ''}});
     if (yol == '/api/hesap/cikis') return _y(200, {'ok': true});
     if (yol == '/api/hesap/veri' && r.method == 'GET') {
+      if (veriAlanlari != null) return _y(200, {'alanlar': veriAlanlari});
       final t = ilerlemeler[hesapId];
       return _y(200, {'alanlar': {if (t != null) 'stats': {'topic': t}}});
     }
@@ -61,6 +66,7 @@ class SahteSunucu {
     if (yol.startsWith('/api/soru/')) {
       if (!soruServisiAcik) return _y(404, {'error': 'yok', 'message': ''});
       if (yol == '/api/soru/ozet') {
+        if (ozetOzel != null) return _y(200, ozetOzel!);
         return _y(200, {
           'toplam': 40,
           'dersler': {

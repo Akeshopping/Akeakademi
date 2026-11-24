@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 
 /// AKE Ritmi — site tasarım token'larının (docs/tasarim/tokens.css) mobil karşılığı. Açık ve koyu tema aynı adlarla.
 /// Renk değerleri tokens.css'den alınmıştır; her yüzey/metin çifti orada ölçülmüş kontrasta sahiptir.

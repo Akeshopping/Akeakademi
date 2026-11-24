@@ -146,7 +146,7 @@ class _Karsilama extends StatelessWidget {
               const SizedBox(height: 8),
               Text.rich(
                 TextSpan(children: [
-                  TextSpan(text: '${tarihMetni(simdi)}'),
+                  TextSpan(text: tarihMetni(simdi)),
                   if (kalan != null) ...[
                     const TextSpan(text: " · YKS 2027'ye "),
                     TextSpan(text: '$kalan', style: rakamStili(AkeTok.acik.mercanAcik, 15)),
@@ -178,7 +178,7 @@ class _YayBoyaci extends CustomPainter {
       ..shader = const LinearGradient(colors: [Color(0x00F27D6D), Color(0x99F27D6D), Color(0x00F27D6D)]).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     canvas.drawPath(yol, boya);
     final glow = Paint()
-      ..shader = RadialGradient(colors: [const Color(0x24F27D6D), const Color(0x00F27D6D)]).createShader(Rect.fromCircle(center: Offset(size.width * 1.02, 0), radius: math.max(size.width, size.height) * 0.7));
+      ..shader = const RadialGradient(colors: [Color(0x24F27D6D), Color(0x00F27D6D)]).createShader(Rect.fromCircle(center: Offset(size.width * 1.02, 0), radius: math.max(size.width, size.height) * 0.7));
     canvas.drawRect(Offset.zero & size, glow);
   }
 

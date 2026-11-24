@@ -150,12 +150,12 @@ class _SoruEkraniState extends State<SoruEkrani> {
     final t = context.ake;
     return AkeSayfa(
       baslik: baslik,
-      sag: gosterIlerleme ? Padding(padding: const EdgeInsets.only(right: 8), child: Hap('${_sira + 1}/${o!.sorular.length}', zemin: Colors.white.withValues(alpha: 0.1), yazi: AkeTok.porselen)) : null,
+      sag: gosterIlerleme ? Padding(padding: const EdgeInsets.only(right: 8), child: Hap('${_sira + 1}/${o.sorular.length}', zemin: Colors.white.withValues(alpha: 0.1), yazi: AkeTok.porselen)) : null,
       altCubuk: gosterIlerleme
           ? PreferredSize(
               preferredSize: const Size.fromHeight(4),
               child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: (_sira + (_sonuc != null ? 1 : 0)) / o!.sorular.length),
+                tween: Tween(begin: 0, end: (_sira + (_sonuc != null ? 1 : 0)) / o.sorular.length),
                 duration: const Duration(milliseconds: 320),
                 curve: Curves.easeOutCubic,
                 builder: (context, v, _) => LinearProgressIndicator(value: v, minHeight: 4, color: t.mercanDeko, backgroundColor: t.ustCubuk),
@@ -163,7 +163,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
             )
           : null,
       govde: _govde(),
-      alt: gosterIlerleme ? _altEylem(o!) : null,
+      alt: gosterIlerleme ? _altEylem(o) : null,
     );
   }
 

@@ -211,7 +211,7 @@ class _AcilisBoyaci extends CustomPainter {
       final o = emblemW / AkeAmblemYolu.genislik;
       canvas.scale(o, o);
       canvas.translate(-AkeAmblemYolu.sol, -AkeAmblemYolu.ust);
-      final kutu = const Rect.fromLTRB(AkeAmblemYolu.sol, AkeAmblemYolu.ust, AkeAmblemYolu.sag, AkeAmblemYolu.alt);
+      const kutu = Rect.fromLTRB(AkeAmblemYolu.sol, AkeAmblemYolu.ust, AkeAmblemYolu.sag, AkeAmblemYolu.alt);
       final boya = Paint()
         ..isAntiAlias = true
         ..shader = LinearGradient(

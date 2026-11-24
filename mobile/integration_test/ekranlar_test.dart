@@ -129,6 +129,19 @@ void main() {
       await t.pumpAndSettle();
     }
 
+    Future<void> kisa([int adim = 8]) async {
+      for (var i = 0; i < adim; i++) {
+        await t.pump(const Duration(milliseconds: 200));
+      }
+    }
+
+    Future<void> dokunKisa(Finder f) async {
+      await t.ensureVisible(f);
+      await t.pump(const Duration(milliseconds: 200));
+      await t.tap(f);
+      await kisa(3);
+    }
+
     Future<void> sekme(int i) async {
       await t.tap(find.byKey(ValueKey('sekme-$i')));
       await t.pumpAndSettle();
@@ -166,12 +179,72 @@ void main() {
       await dokun('Bitir');
       await ek('40-sonuc-$tema');
       await dokun('Ana sayfaya dön');
+      // Soru çöz → Soru ara sekmesi
+      await sekme(1);
+      await t.tap(find.byKey(const ValueKey('soru-sekme-1')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('ara-girdi')), 'asal sayı');
+      await t.pumpAndSettle();
+      await ek('41-soru-ara-$tema');
+      await t.tap(find.byKey(const ValueKey('soru-sekme-0')));
+      await t.pumpAndSettle();
+      // Deneme (süreli; zamanlayıcı çalıştığı için sabit bekleme yok)
       await sekme(2);
-      await ek('50-gelisim-$tema');
+      await ek('45-deneme-baslangic-$tema');
+      await dokun('Denemeyi başlat');
+      await kisa();
+      await t.tap(find.byKey(const ValueKey('deneme-sik-2')));
+      await kisa();
+      expect(t.takeException(), isNull);
+      await binding.takeScreenshot('$g-46-deneme-soru-$tema');
+      await dokunKisa(find.text('Bitir'));
+      await dokunKisa(find.byKey(const ValueKey('deneme-bitir-onay')));
+      await kisa(12);
+      expect(find.byKey(const ValueKey('deneme-net')), findsOneWidget);
+      expect(t.takeException(), isNull);
+      await binding.takeScreenshot('$g-47-deneme-sonuc-$tema');
+      await t.pumpWidget(const SizedBox()); // zamanlayıcıyı bırak
+      await t.pumpWidget(AkeUygulamasi(model: m));
+      await t.pumpAndSettle();
+      // AI öğretmen
       await sekme(3);
-      await ek('60-plan-$tema');
+      if (find.byKey(const ValueKey('ai-kod')).evaluate().isNotEmpty) {
+        await ek('50-ai-kapi-$tema');
+        await t.enterText(find.byKey(const ValueKey('ai-kod')), 'AKE-TEST-1234');
+        await dokun('Kodu bağla');
+      }
+      await t.enterText(find.byKey(const ValueKey('ai-girdi')), 'Asal sayı nedir?');
+      await t.tap(find.byKey(const ValueKey('ai-gonder')));
+      await t.pumpAndSettle();
+      await ek('51-ai-sohbet-$tema');
+      // Menü → Gelişim, Plan (düzenleme), Ayarlar
       await sekme(4);
+      await ek('60-menu-$tema');
+      await t.tap(find.byKey(const ValueKey('menu-gelisim')));
+      await ek('61-gelisim-$tema');
+      await t.tap(find.byKey(const ValueKey('menu-geri')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('menu-plan')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('plan-ekle')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('gorev-metin')), 'Paragraf: 25 soru');
+      await ek('62-plan-gorev-ekle-$tema');
+      await t.ensureVisible(find.byKey(const ValueKey('gorev-kaydet')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('gorev-kaydet')));
+      await ek('63-plan-gorevli-$tema');
+      await t.tap(find.byKey(const ValueKey('menu-geri')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('menu-ayarlar')));
       await ek('70-ayarlar-$tema');
+      await t.ensureVisible(find.byKey(const ValueKey('hesap-sil')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('hesap-sil')));
+      await ek('71-hesap-sil-onay-$tema');
+      await dokun('Vazgeç');
+      await t.tap(find.byKey(const ValueKey('menu-geri')));
+      await t.pumpAndSettle();
     }
 
     await yuru('acik');

@@ -1,0 +1,252 @@
+Running Gradle task 'assembleDebug'...                          
+Loading package information...                                                  
+Loading local repository...                                                     
+[                                       ] 3% Loading local repository...        
+[                                       ] 3% Fetch remote repository...         
+[=                                      ] 3% Fetch remote repository...         
+[=                                      ] 4% Fetch remote repository...         
+[=                                      ] 5% Fetch remote repository...         
+[==                                     ] 5% Fetch remote repository...         
+[==                                     ] 6% Fetch remote repository...         
+[==                                     ] 7% Fetch remote repository...         
+[==                                     ] 7% Computing updates...               
+[===                                    ] 8% Computing updates...               
+[===                                    ] 10% Computing updates...              
+[===                                    ] 10% Installing NDK (Side by side) 28.2
+[===                                    ] 10% Downloading android-ndk-r28c-linux
+[====                                   ] 10% Downloading android-ndk-r28c-linux
+[====                                   ] 11% Downloading android-ndk-r28c-linux
+[====                                   ] 12% Downloading android-ndk-r28c-linux
+[=====                                  ] 13% Downloading android-ndk-r28c-linux
+[=====                                  ] 14% Downloading android-ndk-r28c-linux
+[=====                                  ] 15% Downloading android-ndk-r28c-linux
+[======                                 ] 15% Downloading android-ndk-r28c-linux
+[======                                 ] 16% Downloading android-ndk-r28c-linux
+[======                                 ] 17% Downloading android-ndk-r28c-linux
+[=======                                ] 18% Downloading android-ndk-r28c-linux
+[=======                                ] 19% Downloading android-ndk-r28c-linux
+[=======                                ] 20% Downloading android-ndk-r28c-linux
+[========                               ] 20% Downloading android-ndk-r28c-linux
+[========                               ] 21% Downloading android-ndk-r28c-linux
+[========                               ] 22% Downloading android-ndk-r28c-linux
+[=========                              ] 23% Downloading android-ndk-r28c-linux
+[=========                              ] 24% Downloading android-ndk-r28c-linux
+[=========                              ] 25% Downloading android-ndk-r28c-linux
+[==========                             ] 25% Downloading android-ndk-r28c-linux
+[==========                             ] 26% Downloading android-ndk-r28c-linux
+[==========                             ] 27% Downloading android-ndk-r28c-linux
+[===========                            ] 28% Downloading android-ndk-r28c-linux
+[===========                            ] 29% Downloading android-ndk-r28c-linux
+[===========                            ] 30% Downloading android-ndk-r28c-linux
+[============                           ] 30% Downloading android-ndk-r28c-linux
+[============                           ] 31% Downloading android-ndk-r28c-linux
+[============                           ] 32% Downloading android-ndk-r28c-linux
+[============                           ] 33% Downloading android-ndk-r28c-linux
+[============                           ] 33% Unzipping...                      
+[============                           ] 33% Unzipping... android-ndk-r28c/    
+[============                           ] 33% Unzipping... android-ndk-r28c/READ
+[=============                          ] 33% Unzipping... android-ndk-r28c/READ
+[=============                          ] 33% Unzipping... android-ndk-r28c/meta
+[=============                          ] 33% Unzipping... android-ndk-r28c/shad
+[=============                          ] 33% Unzipping... android-ndk-r28c/ndk-
+[=============                          ] 33% Unzipping... android-ndk-r28c/wrap
+[=============                          ] 33% Unzipping... android-ndk-r28c/ndk-
+[=============                          ] 33% Unzipping... android-ndk-r28c/tool
+[=============                          ] 34% Unzipping... android-ndk-r28c/tool
+[=============                          ] 35% Unzipping... android-ndk-r28c/tool
+[==============                         ] 35% Unzipping... android-ndk-r28c/tool
+[==============                         ] 36% Unzipping... android-ndk-r28c/tool
+[==============                         ] 37% Unzipping... android-ndk-r28c/tool
+[===============                        ] 38% Unzipping... android-ndk-r28c/tool
+[===============                        ] 39% Unzipping... android-ndk-r28c/tool
+[===============                        ] 40% Unzipping... android-ndk-r28c/tool
+[================                       ] 40% Unzipping... android-ndk-r28c/tool
+[================                       ] 41% Unzipping... android-ndk-r28c/tool
+[================                       ] 42% Unzipping... android-ndk-r28c/tool
+[=================                      ] 43% Unzipping... android-ndk-r28c/tool
+[=================                      ] 44% Unzipping... android-ndk-r28c/tool
+[=================                      ] 45% Unzipping... android-ndk-r28c/tool
+[==================                     ] 45% Unzipping... android-ndk-r28c/tool
+[==================                     ] 46% Unzipping... android-ndk-r28c/tool
+[==================                     ] 47% Unzipping... android-ndk-r28c/tool
+[===================                    ] 48% Unzipping... android-ndk-r28c/tool
+[===================                    ] 49% Unzipping... android-ndk-r28c/tool
+[===================                    ] 50% Unzipping... android-ndk-r28c/tool
+[====================                   ] 50% Unzipping... android-ndk-r28c/tool
+[====================                   ] 51% Unzipping... android-ndk-r28c/tool
+[====================                   ] 52% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 53% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 54% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 54% Unzipping... android-ndk-r28c/buil
+[=====================                  ] 54% Unzipping... android-ndk-r28c/sour
+[=====================                  ] 54% Unzipping... android-ndk-r28c/NOTI
+[=====================                  ] 54% Unzipping... android-ndk-r28c/ndk-
+[=====================                  ] 54% Unzipping... android-ndk-r28c/NOTI
+[=====================                  ] 54% Unzipping... android-ndk-r28c/pyth
+[=====================                  ] 54% Unzipping... android-ndk-r28c/preb
+[=====================                  ] 54% Unzipping... android-ndk-r28c/ndk-
+[=====================                  ] 54% Unzipping... android-ndk-r28c/sour
+[=====================                  ] 54% Unzipping... android-ndk-r28c/simp
+[=====================                  ] 55% Unzipping... android-ndk-r28c/simp
+[=====================                  ] 55% Unzipping... android-ndk-r28c/CHAN
+[=======================================] 100% Unzipping... android-ndk-r28c/CHA
+
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+Running Gradle task 'assembleDebug'...                            267.7s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          671ms
+D/FlutterRenderer( 6211): Width is zero. 0,0
+D/FlutterRenderer( 6211): Width is zero. 0,0
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:41209/_l3y3BUlbR8=/
+VMServiceFlutterDriver: Isolate found with number: 7688787509451391
+VMServiceFlutterDriver: Isolate 7688787509451391 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 6211): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 6211): Compat change id reported: 236825255; UID 10192; state: ENABLED
+D/ProfileInstaller( 6211): Installing profile for com.akeakademi.ake_akademi
+I/flutter ( 6211): CIHAZ_MANTIKSAL_GENISLIK=320.0 yukseklik=651.6 dpr=2.25
+I/Choreographer( 6211): Skipped 133 frames!  The application may be doing too much work on its main thread.
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+D/EGL_emulation( 6211): app_time_stats: avg=208.74ms min=21.11ms max=525.12ms count=5
+D/EGL_emulation( 6211): app_time_stats: avg=1282.56ms min=238.48ms max=2574.27ms count=3
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:340d7235: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:340d7235: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6211): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{5e95b98 VFE...... .F....ID 0,0-720,1466 #1} is not served.
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:41703ae3: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:41703ae3: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6211): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{5e95b98 VFE...... .F....ID 0,0-720,1466 #1} is not served.
+I/AssistStructure( 6211): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+D/EGL_emulation( 6211): app_time_stats: avg=104.40ms min=12.68ms max=289.44ms count=10
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:2e53bf52: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 6211): com.akeakademi.ake_akademi:2e53bf52: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+D/EGL_emulation( 6211): app_time_stats: avg=1152.05ms min=1152.05ms max=1152.05ms count=1
+D/EGL_emulation( 6211): app_time_stats: avg=989.32ms min=325.73ms max=1652.91ms count=2
+I/OpenGLRenderer( 6211): Davey! duration=911ms; Flags=0, FrameTimelineVsyncId=14181, IntendedVsync=335328173776, Vsync=335444840438, InputEventId=0, HandleInputStart=335449989755, AnimationStart=335449992980, PerformTraversalsStart=335449995766, DrawStart=335453624633, FrameDeadline=335344840442, FrameInterval=335449820038, FrameStartTime=16666666, SyncQueued=335453896612, SyncStart=335453913623, IssueDrawCommandsStart=335453957064, SwapBuffers=336226456153, FrameCompleted=336239881138, DequeueBufferDuration=6252, QueueBufferDuration=560597, GpuCompleted=336239178165, SwapBuffersCompleted=336239881138, DisplayPresentTime=0, CommandSubmissionCompleted=336226456153, 
+D/EGL_emulation( 6211): app_time_stats: avg=90.12ms min=34.14ms max=258.73ms count=12
+D/EGL_emulation( 6211): app_time_stats: avg=545.13ms min=424.45ms max=665.81ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=124.66ms min=15.31ms max=309.13ms count=9
+W/WindowOnBackDispatcher( 6211): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6211): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+D/EGL_emulation( 6211): app_time_stats: avg=593.39ms min=479.47ms max=707.30ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=533.85ms min=42.61ms max=1025.08ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=1157.77ms min=1157.77ms max=1157.77ms count=1
+D/EGL_emulation( 6211): app_time_stats: avg=128.25ms min=11.01ms max=393.97ms count=10
+D/EGL_emulation( 6211): app_time_stats: avg=532.57ms min=151.27ms max=763.94ms count=3
+D/EGL_emulation( 6211): app_time_stats: avg=79.64ms min=16.53ms max=256.62ms count=14
+D/EGL_emulation( 6211): app_time_stats: avg=625.11ms min=483.40ms max=766.82ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=84.55ms min=12.77ms max=254.46ms count=13
+D/EGL_emulation( 6211): app_time_stats: avg=1137.57ms min=1137.57ms max=1137.57ms count=1
+D/EGL_emulation( 6211): app_time_stats: avg=119.55ms min=28.21ms max=331.51ms count=11
+D/FlutterJNI( 6211): Sending viewport metrics to the engine.
+D/EGL_emulation( 6211): app_time_stats: avg=539.90ms min=229.37ms max=767.03ms count=3
+D/EGL_emulation( 6211): app_time_stats: avg=106.96ms min=21.59ms max=242.54ms count=10
+D/EGL_emulation( 6211): app_time_stats: avg=498.81ms min=479.85ms max=517.77ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=112.25ms min=36.79ms max=240.99ms count=10
+D/EGL_emulation( 6211): app_time_stats: avg=112.97ms min=37.77ms max=252.69ms count=9
+D/EGL_emulation( 6211): app_time_stats: avg=730.51ms min=592.67ms max=868.35ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=108.61ms min=22.01ms max=240.97ms count=11
+D/EGL_emulation( 6211): app_time_stats: avg=689.64ms min=630.68ms max=748.60ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=97.05ms min=13.75ms max=267.29ms count=13
+W/WindowOnBackDispatcher( 6211): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6211): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 6211): app_time_stats: avg=733.91ms min=606.13ms max=861.69ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=85.04ms min=29.95ms max=250.86ms count=12
+D/EGL_emulation( 6211): app_time_stats: avg=87.66ms min=12.03ms max=255.54ms count=12
+D/EGL_emulation( 6211): app_time_stats: avg=493.64ms min=353.44ms max=736.36ms count=3
+D/EGL_emulation( 6211): app_time_stats: avg=115.40ms min=17.77ms max=270.03ms count=9
+D/EGL_emulation( 6211): app_time_stats: avg=633.21ms min=500.73ms max=765.69ms count=2
+D/EGL_emulation( 6211): app_time_stats: avg=65.12ms min=12.94ms max=250.52ms count=17
+D/EGL_emulation( 6211): app_time_stats: avg=1115.80ms min=1115.80ms max=1115.80ms count=1
+D/EGL_emulation( 6211): app_time_stats: avg=100.40ms min=44.36ms max=268.59ms count=10
+D/EGL_emulation( 6211): app_time_stats: avg=98.61ms min=12.85ms max=247.71ms count=11
+I/flutter ( 6211): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 6211): The following TestFailure was thrown running a test:
+I/flutter ( 6211): Expected: null
+I/flutter ( 6211):   Actual: FlutterError:<setState() callback argument returned a Future.
+I/flutter ( 6211):           The setState() method on _GelisimSekmesiState#c4f64 was called with a closure or method
+I/flutter ( 6211): that returned a Future. Maybe it is marked as "async".
+I/flutter ( 6211):           Instead of performing asynchronous work inside a call to setState(), first execute the
+I/flutter ( 6211): work (without updating the widget state), and then synchronously update the state inside a call to
+I/flutter ( 6211): setState().>
+I/flutter ( 6211): ekranda taşma/çizim hatası: 50-gelisim-koyu
+I/flutter ( 6211): 
+I/flutter ( 6211): When the exception was thrown, this was the stack:
+I/flutter ( 6211): #4      main.<anonymous closure>.ek (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:117:7)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): #5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:168:7)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): #6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:179:5)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): #7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): #8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): #9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 6211): <asynchronous suspension>
+I/flutter ( 6211): 
+I/flutter ( 6211): This was caught by the test expectation on the following line:
+I/flutter ( 6211):   file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 117
+I/flutter ( 6211): The test description was:
+I/flutter ( 6211):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6211): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 6211): 00:27 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 6211):   Test failed. See exception logs above.
+I/flutter ( 6211):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6211):   
+I/flutter ( 6211): 00:27 +0 -1: (tearDownAll)
+I/flutter ( 6211): 00:28 +1 -1: Some tests failed.
+D/EGL_emulation( 6211): app_time_stats: avg=1064.85ms min=362.04ms max=2424.35ms count=3
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<setState() callback argument returned a
+Future.
+          The setState() method on _GelisimSekmesiState#c4f64 was
+called with a closure or method that returned a Future. Maybe it
+is marked as "async".
+          Instead of performing asynchronous work inside a call
+to setState(), first execute the work (without updating the
+widget state), and then synchronously update the state inside a
+call to setState().>
+ekranda taşma/çizim hatası: 50-gelisim-koyu
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.ek (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:117:7)
+<asynchronous suspension>
+#5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:168:7)
+<asynchronous suspension>
+#6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:179:5)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+This was caught by the test expectation on the following line:
+  file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 117
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+

@@ -1,0 +1,161 @@
+Running Gradle task 'assembleDebug'...                             28.1s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          869ms
+I/flutter ( 6553): The Dart VM service is listening on http://127.0.0.1:45731/NZqHiMgYvUo=/
+D/FlutterRenderer( 6553): Width is zero. 0,0
+D/FlutterRenderer( 6553): Width is zero. 0,0
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:32807/EpIdGCJM2QA=/
+VMServiceFlutterDriver: Isolate found with number: 3424394809824283
+VMServiceFlutterDriver: Isolate 3424394809824283 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+D/ProfileInstaller( 6553): Installing profile for com.akeakademi.ake_akademi
+I/flutter ( 6553): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 6553): Compat change id reported: 236825255; UID 10193; state: ENABLED
+I/flutter ( 6553): CIHAZ_MANTIKSAL_GENISLIK=390.0 yukseklik=776.0 dpr=3.0
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+I/emi.ake_akademi( 6553): NativeAlloc concurrent copying GC freed 25907(1597KB) AllocSpace objects, 3(60KB) LOS objects, 49% free, 2690KB/5380KB, paused 145us,20us total 124.836ms
+D/EGL_emulation( 6553): app_time_stats: avg=271.25ms min=96.82ms max=478.22ms count=4
+D/EGL_emulation( 6553): app_time_stats: avg=1177.03ms min=764.45ms max=1485.97ms count=3
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:29bf5d41: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:29bf5d41: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6553): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{5e95b98 VFE...... .F....ID 0,0-1170,2328 #1} is not served.
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:61c28882: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:61c28882: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6553): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{5e95b98 VFE...... .F....ID 0,0-1170,2328 #1} is not served.
+I/AssistStructure( 6553): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+D/EGL_emulation( 6553): app_time_stats: avg=125.08ms min=29.53ms max=423.26ms count=8
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:bfa2155f: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 6553): com.akeakademi.ake_akademi:bfa2155f: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+D/EGL_emulation( 6553): app_time_stats: avg=289.66ms min=29.19ms max=1241.61ms count=5
+D/EGL_emulation( 6553): app_time_stats: avg=1098.06ms min=411.58ms max=1784.54ms count=2
+I/OpenGLRenderer( 6553): Davey! duration=1050ms; Flags=0, FrameTimelineVsyncId=27906, IntendedVsync=409128170824, Vsync=409261504152, InputEventId=0, HandleInputStart=409265776880, AnimationStart=409265781769, PerformTraversalsStart=409265784694, DrawStart=409273715977, FrameDeadline=409144837490, FrameInterval=409265533735, FrameStartTime=16666666, SyncQueued=409274140731, SyncStart=409274166850, IssueDrawCommandsStart=409274236370, SwapBuffers=410128568774, FrameCompleted=410178483459, DequeueBufferDuration=11371, QueueBufferDuration=986603, GpuCompleted=410178483459, SwapBuffersCompleted=410172808463, DisplayPresentTime=0, CommandSubmissionCompleted=410128568774, 
+D/EGL_emulation( 6553): app_time_stats: avg=162.10ms min=107.82ms max=332.31ms count=7
+D/EGL_emulation( 6553): app_time_stats: avg=786.47ms min=642.77ms max=930.17ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=170.52ms min=34.45ms max=469.17ms count=6
+W/WindowOnBackDispatcher( 6553): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6553): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+D/EGL_emulation( 6553): app_time_stats: avg=1284.64ms min=844.98ms max=1724.31ms count=2
+I/OpenGLRenderer( 6553): Davey! duration=1100ms; Flags=0, FrameTimelineVsyncId=29242, IntendedVsync=413228170660, Vsync=413278170658, InputEventId=0, HandleInputStart=413281926652, AnimationStart=413281930109, PerformTraversalsStart=413281932934, DrawStart=413292280902, FrameDeadline=413244837326, FrameInterval=413281902728, FrameStartTime=16666666, SyncQueued=413292424751, SyncStart=413292441441, IssueDrawCommandsStart=413292500973, SwapBuffers=414303937218, FrameCompleted=414328477212, DequeueBufferDuration=7043, QueueBufferDuration=305241, GpuCompleted=414328477212, SwapBuffersCompleted=414315885855, DisplayPresentTime=72904454231491268, CommandSubmissionCompleted=414303937218, 
+D/EGL_emulation( 6553): app_time_stats: avg=246.63ms min=22.23ms max=1325.01ms count=9
+D/EGL_emulation( 6553): app_time_stats: avg=185.96ms min=29.53ms max=460.14ms count=6
+D/EGL_emulation( 6553): app_time_stats: avg=510.72ms min=456.11ms max=598.32ms count=3
+D/EGL_emulation( 6553): app_time_stats: avg=100.50ms min=24.49ms max=385.33ms count=10
+D/EGL_emulation( 6553): app_time_stats: avg=125.55ms min=42.56ms max=390.19ms count=8
+D/EGL_emulation( 6553): app_time_stats: avg=978.14ms min=933.84ms max=1022.43ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=162.29ms min=24.05ms max=424.88ms count=7
+D/EGL_emulation( 6553): app_time_stats: avg=931.71ms min=639.48ms max=1223.94ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=96.13ms min=18.76ms max=381.00ms count=13
+D/EGL_emulation( 6553): app_time_stats: avg=552.78ms min=452.46ms max=653.09ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=202.68ms min=58.33ms max=401.98ms count=6
+D/FlutterJNI( 6553): Sending viewport metrics to the engine.
+D/EGL_emulation( 6553): app_time_stats: avg=1420.56ms min=1420.56ms max=1420.56ms count=1
+D/EGL_emulation( 6553): app_time_stats: avg=256.12ms min=129.51ms max=372.37ms count=4
+D/EGL_emulation( 6553): app_time_stats: avg=171.80ms min=102.35ms max=327.75ms count=6
+D/EGL_emulation( 6553): app_time_stats: avg=755.18ms min=512.60ms max=997.76ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=170.77ms min=65.40ms max=501.30ms count=6
+I/emi.ake_akademi( 6553): NativeAlloc concurrent copying GC freed 1581(139KB) AllocSpace objects, 13(2020KB) LOS objects, 49% free, 2734KB/5468KB, paused 2.900ms,15us total 108.640ms
+D/EGL_emulation( 6553): app_time_stats: avg=169.37ms min=89.27ms max=452.99ms count=6
+D/EGL_emulation( 6553): app_time_stats: avg=902.67ms min=837.23ms max=968.10ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=151.87ms min=66.09ms max=371.61ms count=8
+D/EGL_emulation( 6553): app_time_stats: avg=706.91ms min=705.30ms max=708.52ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=87.78ms min=22.43ms max=364.68ms count=12
+W/WindowOnBackDispatcher( 6553): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6553): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 6553): app_time_stats: avg=152.58ms min=58.48ms max=401.87ms count=7
+D/EGL_emulation( 6553): app_time_stats: avg=950.87ms min=707.93ms max=1193.81ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=121.61ms min=26.86ms max=364.15ms count=9
+D/EGL_emulation( 6553): app_time_stats: avg=574.71ms min=301.48ms max=892.90ms count=3
+D/EGL_emulation( 6553): app_time_stats: avg=127.29ms min=22.63ms max=395.39ms count=9
+D/EGL_emulation( 6553): app_time_stats: avg=85.28ms min=21.26ms max=388.02ms count=12
+D/EGL_emulation( 6553): app_time_stats: avg=770.54ms min=621.43ms max=919.65ms count=2
+D/EGL_emulation( 6553): app_time_stats: avg=85.58ms min=23.22ms max=400.81ms count=12
+D/EGL_emulation( 6553): app_time_stats: avg=1345.70ms min=1345.70ms max=1345.70ms count=1
+D/EGL_emulation( 6553): app_time_stats: avg=132.01ms min=43.42ms max=374.22ms count=8
+D/EGL_emulation( 6553): app_time_stats: avg=133.93ms min=19.28ms max=350.28ms count=8
+I/flutter ( 6553): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 6553): The following TestFailure was thrown running a test:
+I/flutter ( 6553): Expected: null
+I/flutter ( 6553):   Actual: FlutterError:<setState() callback argument returned a Future.
+I/flutter ( 6553):           The setState() method on _GelisimSekmesiState#9f80d was called with a closure or method
+I/flutter ( 6553): that returned a Future. Maybe it is marked as "async".
+I/flutter ( 6553):           Instead of performing asynchronous work inside a call to setState(), first execute the
+I/flutter ( 6553): work (without updating the widget state), and then synchronously update the state inside a call to
+I/flutter ( 6553): setState().>
+I/flutter ( 6553): ekranda taşma/çizim hatası: 50-gelisim-koyu
+I/flutter ( 6553): 
+I/flutter ( 6553): When the exception was thrown, this was the stack:
+I/flutter ( 6553): #4      main.<anonymous closure>.ek (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:117:7)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): #5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:168:7)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): #6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:179:5)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): #7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): #8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): #9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 6553): <asynchronous suspension>
+I/flutter ( 6553): 
+I/flutter ( 6553): This was caught by the test expectation on the following line:
+I/flutter ( 6553):   file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 117
+I/flutter ( 6553): The test description was:
+I/flutter ( 6553):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6553): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 6553): 00:32 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 6553):   Test failed. See exception logs above.
+I/flutter ( 6553):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6553):   
+I/flutter ( 6553): 00:32 +0 -1: (tearDownAll)
+I/Choreographer( 6553): Skipped 42 frames!  The application may be doing too much work on its main thread.
+D/EGL_emulation( 6553): app_time_stats: avg=1229.31ms min=427.77ms max=2805.32ms count=3
+I/flutter ( 6553): 00:33 +1 -1: Some tests failed.
+I/OpenGLRenderer( 6553): Davey! duration=750ms; Flags=0, FrameTimelineVsyncId=36310, IntendedVsync=436394836400, Vsync=437094836372, InputEventId=0, HandleInputStart=437118593599, AnimationStart=437118598839, PerformTraversalsStart=437118601143, DrawStart=437119570133, FrameDeadline=436411503066, FrameInterval=437108182855, FrameStartTime=16666666, SyncQueued=437119865104, SyncStart=437119894008, IssueDrawCommandsStart=437119937038, SwapBuffers=437121759452, FrameCompleted=437145154811, DequeueBufferDuration=9779, QueueBufferDuration=319366, GpuCompleted=437145154811, SwapBuffersCompleted=437137353919, DisplayPresentTime=0, CommandSubmissionCompleted=437121759452, 
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: FlutterError:<setState() callback argument returned a
+Future.
+          The setState() method on _GelisimSekmesiState#9f80d was
+called with a closure or method that returned a Future. Maybe it
+is marked as "async".
+          Instead of performing asynchronous work inside a call
+to setState(), first execute the work (without updating the
+widget state), and then synchronously update the state inside a
+call to setState().>
+ekranda taşma/çizim hatası: 50-gelisim-koyu
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.ek (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:117:7)
+<asynchronous suspension>
+#5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:168:7)
+<asynchronous suspension>
+#6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:179:5)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+This was caught by the test expectation on the following line:
+  file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 117
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+

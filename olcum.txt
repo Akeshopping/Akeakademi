@@ -1,0 +1,4 @@
+--- acilis-390-ilk-acilis (390 dp, animator=1)
+--- acilis-320-ilk-acilis (320 dp, animator=1)
+--- acilis-390-ikinci-acilis (390 dp, animator=1)
+--- acilis-320-hareket-azalt (320 dp, animator=0)

@@ -114,6 +114,8 @@ void main() {
 
     Future<void> ek(String ad) async {
       await t.pumpAndSettle();
+      await t.pump(const Duration(milliseconds: 600)); // sayfa geçişi ve sekme göstergesi tamamen otursun
+      await t.pumpAndSettle();
       expect(t.takeException(), isNull, reason: 'ekranda taşma/çizim hatası: $ad');
       await binding.takeScreenshot('$g-$ad');
     }

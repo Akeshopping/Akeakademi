@@ -34,13 +34,13 @@ class _GelisimSekmesiState extends State<GelisimSekmesi> {
   void _sekmeDegisti() {
     // Gelişim sekmesine her dönüşte taze veri (yeni çözülen sorular görünsün).
     final s = widget.model.sekme;
-    if (s == 2 && _sonSekme != 2 && mounted) setState(() => _f = widget.model.hesapVerisi());
+    if (s == 2 && _sonSekme != 2 && mounted) setState(() { _f = widget.model.hesapVerisi(); });
     _sonSekme = s;
   }
 
   Future<void> _yenile() async {
     final y = widget.model.hesapVerisi();
-    setState(() => _f = y);
+    setState(() { _f = y; });
     try {
       await y;
     } catch (_) {}

@@ -32,7 +32,7 @@ mkdir -p kanit/ekranlar && cp -r ekran-kanit/*.png kanit/ekranlar/ 2>/dev/null |
 
 # 2) GERÇEK UYGULAMA: lib/main.dart, release (AOT), Preview adresli. Sürücüden SONRA derlenir (release derlemesi dev-bağımlılık eklentilerini
 #    kayıttan çıkarır; önce yapılırsa sürücü eklentiyi bulamaz) ve flutter drive'ın ezdiği yoldan ayrı kopyalanır.
-flutter build apk --release --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev --dart-define=AKE_OLCUM=1 2>&1 | tail -3
+flutter build apk --release --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev --dart-define=AKE_OLCUM=true 2>&1 | tail -3
 mkdir -p kanit-apk && cp build/app/outputs/flutter-apk/app-release.apk kanit-apk/ake-release.apk
 adb uninstall $PAKET >/dev/null 2>&1 || true   # sürücünün kurduğu test derlemesini kaldır
 adb install "$APK" && echo "GERCEK_APK_KURULDU $(basename "$APK")" | tee -a kanit/cihaz.txt
@@ -54,6 +54,7 @@ kayit() { # $1=dp $2=ad $3=temiz|kal $4=animator ölçeği (1 normal, 0 = hareke
     sleep 1
     adb pull /sdcard/$2.mp4 kanit/$2.mp4 >/dev/null 2>&1 || echo "KAYIT_ALINAMADI_$2" | tee -a kanit/cihaz.txt
     sure=$(ffprobe -v error -show_entries format=duration -of csv=p=0 kanit/$2.mp4 2>/dev/null | cut -d. -f1)
+    [ "$3" != "temiz" ] && break        # ikinci açılış/ sabit ekran: video kısa olabilir (ekran değişmeyince kare yazılmaz)
     [ "${sure:-0}" -ge 6 ] && break
     echo "KAYIT_KISA_$2 (sure=${sure:-0}) deneme=$deneme" | tee -a kanit/cihaz.txt
     adb shell am force-stop $PAKET; [ "$3" = "temiz" ] && adb shell pm clear $PAKET >/dev/null

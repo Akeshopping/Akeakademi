@@ -25,7 +25,7 @@ class _PlanSekmesiState extends State<PlanSekmesi> {
 
   Future<void> _yenile() async {
     final y = widget.model.hesapVerisi();
-    setState(() => _f = y);
+    setState(() { _f = y; });
     try {
       await y;
     } catch (_) {}

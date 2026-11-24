@@ -35,7 +35,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
 
   Future<void> _yenile() async {
     final y = _yukle();
-    setState(() => _f = y);
+    setState(() { _f = y; });
     try {
       await y;
     } catch (_) {}

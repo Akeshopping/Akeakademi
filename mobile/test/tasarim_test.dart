@@ -130,6 +130,22 @@ void main() {
     expect(t.takeException(), isNull);
   });
 
+  testWidgets('Gelişim sekmesine ikinci kez dönünce hata yok (setState Future döndürmemeli) ve yenileme çalışır', (t) async {
+    ekran(t, 390);
+    final s = SahteSunucu()..ilerlemeler['u1'] = {'mat|Sayılar': [7, 3, 0]};
+    final m = model(s, anahtar: SahteSunucu.anahtar);
+    await m.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: m));
+    await t.pumpAndSettle();
+    for (final i in [2, 0, 2, 3, 0, 3, 2]) {
+      await sekme(t, i);
+      expect(t.takeException(), isNull, reason: 'sekme $i');
+    }
+    await t.fling(find.byType(Scrollable).first, const Offset(0, 300), 1000); // çekerek yenile
+    await t.pumpAndSettle();
+    expect(t.takeException(), isNull);
+  });
+
   testWidgets('tema ayarı: Koyu seçilince uygulama koyu temaya geçer', (t) async {
     ekran(t, 390);
     final s = SahteSunucu(), m = model(s, anahtar: SahteSunucu.anahtar);

@@ -317,6 +317,50 @@ class KartKutu extends StatelessWidget {
   }
 }
 
+/// Solda renkli şerit taşıyan kart (sitedeki ders/konu kartları). Flutter, renkleri farklı kenarlığa
+/// yuvarlak köşe vermeyi desteklemez; bu yüzden kenarlık tek renk, şerit ise kırpılmış ayrı bir katmandır.
+class SolSeritKutu extends StatelessWidget {
+  final Widget child;
+  final Color serit;
+  final double seritGenisligi;
+  final Color? renk;
+  final Color? kenar;
+  final double yaricap;
+  final double minYukseklik;
+  final EdgeInsetsGeometry padding;
+  const SolSeritKutu({
+    super.key,
+    required this.child,
+    required this.serit,
+    this.seritGenisligi = 4,
+    this.renk,
+    this.kenar,
+    this.yaricap = 12,
+    this.minYukseklik = 0,
+    this.padding = const EdgeInsets.fromLTRB(14, 12, 12, 12),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final ic = padding.resolve(Directionality.of(context));
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(minHeight: minYukseklik),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: renk ?? t.kart,
+        borderRadius: BorderRadius.circular(yaricap),
+        border: Border.all(color: kenar ?? t.cizgi),
+      ),
+      child: Stack(children: [
+        Padding(padding: ic.copyWith(left: ic.left + seritGenisligi - 1), child: child),
+        Positioned(left: 0, top: 0, bottom: 0, width: seritGenisligi, child: ColoredBox(color: serit)),
+      ]),
+    );
+  }
+}
+
 /// Küçük hap biçimli etiket (örn. "0/5 tamam").
 class Hap extends StatelessWidget {
   final String metin;

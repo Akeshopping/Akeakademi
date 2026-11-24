@@ -228,10 +228,13 @@ class _SoruEkraniState extends State<SoruEkrani> {
         Text(soru.konu, style: TextStyle(color: t.murekkep3, fontSize: 13)),
         const SizedBox(height: 14),
         if (soru.paragraf != null) ...[
-          Container(
-            width: double.infinity,
+          SolSeritKutu(
+            serit: t.mercanDeko,
+            seritGenisligi: 3,
+            renk: t.girinti,
+            kenar: Colors.transparent,
+            yaricap: 14,
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-            decoration: BoxDecoration(color: t.girinti, borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: t.mercanDeko, width: 3))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('OKUMA PARÇASI', style: TextStyle(color: t.mercan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
               const SizedBox(height: 8),

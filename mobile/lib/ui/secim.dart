@@ -185,14 +185,9 @@ class _DersKarti extends StatelessWidget {
       child: ExcludeSemantics(
         child: AkeDokun(
           basinca: basinca,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 64),
-            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-            decoration: BoxDecoration(
-              color: t.kart,
-              borderRadius: BorderRadius.circular(12),
-              border: Border(left: BorderSide(color: bos ? t.cizgi : r.metin, width: 4), top: BorderSide(color: t.cizgi), right: BorderSide(color: t.cizgi), bottom: BorderSide(color: t.cizgi)),
-            ),
+          child: SolSeritKutu(
+            serit: bos ? t.cizgi : r.metin,
+            minYukseklik: 64,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(Katalog.dersAdi(ders), maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: bos ? t.murekkep3 : t.murekkep)),
               const SizedBox(height: 3),
@@ -255,14 +250,10 @@ class _KonuEkraniState extends State<KonuEkrani> {
                     child: ExcludeSemantics(
                       child: AkeDokun(
                         basinca: () => _baslat(k),
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 64),
+                        child: SolSeritKutu(
+                          serit: r.metin,
+                          minYukseklik: 64,
                           padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-                          decoration: BoxDecoration(
-                            color: t.kart,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border(left: BorderSide(color: r.metin, width: 4), top: BorderSide(color: t.cizgi), right: BorderSide(color: t.cizgi), bottom: BorderSide(color: t.cizgi)),
-                          ),
                           child: Row(children: [
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

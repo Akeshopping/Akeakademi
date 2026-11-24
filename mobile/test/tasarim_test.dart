@@ -108,8 +108,10 @@ void main() {
     await sekme(t, 1);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('Matematik'), 120, scrollable: find.byType(Scrollable).first);
     await t.tap(find.text('Matematik'));
     await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('Sayılar'), 120, scrollable: find.byType(Scrollable).first);
     await t.tap(find.text('Sayılar'));
     await t.pumpAndSettle();
     for (final harf in ['a', 'b', 'c', 'd', 'e']) {

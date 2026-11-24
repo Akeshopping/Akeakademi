@@ -1,0 +1,90 @@
+Running Gradle task 'assembleDebug'...                             29.3s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...        1,027ms
+I/flutter ( 6434): The Dart VM service is listening on http://127.0.0.1:36945/eP9i70CDlJ4=/
+D/FlutterRenderer( 6434): Width is zero. 0,0
+D/FlutterRenderer( 6434): Width is zero. 0,0
+D/FlutterJNI( 6434): Sending viewport metrics to the engine.
+D/FlutterJNI( 6434): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:46655/_vJZ6_15x5Y=/
+VMServiceFlutterDriver: Isolate found with number: 5558186690538211
+VMServiceFlutterDriver: Isolate 5558186690538211 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 6434): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+I/flutter ( 6434): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 6434): The following MissingPluginException was thrown running a test:
+I/flutter ( 6434): MissingPluginException(No implementation found for method convertFlutterSurfaceToImage on channel
+I/flutter ( 6434): plugins.flutter.io/integration_test)
+I/flutter ( 6434): 
+I/flutter ( 6434): When the exception was thrown, this was the stack:
+I/flutter ( 6434): #0      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:363:7)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #1      _IOCallbackManager.convertFlutterSurfaceToImage (package:integration_test/src/_callback_io.dart:71:5)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #2      IntegrationTestWidgetsFlutterBinding.convertFlutterSurfaceToImage (package:integration_test/integration_test.dart:205:5)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #3      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:101:5)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): #6      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 6434): <asynchronous suspension>
+I/flutter ( 6434): 
+I/flutter ( 6434): The test description was:
+I/flutter ( 6434):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6434): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 6434): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 6434):   Test failed. See exception logs above.
+I/flutter ( 6434):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6434):   
+I/flutter ( 6434): 00:00 +0 -1: (tearDownAll)
+I/flutter ( 6434): Warning: integration_test plugin was not detected.
+I/flutter ( 6434): 
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following MissingPluginException was thrown running a test:
+MissingPluginException(No implementation found for method
+convertFlutterSurfaceToImage on channel
+plugins.flutter.io/integration_test)
+
+When the exception was thrown, this was the stack:
+#0      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:363:7)
+<asynchronous suspension>
+#1      _IOCallbackManager.convertFlutterSurfaceToImage (package:integration_test/src/_callback_io.dart:71:5)
+<asynchronous suspension>
+#2      IntegrationTestWidgetsFlutterBinding.convertFlutterSurfaceToImage (package:integration_test/integration_test.dart:205:5)
+<asynchronous suspension>
+#3      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:101:5)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+
+I/flutter ( 6434): If you're running the tests with `flutter drive`, please make sure your tests
+I/flutter ( 6434): are in the `integration_test/` directory of your package and use
+I/flutter ( 6434): `flutter test $path_to_test` to run it instead.
+I/flutter ( 6434): 
+I/flutter ( 6434): If you're running the tests with Android instrumentation or XCTest, this means
+I/flutter ( 6434): that you are not capturing test results properly! See the following link for
+I/flutter ( 6434): how to set up the integration_test plugin:
+I/flutter ( 6434): 
+I/flutter ( 6434): https://docs.flutter.dev/testing/integration-tests
+I/flutter ( 6434): 
+I/flutter ( 6434): 00:00 +1 -1: Some tests failed.

@@ -90,16 +90,80 @@ class CevapSonucu {
       );
 }
 
+/// Bitişte sunucunun döndüğü soru satırı. Sınav (deneme) cevap anahtarı yalnız BURADA, oturum bittikten sonra gelir.
+class SonucSatir {
+  final String id;
+  final int? secim;
+  final int? dogruSecenek;
+  final String? aciklama;
+  final bool? dogru;
+  const SonucSatir({required this.id, required this.secim, required this.dogruSecenek, required this.aciklama, required this.dogru});
+  factory SonucSatir.fromJson(Map<String, dynamic> j) => SonucSatir(
+        id: '${j['id']}',
+        secim: j['secim'] is num ? (j['secim'] as num).toInt() : null,
+        dogruSecenek: j['a'] is num ? (j['a'] as num).toInt() : null,
+        aciklama: j['x'] is String && (j['x'] as String).isNotEmpty ? j['x'] as String : null,
+        dogru: j['dogru'] is bool ? j['dogru'] as bool : null,
+      );
+}
+
 class OturumSonucu {
   final int dogru;
   final int yanlis;
   final int bos;
-  const OturumSonucu({required this.dogru, required this.yanlis, required this.bos});
+  final List<SonucSatir> sorular;
+  const OturumSonucu({required this.dogru, required this.yanlis, required this.bos, this.sorular = const []});
   factory OturumSonucu.fromJson(Map<String, dynamic> j) => OturumSonucu(
         dogru: (j['dogru'] as num?)?.toInt() ?? 0,
         yanlis: (j['yanlis'] as num?)?.toInt() ?? 0,
         bos: (j['bos'] as num?)?.toInt() ?? 0,
+        sorular: [
+          for (final e in (j['sorular'] as List? ?? const []))
+            if (e is Map) SonucSatir.fromJson(Map<String, dynamic>.from(e)),
+        ],
       );
+
+  /// Site ile aynı net: doğru − yanlış/4 (yüzde bire yuvarlı).
+  double get net => ((dogru - yanlis / 4) * 100).round() / 100;
+}
+
+/// /api/hesap/ben: paket, AI kullanımı ve ücretsiz haklar (sunucu söyler; istemci hesap yapmaz).
+class HesapDurumu {
+  final String? plan; // null = paket yok
+  final String bitis;
+  final int aiMesaj;
+  final int aiMesajLimit;
+  final int aiGuclu;
+  final int aiGucluLimit;
+  final bool ucretsizVar;
+  final int? kalanSoru;
+  final int? kalanDeneme;
+  const HesapDurumu({this.plan, this.bitis = '', this.aiMesaj = 0, this.aiMesajLimit = 0, this.aiGuclu = 0, this.aiGucluLimit = 0, this.ucretsizVar = false, this.kalanSoru, this.kalanDeneme});
+  bool get paketli => plan != null;
+  factory HesapDurumu.fromJson(Map<String, dynamic> j) {
+    Map<String, dynamic> m(Object? v) => v is Map ? Map<String, dynamic>.from(v) : <String, dynamic>{};
+    int n(Object? v) => v is num ? v.toInt() : 0;
+    final paket = j['paket'] is Map ? m(j['paket']) : null;
+    final k = m(j['kullanim']), l = m(j['limit']), u = m(j['ucretsiz']);
+    return HesapDurumu(
+      plan: paket == null ? null : '${paket['plan'] ?? ''}',
+      bitis: paket == null ? '' : '${paket['bitis'] ?? ''}',
+      aiMesaj: n(k['mesaj']),
+      aiMesajLimit: n(l['mesaj']),
+      aiGuclu: n(k['guclu']),
+      aiGucluLimit: n(l['guclu']),
+      ucretsizVar: u.isNotEmpty && u['sinirsiz'] != true,
+      kalanSoru: u['kalanSoru'] is num ? n(u['kalanSoru']) : null,
+      kalanDeneme: u['kalanDeneme'] is num ? n(u['kalanDeneme']) : null,
+    );
+  }
+}
+
+/// Hesap belgesi + sürümü (koşullu yazma için). [surum] sunucunun `u` değeridir.
+class SurumluBelge {
+  final Map<String, dynamic> belge;
+  final int surum;
+  const SurumluBelge(this.belge, this.surum);
 }
 
 class Ozet {

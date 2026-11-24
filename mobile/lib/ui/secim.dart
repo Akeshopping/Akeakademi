@@ -21,11 +21,20 @@ class SoruCozSekmesi extends StatefulWidget {
 class _SoruCozSekmesiState extends State<SoruCozSekmesi> {
   late Future<Ozet> _ozet;
   String _sinav = 'TYT';
+  int _sekme = 0; // 0 Konular · 1 Soru ara · 2 Paragraf
+  int? _zorluk; // arama ve paragraf için (null = karışık)
+  final TextEditingController _ara = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _ozet = widget.model.api.ozet();
+  }
+
+  @override
+  void dispose() {
+    _ara.dispose();
+    super.dispose();
   }
 
   void _yenile() => setState(() => _ozet = widget.model.api.ozet());
@@ -48,6 +57,11 @@ class _SoruCozSekmesiState extends State<SoruCozSekmesi> {
           children: [
             const _Baslik('Soru Çözüm Merkezi'),
             const SizedBox(height: 14),
+            _SekmeSecici(secili: _sekme, degisti: (i) => setState(() => _sekme = i)),
+            const SizedBox(height: 16),
+            if (_sekme == 1) ..._araGovdesi(context, m)
+            else if (_sekme == 2) ..._paragrafGovdesi(context, m, ozet)
+            else ...[
             const _AdimBasligi(1, 'Hangi sınava çalışıyorsun?'),
             const SizedBox(height: 10),
             LayoutBuilder(builder: (context, c) {
@@ -78,10 +92,64 @@ class _SoruCozSekmesiState extends State<SoruCozSekmesi> {
                   ),
               ]);
             }),
+            ],
           ],
         );
       },
     );
+  }
+
+  List<Widget> _araGovdesi(BuildContext context, UygulamaModeli m) {
+    final t = context.ake;
+    final gecerli = _ara.text.trim().length >= 2;
+    return [
+      Text('Soru metninde geçen bir kelimeyi yaz; eşleşen sorulardan 10 soruluk oturum açılır.', style: TextStyle(color: t.murekkep2, height: 1.4)),
+      const SizedBox(height: 12),
+      TextField(
+        key: const ValueKey('ara-girdi'),
+        controller: _ara,
+        maxLength: 60,
+        textInputAction: TextInputAction.search,
+        decoration: const InputDecoration(labelText: 'Aranacak kelime', hintText: 'Örn. asal, paragraf, mol', border: OutlineInputBorder(), counterText: ''),
+        onChanged: (_) => setState(() {}),
+        onSubmitted: (_) => gecerli ? _araBaslat(m) : null,
+      ),
+      const SizedBox(height: 12),
+      _ZorlukSecici(secili: _zorluk, degisti: (z) => setState(() => _zorluk = z)),
+      const SizedBox(height: 14),
+      AkeDugme('Ara ve çöz', key: const ValueKey('ara-baslat'), simge: Icons.search_rounded, basinca: gecerli ? () => _araBaslat(m) : null),
+      if (!gecerli) Padding(padding: const EdgeInsets.only(top: 8), child: Text('En az 2 karakter yaz.', style: TextStyle(color: t.murekkep3, fontSize: 12.5))),
+    ];
+  }
+
+  void _araBaslat(UygulamaModeli m) {
+    final k = _ara.text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (k.length < 2) return;
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: m, ara: k, zorluk: _zorluk)));
+  }
+
+  List<Widget> _paragrafGovdesi(BuildContext context, UygulamaModeli m, Ozet ozet) {
+    final t = context.ake;
+    final n = (ozet.konular['turkce'] ?? const <String, int>{})['Paragraf'] ?? 0;
+    if (n == 0) {
+      return [KartKutu(child: Text('Bu soru bankasında “Paragraf” konusu henüz yok.', style: TextStyle(color: t.murekkep2, height: 1.4)))];
+    }
+    final r = dersRengi(context, 'turkce');
+    return [
+      SolSeritKutu(
+        serit: r.metin,
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Paragraf', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 3),
+          Text('Türkçe · $n soru. Okuma parçalı sorular.', style: TextStyle(color: t.murekkep2, fontSize: 13, height: 1.35)),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      _ZorlukSecici(secili: _zorluk, degisti: (z) => setState(() => _zorluk = z)),
+      const SizedBox(height: 14),
+      AkeDugme('Paragraf çöz', key: const ValueKey('paragraf-baslat'), simge: Icons.menu_book_rounded, basinca: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: m, ders: 'turkce', konu: 'Paragraf', zorluk: _zorluk)))),
+    ];
   }
 
   Widget _hataGorunumu(Object e, VoidCallback tekrar) {
@@ -327,6 +395,46 @@ class _ZorlukSecici extends StatelessWidget {
             ),
           ),
         ],
+      ]),
+    );
+  }
+}
+
+/// Soru Çözüm Merkezi sekmeleri. Yalnız sunucu desteği olanlar: Konular, Soru ara (sunucu `ara` filtresi), Paragraf.
+/// "ÖSYM tarzı" ve "AI ile üret" sunucuda karşılığı olmadığı için YOK.
+class _SekmeSecici extends StatelessWidget {
+  final int secili;
+  final ValueChanged<int> degisti;
+  const _SekmeSecici({required this.secili, required this.degisti});
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    const adlar = ['Konular', 'Soru ara', 'Paragraf'];
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: t.girinti, borderRadius: BorderRadius.circular(14)),
+      child: Row(children: [
+        for (var i = 0; i < adlar.length; i++)
+          Expanded(
+            child: Semantics(
+              button: true,
+              selected: i == secili,
+              label: adlar[i],
+              child: ExcludeSemantics(
+                child: AkeDokun(
+                  basinca: () => degisti(i),
+                  child: AnimatedContainer(
+                    key: ValueKey('soru-sekme-$i'),
+                    duration: const Duration(milliseconds: 160),
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: i == secili ? t.kart : Colors.transparent, borderRadius: BorderRadius.circular(11), border: Border.all(color: i == secili ? t.cizgi : Colors.transparent)),
+                    child: Text(adlar[i], maxLines: 1, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: i == secili ? t.murekkep : t.murekkep2)),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ]),
     );
   }

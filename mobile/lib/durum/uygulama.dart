@@ -11,6 +11,9 @@ import 'package:flutter/material.dart' show ThemeMode;
 
 enum Faz { yukleniyor, ag, giris, oturumBitti, ana }
 
+/// Menü sekmesinin alt sayfaları (sitedeki Menü bölümü): null = menü listesi.
+enum MenuSayfasi { gelisim, plan, ayarlar }
+
 /// Uygulamanın kök durumu: oturum var mı, süresi doldu mu, ağ var mı.
 class UygulamaModeli extends ChangeNotifier {
   final AkeApi api;
@@ -23,11 +26,43 @@ class UygulamaModeli extends ChangeNotifier {
   /// İlk açılışta bir kez oynayan giriş animasyonu. Görüldüğü cihazda saklanır; tekrar açılışta hiç gösterilmez.
   bool acilisOynat = false;
 
-  /// Alt gezinmedeki etkin sekme (0 Ana sayfa, 1 Soru çöz, 2 Gelişim, 3 Plan, 4 Ayarlar). Ekranlar buradan sekme değiştirebilir.
+  /// Alt gezinmedeki etkin sekme (0 Ana sayfa, 1 Soru çöz, 2 Deneme, 3 AI, 4 Menü). Ekranlar buradan sekme değiştirebilir.
   int sekme = 0;
   void sekmeGit(int i) {
     if (sekme == i) return;
     sekme = i;
+    notifyListeners();
+  }
+
+  /// Menü sekmesinde açık alt sayfa (Gelişim, Plan, Ayarlar); null ise menü listesi.
+  MenuSayfasi? menuSayfasi;
+  void menuyeGit(MenuSayfasi? s) {
+    sekme = 4;
+    menuSayfasi = s;
+    notifyListeners();
+  }
+
+  /// Geri tuşu: önce menü alt sayfası, sonra Ana sayfaya; zaten Ana sayfadaysa false (sistem çıkar).
+  bool geriGit() {
+    if (sekme == 4 && menuSayfasi != null) {
+      menuSayfasi = null;
+    } else if (sekme != 0) {
+      sekme = 0;
+    } else {
+      return false;
+    }
+    notifyListeners();
+    return true;
+  }
+
+  /// Hesap silme: sunucu siler, yerel her şey temizlenir, giriş ekranına dönülür.
+  Future<void> hesapSil() async {
+    await api.hesapSil();
+    senkron.temizle();
+    kullanici = null;
+    sekme = 0;
+    menuSayfasi = null;
+    faz = Faz.giris;
     notifyListeners();
   }
 
@@ -119,6 +154,7 @@ class UygulamaModeli extends ChangeNotifier {
     senkron.temizle();
     kullanici = null;
     sekme = 0;
+    menuSayfasi = null;
     faz = Faz.giris;
     notifyListeners();
   }

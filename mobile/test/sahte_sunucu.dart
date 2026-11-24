@@ -28,6 +28,21 @@ class SahteSunucu {
   /// Doluysa /api/soru/ozet bunu döndürür (ders/konu listesi test verisi).
   Map<String, dynamic>? ozetOzel;
   int cevapSayisi = 0;
+  // ---- hesap belgeleri (plan/profil): web ile aynı koşullu yazma sözleşmesi (_b = okunan sürüm, _h = hesap) ----
+  final Map<String, Map<String, dynamic>> belgeler = {}; // alan -> belge (veriAlanlari yoksa)
+  final Map<String, int> surumler = {};
+  final List<Map<String, dynamic>> veriYazmalari = []; // gövde + '_alan' (hangi belge)
+  int veriCakismasi = 0; // ilk N koşullu yazma 409 'eski' dönsün (araya başka yazma girmiş gibi)
+  // ---- paket / AI ----
+  bool paketli = false;
+  int kalanDeneme = 3;
+  bool aiKotaDoldu = false;
+  final List<List<Map<String, dynamic>>> aiIstekleri = [];
+  bool silindi = false;
+  int _sur(String a) => surumler[a] ?? ((veriAlanlari?.containsKey(a) ?? false) ? 1 : 0);
+  String? sonOturumGovdesi;
+  String? sonModu;
+  final Map<String, List<(String soru, int secim)>> sinavCevaplari = {};
   int ilerlemeHata500 = 0; // ilk N /ilerleme isteği 500 dönsün
   final List<Map<String, dynamic>> sorular = [
     {'id': 'q1', 's': 'mat', 't': 'Sayılar', 'd': 1, 'q': 'Soru 1?', 'o': ['a', 'b', 'c', 'd', 'e']},
@@ -55,14 +70,60 @@ class SahteSunucu {
     }
     final yetkili = r.headers['authorization'] == 'Bearer $anahtar' && oturumGecerli;
     if (!yetkili) return _y(401, {'error': 'giris'});
-    if (yol == '/api/hesap/ben') return _y(200, {'kullanici': {'id': hesapId, 'eposta': 'ogrenci@ornek.com', 'ad': ''}});
+    if (silindi) return _y(401, {'error': 'giris'});
+    if (yol == '/api/hesap/ben') {
+      return _y(200, {
+        'kullanici': {'id': hesapId, 'eposta': 'ogrenci@ornek.com', 'ad': ''},
+        'paket': paketli ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
+        'kullanim': {'mesaj': aiIstekleri.length, 'guclu': 0},
+        'limit': paketli ? {'mesaj': 500, 'guclu': 60} : null,
+        'ucretsiz': paketli ? {'sinirsiz': true} : {'sinirsiz': false, 'kalanSoru': 12, 'kalanDeneme': kalanDeneme},
+      });
+    }
+    if (yol == '/api/hesap/kod-bagla') {
+      final b = jsonDecode(r.body) as Map<String, dynamic>;
+      if (b['kod'] != 'AKE-TEST-1234') return _y(400, {'error': 'kod_gecersiz'});
+      paketli = true;
+      return _y(200, {'paket': {'plan': 'premium', 'bitis': '2027-06-30'}});
+    }
+    if (yol == '/api/hesap/sil' && r.method == 'POST') {
+      silindi = true;
+      return _y(200, {'ok': true});
+    }
+    if (yol == '/api/ai' && r.method == 'POST') {
+      if (!paketli) return _y(402, {'error': 'paket'});
+      if (aiKotaDoldu) return _y(429, {'error': 'kota'});
+      final b = jsonDecode(r.body) as Map<String, dynamic>;
+      aiIstekleri.add([for (final m in (b['messages'] as List)) Map<String, dynamic>.from(m as Map)]);
+      return _y(200, {'text': 'SAHTE YANIT ${aiIstekleri.length}: önce yöntemi kur.', 'truncated': false, 'plan': 'premium'});
+    }
     if (yol == '/api/hesap/cikis') return _y(200, {'ok': true});
     if (yol == '/api/hesap/veri' && r.method == 'GET') {
-      if (veriAlanlari != null) return _y(200, {'alanlar': veriAlanlari});
+      if (veriAlanlari != null) return _y(200, {'alanlar': veriAlanlari, 'u': {for (final k in veriAlanlari!.keys) k: _sur(k)}, 'hesap': hesapId});
       final t = ilerlemeler[hesapId];
-      return _y(200, {'alanlar': {if (t != null) 'stats': {'topic': t}}});
+      return _y(200, {'alanlar': {if (t != null) 'stats': {'topic': t}, ...belgeler}, 'u': {...surumler}, 'hesap': hesapId});
     }
-    if (yol.startsWith('/api/hesap/veri/')) return _y(500, {'error': 'mobil_veri_yazmamali'}); // uygulama stats'a yazmaz
+    if (yol.startsWith('/api/hesap/veri/') && r.method == 'PUT') {
+      final alan = yol.substring('/api/hesap/veri/'.length);
+      if (alan != 'plan' && alan != 'profile') return _y(500, {'error': 'mobil_veri_yazmamali'}); // uygulama yalnız plan ve profil yazar; stats sunucuda hesaplanır
+      final g = jsonDecode(r.body) as Map<String, dynamic>;
+      veriYazmalari.add({...g, '_alan': alan});
+      if (g['_h'] != hesapId) return _y(409, {'error': 'hesap'});
+      final b = g['_b'] as int?;
+      if (b == null) return _y(400, {'error': '_b'});
+      if (veriCakismasi > 0) {
+        veriCakismasi--;
+        surumler[alan] = _sur(alan) + 1; // araya başka yazma girdi
+        return _y(409, {'error': 'eski', 'u': surumler[alan]});
+      }
+      if (_sur(alan) != b) return _y(409, {'error': 'eski', 'u': _sur(alan)});
+      final belge = Map<String, dynamic>.from(g)..remove('_b')..remove('_h');
+      belgeler[alan] = belge;
+      veriAlanlari?[alan] = belge;
+      surumler[alan] = b + 1;
+      return _y(200, {'ok': true, 'u': b + 1});
+    }
+    if (yol.startsWith('/api/hesap/veri/')) return _y(500, {'error': 'mobil_veri_yazmamali'});
     if (yol.startsWith('/api/soru/')) {
       if (!soruServisiAcik) return _y(404, {'error': 'yok', 'message': ''});
       if (yol == '/api/soru/ozet') {
@@ -77,10 +138,13 @@ class SahteSunucu {
       }
       final b = jsonDecode(r.body) as Map<String, dynamic>;
       if (yol == '/api/soru/oturum') {
+        sonOturumGovdesi = r.body;
+        sonModu = '${b['mod']}';
         final anahtarIstek = '$hesapId|${b['istek']}';
         var oturum = istekOturum[anahtarIstek];
         if (oturum == null) {
-          if (limitDoldu) return _y(402, {'error': 'limit', 'message': 'Ücretsiz hakkın bitti.'});
+          if (limitDoldu || (b['mod'] == 'exam' && !paketli && kalanDeneme < 1)) return _y(402, {'error': 'limit', 'message': 'Ücretsiz hakkın bitti.'});
+          if (b['mod'] == 'exam' && !paketli) kalanDeneme--;
           kotaKullanilan++;
           oturum = 'o${kotaKullanilan.toString().padLeft(47, '0')}';
           istekOturum[anahtarIstek] = oturum;
@@ -90,7 +154,7 @@ class SahteSunucu {
           yanitKaybi--;
           throw http.ClientException('yanıt kayboldu');
         }
-        return _y(200, {'oturum': oturum, 'mod': 'practice', 'adet': sorular.length, 'sonaErme': 0, 'sorular': sorular, 'kota': {'tur': 'soru', 'limit': 30, 'kalan': 30 - kotaKullanilan}});
+        return _y(200, {'oturum': oturum, 'mod': '${b['mod']}', 'adet': sorular.length, 'sonaErme': 0, 'sorular': sorular, 'kota': {'tur': 'soru', 'limit': 30, 'kalan': 30 - kotaKullanilan}});
       }
       if (yol == '/api/soru/ilerleme') {
         if (ilerlemeHata500 > 0) {
@@ -111,11 +175,35 @@ class SahteSunucu {
         final bekleyen = oturumSahibi.entries.where((e) => e.value == hesapId && (cevaplar[e.key] ?? []).any((c) => !islendi.contains('$hesapId|${e.key}|${c.$1}'))).length;
         return _y(200, {'bekleyen': bekleyen});
       }
+      if (yol == '/api/soru/cevap' && sonModu == 'exam') {
+        cevapSayisi++;
+        final l = sinavCevaplari.putIfAbsent(b['oturum'] as String, () => []);
+        l.removeWhere((e) => e.$1 == b['soru']);
+        l.add((b['soru'] as String, b['secim'] as int));
+        return _y(200, {'kaydedildi': true}); // sınav: anahtar YOK
+      }
       if (yol == '/api/soru/cevap') {
         cevapSayisi++;
         final dogru = dogruSecenek[b['soru']]!;
         (cevaplar[b['oturum'] as String] ??= []).add((b['soru'] as String, b['secim'] as int));
         return _y(200, {'dogru': b['secim'] == dogru, 'a': dogru, 'x': aciklama});
+      }
+      if (yol == '/api/soru/bitir' && sonModu == 'exam') {
+        final l = sinavCevaplari[b['oturum'] as String] ?? [];
+        var d = 0, y = 0;
+        final satirlar = <Map<String, dynamic>>[];
+        for (final q in sorular) {
+          final c = l.where((e) => e.$1 == q['id']).toList();
+          final a = dogruSecenek[q['id']]!;
+          if (c.isEmpty) {
+            satirlar.add({'id': q['id'], 'secim': null, 'a': a, 'x': aciklama, 'dogru': null});
+          } else {
+            final ok = c.first.$2 == a;
+            ok ? d++ : y++;
+            satirlar.add({'id': q['id'], 'secim': c.first.$2, 'a': a, 'x': aciklama, 'dogru': ok});
+          }
+        }
+        return _y(200, {'oturum': b['oturum'], 'mod': 'exam', 'dogru': d, 'yanlis': y, 'bos': sorular.length - d - y, 'sorular': satirlar});
       }
       if (yol == '/api/soru/bitir') return _y(200, {'oturum': b['oturum'], 'mod': 'practice', 'dogru': 1, 'yanlis': 1, 'bos': 0, 'sorular': []});
     }

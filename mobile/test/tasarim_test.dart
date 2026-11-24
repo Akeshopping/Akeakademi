@@ -81,7 +81,7 @@ void main() {
         expect(t.takeException(), isNull);
       });
 
-      testWidgets('ana sayfa, soru çöz, gelişim, plan, ayarlar taşmadan çizilir; alt gezinme ≥48 ($etiket)', (t) async {
+      testWidgets('ana sayfa, soru çöz, deneme, AI, menü ve menü alt sayfaları taşmadan çizilir; alt gezinme ≥48 ($etiket)', (t) async {
         ekran(t, genislik);
         t.platformDispatcher.platformBrightnessTestValue = koyu ? Brightness.dark : Brightness.light;
         addTearDown(t.platformDispatcher.clearPlatformBrightnessTestValue);
@@ -95,6 +95,11 @@ void main() {
           await sekme(t, i);
           expect(t.takeException(), isNull, reason: 'sekme $i');
           expect(t.getSize(find.byKey(ValueKey('sekme-$i'))).height, greaterThanOrEqualTo(48));
+        }
+        for (final sayfa in MenuSayfasi.values) {
+          m.menuyeGit(sayfa);
+          await t.pumpAndSettle();
+          expect(t.takeException(), isNull, reason: 'menü $sayfa');
         }
       });
     }
@@ -137,9 +142,14 @@ void main() {
     await m.baslat();
     await t.pumpWidget(AkeUygulamasi(model: m));
     await t.pumpAndSettle();
-    for (final i in [2, 0, 2, 3, 0, 3, 2]) {
-      await sekme(t, i);
-      expect(t.takeException(), isNull, reason: 'sekme $i');
+    for (final i in [MenuSayfasi.gelisim, null, MenuSayfasi.gelisim, MenuSayfasi.plan, null, MenuSayfasi.plan, MenuSayfasi.gelisim]) {
+      if (i == null) {
+        await sekme(t, 0);
+      } else {
+        m.menuyeGit(i);
+        await t.pumpAndSettle();
+      }
+      expect(t.takeException(), isNull, reason: 'sayfa $i');
     }
     await t.fling(find.byType(Scrollable).first, const Offset(0, 300), 1000); // çekerek yenile
     await t.pumpAndSettle();
@@ -147,12 +157,13 @@ void main() {
   });
 
   testWidgets('tema ayarı: Koyu seçilince uygulama koyu temaya geçer', (t) async {
-    ekran(t, 390);
+    ekran(t, 390, yukseklik: 2600);
     final s = SahteSunucu(), m = model(s, anahtar: SahteSunucu.anahtar);
     await m.baslat();
     await t.pumpWidget(AkeUygulamasi(model: m));
     await t.pumpAndSettle();
-    await sekme(t, 4);
+    m.menuyeGit(MenuSayfasi.ayarlar);
+    await t.pumpAndSettle();
     await t.tap(find.text('Koyu'));
     await t.pumpAndSettle();
     expect(m.tema, ThemeMode.dark);

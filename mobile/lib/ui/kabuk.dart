@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import '../durum/uygulama.dart';
 import '../veri/hesap_verisi.dart';
 import 'ana_sayfa.dart';
-import 'ayarlar.dart';
-import 'gelisim.dart';
+import 'ai.dart';
+import 'deneme.dart';
 import 'marka.dart';
-import 'plan.dart';
+import 'menu.dart';
 import 'secim.dart';
 import 'tema.dart';
 
@@ -21,9 +21,9 @@ class _Sekme {
 const _sekmeler = [
   _Sekme('Ana sayfa', Icons.home_outlined, Icons.home_rounded),
   _Sekme('Soru çöz', Icons.layers_outlined, Icons.layers_rounded),
-  _Sekme('Gelişim', Icons.show_chart_rounded, Icons.show_chart_rounded),
-  _Sekme('Plan', Icons.event_note_outlined, Icons.event_note_rounded),
-  _Sekme('Ayarlar', Icons.tune_rounded, Icons.tune_rounded),
+  _Sekme('Deneme', Icons.timer_outlined, Icons.timer_rounded),
+  _Sekme('AI', Icons.auto_awesome_outlined, Icons.auto_awesome_rounded),
+  _Sekme('Menü', Icons.menu_rounded, Icons.menu_rounded),
 ];
 
 /// Giriş yapılmış uygulama kabuğu: koyu mürekkep üst çubuk (K amblemi + kalan gün), sayfa alanı, koyu alt gezinme (site mobil menüsü).
@@ -67,18 +67,23 @@ class _AnaEkranState extends State<AnaEkran> {
       case 1:
         return SoruCozSekmesi(model: m);
       case 2:
-        return GelisimSekmesi(model: m);
+        return DenemeSekmesi(model: m);
       case 3:
-        return PlanSekmesi(model: m);
+        return AiSekmesi(model: m);
       default:
-        return AyarlarSekmesi(model: m);
+        return MenuSekmesi(model: m);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final t = context.ake;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+    return PopScope(
+      canPop: m.sekme == 0 && m.menuSayfasi == null,
+      onPopInvokedWithResult: (bilgi, _) {
+        if (!bilgi.didPop) m.geriGit();
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: t.ustCubuk, systemNavigationBarColor: t.ustCubuk, systemNavigationBarIconBrightness: Brightness.light),
       child: Scaffold(
         backgroundColor: t.kagit,
@@ -91,6 +96,7 @@ class _AnaEkranState extends State<AnaEkran> {
           ),
           _AltGezinme(secili: m.sekme, secince: m.sekmeGit),
         ]),
+      ),
       ),
     );
   }
@@ -122,7 +128,7 @@ class _UstCubuk extends StatelessWidget {
             button: true,
             label: 'Hesabım ve ayarlar',
             child: AkeDokun(
-              basinca: () => model.sekmeGit(4),
+              basinca: () => model.menuyeGit(MenuSayfasi.ayarlar),
               child: SizedBox(
                 width: 48,
                 height: 48,

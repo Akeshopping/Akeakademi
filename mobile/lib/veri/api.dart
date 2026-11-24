@@ -170,8 +170,9 @@ class AkeApi {
   // ---------- soru bankası (sunucu tarafı oturum; cevap anahtarı yalnızca cevaptan sonra gelir) ----------
   Future<Ozet> ozet() async => Ozet.fromJson(await _istek('GET', '/api/soru/ozet'));
 
-  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu, int? zorluk}) async {
-    final g = <String, dynamic>{'istek': istek, 'mod': 'practice', 'adet': adet};
+  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu, int? zorluk, String? ara, bool sinav = false}) async {
+    final g = <String, dynamic>{'istek': istek, 'mod': sinav ? 'exam' : 'practice', 'adet': adet};
+    if (ara != null) g['ara'] = ara;
     if (ders != null) g['ders'] = ders;
     if (konu != null) g['konu'] = konu;
     if (zorluk != null) g['zorluk'] = zorluk; // 1 kolay · 2 orta · 3 zor; yoksa karışık
@@ -181,14 +182,65 @@ class AkeApi {
   Future<CevapSonucu> cevapVer({required String oturum, required String soru, required int secim}) async =>
       CevapSonucu.fromJson(await _istek('POST', '/api/soru/cevap', govde: {'oturum': oturum, 'soru': soru, 'secim': secim}));
 
+  /// Sınav (deneme) cevabı: sunucu yalnız kaydeder; doğru/yanlış ve anahtar DÖNMEZ (bitişe kadar). Şık bitene kadar değiştirilebilir.
+  Future<void> sinavCevabi({required String oturum, required String soru, required int secim}) async {
+    final y = await _istek('POST', '/api/soru/cevap', govde: {'oturum': oturum, 'soru': soru, 'secim': secim});
+    if (y['kaydedildi'] != true) throw const ApiHata(HataTuru.sunucu, mesaj: 'Cevap kaydedilemedi.');
+  }
+
   Future<OturumSonucu> bitir(String oturum) async =>
       OturumSonucu.fromJson(await _istek('POST', '/api/soru/bitir', govde: {'oturum': oturum}));
 
+  // ---------- hesap durumu, veri, AI, hesap silme ----------
+  /// Paket, AI kullanımı, ücretsiz haklar (sunucudan).
+  Future<HesapDurumu> hesapDurumu() async => HesapDurumu.fromJson(await _istek('GET', '/api/hesap/ben'));
+
+  /// Erişim kodunu hesaba bağlar (sunucu doğrular). Yanlış/kullanılmış kod ayrı mesaj vermez.
+  Future<HesapDurumu> kodBagla(String kod) async {
+    await _istek('POST', '/api/hesap/kod-bagla', govde: {'kod': kod.trim()});
+    return hesapDurumu();
+  }
+
+  /// AI öğretmen: sunucu hesabı, paketi ve kotayı denetler. JSON modu (akış yok). Anahtar ve model sunucudadır.
+  Future<AiYaniti> aiSor({required List<Map<String, String>> mesajlar, String katman = 'quick'}) async {
+    final y = await _istek('POST', '/api/ai', govde: {'messages': mesajlar, 'tier': katman, 'json': true});
+    return AiYaniti('${y['text'] ?? ''}', y['truncated'] == true);
+  }
+
+  /// Hesabı ve çalışma verilerini kalıcı siler (sunucu: POST /api/hesap/sil). Başarılıysa yerel oturum da silinir.
+  Future<void> hesapSil() async {
+    await _istek('POST', '/api/hesap/sil', govde: const {});
+    _anahtar = null;
+    _hesapId = null;
+    await _depo.sil();
+  }
+
   // ---------- ilerleme ----------
-  /// Hesap verisi (salt okuma): web ile aynı alanlar. İstemci bu belgeye YAZMAZ.
-  Future<Map<String, dynamic>> veriOku() async {
+  /// Hesap verisi (salt okuma): web ile aynı alanlar.
+  Future<Map<String, dynamic>> veriOku() async => (await veriOkuSurumlu()).$1;
+
+  /// Alanlar + her alanın sürümü (`u`): koşullu yazma bu sürümle yapılır.
+  Future<(Map<String, dynamic>, Map<String, int>)> veriOkuSurumlu() async {
     final y = await _istek('GET', '/api/hesap/veri');
-    return y['alanlar'] is Map ? Map<String, dynamic>.from(y['alanlar'] as Map) : <String, dynamic>{};
+    final alanlar = y['alanlar'] is Map ? Map<String, dynamic>.from(y['alanlar'] as Map) : <String, dynamic>{};
+    final u = <String, int>{};
+    if (y['u'] is Map) {
+      (y['u'] as Map).forEach((k, v) {
+        if (v is num) u['$k'] = v.toInt();
+      });
+    }
+    return (alanlar, u);
+  }
+
+  /// Bir alanı KOŞULLU yazar (`_b` = okunan sürüm, `_h` = bu hesap). Araya başka yazma girdiyse [HataTuru.cakisma] (409) fırlar;
+  /// çağıran yeniden okuyup uygular. Yalnız profil ve plan alanları için kullanılır; `stats` mobilden YAZILMAZ (sunucu hesaplar).
+  Future<int> veriYaz(String alan, Map<String, dynamic> belge, int okunanSurum) async {
+    assert(alan == 'plan' || alan == 'profile');
+    final g = Map<String, dynamic>.from(belge)..remove('_u');
+    g['_b'] = okunanSurum;
+    if (_hesapId != null) g['_h'] = _hesapId;
+    final y = await _istek('PUT', '/api/hesap/veri/$alan', govde: g);
+    return (y['u'] as num?)?.toInt() ?? 0;
   }
 
   /// Sunucuya "cevaplarımı hesabıma işle" der. [oturum] verilmezse yalnız BU hesabın bekleyen oturumları işlenir (süpürme).
@@ -199,4 +251,10 @@ class AkeApi {
     final y = await _istek('POST', '/api/soru/ilerleme', govde: g, beklenenHesap: beklenenHesap);
     return (y['bekleyen'] as num?)?.toInt() ?? 0;
   }
+}
+
+class AiYaniti {
+  final String metin;
+  final bool kesildi;
+  const AiYaniti(this.metin, this.kesildi);
 }

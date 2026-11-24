@@ -16,11 +16,13 @@ const _harfler = ['A', 'B', 'C', 'D', 'E'];
 /// Bir soru oturumu: sunucudan oturum açılır, sorular cevapsız gelir, şık seçilip gönderilince sunucu doğru/yanlış ve açıklamayı döner.
 class SoruEkrani extends StatefulWidget {
   final UygulamaModeli model;
-  final String ders;
+  final String? ders;
   final String? konu;
   final int adet;
   final int? zorluk;
-  const SoruEkrani({super.key, required this.model, required this.ders, this.konu, this.adet = 10, this.zorluk});
+  /// Soru arama: metin içinde geçen kelime (sunucu `ara` filtresi).
+  final String? ara;
+  const SoruEkrani({super.key, required this.model, this.ders, this.konu, this.adet = 10, this.zorluk, this.ara});
   @override
   State<SoruEkrani> createState() => _SoruEkraniState();
 }
@@ -64,7 +66,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
       _hata = null;
     });
     try {
-      final o = await _api.oturumOlustur(istek: _istekKimligi, adet: widget.adet, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk);
+      final o = await _api.oturumOlustur(istek: _istekKimligi, adet: widget.adet, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk, ara: widget.ara);
       if (!mounted) return;
       setState(() {
         _oturum = o;
@@ -126,7 +128,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
     try {
       final s = await _api.bitir(o.oturum);
       if (!mounted) return;
-      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SonucEkrani(model: widget.model, sonuc: s, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk)));
+      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SonucEkrani(model: widget.model, sonuc: s, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk, ara: widget.ara)));
     } catch (e) {
       if (mounted) setState(() => _cevapHatasi = e);
     } finally {
@@ -145,7 +147,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
 
   @override
   Widget build(BuildContext context) {
-    final baslik = widget.konu ?? Katalog.dersAdi(widget.ders);
+    final baslik = widget.ara != null ? '“${widget.ara}” araması' : (widget.konu ?? (widget.ders == null ? 'Karışık sorular' : Katalog.dersAdi(widget.ders!)));
     final o = _oturum;
     final gosterIlerleme = _evre == _Evre.soru && o != null;
     final t = context.ake;
@@ -430,10 +432,11 @@ class _GeriBildirim extends StatelessWidget {
 class SonucEkrani extends StatelessWidget {
   final UygulamaModeli model;
   final OturumSonucu sonuc;
-  final String ders;
+  final String? ders;
+  final String? ara;
   final String? konu;
   final int? zorluk;
-  const SonucEkrani({super.key, required this.model, required this.sonuc, required this.ders, this.konu, this.zorluk});
+  const SonucEkrani({super.key, required this.model, required this.sonuc, this.ders, this.konu, this.zorluk, this.ara});
 
   @override
   Widget build(BuildContext context) {
@@ -491,11 +494,11 @@ class SonucEkrani extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
-        AkeDugme('Yeni 10 soru', basinca: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: ders, konu: konu, zorluk: zorluk))), simge: Icons.refresh_rounded),
+        AkeDugme('Yeni 10 soru', basinca: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: ders, konu: konu, zorluk: zorluk, ara: ara))), simge: Icons.refresh_rounded),
         const SizedBox(height: 12),
         AkeDugme('Gelişimimi gör', tur: DugmeTuru.cizgili, basinca: () {
           Navigator.of(context).popUntil((r) => r.isFirst);
-          model.sekmeGit(2);
+          model.menuyeGit(MenuSayfasi.gelisim);
         }),
         const SizedBox(height: 8),
         AkeDugme('Ana sayfaya dön', tur: DugmeTuru.metin, basinca: () {

@@ -1,0 +1,53 @@
+name: Mobil (Flutter)
+
+on:
+  pull_request:
+    paths: ['mobile/**', '.github/workflows/mobil.yml']
+  push:
+    branches: ['mobil/**']
+    paths: ['mobile/**', '.github/workflows/mobil.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobil-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: pub get · analyze · test · Android debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Flutter sürümü
+        run: flutter --version
+      - name: Platform klasörlerini üret (kur.sh; flutter pub get dahil)
+        run: ./kur.sh
+      - name: flutter pub get
+        run: flutter pub get
+      - name: flutter analyze
+        run: flutter analyze
+      - name: flutter test
+        run: flutter test --reporter expanded
+      - name: Android debug APK (Preview adresiyle; Production'a bağlanmaz)
+        run: flutter build apk --debug --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
+      - name: APK özeti
+        run: ls -l build/app/outputs/flutter-apk/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ake-akademi-android-debug
+          path: mobile/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7

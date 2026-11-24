@@ -30,3 +30,28 @@ class BellekDeposu implements OturumDeposu {
   @override
   Future<void> sil() async => _v = null;
 }
+
+/// Küçük uygulama ayarları (tema, açılış animasyonu görüldü mü). Oturum anahtarından ayrı tutulur; çıkışta silinmez.
+abstract class AyarDeposu {
+  Future<String?> oku(String ad);
+  Future<void> yaz(String ad, String deger);
+}
+
+class GuvenliAyar implements AyarDeposu {
+  final FlutterSecureStorage _d;
+  GuvenliAyar([FlutterSecureStorage? depo])
+      : _d = depo ?? const FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+  @override
+  Future<String?> oku(String ad) => _d.read(key: 'ake_ayar_$ad');
+  @override
+  Future<void> yaz(String ad, String deger) => _d.write(key: 'ake_ayar_$ad', value: deger);
+}
+
+class BellekAyar implements AyarDeposu {
+  final Map<String, String> _m;
+  BellekAyar([Map<String, String>? ilk]) : _m = {...?ilk};
+  @override
+  Future<String?> oku(String ad) async => _m[ad];
+  @override
+  Future<void> yaz(String ad, String deger) async => _m[ad] = deger;
+}

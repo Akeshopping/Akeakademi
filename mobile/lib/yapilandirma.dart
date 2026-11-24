@@ -19,6 +19,15 @@ class Yapilandirma {
   /// Doğrulanmış sunucu adresi ya da [YapilandirmaHatasi] atar.
   static String api() => dogrula(_apiTanim, yayinDerlemesi: kReleaseMode, uretimOnay: _uretimOnayTanim == 'evet');
 
+  /// Ayarlar ekranında gösterilen kısa sunucu adı (yalnız alan adı; gizli bir şey içermez). Adres geçersizse boş döner.
+  static String apiKisa() {
+    try {
+      return Uri.parse(api()).host;
+    } on YapilandirmaHatasi {
+      return '-';
+    }
+  }
+
   /// Saf doğrulama (testlenebilir): adresi normalleştirip döner.
   static String dogrula(String ham, {required bool yayinDerlemesi, bool uretimOnay = false}) {
     final a = ham.trim().replaceAll(RegExp(r'/+$'), '');

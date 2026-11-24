@@ -5,21 +5,22 @@ import '../veri/api.dart';
 import '../veri/ilerleme.dart';
 import '../veri/katalog.dart';
 import '../veri/modeller.dart';
-import 'ilerleme_ekrani.dart';
 import 'ortak.dart';
 import 'soru.dart';
 import 'tema.dart';
 
-/// Ana ekran: Sınav seçimi. Konu/soru sayıları sunucunun /api/soru/ozet yanıtından gelir.
-class AnaEkran extends StatefulWidget {
+/// "Soru çöz" sekmesi: 1) sınavı seç, 2) dersini seç → konu listesi → soru oturumu.
+/// Konu/soru sayıları sunucunun /api/soru/ozet yanıtından gelir; soru olmayan ders/konu listelenmez ya da pasif görünür.
+class SoruCozSekmesi extends StatefulWidget {
   final UygulamaModeli model;
-  const AnaEkran({super.key, required this.model});
+  const SoruCozSekmesi({super.key, required this.model});
   @override
-  State<AnaEkran> createState() => _AnaEkranState();
+  State<SoruCozSekmesi> createState() => _SoruCozSekmesiState();
 }
 
-class _AnaEkranState extends State<AnaEkran> {
+class _SoruCozSekmesiState extends State<SoruCozSekmesi> {
   late Future<Ozet> _ozet;
+  String _sinav = 'TYT';
 
   @override
   void initState() {
@@ -32,61 +33,54 @@ class _AnaEkranState extends State<AnaEkran> {
   @override
   Widget build(BuildContext context) {
     final m = widget.model;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('AKE Akademi', style: TextStyle(fontWeight: FontWeight.w800)),
-        actions: [
-          IconButton(
-            tooltip: 'Hesabımdaki ilerleme',
-            icon: const Icon(Icons.insights_outlined),
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => IlerlemeEkrani(senkron: m.senkron))),
-          ),
-          PopupMenuButton<String>(
-            tooltip: 'Hesap',
-            onSelected: (v) {
-              if (v == 'cikis') m.cikis();
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem<String>(enabled: false, child: Text(m.kullanici?.eposta ?? '')),
-              const PopupMenuItem<String>(value: 'cikis', child: Text('Çıkış yap')),
-            ],
-          ),
-        ],
-      ),
-      body: FutureBuilder<Ozet>(
-        future: _ozet,
-        builder: (context, s) {
-          if (s.connectionState != ConnectionState.done) return const Yukleniyor(metin: 'Sınavlar hazırlanıyor…');
-          if (s.hasError) return _hataGorunumu(s.error!, _yenile);
-          final ozet = s.data!;
-          if (ozet.toplam == 0) {
-            return DurumKutusu(
-              simge: Icons.hourglass_empty,
-              baslik: 'Henüz soru yok',
-              aciklama: 'Soru bankası şu an boş görünüyor. Biraz sonra tekrar dene.',
-              dugme: 'Yenile',
-              basinca: _yenile,
-            );
-          }
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(4, 4, 4, 12),
-                child: Text('Hangi sınava çalışıyorsun?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-              ),
-              for (final sinav in Katalog.sinavlar) ...[
-                _SinavKarti(
-                  sinav: sinav,
-                  soruSayisi: sinav.dersler.fold<int>(0, (a, d) => a + ozet.dersToplami(d)),
-                  basinca: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DersEkrani(model: m, sinav: sinav, ozet: ozet))),
-                ),
-                const SizedBox(height: 12),
-              ],
-            ],
-          );
-        },
-      ),
+    return FutureBuilder<Ozet>(
+      future: _ozet,
+      builder: (context, s) {
+        if (s.connectionState != ConnectionState.done) return const Yukleniyor(metin: 'Sınavlar hazırlanıyor…');
+        if (s.hasError) return _hataGorunumu(s.error!, _yenile);
+        final ozet = s.data!;
+        if (ozet.toplam == 0) {
+          return DurumKutusu(simge: Icons.hourglass_empty, baslik: 'Henüz soru yok', aciklama: 'Soru bankası şu an boş görünüyor. Biraz sonra tekrar dene.', dugme: 'Yenile', basinca: _yenile);
+        }
+        final sinav = Katalog.sinavlar.firstWhere((e) => e.anahtar == _sinav, orElse: () => Katalog.sinavlar.first);
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+          children: [
+            const _Baslik('Soru Çözüm Merkezi'),
+            const SizedBox(height: 14),
+            const _AdimBasligi(1, 'Hangi sınava çalışıyorsun?'),
+            const SizedBox(height: 10),
+            LayoutBuilder(builder: (context, c) {
+              final w = (c.maxWidth - 10) / 2;
+              return Wrap(spacing: 10, runSpacing: 10, children: [
+                for (final e in Katalog.sinavlar)
+                  SizedBox(
+                    width: e.anahtar == 'YDT' ? c.maxWidth : w,
+                    child: _SinavKarti(sinav: e, soruSayisi: e.dersler.fold<int>(0, (a, d) => a + ozet.dersToplami(d)), secili: e.anahtar == _sinav, basinca: () => setState(() => _sinav = e.anahtar)),
+                  ),
+              ]);
+            }),
+            const SizedBox(height: 22),
+            const _AdimBasligi(2, 'Dersini seç'),
+            const SizedBox(height: 10),
+            LayoutBuilder(builder: (context, c) {
+              final w = (c.maxWidth - 10) / 2;
+              return Wrap(spacing: 10, runSpacing: 10, children: [
+                for (final d in sinav.dersler)
+                  SizedBox(
+                    width: w,
+                    child: _DersKarti(
+                      ders: d,
+                      konuSayisi: (ozet.konular[d] ?? const <String, int>{}).length,
+                      soruSayisi: ozet.dersToplami(d),
+                      basinca: ozet.dersToplami(d) == 0 ? null : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => KonuEkrani(model: m, ders: d, ozet: ozet))),
+                    ),
+                  ),
+              ]);
+            }),
+          ],
+        );
+      },
     );
   }
 
@@ -105,76 +99,107 @@ class _AnaEkranState extends State<AnaEkran> {
   }
 }
 
+class _Baslik extends StatelessWidget {
+  final String metin;
+  const _Baslik(this.metin);
+  @override
+  Widget build(BuildContext context) => Text(metin, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, height: 1.15));
+}
+
+class _AdimBasligi extends StatelessWidget {
+  final int no;
+  final String metin;
+  const _AdimBasligi(this.no, this.metin);
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    return Row(children: [
+      Container(
+        width: 26,
+        height: 26,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: t.koyu ? t.murekkep : AkeTok.murekkepSabit, shape: BoxShape.circle),
+        child: Text('$no', style: TextStyle(color: t.koyu ? AkeTok.murekkepSabit : AkeTok.porselen, fontWeight: FontWeight.w700, fontSize: 13)),
+      ),
+      const SizedBox(width: 10),
+      Expanded(child: Text(metin, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
+    ]);
+  }
+}
+
 class _SinavKarti extends StatelessWidget {
   final Sinav sinav;
   final int soruSayisi;
+  final bool secili;
   final VoidCallback basinca;
-  const _SinavKarti({required this.sinav, required this.soruSayisi, required this.basinca});
+  const _SinavKarti({required this.sinav, required this.soruSayisi, required this.secili, required this.basinca});
   @override
   Widget build(BuildContext context) {
+    final t = context.ake;
     final bos = soruSayisi == 0;
     return Semantics(
-      button: true,
+      selected: secili,
       label: '${sinav.ad}, ${sinav.aciklama}, $soruSayisi soru',
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: bos ? null : basinca,
-        child: KartKutu(
-          padding: const EdgeInsets.all(18),
-          child: Row(children: [
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(sinav.ad, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 4),
-                Text(sinav.aciklama, style: const TextStyle(color: AkeRenk.murekkep2)),
-                const SizedBox(height: 8),
-                Text(bos ? 'Bu sınav için henüz soru yok' : '$soruSayisi soru', style: TextStyle(color: bos ? AkeRenk.uyari : AkeRenk.mercan, fontWeight: FontWeight.w600)),
-              ]),
+      child: ExcludeSemantics(
+        child: AkeDokun(
+          basinca: bos ? null : basinca,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            constraints: const BoxConstraints(minHeight: 96),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: secili ? t.girinti : t.kart,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: secili ? t.murekkep : t.cizgi, width: secili ? 2 : 1),
             ),
-            const Icon(Icons.chevron_right, color: AkeRenk.murekkep2),
-          ]),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Expanded(child: Text(sinav.ad, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700))),
+                if (secili) Icon(Icons.check_circle_rounded, size: 20, color: t.murekkep),
+              ]),
+              const SizedBox(height: 4),
+              Text(sinav.aciklama, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: t.murekkep2, fontSize: 12.5, height: 1.3)),
+              const SizedBox(height: 6),
+              Text(bos ? 'Henüz soru yok' : '$soruSayisi soru', style: TextStyle(color: bos ? t.uyari : t.murekkep3, fontSize: 12.5)),
+            ]),
+          ),
         ),
       ),
     );
   }
 }
 
-/// Ders seçimi (yalnızca o sınavın dersleri; sorusu olmayan ders pasif).
-class DersEkrani extends StatelessWidget {
-  final UygulamaModeli model;
-  final Sinav sinav;
-  final Ozet ozet;
-  const DersEkrani({super.key, required this.model, required this.sinav, required this.ozet});
+class _DersKarti extends StatelessWidget {
+  final String ders;
+  final int konuSayisi;
+  final int soruSayisi;
+  final VoidCallback? basinca;
+  const _DersKarti({required this.ders, required this.konuSayisi, required this.soruSayisi, required this.basinca});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(sinav.ad)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          for (final d in sinav.dersler) ...[
-            Builder(builder: (context) {
-              final n = ozet.dersToplami(d);
-              return Semantics(
-                button: true,
-                label: '${Katalog.dersAdi(d)}, $n soru',
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: n == 0 ? null : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => KonuEkrani(model: model, ders: d, ozet: ozet))),
-                  child: KartKutu(
-                    child: Row(children: [
-                      Expanded(child: Text(Katalog.dersAdi(d), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
-                      Text(n == 0 ? 'Yakında' : '$n soru', style: TextStyle(color: n == 0 ? AkeRenk.uyari : AkeRenk.murekkep2)),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.chevron_right, color: AkeRenk.murekkep2),
-                    ]),
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 10),
-          ],
-        ],
+    final t = context.ake;
+    final r = dersRengi(context, ders);
+    final bos = basinca == null;
+    return Semantics(
+      label: '${Katalog.dersAdi(ders)}, ${bos ? 'henüz soru yok' : '$konuSayisi konu, $soruSayisi soru'}',
+      child: ExcludeSemantics(
+        child: AkeDokun(
+          basinca: basinca,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 64),
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            decoration: BoxDecoration(
+              color: t.kart,
+              borderRadius: BorderRadius.circular(12),
+              border: Border(left: BorderSide(color: bos ? t.cizgi : r.metin, width: 4), top: BorderSide(color: t.cizgi), right: BorderSide(color: t.cizgi), bottom: BorderSide(color: t.cizgi)),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(Katalog.dersAdi(ders), maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: bos ? t.murekkep3 : t.murekkep)),
+              const SizedBox(height: 3),
+              Text(bos ? 'Yakında' : '$konuSayisi konu', style: TextStyle(color: bos ? t.uyari : t.murekkep2, fontSize: 12.5)),
+            ]),
+          ),
+        ),
       ),
     );
   }
@@ -211,35 +236,44 @@ class _KonuEkraniState extends State<KonuEkrani> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.ake;
+    final r = dersRengi(context, widget.ders);
     final konular = (widget.ozet.konular[widget.ders] ?? const <String, int>{});
     final adlar = konular.keys.toList()..sort((a, b) => a.compareTo(b));
-    return Scaffold(
-      appBar: AppBar(title: Text(Katalog.dersAdi(widget.ders))),
-      body: adlar.isEmpty
+    return AkeSayfa(
+      baslik: Katalog.dersAdi(widget.ders),
+      govde: adlar.isEmpty
           ? const DurumKutusu(simge: Icons.hourglass_empty, baslik: 'Bu derste konu yok', aciklama: 'Bu ders için henüz soru eklenmemiş.')
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
               children: [
-                FilledButton(onPressed: () => _baslat(null), child: const Text('Karışık 10 soru')),
+                AkeDugme('Karışık 10 soru', basinca: () => _baslat(null), simge: Icons.shuffle_rounded),
                 const SizedBox(height: 16),
                 for (final k in adlar) ...[
                   Semantics(
-                    button: true,
                     label: '$k, ${konular[k]} soru',
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => _baslat(k),
-                      child: KartKutu(
-                        child: Row(children: [
-                          Expanded(
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(k, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                              const SizedBox(height: 4),
-                              Text(_altMetin(k, konular[k] ?? 0), style: const TextStyle(color: AkeRenk.murekkep2, fontSize: 13)),
-                            ]),
+                    child: ExcludeSemantics(
+                      child: AkeDokun(
+                        basinca: () => _baslat(k),
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 64),
+                          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                          decoration: BoxDecoration(
+                            color: t.kart,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border(left: BorderSide(color: r.metin, width: 4), top: BorderSide(color: t.cizgi), right: BorderSide(color: t.cizgi), bottom: BorderSide(color: t.cizgi)),
                           ),
-                          const Icon(Icons.chevron_right, color: AkeRenk.murekkep2),
-                        ]),
+                          child: Row(children: [
+                            Expanded(
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text(k, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, height: 1.25)),
+                                const SizedBox(height: 3),
+                                Text(_altMetin(k, konular[k] ?? 0), style: TextStyle(color: t.murekkep2, fontSize: 13)),
+                              ]),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: t.murekkep3),
+                          ]),
+                        ),
                       ),
                     ),
                   ),

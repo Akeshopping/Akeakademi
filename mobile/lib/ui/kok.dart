@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../durum/uygulama.dart';
+import 'acilis.dart';
 import 'giris.dart';
 import 'ortak.dart';
-import 'secim.dart';
+import 'kabuk.dart';
 import 'tema.dart';
 
 /// Oturum durumuna göre kök ekranı seçer: yükleniyor, ağ yok, giriş, oturum süresi doldu, ana ekran.
@@ -37,14 +38,21 @@ class _AkeUygulamasiState extends State<AkeUygulamasi> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: _gezgin,
-      title: 'AKE Akademi',
-      debugShowCheckedModeBanner: false,
-      theme: akeTema(),
-      home: ListenableBuilder(
-        listenable: model,
-        builder: (context, _) {
+    return ListenableBuilder(
+      listenable: model,
+      builder: (context, _) => MaterialApp(
+        navigatorKey: _gezgin,
+        title: 'AKE Akademi',
+        debugShowCheckedModeBanner: false,
+        theme: akeTema(koyu: false),
+        darkTheme: akeTema(koyu: true),
+        themeMode: model.tema,
+        // İlk açılışta bir kez oynayan giriş animasyonu uygulamanın ÜSTÜNDE durur; altta uygulama aynı anda yüklenir.
+        builder: (context, child) => Stack(children: [
+          Positioned.fill(child: child ?? const SizedBox.shrink()),
+          if (model.acilisOynat) Positioned.fill(child: AcilisKatmani(bitti: model.acilisBitti)),
+        ]),
+        home: Builder(builder: (context) {
           switch (model.faz) {
             case Faz.yukleniyor:
               return const Scaffold(body: Yukleniyor(metin: 'AKE Akademi açılıyor…'));
@@ -65,7 +73,7 @@ class _AkeUygulamasiState extends State<AkeUygulamasi> {
             case Faz.ana:
               return AnaEkran(key: ValueKey('ana-${model.kullanici?.id}'), model: model);
           }
-        },
+        }),
       ),
     );
   }

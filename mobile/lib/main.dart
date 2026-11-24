@@ -18,7 +18,7 @@ void main() {
     return;
   }
   final api = AkeApi(taban: adres, istemci: http.Client(), depo: GuvenliDepo());
-  final model = UygulamaModeli(api, IlerlemeSenkron(api));
+  final model = UygulamaModeli(api, IlerlemeSenkron(api), ayar: GuvenliAyar());
   model.baslat();
   runApp(AkeUygulamasi(model: model));
 }

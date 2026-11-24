@@ -80,8 +80,8 @@ class _AnaEkranState extends State<AnaEkran> {
     final t = context.ake;
     return PopScope(
       canPop: m.sekme == 0 && m.menuSayfasi == null,
-      onPopInvokedWithResult: (bilgi, _) {
-        if (!bilgi.didPop) m.geriGit();
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) m.geriGit();
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: t.ustCubuk, systemNavigationBarColor: t.ustCubuk, systemNavigationBarIconBrightness: Brightness.light),

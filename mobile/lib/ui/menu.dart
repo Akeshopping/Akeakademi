@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../durum/uygulama.dart';
 import 'ayarlar.dart';
 import 'gelisim.dart';
-import 'ortak.dart';
 import 'plan.dart';
 import 'tema.dart';
 

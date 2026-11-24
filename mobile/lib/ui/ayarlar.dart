@@ -98,15 +98,19 @@ class _AyarlarSekmesiState extends State<AyarlarSekmesi> {
     try {
       final ad = _ad.text.trim();
       await _profil.kaydet({'name': ad.length > 60 ? ad.substring(0, 60) : ad, 'alan': _alan, 'gunluk': _hedef, 'examDate': _sinav});
-      if (mounted) setState(() {
-        _mesaj = 'Kaydedildi. Siteyle aynı profil güncellendi.';
-        _mesajHata = false;
-      });
+      if (mounted) {
+        setState(() {
+          _mesaj = 'Kaydedildi. Siteyle aynı profil güncellendi.';
+          _mesajHata = false;
+        });
+      }
     } catch (e) {
-      if (mounted) setState(() {
-        _mesaj = 'Kaydedilemedi: ${hataMetni(e)}';
-        _mesajHata = true;
-      });
+      if (mounted) {
+        setState(() {
+          _mesaj = 'Kaydedilemedi: ${hataMetni(e)}';
+          _mesajHata = true;
+        });
+      }
     } finally {
       if (mounted) setState(() => _kaydediliyor = false);
     }

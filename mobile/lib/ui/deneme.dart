@@ -308,8 +308,8 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
     final o = _oturum;
     return PopScope(
       canPop: o == null,
-      onPopInvokedWithResult: (bilgi, _) async {
-        if (bilgi.didPop) return;
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
         final nav = Navigator.of(context);
         if (await _cikisSor()) {
           _zamanlayici?.cancel();

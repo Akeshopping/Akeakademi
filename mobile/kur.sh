@@ -24,5 +24,6 @@ if p.exists():
     p.write_text(s, encoding='utf-8')
 print('Platform ayarları uygulandı.')
 PY
+rm -f test/widget_test.dart   # flutter create şablon testi (bu uygulamaya ait değil)
 flutter pub get
 echo "Hazır. Test: flutter test | Çalıştır: flutter run --dart-define=AKE_API=<Preview adresi>"

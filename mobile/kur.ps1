@@ -20,6 +20,7 @@ if (Test-Path $p) {
   $s = ([regex]'(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)').Replace($s, '${1}AKE Akademi${2}', 1)
   [IO.File]::WriteAllText((Resolve-Path $p), $s, (New-Object Text.UTF8Encoding($false)))
 }
+Remove-Item -Force -ErrorAction SilentlyContinue test\widget_test.dart   # flutter create şablon testi (bu uygulamaya ait değil)
 flutter pub get
 if ($LASTEXITCODE -ne 0) { throw 'flutter pub get başarısız' }
 Write-Host 'Hazır. Test: flutter test | Çalıştır: flutter run --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev'

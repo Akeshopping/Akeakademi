@@ -87,11 +87,6 @@ jobs:
           cache: true
       - name: Platform klasörleri (kur.sh)
         run: ./kur.sh
-      - name: Gerçek uygulama (release/AOT, Preview adresi) — flutter drive'ın ezmeyeceği ayrı yola
-        run: |
-          flutter build apk --release --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
-          mkdir -p kanit-apk && cp build/app/outputs/flutter-apk/app-release.apk kanit-apk/ake-release.apk
-          ls -l kanit-apk
       - name: KVM ve ffmpeg
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

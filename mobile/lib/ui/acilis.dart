@@ -1,9 +1,42 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'marka.dart';
 import 'tema.dart';
+
+/// Yalnızca kanıt derlemesinde (`--dart-define=AKE_OLCUM=1`) açılış animasyonunun gerçek süresini ve kare sürelerini logcat'e yazar.
+/// Normal derlemelerde hiçbir şey yapmaz.
+const _olcum = bool.fromEnvironment('AKE_OLCUM');
+final List<FrameTiming> _olcumKareleri = [];
+final Stopwatch _olcumSaati = Stopwatch();
+bool _olcumDinliyor = false;
+
+void _olcumBasla() {
+  if (!_olcum) return;
+  _olcumSaati
+    ..reset()
+    ..start();
+  if (_olcumDinliyor) return;
+  _olcumDinliyor = true;
+  SchedulerBinding.instance.addTimingsCallback(_olcumKareleri.addAll);
+  // ignore: avoid_print
+  print('AKE_OLCUM acilis_basladi');
+}
+
+void _olcumBitir(String neden) {
+  if (!_olcum) return;
+  final sureMs = _olcumSaati.elapsedMilliseconds;
+  Future<void>.delayed(const Duration(milliseconds: 900), () {
+    final k = _olcumKareleri.map((f) => f.totalSpan.inMicroseconds / 1000).toList();
+    final ort = k.isEmpty ? 0.0 : k.reduce((a, b) => a + b) / k.length;
+    final enKotu = k.isEmpty ? 0.0 : k.reduce(math.max);
+    // ignore: avoid_print
+    print('AKE_OLCUM acilis_bitti neden=$neden sure_ms=$sureMs kare=${k.length} ort_kare_ms=${ort.toStringAsFixed(1)} en_kotu_kare_ms=${enKotu.toStringAsFixed(1)} '
+        'kare_16ms_ustu=${k.where((x) => x > 16.7).length} kare_33ms_ustu=${k.where((x) => x > 33.4).length}');
+  });
+}
 
 /// İlk açılışta bir kez oynayan kısa giriş: konu haritasının noktaları ve yolları bir öğrenme yolunda birleşir,
 /// nokta ve çizgiler K amblemin gerçek köşe noktalarına oturur; son karede gerçek K amblemi (aynı path, aynı gradyan) belirir.
@@ -44,6 +77,7 @@ class _AcilisKatmaniState extends State<AcilisKatmani> with TickerProviderStateM
       // Hareketi azalt: animasyon oynamaz; ilk karede bitir.
       WidgetsBinding.instance.addPostFrameCallback((_) => _bitir());
     } else {
+      _olcumBasla();
       _c.forward();
     }
   }
@@ -56,6 +90,7 @@ class _AcilisKatmaniState extends State<AcilisKatmani> with TickerProviderStateM
   void _bitir() {
     if (_bitirildi) return;
     _bitirildi = true;
+    _olcumBitir(_c.isCompleted ? 'tamam' : (MediaQuery.of(context).disableAnimations ? 'hareket_azalt' : 'gecildi'));
     widget.bitti();
   }
 

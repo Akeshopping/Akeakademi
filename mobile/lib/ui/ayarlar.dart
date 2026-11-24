@@ -336,13 +336,13 @@ class _SilOnayiState extends State<_SilOnayi> {
     final tamam = _sade(_c.text) == 'SIL';
     return AlertDialog(
       title: const Text('Hesabın silinsin mi?'),
-      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Text('Hesabın ve hesabında saklanan tüm çalışma verilerin sunucudan kalıcı olarak silinir. Bu işlem geri alınamaz. Hesabına bağlı paket kodu başka hesapta kullanılabilir hâle gelmeyebilir.'),
         const SizedBox(height: 12),
         Text('Onaylamak için SİL yaz.', style: TextStyle(color: t.murekkep2, fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         TextField(key: const ValueKey('sil-yaz'), controller: _c, autofocus: true, autocorrect: false, enableSuggestions: false, textCapitalization: TextCapitalization.characters, decoration: const InputDecoration(border: OutlineInputBorder()), onChanged: (_) => setState(() {})),
-      ]),
+      ])),
       actions: [
         TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Vazgeç')),
         TextButton(key: const ValueKey('sil-onay'), onPressed: tamam ? () => Navigator.of(context).pop(true) : null, child: Text('Hesabı kalıcı sil', style: TextStyle(color: tamam ? t.yanlis : null))),

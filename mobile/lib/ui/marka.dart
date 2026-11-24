@@ -144,7 +144,7 @@ class AkeYaziMarka extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.fade,
       softWrap: false,
-      style: TextStyle(fontFamily: AkeYazi.govde, fontSize: boyut, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: renk, height: 1),
+      style: TextStyle(fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek, fontSize: boyut, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: renk, height: 1),
     );
   }
 }

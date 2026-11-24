@@ -40,7 +40,11 @@ flutter:
           weight: 600
     - family: AkeRakam
       fonts:
+        - asset: assets/fontlar/AkeRakam-400.ttf
+          weight: 400
         - asset: assets/fontlar/AkeRakam-500.ttf
           weight: 500
+        - asset: assets/fontlar/AkeRakam-600.ttf
+          weight: 600
         - asset: assets/fontlar/AkeRakam-700.ttf
           weight: 700

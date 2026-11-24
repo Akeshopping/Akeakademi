@@ -230,7 +230,7 @@ class _AcilisBoyaci extends CustomPainter {
         text: TextSpan(children: [
           TextSpan(text: 'AKE', style: TextStyle(color: AkeTok.porselen.withValues(alpha: yazi))),
           TextSpan(text: ' Akademi', style: TextStyle(color: AkeTok.porselen.withValues(alpha: 0.86 * yazi))),
-        ], style: const TextStyle(fontFamily: AkeYazi.govde, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
+        ], style: const TextStyle(fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, Offset(merkez.dx - tp.width / 2, ust + emblemH + 28 + (1 - yazi) * 8));

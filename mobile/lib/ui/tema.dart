@@ -160,8 +160,11 @@ DersRengi dersRengi(BuildContext c, String ders) {
   }
 }
 
+/// Site yığını (tokens.css --f-body): önce "AKE Rakam" (yalnız U+0030-0039, Inter rakamları), harfler "AKE Sans" (Atkinson).
+/// AkeRakam dosyaları yalnız rakam içerdiği için harfler otomatik yedeğe (AkeSans) düşer; böylece sitedeki gibi sıfır eğik çizgisiz çizilir.
 class AkeYazi {
-  static const govde = 'AkeSans';
+  static const govde = 'AkeRakam';
+  static const yedek = <String>['AkeSans'];
   static const serif = 'AkeSerif';
   static const rakam = 'AkeRakam';
 }
@@ -179,13 +182,13 @@ ThemeData akeTema({required bool koyu}) {
     surface: t.kagit,
     onSurface: t.murekkep,
   );
-  final temel = ThemeData(brightness: koyu ? Brightness.dark : Brightness.light, useMaterial3: true, fontFamily: AkeYazi.govde);
+  final temel = ThemeData(brightness: koyu ? Brightness.dark : Brightness.light, useMaterial3: true, fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek);
   return temel.copyWith(
     colorScheme: sema,
     scaffoldBackgroundColor: t.kagit,
     canvasColor: t.kagit,
     extensions: <ThemeExtension<dynamic>>[t],
-    textTheme: temel.textTheme.apply(bodyColor: t.murekkep, displayColor: t.murekkep, fontFamily: AkeYazi.govde),
+    textTheme: temel.textTheme.apply(bodyColor: t.murekkep, displayColor: t.murekkep, fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek),
     dividerColor: t.cizgi,
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
@@ -380,4 +383,4 @@ class Hap extends StatelessWidget {
 
 /// Rakamlar için site yazı tipi (AKE Rakam).
 TextStyle rakamStili(Color renk, double boyut, {FontWeight agirlik = FontWeight.w700}) =>
-    TextStyle(fontFamily: AkeYazi.rakam, fontSize: boyut, fontWeight: agirlik, color: renk, height: 1.05);
+    TextStyle(fontFamily: AkeYazi.rakam, fontFamilyFallback: AkeYazi.yedek, fontSize: boyut, fontWeight: agirlik, color: renk, height: 1.05);

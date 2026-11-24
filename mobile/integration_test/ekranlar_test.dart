@@ -76,7 +76,7 @@ void _sunucuHazirla(SahteSunucu s, {required bool uzunAciklama}) {
       {
         'id': 'q2', 's': 'mat', 't': 'Sayılar', 'd': 2,
         'q': 'x ve y pozitif tam sayılardır. x + y = 12 ve x · y = 35 ise |x − y| kaçtır?',
-        'o': ['1', '2', '3', '4', '5'],
+        'o': ['|x − y| = 1', '|x − y| = 2', '|x − y| = 3', '|x − y| = 4', '|x − y| = 5'],
       },
     ]);
   s.dogruSecenek
@@ -152,15 +152,13 @@ void main() {
       await ek('22-soru-sec-konu-$tema');
       await dokun('Paragraf');
       await ek('30-soru-okuma-$tema');
-      await t.tap(find.text('b'));
-      await t.pumpAndSettle();
+      await dokun('Sözcükler tek başına yeterli bir anlam taşır.'); // B: yanlış şık (doğru: A)
       await ek('31-soru-secili-$tema');
       await dokun('Cevapla');
       await ek('32-soru-yanlis-aciklama-$tema');
       await dokun('Sonraki soru');
       await ek('33-soru-2-$tema');
-      await t.tap(find.text('b'));
-      await t.pumpAndSettle();
+      await dokun('|x − y| = 2'); // doğru şık
       await dokun('Cevapla');
       await ek('34-soru-dogru-$tema');
       await dokun('Bitir');

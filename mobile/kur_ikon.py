@@ -26,4 +26,25 @@ zemin = ('<?xml version="1.0" encoding="utf-8"?>\n<layer-list xmlns:android="htt
 for ad in ('drawable', 'drawable-v21'):
     (res / ad).mkdir(parents=True, exist_ok=True)
     (res / ad / 'launch_background.xml').write_text(zemin, encoding='utf-8')
+# Android 12+ sistem açılış ekranı varsayılan olarak uygulama ikonunu (K) gösterir; animasyonumuz zaten K ile biter.
+# Bu yüzden sistem ekranı yalnız aynı koyu zemin olur (K → noktalar → K akışı oluşmaz), animasyonun ilk karesiyle aynı renkte.
+(res / 'drawable/ake_bos_ikon.xml').write_text(
+    '<?xml version="1.0" encoding="utf-8"?>\n<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">\n'
+    '    <solid android:color="#00000000"/>\n    <size android:width="1dp" android:height="1dp"/>\n</shape>\n', encoding='utf-8')
+v31 = ('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
+       '    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">\n'
+       '        <item name="android:windowBackground">@drawable/launch_background</item>\n'
+       '        <item name="android:windowSplashScreenBackground">@color/ake_murekkep</item>\n'
+       '        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ake_bos_ikon</item>\n'
+       '        <item name="android:forceDarkAllowed">false</item>\n'
+       '        <item name="android:windowFullscreen">false</item>\n'
+       '        <item name="android:windowDrawsSystemBarBackgrounds">false</item>\n'
+       '        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>\n'
+       '    </style>\n'
+       '    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">\n'
+       '        <item name="android:windowBackground">?android:colorBackground</item>\n'
+       '    </style>\n</resources>\n')
+for ad in ('values-v31', 'values-night-v31'):
+    (res / ad).mkdir(parents=True, exist_ok=True)
+    (res / ad / 'styles.xml').write_text(v31, encoding='utf-8')
 print('AKE K ikonu ve koyu açılış zemini uygulandı.')

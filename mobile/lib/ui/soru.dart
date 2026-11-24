@@ -238,7 +238,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('OKUMA PARÇASI', style: TextStyle(color: t.mercan, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
               const SizedBox(height: 8),
-              Text(soru.paragraf!, style: TextStyle(fontFamily: AkeYazi.serif, fontSize: 16.5, height: 1.65, color: t.murekkep)),
+              Text(soru.paragraf!, style: TextStyle(fontFamily: AkeYazi.serif, fontFamilyFallback: const ['AkeSans'], fontSize: 16.5, height: 1.65, color: t.murekkep)),
             ]),
           ),
           const SizedBox(height: 16),

@@ -192,7 +192,8 @@ class _AcilisBoyaci extends CustomPainter {
 
     // Arka plan ışığı (mercan, K belirdikçe güçlenir).
     final isik = Paint()..shader = RadialGradient(colors: [const Color(0xFFF27D6D).withValues(alpha: 0.10 + 0.20 * doldur), const Color(0x00F27D6D)]).createShader(Rect.fromCircle(center: merkez, radius: math.min(w, h) * 0.55));
-    canvas.drawRect(Offset.zero & size, isik);
+    // Yalnız ışığın gerçekten göründüğü daire çizilir (tüm ekranı boyamak yazılım GPU'sunda gereksiz dolgu maliyeti).
+    canvas.drawCircle(merkez, math.min(w, h) * 0.55, isik);
 
     // Nokta konumları: dağınıktan K köşelerine.
     final konum = <Offset>[

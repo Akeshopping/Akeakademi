@@ -87,6 +87,15 @@ jobs:
           cache: true
       - name: Platform klasörleri (kur.sh)
         run: ./kur.sh
+      - name: Gerçek uygulama (release/AOT, Preview adresi) emülatör başlamadan derlenir — emülatörle CPU paylaşıp kaydı bozmasın
+        run: |
+          flutter build apk --release --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev --dart-define=AKE_OLCUM=true
+          mkdir -p kanit-apk && cp build/app/outputs/flutter-apk/app-release.apk kanit-apk/ake-release.apk
+          ls -l kanit-apk
+          # release derlemesi dev-bağımlılık eklentilerini (integration_test) kayıttan çıkarır; sürücü derlemesi temiz başlasın
+          (cd android && ./gradlew --stop >/dev/null 2>&1 || true)
+          flutter clean
+          flutter pub get
       - name: KVM ve ffmpeg
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

@@ -10,7 +10,7 @@
 //
 // Uçlar:
 //   POST kod-gonder {eposta}         e-postaya 8 haneli giriş kodu gönderir (60 sn bekleme + saatte 5 kod: tek atomik komut)
-//   POST kod-dogrula {eposta, kod}    kodu doğrular, oturum açar (çerez). Deneme hakkı ÖNCE atomik ayrılır, kod tek komutta tüketilir.
+//   POST kod-dogrula {eposta, kod, istemci?}  kodu doğrular, oturum açar (çerez; istemci:"mobil" ise yanıtta oturumAnahtari da döner, sonraki istekler Authorization: Bearer ile). Deneme hakkı ÖNCE atomik ayrılır, kod tek komutta tüketilir.
 //   GET  ben                          oturumdaki kullanıcı, paket, bu ayki kullanım
 //   GET  kota                         ücretsiz kalan hak (günlük soru, aylık deneme)
 //   POST kota {tur, adet}             ücretsiz hak ayırır (tur: soru | deneme); biterse 402
@@ -22,7 +22,7 @@
 //   POST sil                          hesabı ve verilerini siler
 
 import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
-import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
+import { json, fail, sha256, sema, oturum, bearerToken, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
 import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
 
@@ -106,8 +106,10 @@ export async function onRequest({ request, env, params }) {
     if (!degisti(tuk)) return kodHatasi();
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
     await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
-    const u = { id: kid, eposta, ad: "" };
-    return json(200, { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid), ucretsiz: await kotaDurum(env, kid).catch(() => null) }, { "set-cookie": c });
+    const u = { id: kid, eposta, ad: "" }, y = { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid), ucretsiz: await kotaDurum(env, kid).catch(() => null) };
+    /* Mobil uygulama çerez saklamaz: yalnız istemci AÇIKÇA "mobil" derse oturum anahtarı gövdede döner (web yanıtı değişmez; anahtar yalnızca geçerli kodla alınır). */
+    if (b.istemci === "mobil") { const m = /^ake_s=([^;]*)/.exec(c); if (m) y.oturumAnahtari = decodeURIComponent(m[1]); }
+    return json(200, y, { "set-cookie": c });
   }
 
   /* ---------- Google ile giriş ---------- */
@@ -152,7 +154,7 @@ export async function onRequest({ request, env, params }) {
     return json(200, r);
   }
   if (ad === "cikis" && m === "POST") {
-    const t = cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
+    const t = bearerToken(request) !== null ? bearerToken(request) : cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
   }
   if (ad === "veri" && m === "GET") {

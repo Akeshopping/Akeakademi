@@ -26,7 +26,8 @@ adb shell getprop ro.build.version.release | tr -d '\r' | sed 's/^/ANDROID=/' | 
 for G in 320 390; do
   cihaz $G
   flutter drive --no-pub --driver=test_driver/integration_test.dart --target=integration_test/ekranlar_test.dart -d emulator-5554 \
-    --dart-define=GENISLIK=$G 2>&1 | tee kanit/drive-$G.log || echo "DRIVE_HATA_$G" | tee -a kanit/cihaz.txt
+    --dart-define=GENISLIK=$G 2>&1 | tee kanit/drive-$G.log
+  if [ "${PIPESTATUS[0]}" != "0" ]; then echo "DRIVE_HATA_$G" | tee -a kanit/cihaz.txt; DRIVE_HATASI=1; fi
 done
 mkdir -p kanit/ekranlar && cp -r ekran-kanit/*.png kanit/ekranlar/ 2>/dev/null || true
 
@@ -87,3 +88,6 @@ if command -v ffmpeg >/dev/null; then
 fi
 adb shell wm size reset; adb shell wm density reset
 echo "bitti"
+
+# ekran yürüyüşü başarısızsa iş kırmızı olur (kanıtlar yine de yüklenir)
+[ "${DRIVE_HATASI:-0}" = "0" ] || { echo 'EKRAN YÜRÜYÜŞÜ BAŞARISIZ' >&2; exit 1; }

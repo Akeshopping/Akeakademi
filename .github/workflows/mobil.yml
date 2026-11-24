@@ -65,6 +65,28 @@ jobs:
           path: mobile/build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 7
 
+  ios:
+    name: iOS · macOS derleme + test (imzasız; mağaza/TestFlight değil)
+    runs-on: macos-latest
+    timeout-minutes: 50
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Platform klasörlerini üret (kur.sh; flutter pub get dahil)
+        run: ./kur.sh
+      - name: flutter test (macOS üzerinde)
+        run: flutter test --reporter expanded
+      - name: iOS derlemesi (--no-codesign; Preview adresiyle)
+        run: flutter build ios --release --no-codesign --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
+      - name: Derleme özeti
+        run: ls -l build/ios/iphoneos/Runner.app | head -5
+
   emulator:
     name: Emülatör ekran kanıtı (320/390 dp ekran yürüyüşü + gerçek zamanlı açılış kaydı)
     needs: android

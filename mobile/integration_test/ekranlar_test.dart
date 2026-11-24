@@ -161,6 +161,14 @@ void main() {
       await ek('10-ana-$tema');
       await sekme(1);
       await ek('20-soru-sec-sinav-$tema');
+      // Soru çöz → Soru ara sekmesi
+      await t.tap(find.byKey(const ValueKey('soru-sekme-1')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('ara-girdi')), 'asal sayı');
+      await t.pumpAndSettle();
+      await ek('41-soru-ara-$tema');
+      await t.tap(find.byKey(const ValueKey('soru-sekme-0')));
+      await t.pumpAndSettle();
       await dokun('TYT');
       await ek('21-soru-sec-ders-$tema');
       await dokun('Türkçe');
@@ -179,15 +187,6 @@ void main() {
       await dokun('Bitir');
       await ek('40-sonuc-$tema');
       await dokun('Ana sayfaya dön');
-      // Soru çöz → Soru ara sekmesi
-      await sekme(1);
-      await t.tap(find.byKey(const ValueKey('soru-sekme-1')));
-      await t.pumpAndSettle();
-      await t.enterText(find.byKey(const ValueKey('ara-girdi')), 'asal sayı');
-      await t.pumpAndSettle();
-      await ek('41-soru-ara-$tema');
-      await t.tap(find.byKey(const ValueKey('soru-sekme-0')));
-      await t.pumpAndSettle();
       // Deneme (süreli; zamanlayıcı çalıştığı için sabit bekleme yok)
       await sekme(2);
       await ek('45-deneme-baslangic-$tema');

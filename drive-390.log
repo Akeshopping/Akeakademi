@@ -1,0 +1,194 @@
+Running Gradle task 'assembleDebug'...                             15.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          489ms
+I/flutter ( 6292): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(105)] Using the Impeller rendering backend (OpenGLES).
+D/FlutterRenderer( 6292): Width is zero. 0,0
+D/FlutterRenderer( 6292): Width is zero. 0,0
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:37415/ixqwhM70T6U=/
+VMServiceFlutterDriver: Isolate found with number: 562025627998991
+VMServiceFlutterDriver: Isolate 562025627998991 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 6292): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 6292): Compat change id reported: 236825255; UID 10193; state: ENABLED
+I/flutter ( 6292): CIHAZ_MANTIKSAL_GENISLIK=390.0 yukseklik=776.0 dpr=2.0
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=1180.27ms min=1169.77ms max=1190.77ms count=2
+D/EGL_emulation( 6292): app_time_stats: avg=333.17ms min=58.59ms max=679.53ms count=5
+D/ProfileInstaller( 6292): Installing profile for com.akeakademi.ake_akademi
+D/EGL_emulation( 6292): app_time_stats: avg=196.25ms min=13.39ms max=616.30ms count=6
+D/EGL_emulation( 6292): app_time_stats: avg=1849.61ms min=1849.61ms max=1849.61ms count=1
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:d554ed26: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6292): showSoftInput() view=io.flutter.embedding.android.FlutterView{7eb392d VFE...... .F....ID 0,0-780,1552 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:a1698b03: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6292): showSoftInput() view=io.flutter.embedding.android.FlutterView{7eb392d VFE...... .F....ID 0,0-780,1552 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 6292): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+D/InsetsController( 6292): show(ime(), fromIme=true)
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:a1698b03: onShown
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=147.54ms min=86.09ms max=226.67ms count=8
+D/EGL_emulation( 6292): app_time_stats: avg=128.56ms min=18.68ms max=523.07ms count=8
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:ef07bf61: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=847.70ms min=28.80ms max=1666.59ms count=2
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 6292): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@112448588 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@bfd40f8
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+I/emi.ake_akademi( 6292): NativeAlloc concurrent copying GC freed 38975(2088KB) AllocSpace objects, 17(1100KB) LOS objects, 49% free, 2805KB/5611KB, paused 93us,8us total 599.695ms
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:b4f42988: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:ef07bf61: onHidden
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=382.11ms min=66.46ms max=1665.84ms count=6
+D/EGL_emulation( 6292): app_time_stats: avg=132.70ms min=47.96ms max=461.58ms count=8
+D/EGL_emulation( 6292): app_time_stats: avg=578.14ms min=43.30ms max=1688.48ms count=4
+W/WindowOnBackDispatcher( 6292): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6292): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 6292): app_time_stats: avg=151.74ms min=7.14ms max=571.94ms count=7
+D/EGL_emulation( 6292): app_time_stats: avg=1221.39ms min=1221.39ms max=1221.39ms count=1
+D/EGL_emulation( 6292): app_time_stats: avg=170.53ms min=13.52ms max=617.44ms count=6
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:46a34fa1: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6292): showSoftInput() view=io.flutter.embedding.android.FlutterView{7eb392d VFE...... .F...... 0,0-780,1552 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:d8f55a0: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6292): showSoftInput() view=io.flutter.embedding.android.FlutterView{7eb392d VFE...... .F...... 0,0-780,1552 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 6292): Flattened final assist data: 492 bytes, containing 1 windows, 3 views
+D/InsetsController( 6292): show(ime(), fromIme=true)
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/InsetsController( 6292): show(ime(), fromIme=true)
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:d8f55a0: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:46a34fa1: onShown
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=148.55ms min=27.69ms max=302.37ms count=7
+D/EGL_emulation( 6292): app_time_stats: avg=206.77ms min=16.00ms max=1106.30ms count=10
+D/EGL_emulation( 6292): app_time_stats: avg=335.16ms min=186.56ms max=565.06ms count=3
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:24eb2629: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 6292): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@112448588 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@2c6fa07
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+I/emi.ake_akademi( 6292): Background young concurrent copying GC freed 8993(538KB) AllocSpace objects, 22(2148KB) LOS objects, 47% free, 2956KB/5611KB, paused 30us,29us total 236.986ms
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:7f84f72a: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 6292): com.akeakademi.ake_akademi:24eb2629: onHidden
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=163.18ms min=24.73ms max=616.29ms count=6
+D/EGL_emulation( 6292): app_time_stats: avg=214.17ms min=91.25ms max=373.73ms count=5
+D/EGL_emulation( 6292): app_time_stats: avg=165.35ms min=8.72ms max=553.67ms count=9
+D/EGL_emulation( 6292): app_time_stats: avg=1784.66ms min=1784.66ms max=1784.66ms count=1
+E/FrameTracker( 6292): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+D/EGL_emulation( 6292): app_time_stats: avg=213.07ms min=32.34ms max=581.96ms count=5
+D/EGL_emulation( 6292): app_time_stats: avg=974.36ms min=853.72ms max=1095.00ms count=2
+D/EGL_emulation( 6292): app_time_stats: avg=227.11ms min=10.06ms max=568.92ms count=6
+E/FrameTracker( 6292): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 6292): app_time_stats: avg=221.41ms min=11.56ms max=616.19ms count=6
+D/EGL_emulation( 6292): app_time_stats: avg=908.18ms min=636.04ms max=1180.33ms count=2
+D/EGL_emulation( 6292): app_time_stats: avg=140.22ms min=8.58ms max=619.09ms count=10
+D/EGL_emulation( 6292): app_time_stats: avg=1400.78ms min=1400.78ms max=1400.78ms count=1
+E/FrameTracker( 6292): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 6292): app_time_stats: avg=139.23ms min=12.53ms max=616.87ms count=11
+D/EGL_emulation( 6292): app_time_stats: avg=1532.65ms min=1532.65ms max=1532.65ms count=1
+D/EGL_emulation( 6292): app_time_stats: avg=147.66ms min=10.78ms max=612.57ms count=8
+D/EGL_emulation( 6292): app_time_stats: avg=1186.03ms min=1186.03ms max=1186.03ms count=1
+E/FrameTracker( 6292): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 6292): app_time_stats: avg=74.41ms min=11.49ms max=200.31ms count=14
+D/EGL_emulation( 6292): app_time_stats: avg=1864.34ms min=1864.34ms max=1864.34ms count=1
+D/EGL_emulation( 6292): app_time_stats: avg=231.92ms min=94.19ms max=617.42ms count=5
+D/EGL_emulation( 6292): app_time_stats: avg=155.35ms min=38.59ms max=613.26ms count=7
+D/EGL_emulation( 6292): app_time_stats: avg=707.51ms min=404.07ms max=1010.95ms count=2
+W/WindowOnBackDispatcher( 6292): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6292): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 6292): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 6292): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6292): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 6292): app_time_stats: avg=101.75ms min=33.31ms max=201.32ms count=10
+D/EGL_emulation( 6292): app_time_stats: avg=952.72ms min=611.66ms max=1293.77ms count=2
+D/EGL_emulation( 6292): app_time_stats: avg=254.36ms min=110.45ms max=544.94ms count=4
+I/flutter ( 6292): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 6292): The following TestFailure was thrown running a test:
+I/flutter ( 6292): Expected: at least one matching candidate
+I/flutter ( 6292):   Actual: _TextWidgetFinder:<Found 0 widgets with text "Denemeyi başlat": []>
+I/flutter ( 6292):    Which: means none were found but some were expected
+I/flutter ( 6292): "Denemeyi başlat" ekranda yok
+I/flutter ( 6292): 
+I/flutter ( 6292): When the exception was thrown, this was the stack:
+I/flutter ( 6292): #4      main.<anonymous closure>.dokun (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:125:7)
+I/flutter ( 6292): #5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:193:13)
+I/flutter ( 6292): <asynchronous suspension>
+I/flutter ( 6292): #6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:249:5)
+I/flutter ( 6292): <asynchronous suspension>
+I/flutter ( 6292): #7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 6292): <asynchronous suspension>
+I/flutter ( 6292): #8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 6292): <asynchronous suspension>
+I/flutter ( 6292): #9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 6292): <asynchronous suspension>
+I/flutter ( 6292): 
+I/flutter ( 6292): This was caught by the test expectation on the following line:
+I/flutter ( 6292):   file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 125
+I/flutter ( 6292): The test description was:
+I/flutter ( 6292):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6292): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 6292): 00:29 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 6292):   Test failed. See exception logs above.
+I/flutter ( 6292):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6292):   
+I/flutter ( 6292): 00:29 +0 -1: (tearDownAll)
+I/flutter ( 6292): 00:29 +1 -1: Some tests failed.
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Expected: at least one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "Denemeyi
+başlat": []>
+   Which: means none were found but some were expected
+"Denemeyi başlat" ekranda yok
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.dokun (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:125:7)
+#5      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:193:13)
+<asynchronous suspension>
+#6      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:249:5)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#9      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+This was caught by the test expectation on the following line:
+  file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart line 125
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+

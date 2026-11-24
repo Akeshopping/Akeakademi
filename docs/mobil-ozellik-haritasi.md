@@ -1,8 +1,8 @@
 # AKE Akademi · Site → Mobil uygulama özellik haritası
 
-Durum etiketleri: **Gerçek** = çalışan sunucu API'siyle uygulamada çalışıyor · **Salt okunur** = hesap verisini okur, yazmaz · **Yok** = uygulamada yok (ekranda "Sitede var, mobilde henüz yok" diye açıkça yazılı, sahte düğme yok).
+Durum etiketleri: **Gerçek** = sunucu API'siyle çalışan akış (testler sahte sunucuyla; canlı hesapla denenmedi)  · **Salt okunur** = hesap verisini okur, yazmaz · **Yok** = uygulamada yok (ekranda "Sitede var, mobilde henüz yok" diye açıkça yazılı, sahte düğme yok).
 
-Mobil altyapı kuralları (değişmedi): Bearer oturum anahtarı, WebView yok, web belgelerine (`profile`, `stats`, `plan`) mobilden yazılmaz, soru bankası cevap anahtarı istemciye cevaptan önce gitmez.
+Mobil altyapı kuralları (değişmedi): Bearer oturum anahtarı, WebView yok, web belgelerinden yalnız `profile` ve `plan` koşullu (CAS) yazılır, `stats`'a mobilden yazılmaz, soru bankası cevap anahtarı istemciye cevaptan önce gitmez.
 
 | Site bölümü | Mobil | Durum | Not / neden |
 |---|---|---|---|
@@ -15,18 +15,21 @@ Mobil altyapı kuralları (değişmedi): Bearer oturum anahtarı, WebView yok, w
 | Soru çöz · zorluk (Karışık/Kolay/Orta/Zor) | Konu ekranı | **Gerçek** | `oturum` isteğinde `zorluk: 1\|2\|3`; seçilmezse alan gönderilmez |
 | Soru çöz · soru, 5 şık, cevap, açıklama, sonuç | Soru ekranı | **Gerçek** | `oturum` / `cevap` / `bitir`; cevap anahtarı cevaptan sonra gelir |
 | Soru çöz · ilerleme senkronu | Arka planda | **Gerçek** | `POST /api/soru/ilerleme` (sunucu kendi kaydından işler; istemci sayaç göndermez) |
-| Soru çöz · "Soru ara", "ÖSYM tarzı", "Paragraf", "AI ile üret" sekmeleri | — | **Yok** | Mobil için API sözleşmesi hazır değil |
-| Deneme | Ana sayfada "Sitede var" kartı | **Yok** | Deneme akışı mobilde yok (sunucuda `exam` modu var, arayüzü yapılmadı) |
-| AI öğretmen | Ana sayfada "Sitede var" kartı | **Yok** | Premium + çerez oturumu; Bearer ile AI ucu yok |
-| Planım | Plan sekmesi | **Salt okunur** | `plan.tasks`; görev ekleme/işaretleme mobilde yok (yazma kapalı) |
-| Gelişimim | Gelişim sekmesi | **Salt okunur** | Günlük çözülen/doğru, konu başarısı; site rozet/seri/grafik ayrıntıları yok |
-| Ayarlar · görünüm | Ayarlar | **Gerçek** | Sistem / Açık / Koyu (yerel) |
-| Ayarlar · çıkış | Ayarlar | **Gerçek** | `POST /api/hesap/cikis` + yerel anahtar silme |
-| Ayarlar · hedef, odak odası, bildirimler | — | **Yok** | Profil yazma ve bildirim altyapısı mobilde yok |
-| Hesap silme | — | **Yok** | Mobilden yapılamaz; ekranda söylenir (web'de yapılır) |
+| Soru çöz · "Soru ara" sekmesi | Soru çöz → Soru ara | **Gerçek** | `oturum` isteğine `ara` (en çok 80 karakter, sunucuda LIKE ile; bu turda sunucuya eklendi, testli, Production'a dağıtılmadı) |
+| Soru çöz · "Paragraf" sekmesi | Soru çöz → Paragraf | **Gerçek** | Türkçe/Paragraf konusuyla oturum |
+| Soru çöz · "ÖSYM tarzı", "AI ile üret" sekmeleri | — | **Yok** | Sunucuda karşılığı yok (soru bankasında ÖSYM etiketi / üretim ucu yok); düğme konmadı |
+| Deneme (süreli, ders ve soru sayısı seçmeli) | Deneme sekmesi | **Gerçek (kısmi)** | `oturum` `mod: exam`; cevap anahtarı bitene kadar gelmez; net = doğru − yanlış/4. Ücretsiz hesapta aylık deneme hakkı sunucuda. **Yok:** bölümlü tam TYT/AYT denemesi, canlı deneme; sonuç Gelişim geçmişine yazılmaz (sunucu sınav modunu istatistiğe işlemez) |
+| AI öğretmen | AI sekmesi | **Gerçek (sahte yanıtla test edildi)** | `POST /api/ai` (Bearer, paket kodu gerekir, aylık kota sunucuda). Kod bağlama: `POST /api/hesap/kod-bagla`. Testler sahte sunucuyla; **gerçek AI çağrısı yapılmadı** |
+| Planım | Menü → Plan | **Gerçek** | Görev ekle/düzenle/işaretle/sil, haftayı sıfırla; `plan` belgesi koşullu yazma (`_b`/`_h`), 409'da yeniden okuyup dener; bilinmeyen alanlar korunur |
+| Gelişimim | Menü → Gelişim | **Salt okunur** | Günlük çözülen/doğru, konu başarısı; site rozet/seri/grafik ayrıntıları yok |
+| Ayarlar · görünüm | Menü → Ayarlar | **Gerçek** | Sistem / Açık / Koyu (yerel) |
+| Ayarlar · profil (ad, alan, günlük hedef, sınav tarihi) | Menü → Ayarlar | **Gerçek** | `profile` belgesi koşullu yazma; bilinmeyen alanlar korunur |
+| Ayarlar · çıkış | Menü → Ayarlar | **Gerçek** | `POST /api/hesap/cikis` + yerel anahtar silme |
+| Ayarlar · odak odası, bildirimler | — | **Yok** | Bildirim altyapısı mobilde yok |
+| Hesap silme | Menü → Ayarlar | **Gerçek (sahte sunucuyla test edildi)** | `POST /api/hesap/sil`; "SİL" yazılmadan düğme pasif; başarıda yerel anahtar silinir. **Gerçek hesapta/Production'da denenmedi** |
 | Arkadaş ligi, Sınıfım | — | **Yok** | Sosyal API'leri Bearer ile açılmadı |
 | Paketler ve Üyelik / ödeme | — | **Yok** | Bu turda ödeme canlıya açılmadı; mağaza faturalaması sandbox doğrulaması ve 20/B hazırlığıyla sonra |
 
-## Alt gezinme farkı (bilinçli)
+## Alt gezinme
 
-Sitenin mobil alt çubuğu: Ana sayfa · Soru çöz · Deneme · AI · Menü. Uygulamada Deneme ve AI yok, bu yüzden ölü sekme koymak yerine çalışan ekranlar öne alındı: Ana sayfa · Soru çöz · Gelişim · Plan · Ayarlar. Deneme ve AI, ana sayfadaki "Sitede var, mobilde henüz yok" kartında görünür.
+Site ile aynı: Ana sayfa · Soru çöz · Deneme · AI · Menü. Gelişim, Plan ve Ayarlar Menü içinden açılır; Android geri tuşu önce alt sayfadan Menü'ye, sonra Ana sayfaya, en son uygulamadan çıkar.

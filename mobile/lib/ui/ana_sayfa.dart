@@ -244,8 +244,8 @@ class _MobildeYok extends StatelessWidget {
           Expanded(child: Text('Sitede var, mobilde henüz yok', style: TextStyle(fontWeight: FontWeight.w700, color: t.murekkep))),
         ]),
         const SizedBox(height: 4),
-        satir(Icons.timer_outlined, 'Deneme sınavları', 'Süreli denemeler şimdilik akeakademi.com üzerinden çözülüyor.'),
-        satir(Icons.auto_awesome_outlined, 'AI öğretmen', 'Mobilde açık değil; sitede çalışıyor.'),
+        satir(Icons.timer_outlined, 'Bölümlü tam deneme', 'Tam TYT/AYT bölümlü ve canlı denemeler şimdilik akeakademi.com üzerinden çözülüyor.'),
+        satir(Icons.groups_outlined, 'Arkadaş ligi ve Sınıfım', 'Sosyal bölümler mobilde henüz yok; sitede çalışıyor.'),
       ]),
     );
   }

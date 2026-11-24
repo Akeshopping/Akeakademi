@@ -1,0 +1,102 @@
+Running Gradle task 'assembleDebug'...                             17.2s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          598ms
+I/flutter ( 6409): The Dart VM service is listening on http://127.0.0.1:35917/MSvneijjK80=/
+D/FlutterRenderer( 6409): Width is zero. 0,0
+D/FlutterRenderer( 6409): Width is zero. 0,0
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:36271/dNAEyzb5BuY=/
+VMServiceFlutterDriver: Isolate found with number: 7167331336287419
+VMServiceFlutterDriver: Isolate 7167331336287419 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 6409): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 6409): Compat change id reported: 236825255; UID 10193; state: ENABLED
+I/flutter ( 6409): CIHAZ_MANTIKSAL_GENISLIK=390.0 yukseklik=776.0 dpr=3.0
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+D/ProfileInstaller( 6409): Installing profile for com.akeakademi.ake_akademi
+D/EGL_emulation( 6409): app_time_stats: avg=239.84ms min=37.82ms max=539.56ms count=5
+D/EGL_emulation( 6409): app_time_stats: avg=164.91ms min=33.22ms max=615.45ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1305.79ms min=855.61ms max=1641.66ms count=3
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:6d7a5e31: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:6d7a5e31: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6409): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{de3c5c0 VFE...... .F....ID 0,0-1170,2328 #1} is not served.
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:d773f8cd: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:d773f8cd: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 6409): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{de3c5c0 VFE...... .F....ID 0,0-1170,2328 #1} is not served.
+I/AssistStructure( 6409): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:6fa35700: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 6409): com.akeakademi.ake_akademi:6fa35700: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+D/EGL_emulation( 6409): app_time_stats: avg=132.72ms min=23.14ms max=474.03ms count=10
+D/EGL_emulation( 6409): app_time_stats: avg=607.92ms min=290.11ms max=925.73ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=161.37ms min=62.99ms max=590.57ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1260.31ms min=1260.31ms max=1260.31ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=175.48ms min=18.83ms max=617.32ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=1382.31ms min=1382.31ms max=1382.31ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=155.99ms min=18.88ms max=620.15ms count=9
+D/EGL_emulation( 6409): app_time_stats: avg=1402.35ms min=1402.35ms max=1402.35ms count=1
+W/WindowOnBackDispatcher( 6409): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6409): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+D/EGL_emulation( 6409): app_time_stats: avg=239.00ms min=24.95ms max=624.76ms count=5
+D/EGL_emulation( 6409): app_time_stats: avg=974.97ms min=925.80ms max=1024.14ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=190.52ms min=14.84ms max=617.32ms count=6
+D/EGL_emulation( 6409): app_time_stats: avg=176.13ms min=25.54ms max=618.33ms count=6
+D/EGL_emulation( 6409): app_time_stats: avg=724.57ms min=337.29ms max=1111.84ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=149.73ms min=15.73ms max=617.43ms count=10
+D/EGL_emulation( 6409): app_time_stats: avg=1495.57ms min=1495.57ms max=1495.57ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=101.75ms min=27.03ms max=317.55ms count=10
+D/EGL_emulation( 6409): app_time_stats: avg=1636.71ms min=1636.71ms max=1636.71ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=344.78ms min=118.78ms max=617.93ms count=3
+D/EGL_emulation( 6409): app_time_stats: avg=1262.39ms min=1262.39ms max=1262.39ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=157.77ms min=13.47ms max=618.40ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=103.76ms min=15.58ms max=614.57ms count=14
+D/EGL_emulation( 6409): app_time_stats: avg=1868.62ms min=1868.62ms max=1868.62ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=189.87ms min=38.23ms max=608.13ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=761.42ms min=334.76ms max=1188.07ms count=2
+D/FlutterJNI( 6409): Sending viewport metrics to the engine.
+D/EGL_emulation( 6409): app_time_stats: avg=188.17ms min=118.62ms max=297.22ms count=6
+D/EGL_emulation( 6409): app_time_stats: avg=146.82ms min=10.94ms max=582.29ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1019.07ms min=857.30ms max=1180.83ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=173.93ms min=65.74ms max=603.61ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1343.15ms min=1343.15ms max=1343.15ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=188.83ms min=56.93ms max=617.77ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1312.81ms min=1312.81ms max=1312.81ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=140.27ms min=51.40ms max=320.82ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=143.33ms min=33.43ms max=616.88ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1066.50ms min=577.95ms max=1555.05ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=158.81ms min=26.80ms max=617.84ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=1267.65ms min=1267.65ms max=1267.65ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=152.07ms min=19.66ms max=618.32ms count=9
+D/EGL_emulation( 6409): app_time_stats: avg=1362.81ms min=1362.81ms max=1362.81ms count=1
+W/WindowOnBackDispatcher( 6409): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6409): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 6409): app_time_stats: avg=144.63ms min=37.55ms max=616.78ms count=11
+D/EGL_emulation( 6409): app_time_stats: avg=1598.96ms min=1598.96ms max=1598.96ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=151.97ms min=18.22ms max=615.24ms count=10
+D/EGL_emulation( 6409): app_time_stats: avg=758.66ms min=363.29ms max=1154.03ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=150.05ms min=12.82ms max=616.93ms count=10
+D/EGL_emulation( 6409): app_time_stats: avg=1499.71ms min=1499.71ms max=1499.71ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=145.63ms min=26.81ms max=611.50ms count=11
+D/EGL_emulation( 6409): app_time_stats: avg=1600.49ms min=1600.49ms max=1600.49ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=155.65ms min=21.17ms max=616.52ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=1247.59ms min=1247.59ms max=1247.59ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=77.54ms min=15.30ms max=301.11ms count=13
+D/EGL_emulation( 6409): app_time_stats: avg=216.00ms min=112.47ms max=618.01ms count=5
+D/EGL_emulation( 6409): app_time_stats: avg=1970.13ms min=1970.13ms max=1970.13ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=170.02ms min=20.38ms max=617.40ms count=8
+D/EGL_emulation( 6409): app_time_stats: avg=740.33ms min=324.67ms max=1155.99ms count=2
+D/EGL_emulation( 6409): app_time_stats: avg=97.41ms min=18.51ms max=299.84ms count=11
+D/EGL_emulation( 6409): app_time_stats: avg=1915.31ms min=1915.31ms max=1915.31ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=236.11ms min=115.53ms max=616.66ms count=5
+D/EGL_emulation( 6409): app_time_stats: avg=147.63ms min=20.73ms max=615.67ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1249.42ms min=1249.42ms max=1249.42ms count=1
+D/EGL_emulation( 6409): app_time_stats: avg=164.11ms min=20.41ms max=616.36ms count=7
+D/EGL_emulation( 6409): app_time_stats: avg=1266.28ms min=1266.28ms max=1266.28ms count=1
+I/flutter ( 6409): 00:45 +1: (tearDownAll)
+I/flutter ( 6409): 00:46 +2: All tests passed!
+All tests passed.

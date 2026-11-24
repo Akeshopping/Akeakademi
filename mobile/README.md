@@ -39,7 +39,7 @@ macOS/Linux: `./kur.sh` aynı işi yapar.
 `ios/` kaynakları `./kur.sh` ile üretilir. Derleme ve imzalama için Mac + Xcode + Apple geliştirici hesabı gerekir; bu depoda iOS derlemesi **yapılmadı**.
 
 ## Bilinen sınırlar (bu sürüm)
-- **Web ile eşzamanlı yazma:** sunucu tarafı artık atomik ve çift saymaz; ancak web istemcisi, daha yeni uzak `stats` belgesini bütünüyle benimser. Web'de henüz gönderilmemiş (≈6 sn / çevrimdışı) yerel değişiklikler, aynı hesapta mobil yazdıktan sonra ezilebilir. Çözüm web tarafı birleştirme ister; yapılmadı. Bu yüzden "web ile tam güvenli senkron" denmez.
+- **Web ile eşzamanlı yazma:** yeni web sürümü cevapları yerelde kalıcı olay olarak da tutar; senkronda uzak belgeyi okur, eksik olayları üstüne uygular ve sunucuya koşullu (`_b`) yazar. Çevrimdışı/gönderilmemiş cevaplar ve eskimiş sekmeler mobil ilerlemesini ezmez, mobil de web'inkini ezmez; yanıt kaybolsa çift sayım olmaz (testler: `tests/web-stats-senkron.test.mjs`, ayrıca Preview D1'de doğrulandı). **Kalan sınırlar:** (1) bu değişiklikten önceki, önbellekteki ESKİ web sürümü koşulsuz yazmaya devam eder; yeni web yayınlanıp sekme yenilenince kapanır. (2) Bir cihaz yeni sürümle ilk kez senkron olurken, eski sürümden kalan gönderilmemiş yerel sayaçlar uzak sayaçlarla "büyüğünü koru" kuralıyla birleşir (tek seferlik, en kötü durumda küçük taraftaki artış kaybolabilir). (3) `ans/para/rozet` dışındaki web alanları (sınavlar, yanlışlar defteri vb.) eskisi gibi son-yazan-kazanır.
 - Google ile giriş yok (yalnız e-posta kodu).
 - Web'deki yanlışlar defteri, XP ve rozetler mobilde güncellenmez; yalnız konu sayaçları.
 - Bekleyen kayıt listesi bellektedir; kaybolursa açılışta sunucu süpürmesi cevapları toparlar (cevaplar sunucuda durur).

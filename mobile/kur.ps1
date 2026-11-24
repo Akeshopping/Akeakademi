@@ -20,6 +20,7 @@ if (Test-Path $p) {
   $s = ([regex]'(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)').Replace($s, '${1}AKE Akademi${2}', 1)
   [IO.File]::WriteAllText((Resolve-Path $p), $s, (New-Object Text.UTF8Encoding($false)))
 }
+if (Get-Command python -ErrorAction SilentlyContinue) { python kur_ikon.py } else { Write-Host 'Python yok: K ikonu uygulanmadı (varsayılan Flutter ikonu kalır).' }
 Remove-Item -Force -ErrorAction SilentlyContinue test\widget_test.dart   # flutter create şablon testi (bu uygulamaya ait değil)
 flutter pub get
 if ($LASTEXITCODE -ne 0) { throw 'flutter pub get başarısız' }

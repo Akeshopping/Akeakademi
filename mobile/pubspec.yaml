@@ -19,5 +19,26 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/ake_logo.png
+  # Yazı tipleri sitedeki gömülü yazı tiplerinin (AKE Sans = Atkinson Hyperlegible Next, AKE Serif = Newsreader, AKE Rakam = Inter rakamları;
+  # üçü de SIL Open Font License) statik örnekleridir. Yaklaşık logo kullanılmaz: K amblemi lib/ui/marka.dart içinde gerçek path ile çizilir.
+  fonts:
+    - family: AkeSans
+      fonts:
+        - asset: assets/fontlar/AkeSans-400.ttf
+          weight: 400
+        - asset: assets/fontlar/AkeSans-600.ttf
+          weight: 600
+        - asset: assets/fontlar/AkeSans-700.ttf
+          weight: 700
+    - family: AkeSerif
+      fonts:
+        - asset: assets/fontlar/AkeSerif-400.ttf
+          weight: 400
+        - asset: assets/fontlar/AkeSerif-600.ttf
+          weight: 600
+    - family: AkeRakam
+      fonts:
+        - asset: assets/fontlar/AkeRakam-500.ttf
+          weight: 500
+        - asset: assets/fontlar/AkeRakam-700.ttf
+          weight: 700

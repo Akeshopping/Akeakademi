@@ -96,10 +96,25 @@ void main() {
     expect(find.text('Hangi sınava çalışıyorsun?'), findsOneWidget);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
-    s.oturumGecerli = false;
     await t.tap(find.text('Matematik'));
     await t.pumpAndSettle();
+    s.oturumGecerli = false; // konu listesi açıkken oturum biter
     await t.tap(find.text('Sayılar'));
+    await t.pumpAndSettle();
+    expect(find.textContaining('Oturumunun süresi doldu'), findsOneWidget);
+    expect(find.text('Soru 1 / 2'), findsNothing);
+  });
+
+  testWidgets('oturum, konu listesi yüklenirken biterse de açık ekranlar kapanır ve giriş ekranı gelir', (t) async {
+    await buyukEkran(t);
+    final s = SahteSunucu(), model = kurModel(s, BellekDeposu(SahteSunucu.anahtar));
+    await model.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: model));
+    await t.pumpAndSettle();
+    await t.tap(find.text('TYT'));
+    await t.pumpAndSettle();
+    s.oturumGecerli = false;
+    await t.tap(find.text('Matematik'));
     await t.pumpAndSettle();
     expect(find.textContaining('Oturumunun süresi doldu'), findsOneWidget);
   });

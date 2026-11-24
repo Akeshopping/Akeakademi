@@ -18,9 +18,21 @@ rep('if (R.kind === "para") { S.para.times.push(secs); if (res) S.para.c++; else
 rep('d.fm = (d.fm || 0) + 25; touch("stats"); xpEkle("odak");', 'd.fm = (d.fm || 0) + 25; olayEkle({ e: olayId(), k: "f", g: dayKey(), ts: Date.now() }); touch("stats"); xpEkle("odak");')
 
 rep('async function flush() {', '''/* STATS-SENKRON-BASLA (tests/web-stats-senkron.test.mjs bu bloğu index.html'den çıkarıp gerçek sunucu koduyla çalıştırır) */
-const EV_MAX = 500, EVID_MAX = 400, olayId = () => uid() + Math.random().toString(36).slice(2, 6);
+const EV_MAX = 2000, EVID_MAX = 3000, olayId = () => uid() + Math.random().toString(36).slice(2, 6);
+const hesapKimlik = () => (HESAP.user && HESAP.user.id) || null;
 function statsOlay(q, res) { return { e: olayId(), k: "q", s: q.s, t: q.t, d: q.d || 2, i: q.gen ? null : q.id, r: res, ts: Date.now(), g: dayKey() }; }
-function olayEkle(ev) { if (!Array.isArray(S.pend)) S.pend = []; S.pend.push(ev); if (S.pend.length > EV_MAX) S.pend.splice(0, S.pend.length - EV_MAX); }
+/* Bekleyen olay yerel listeye eklenir ve HESABA BAĞLANIR (h). Liste dolarsa eski olaylar SİLİNMEZ: açık uyarı verilir (false döner),
+   senkron bu durumda yerel sayaçları da korur (statsMaks). */
+function olayEkle(ev) {
+  if (!Array.isArray(S.pend)) S.pend = [];
+  if (ev.h === undefined) ev.h = hesapKimlik();
+  if (S.pend.length >= EV_MAX) {
+    S.kayipRisk = (S.kayipRisk || 0) + 1;
+    try { if (typeof cloud !== "undefined") cloud.state = "dolu"; if (typeof paintSave === "function") paintSave(); if (typeof toast === "function" && (S.kayipRisk === 1 || S.kayipRisk % 50 === 0)) toast("Çevrimdışı kayıt sınırı doldu. İnternete bağlanıp kaydet; yoksa bazı cevaplar hesabına yazılamayabilir."); } catch (e) { }
+    return false;
+  }
+  S.pend.push(ev); return true;
+}
 /* Bir olayı düz stats nesnesine uygular (record() ile aynı sayaç kuralları; sunucudaki lib/ilerleme.js ile aynı biçim) */
 function olayUygula(st, ev) {
   if (ev.k === "p") { const p = st.para = st.para || { times: [], c: 0, w: 0 }; p.times = (p.times || []).concat([ev.secs]).slice(-60); if (ev.r) p.c = (p.c || 0) + 1; else p.w = (p.w || 0) + 1; return; }
@@ -33,15 +45,17 @@ function olayUygula(st, ev) {
   if (ev.i) { st.ans = st.ans || {}; const a = st.ans[ev.i] || (st.ans[ev.i] = [0, 0, 0, 0, 0]); a[ev.r === 1 ? 0 : ev.r === 0 ? 1 : 2]++; a[3] = ev.ts; a[4] = ev.r; }
 }
 const yerelStats = () => { const o = {}; AREA.stats.forEach(k => { if (S[k] !== undefined) o[k] = clone(S[k]); }); return o; };
+const bosStats = () => ({ ans: {}, topic: {}, daily: {}, para: { times: [], c: 0, w: 0 }, badges: {}, tr: {}, td: {} });
+/* Uzak belgede uygulanmış olay kimlikleri: uygulama PARTİLERİ (g = yazma numarası). Eski düz liste de okunur. Eski partiler sınır aşılınca atılır; atılan en büyük numara _ed. */
+const evPartileri = R => { const ev = R && R._ev; if (!Array.isArray(ev)) return []; return ev.length && typeof ev[0] === "string" ? [{ g: 0, i: ev }] : ev.filter(b => b && Array.isArray(b.i)); };
 /* Uzak belge + henüz uzakta olmayan olaylar. Rozetler birleşim. */
-function statsBirlestir(R, bek, yerelBadges) {
-  const out = clone(R), ev = Array.isArray(out._ev) ? out._ev.slice() : [], gorulen = new Set(ev);
-  bek.slice().sort((a, b) => a.ts - b.ts).forEach(e => { if (gorulen.has(e.e)) return; olayUygula(out, e); gorulen.add(e.e); ev.push(e.e); });
-  if (ev.length || out._ev) out._ev = ev.slice(-EVID_MAX);
+function statsBirlestir(R, uygula, yerelBadges) {
+  const out = clone(R);
+  uygula.slice().sort((a, b) => a.ts - b.ts).forEach(e => olayUygula(out, e));
   out.badges = Object.assign({}, yerelBadges || {}, out.badges || {});
   return out;
 }
-/* Tek seferlik başlangıç (bu cihaz bu sürümle henüz senkron olmadı): iki belgenin sayaçları, büyüğünün altına düşmeyecek biçimde birleşir. */
+/* Başlangıç / sınır-dolu durumu: iki belgenin sayaçları, büyüğünün altına düşmeyecek biçimde birleşir (kayıp yerine bilinen küçük sapma). */
 function statsMaks(a, b) {
   const o = clone(a || {}), mxa = (x, y) => x.map((v, i) => Math.max(v || 0, (y && y[i]) || 0));
   b = b || {};
@@ -58,36 +72,73 @@ function statsMaks(a, b) {
   o.badges = Object.assign({}, b.badges || {}, o.badges || {});
   return o;
 }
-const statsKarsi = x => { const c = clone(x || {}); delete c._u; delete c._b; return JSON.stringify(c); };
-function statsBenimse(out, ids, u) {
-  AREA.stats.forEach(k => { if (out[k] !== undefined) S[k] = clone(out[k]); });
-  const kalan = (S.pend || []).filter(e => !ids.has(e.e)); S.pend = kalan; kalan.forEach(e => olayUygula(S, e)); // senkron sürerken gelen yeni cevaplar
-  S.sb = 1; S.upd.stats = u; normalize(); saveLocal();
+const statsCekirdek = x => { const c = clone(x || {}); ["_u", "_b", "_h", "_g", "_ev", "_ed"].forEach(k => delete c[k]); return JSON.stringify(c); };
+/* Yerel sayaçlar başka bir hesaba aitse (aynı tarayıcıda hesap değişti) o hesabın YEDEĞİ ayrılır ve sayaçlar boşaltılır: yeni hesapla ASLA karışmaz.
+   Eski hesabın bekleyen olayları (h) listede durur; yalnızca o hesap tekrar senkron olunca yazılır. */
+function yerelHesaba(hid) {
+  if (S.hid && S.hid !== hid) {
+    if (S.kayipRisk) { S.yedek = S.yedek || {}; S.yedek[S.hid] = { sayac: yerelStats(), risk: S.kayipRisk }; }
+    const b = bosStats(); AREA.stats.forEach(k => { S[k] = b[k]; }); S.kayipRisk = 0; S.sb = 1;
+    (S.pend || []).filter(e => e.h === hid).forEach(e => olayUygula(S, e)); // yeni hesabın zaten bekleyen cevapları boş sayaçlara yeniden işlenir
+  }
+  if (S.hid !== hid && S.yedek && S.yedek[hid]) { const y = S.yedek[hid]; AREA.stats.forEach(k => { if (y.sayac[k] !== undefined) S[k] = clone(y.sayac[k]); }); S.kayipRisk = y.risk; delete S.yedek[hid]; S.sb = 1; }
+  S.hid = hid;
 }
-/* Okur, birleştirir, koşullu yazar; araya başka yazma girerse (409) baştan dener. Başarısızlıkta olaylar KORUNUR (hata fırlatır; flush yeniden dener). */
+function statsBenimse(out, hid, ids, u, belirsiz) {
+  AREA.stats.forEach(k => { if (out[k] !== undefined) S[k] = clone(out[k]); });
+  const kalan = (S.pend || []).filter(e => !ids.has(e.e)); S.pend = kalan;
+  kalan.filter(e => e.h === hid || e.h == null).forEach(e => olayUygula(S, e)); // senkron sürerken gelen yeni cevaplar (yalnız bu hesabınkiler)
+  S.sb = 1; S.hid = hid; S.kayipRisk = 0; S.upd.stats = u; if (belirsiz) S.belirsiz = (S.belirsiz || 0) + belirsiz;
+  normalize(); saveLocal();
+  if (belirsiz) { try { if (typeof toast === "function") toast(belirsiz + " cevabın hesaba yazılıp yazılmadığı doğrulanamadı; sayaçlarda küçük bir fark olabilir."); } catch (e) { } }
+}
+/* Okur, birleştirir, KOŞULLU yazar; araya başka yazma girerse (409) baştan dener. Hesap kimliği işlem başında yakalanır; her await sonrasında,
+   PUT öncesinde ve benimsemeden önce aynı hesapta olunduğu doğrulanır (sunucu da _h ile doğrular). Başarısızlıkta olaylar KORUNUR. */
 async function statsSenkron() {
+  const hid = hesapKimlik(); if (!hid) throw { code: "not_granted" };
+  const ayni = () => hesapKimlik() === hid, iptal = () => { throw { code: "hesap_degisti" }; };
+  yerelHesaba(hid);
   for (let n = 0; n < 6; n++) {
-    const { r, j } = await hesapIstek("veri");
+    const { r, j } = await hesapIstek("veri"); if (!ayni()) iptal();
     if (r.status === 401) { HESAP.user = null; throw { code: "not_granted" }; }
     if (!r.ok) throw { code: "network" };
-    const R = (j.alanlar && j.alanlar.stats) || null, ru = Number(j.u && j.u.stats) || (R && Number(R._u)) || 0;
-    const bek = (S.pend || []).slice(), ids = new Set(bek.map(e => e.e)), yerel = yerelStats();
+    if (j.hesap && j.hesap !== hid) iptal(); // tarayıcının oturumu (çerez) beklenen hesap değil: başka sekmede hesap değişmiş
+    const R = (j.alanlar && j.alanlar.stats) || null, ru = Number(j.u && j.u.stats) || (R && Number(R._u)) || 0, G = Number(R && R._g) || 0, ed = Number(R && R._ed) || 0;
+    const bat = evPartileri(R), listede = new Set(); bat.forEach(b => b.i.forEach(x => listede.add(x)));
+    const benim = (S.pend || []).filter(e => e.h === hid || e.h == null), yerel = yerelStats();
+    const uygula = []; let belirsiz = 0;
+    benim.forEach(e => { if (listede.has(e.e)) return; if (e.tg !== undefined && e.tg + 1 <= ed) { belirsiz++; return; } uygula.push(e); }); // tg: bu olayı içeren yazma denemesinde okunan yazma numarası
     let out;
-    if (!R) { out = yerel; out._ev = bek.map(e => e.e).slice(-EVID_MAX); }
-    else if (!S.sb) { out = statsMaks(R, yerel); out._ev = (R._ev || []).concat(bek.map(e => e.e)).slice(-EVID_MAX); }
-    else out = statsBirlestir(R, bek, S.badges);
-    delete out._u; delete out._b;
-    if (R && statsKarsi(out) === statsKarsi(R)) { statsBenimse(out, ids, ru); return; } // uzakta zaten aynı: yazmaya gerek yok
+    if (!R) out = yerel;
+    else if (!S.sb) out = statsMaks(R, yerel);
+    else out = statsBirlestir(R, uygula, S.badges);
+    if (S.kayipRisk && R && S.sb) out = statsMaks(out, yerel); // olay sınırı dolmuştu: yakalanamayan cevaplar yerel sayaçlardan korunur
+    const ids = new Set(benim.map(e => e.e)), yeni = (!R || !S.sb) ? benim.filter(e => !listede.has(e.e)) : uygula;
+    if (R && !yeni.length && statsCekirdek(out) === statsCekirdek(R)) { statsBenimse(R, hid, ids, ru, belirsiz); return; } // uzakta zaten aynı: yazmaya gerek yok
+    delete out._u; delete out._b; delete out._h;
+    const bat2 = bat.map(b => ({ g: b.g, i: b.i.slice() })); if (yeni.length) bat2.push({ g: G + 1, i: yeni.map(e => e.e) });
+    let say = bat2.reduce((a, b) => a + b.i.length, 0), ed2 = ed;
+    while (say > EVID_MAX && bat2.length > 1) { const b0 = bat2.shift(); say -= b0.i.length; ed2 = Math.max(ed2, b0.g); }
+    out._g = G + 1; out._ev = bat2; if (ed2) out._ed = ed2; else delete out._ed;
     let g = 0; while (BYTES(JSON.stringify(out)) > DOC_LIMIT && g++ < 20) { const ks = Object.keys(out.daily || {}).sort(); if (ks.length > 60) ks.slice(0, 30).forEach(k => delete out.daily[k]); else break; }
     if (BYTES(JSON.stringify(out)) > DOC_LIMIT) throw { code: "invalid_argument" };
-    out._b = ru;
+    yeni.forEach(e => { e.tg = G; }); saveLocal(); // deneme kaydı: yanıt kaybolursa bu olayın uygulanmış olabileceği bilinir
+    out._b = ru; out._h = hid;
+    if (!ayni()) iptal();
     const r2 = await fetch("/api/hesap/veri/stats", { method: "PUT", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify(out) });
-    if (r2.status === 409) continue;
+    if (r2.status === 409) {
+      let j9 = {}; try { j9 = await r2.json(); } catch (e) { }
+      yeni.forEach(e => { delete e.tg; }); // 409: yazılmadığı KESİN
+      if (j9 && j9.error === "hesap") iptal();
+      if (!ayni()) iptal();
+      continue;
+    }
     if (r2.status === 401) { HESAP.user = null; throw { code: "not_granted" }; }
     if (r2.status === 413) throw { code: "invalid_argument" };
     if (!r2.ok) throw { code: "network" };
     let j2 = {}; try { j2 = await r2.json(); } catch (e) { }
-    delete out._b; statsBenimse(out, ids, Number(j2.u) || ru + 1); return;
+    if (!ayni()) { S.pend = (S.pend || []).filter(e => !ids.has(e.e)); saveLocal(); iptal(); } // yazma ESKİ hesaba onaylandı: olaylar silinir, yeni hesaba hiçbir şey benimsenmez
+    delete out._b; delete out._h; statsBenimse(out, hid, ids, Number(j2.u) || ru + 1, belirsiz); return;
   }
   throw { code: "network" };
 }
@@ -108,3 +159,5 @@ rep('''    const snap = await cloud.col.get(), remote = {};
     for (const a of Object.keys(AREA)) {
       if (a === "stats") continue;
       const r = remote[a], ru = (r && r._u) || 0, lu = S.upd[a] || 0;''')
+
+rep('retry: ["retry", "Kayıt bekliyor, tekrar denenecek"], local:', 'retry: ["retry", "Kayıt bekliyor, tekrar denenecek"], dolu: ["retry", "Çevrimdışı kayıt sınırı doldu · internete bağlan"], local:')

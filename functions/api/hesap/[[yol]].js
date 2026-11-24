@@ -160,12 +160,19 @@ export async function onRequest({ request, env, params }) {
   if (ad === "veri" && m === "GET") {
     const { results } = await env.DB.prepare("SELECT alan, json, u FROM veri WHERE kid = ?").bind(u.id).all();
     const alanlar = {}, uu = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); uu[r.alan] = r.u; } catch (e) { } });
-    return json(200, { alanlar, u: uu });
+    return json(200, { alanlar, u: uu, hesap: u.id });
   }
   if (ad === "veri" && m === "PUT") {
     const alan = yol[1]; if (!ALANLAR.includes(alan)) return fail(400, "alan");
     const ham = await request.text(); if (ham.length > 262144) return fail(413, "buyuk");
     let o; try { o = JSON.parse(ham); } catch (e) { return fail(400, "json"); }
+    /* HESAP DOĞRULAMA: gövdede "_h" (istemcinin yazmak istediği hesap) varsa oturumun hesabıyla aynı olmalı. İstemci işlemi başlatırken bir hesaptaydı;
+       araya hesap değişimi (başka sekmede giriş/çıkış) girdiyse yazma REDDEDİLİR, başka hesabın belgesine yanlış veri girmez. "_h" saklanmaz. */
+    let ham1 = ham;
+    if (o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, "_h")) {
+      if (o._h !== u.id) return json(409, { error: "hesap" });
+      delete o._h; ham1 = JSON.stringify(o);
+    }
     /* KOŞULLU YAZMA (compare-and-swap): gövdede "_b" (istemcinin okuduğu sürüm = veri.u) varsa, kayıt YALNIZCA hâlâ o sürümdeyse yazılır.
        Aradan başka bir yazma (başka cihaz, mobil sunucu-tarafı ilerleme) girdiyse 409 döner ve istemci yeniden okuyup birleştirir; böylece
        "yeni" zaman damgasıyla eskimiş bir belgenin üzerine yazıp başkasının ilerlemesini silmek mümkün olmaz. Karşılaştırma ve yazma TEK atomik komuttur.
@@ -183,7 +190,7 @@ export async function onRequest({ request, env, params }) {
     const yeniU = Number(o && o._u) || Date.now();
     /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda). Karşılaştırma ve yazma TEK atomik komuttur (önce oku, sonra yaz yarışı yok):
        eşzamanlı iki yazmadan eskisi, sıralama ne olursa olsun yenisinin üstüne yazamaz. Etkilenen satır 0 ise daha yeni kayıt vardır → 409. */
-    const yaz = await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u WHERE veri.u <= excluded.u").bind(u.id, alan, ham, yeniU).run();
+    const yaz = await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u WHERE veri.u <= excluded.u").bind(u.id, alan, ham1, yeniU).run();
     if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
     return json(200, { ok: true });
   }

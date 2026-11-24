@@ -238,3 +238,22 @@ test("doküman: güncel göç toplamı 1.216 ve yönetim write-path cutover bloc
   assert.ok(/CUTOVER BLOCKER/.test(d) && /soru-uret/.test(d) && /ZORUNDADIR/.test(d));
   assert.ok(!/yalnız okur|yalnız okuma/.test(d + k) && /saf okuma/.test(d) && /hazirla\(\)/.test(k));
 });
+
+test("ara: metin araması doğru filtreler; joker karakter etkisiz; geçersiz ara → 400; aynı istek aynı oturum", async () => {
+  const K = T;
+  tohumla(K.DB, 24, { onek: "ar", s: "kimya", konular: ["Asitler"], zorluklar: [1, 2] });
+  K.DB.db.exec("UPDATE soru SET govde = json_set(govde, '$.q', 'Mol kavramı nedir ar-3') WHERE id = 'ar-3'");
+  K.DB.db.exec("UPDATE soru SET govde = json_set(govde, '$.q', '100% saf %_ madde') WHERE id = 'ar-5'");
+  const k = await K.giris("ara@ornek.com"); K.premiumYap(k.kid);
+  const al = async g => K.api("oturum", { cookie: k.cookie, govde: { istek: K.yeniIstek(), mod: "practice", adet: 10, ...g } });
+  const a = await al({ ders: "kimya", ara: "mol kavramı" }); assert.equal(a.s, 200); assert.deepEqual(a.j.sorular.map(q => q.id), ["ar-3"]);
+  K.DB.db.prepare("UPDATE soru_oturum SET durum = 'bitti' WHERE id = ?").run(a.j.oturum);
+  const j = await al({ ders: "kimya", ara: "0% s" }); assert.equal(j.s, 200); assert.deepEqual(j.j.sorular.map(q => q.id), ["ar-5"]);   // % joker değil, düz karakter
+  K.DB.db.prepare("UPDATE soru_oturum SET durum = 'bitti' WHERE id = ?").run(j.j.oturum);
+  for (const kotu of ["a", "x".repeat(61), 5, {}, ["mol"]]) assert.equal((await al({ ders: "kimya", ara: kotu })).s, 400);
+  assert.equal((await al({ ders: "kimya", ara: "yokböyle" })).s, 503);   // sonuç yok → güvenli açık hata
+  const id = K.yeniIstek(), r1 = await K.api("oturum", { cookie: k.cookie, govde: { istek: id, mod: "practice", adet: 5, ders: "kimya", ara: "ar-1" } });
+  const r2 = await K.api("oturum", { cookie: k.cookie, govde: { istek: id, mod: "practice", adet: 5, ders: "kimya", ara: "ar-1" } });
+  assert.equal(r1.s, 200); assert.equal(r2.j.oturum, r1.j.oturum);
+  assert.equal((await K.api("oturum", { cookie: k.cookie, govde: { istek: id, mod: "practice", adet: 5, ders: "kimya", ara: "ar-2" } })).s, 409);   // farklı filtre aynı kimlikle çakışır
+});

@@ -1,0 +1,20 @@
+EMULATOR_MODEL=sdk_gphone64_x86_64
+ANDROID=14
+EKRAN 320 dp: Override size: 640x1360 / Override density: 320
+EKRAN 390 dp: Override size: 780x1600 / Override density: 320
+GERCEK_APK_KURULDU ake-release.apk
+    flags=0x0
+    versionName=0.1.0
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+EKRAN 390 dp: Override size: 780x1600 / Override density: 320
+EKRAN 320 dp: Override size: 640x1360 / Override density: 320
+EKRAN 390 dp: Override size: 780x1600 / Override density: 320
+EKRAN 320 dp: Override size: 640x1360 / Override density: 320
+SURE_SN acilis-320-hareket-azalt=20.815311
+KARE_SAYISI acilis-320-hareket-azalt=35
+SURE_SN acilis-320-ilk-acilis=6.979144
+KARE_SAYISI acilis-320-ilk-acilis=54
+SURE_SN acilis-390-ikinci-acilis=5.944278
+KARE_SAYISI acilis-390-ikinci-acilis=42
+SURE_SN acilis-390-ilk-acilis=6.966900
+KARE_SAYISI acilis-390-ilk-acilis=34

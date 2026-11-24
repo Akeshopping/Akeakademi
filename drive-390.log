@@ -1,0 +1,122 @@
+Running Gradle task 'assembleDebug'...                             14.0s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          579ms
+I/flutter ( 6131): The Dart VM service is listening on http://127.0.0.1:33473/XIYQ7DIDub4=/
+D/FlutterRenderer( 6131): Width is zero. 0,0
+D/FlutterRenderer( 6131): Width is zero. 0,0
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:38661/4CaiFDEXLuA=/
+VMServiceFlutterDriver: Isolate found with number: 1377941452576339
+VMServiceFlutterDriver: Isolate 1377941452576339 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 6131): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 6131): Compat change id reported: 236825255; UID 10193; state: ENABLED
+I/flutter ( 6131): CIHAZ_MANTIKSAL_GENISLIK=390.0 yukseklik=776.0 dpr=3.0
+I/Choreographer( 6131): Skipped 65 frames!  The application may be doing too much work on its main thread.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/ProfileInstaller( 6131): Installing profile for com.akeakademi.ake_akademi
+D/EGL_emulation( 6131): app_time_stats: avg=413.74ms min=36.81ms max=823.99ms count=4
+D/EGL_emulation( 6131): app_time_stats: avg=1119.50ms min=458.89ms max=1851.28ms count=3
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:cef9db05: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6131): showSoftInput() view=io.flutter.embedding.android.FlutterView{ae2e689 VFE...... .F....ID 0,0-1170,2328 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:4337b0c2: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 6131): showSoftInput() view=io.flutter.embedding.android.FlutterView{ae2e689 VFE...... .F....ID 0,0-1170,2328 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 6131): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 6131): app_time_stats: avg=102.35ms min=24.27ms max=245.23ms count=10
+D/InsetsController( 6131): show(ime(), fromIme=true)
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/EGL_emulation( 6131): app_time_stats: avg=257.84ms min=57.71ms max=546.00ms count=4
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:4337b0c2: onShown
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:5f249a85: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 6131): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@221031753 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@5da1384
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/EGL_emulation( 6131): app_time_stats: avg=213.39ms min=31.63ms max=601.54ms count=5
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:e859badc: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 6131): com.akeakademi.ake_akademi:5f249a85: onHidden
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/EGL_emulation( 6131): app_time_stats: avg=710.81ms min=289.41ms max=1193.81ms count=3
+D/EGL_emulation( 6131): app_time_stats: avg=144.54ms min=44.49ms max=329.43ms count=7
+D/EGL_emulation( 6131): app_time_stats: avg=566.92ms min=84.03ms max=1502.62ms count=3
+I/emi.ake_akademi( 6131): NativeAlloc concurrent copying GC freed 29421(1759KB) AllocSpace objects, 18(1676KB) LOS objects, 49% free, 2772KB/5544KB, paused 104us,14us total 212.361ms
+D/EGL_emulation( 6131): app_time_stats: avg=135.37ms min=19.84ms max=344.51ms count=8
+D/EGL_emulation( 6131): app_time_stats: avg=658.21ms min=654.55ms max=661.87ms count=2
+W/WindowOnBackDispatcher( 6131): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 6131): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 6131): Sending viewport metrics to the engine.
+D/EGL_emulation( 6131): app_time_stats: avg=117.65ms min=20.66ms max=359.82ms count=9
+D/EGL_emulation( 6131): app_time_stats: avg=503.30ms min=455.27ms max=551.33ms count=2
+D/EGL_emulation( 6131): app_time_stats: avg=237.65ms min=29.05ms max=536.13ms count=6
+D/EGL_emulation( 6131): app_time_stats: avg=716.56ms min=457.14ms max=975.98ms count=2
+I/flutter ( 6131): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 6131): The following assertion was thrown running a test:
+I/flutter ( 6131): The finder "Found 0 widgets with text "b": []" (used in a call to "tap()") could not find any
+I/flutter ( 6131): matching widgets.
+I/flutter ( 6131): 
+I/flutter ( 6131): When the exception was thrown, this was the stack:
+I/flutter ( 6131): #0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2094:7)
+I/flutter ( 6131): #1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1946:12)
+I/flutter ( 6131): #2      WidgetController.tap (package:flutter_test/src/controller.dart:1079:7)
+I/flutter ( 6131): #3      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:155:15)
+I/flutter ( 6131): <asynchronous suspension>
+I/flutter ( 6131): #4      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:177:5)
+I/flutter ( 6131): <asynchronous suspension>
+I/flutter ( 6131): #5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 6131): <asynchronous suspension>
+I/flutter ( 6131): #6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 6131): <asynchronous suspension>
+I/flutter ( 6131): #7      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 6131): <asynchronous suspension>
+I/flutter ( 6131): 
+I/flutter ( 6131): The test description was:
+I/flutter ( 6131):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6131): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 6131): 00:12 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 6131):   Test failed. See exception logs above.
+I/flutter ( 6131):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 6131):   
+I/flutter ( 6131): 00:12 +0 -1: (tearDownAll)
+I/flutter ( 6131): 00:12 +1 -1: Some tests failed.
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with text "b": []" (used in a call to
+"tap()") could not find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2094:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1946:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1079:7)
+#3      main.<anonymous closure>.yuru (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:155:15)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:177:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#7      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+

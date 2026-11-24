@@ -1,0 +1,19 @@
+EMULATOR_MODEL=sdk_gphone64_x86_64
+ANDROID=14
+EKRAN 320 dp: Override size: 720x1520 / Override density: 360
+DRIVE_HATA_320
+EKRAN 390 dp: Override size: 1170x2400 / Override density: 480
+DRIVE_HATA_390
+APK kuruldu
+EKRAN 390 dp: Override size: 1170x2400 / Override density: 480
+EKRAN 320 dp: Override size: 720x1520 / Override density: 360
+EKRAN 390 dp: Override size: 1170x2400 / Override density: 480
+EKRAN 320 dp: Override size: 720x1520 / Override density: 360
+SURE_SN acilis-320-hareket-azalt=7.232633
+KARE_SAYISI acilis-320-hareket-azalt=22
+SURE_SN acilis-320-ilk-acilis=3.768756
+KARE_SAYISI acilis-320-ilk-acilis=32
+SURE_SN acilis-390-ikinci-acilis=4.697011
+KARE_SAYISI acilis-390-ikinci-acilis=34
+SURE_SN acilis-390-ilk-acilis=5.103056
+KARE_SAYISI acilis-390-ilk-acilis=23

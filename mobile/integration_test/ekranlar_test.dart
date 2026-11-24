@@ -139,7 +139,16 @@ void main() {
       }
     }
 
+    /// Gerçek cihazda ağ/çizim zamanı gerçek geçer: bulucu çıkana dek (en çok ~8 sn) kısa adımlarla bekler.
+    Future<void> bekleBul(Finder f) async {
+      for (var i = 0; i < 40 && f.evaluate().isEmpty; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await t.pump(const Duration(milliseconds: 100));
+      }
+    }
+
     Future<void> dokunKisa(Finder f) async {
+      await bekleBul(f);
       await t.ensureVisible(f);
       await t.pump(const Duration(milliseconds: 200));
       await t.tap(f);
@@ -196,16 +205,19 @@ void main() {
       await ek('45-deneme-baslangic-$tema');
       await dokun('Denemeyi başlat');
       await kisa();
+      await bekleBul(find.byKey(const ValueKey('deneme-sik-2')));
       await t.tap(find.byKey(const ValueKey('deneme-sik-2')));
       await kisa();
       expect(t.takeException(), isNull);
       await binding.takeScreenshot('$g-46-deneme-soru-$tema');
       await dokunKisa(find.text('Sonraki'));
+      await bekleBul(find.byKey(const ValueKey('deneme-sik-1')));
       await t.tap(find.byKey(const ValueKey('deneme-sik-1')));
       await kisa(3);
       await dokunKisa(find.text('Bitir'));
       await dokunKisa(find.byKey(const ValueKey('deneme-bitir-onay')));
-      await kisa(12);
+      await bekleBul(find.byKey(const ValueKey('deneme-net')));
+      await kisa(4);
       expect(find.byKey(const ValueKey('deneme-net')), findsOneWidget);
       expect(t.takeException(), isNull);
       await binding.takeScreenshot('$g-47-deneme-sonuc-$tema');

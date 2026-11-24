@@ -46,7 +46,11 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
     return (o, h);
   }
 
-  void _yenile() => setState(() => _f = _yukle());
+  void _yenile() {
+    setState(() {
+      _f = _yukle();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

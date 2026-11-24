@@ -184,13 +184,17 @@ class _AyarlarSekmesiState extends State<AyarlarSekmesi> {
                 ),
                 const SizedBox(height: 14),
                 if (s.connectionState != ConnectionState.done)
-                  const KartKutu(child: Row(children: [SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 12), Text('Profilin getiriliyor…')]))
+                  const KartKutu(child: Row(children: [SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 12), Flexible(child: Text('Profilin getiriliyor…'))]))
                 else if (s.hasError)
                   KartKutu(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('Profil getirilemedi: ${hataMetni(s.error!)}', style: TextStyle(color: t.uyari)),
                       const SizedBox(height: 10),
-                      AkeDugme('Tekrar dene', tur: DugmeTuru.cizgili, genis: false, basinca: () => setState(() => _f = _yukle())),
+                      AkeDugme('Tekrar dene', tur: DugmeTuru.cizgili, genis: false, basinca: () {
+                        setState(() {
+                          _f = _yukle();
+                        });
+                      }),
                     ]),
                   )
                 else if (yuklendi) _profilKarti(t),

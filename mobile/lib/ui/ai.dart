@@ -57,7 +57,11 @@ class _AiSekmesiState extends State<AiSekmesi> {
     return d;
   }
 
-  void _yenile() => setState(() => _durum = _yukle());
+  void _yenile() {
+    setState(() {
+      _durum = _yukle();
+    });
+  }
 
   Future<void> _kodBagla() async {
     final k = _kod.text.trim();

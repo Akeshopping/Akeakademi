@@ -40,7 +40,7 @@ class MenuSekmesi extends StatelessWidget {
                   Icon(Icons.arrow_back_rounded, size: 20, color: t.murekkep2),
                   const SizedBox(width: 8),
                   Text('Menü', style: TextStyle(color: t.murekkep2, fontWeight: FontWeight.w600)),
-                  Text('  ›  $baslik', style: TextStyle(color: t.murekkep3)),
+                  Flexible(child: Text('  ›  $baslik', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: t.murekkep3))),
                 ]),
               ),
             ),

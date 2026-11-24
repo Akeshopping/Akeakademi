@@ -37,7 +37,11 @@ class _SoruCozSekmesiState extends State<SoruCozSekmesi> {
     super.dispose();
   }
 
-  void _yenile() => setState(() => _ozet = widget.model.api.ozet());
+  void _yenile() {
+    setState(() {
+      _ozet = widget.model.api.ozet();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

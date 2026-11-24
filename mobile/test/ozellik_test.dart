@@ -234,8 +234,7 @@ void main() {
       await t.tap(find.byKey(const ValueKey('gun-1')));
       await t.tap(find.text('Türkçe').last);
       await t.pumpAndSettle();
-      await t.tap(find.byKey(const ValueKey('gorev-kaydet')));
-      await t.pumpAndSettle();
+      await gorunurDokun(t, find.byKey(const ValueKey('gorev-kaydet')));
       expect(find.text('Paragraf: 25 soru'), findsOneWidget);
       var yaz = s.veriYazmalari.last;
       expect(yaz['_alan'], 'plan');

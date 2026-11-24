@@ -22,6 +22,7 @@ class SahteSunucu {
   bool soruServisiAcik = true;
   bool limitDoldu = false;
   bool agYok = false;
+  String aciklama = 'Açıklama metni'; // cevaptan sonra dönen açıklama (uzun açıklama testi için değiştirilebilir)
   int cevapSayisi = 0;
   int ilerlemeHata500 = 0; // ilk N /ilerleme isteği 500 dönsün
   final List<Map<String, dynamic>> sorular = [
@@ -108,7 +109,7 @@ class SahteSunucu {
         cevapSayisi++;
         final dogru = dogruSecenek[b['soru']]!;
         (cevaplar[b['oturum'] as String] ??= []).add((b['soru'] as String, b['secim'] as int));
-        return _y(200, {'dogru': b['secim'] == dogru, 'a': dogru, 'x': 'Açıklama metni'});
+        return _y(200, {'dogru': b['secim'] == dogru, 'a': dogru, 'x': aciklama});
       }
       if (yol == '/api/soru/bitir') return _y(200, {'oturum': b['oturum'], 'mod': 'practice', 'dogru': 1, 'yanlis': 1, 'bos': 0, 'sorular': []});
     }

@@ -10,7 +10,13 @@ import 'sahte_sunucu.dart';
 
 UygulamaModeli kurModel(SahteSunucu s, [BellekDeposu? depo]) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: depo ?? BellekDeposu());
-  return UygulamaModeli(api, IlerlemeSenkron(api));
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'})); // açılış animasyonu bu testlerde kapalı (kendi testi var)
+}
+
+/// Alt gezinmeden "Soru çöz" sekmesine geç.
+Future<void> sorulariAc(WidgetTester t) async {
+  await t.tap(find.byKey(const ValueKey('sekme-1')));
+  await t.pumpAndSettle();
 }
 
 Future<void> buyukEkran(WidgetTester t) async {
@@ -37,6 +43,7 @@ void main() {
     await t.tap(find.text('Giriş yap'));
     await t.pumpAndSettle();
 
+    await sorulariAc(t);
     expect(find.text('Hangi sınava çalışıyorsun?'), findsOneWidget);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
@@ -72,7 +79,7 @@ void main() {
     expect(s.ilerlemeler['u1']!['mat|Sayılar'], [1, 1, 0]);
     expect(s.istekler.where((r) => r.url.path.startsWith('/api/hesap/veri/')), isEmpty);
 
-    await t.tap(find.text('Hesabımdaki ilerleme'));
+    await t.tap(find.text('Gelişimimi gör'));
     await t.pumpAndSettle();
     expect(find.text('1 doğru · 1 yanlış · %50'), findsOneWidget);
     // Cevap anahtarı hiçbir istek gövdesinde ya da istemci modelinde yok; çerez hiç gönderilmedi
@@ -93,6 +100,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     expect(find.text('Hangi sınava çalışıyorsun?'), findsOneWidget);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
@@ -111,6 +119,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
     s.oturumGecerli = false;
@@ -127,6 +136,7 @@ void main() {
     s.agYok = false;
     await t.tap(find.text('Tekrar dene'));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     expect(find.text('Hangi sınava çalışıyorsun?'), findsOneWidget);
   });
 
@@ -135,6 +145,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     expect(find.text('Soru servisi henüz açık değil'), findsOneWidget);
   });
 
@@ -144,6 +155,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
     await t.tap(find.text('Matematik'));
@@ -161,6 +173,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
     await t.tap(find.text('Matematik'));
@@ -183,6 +196,7 @@ void main() {
     await model.baslat();
     await t.pumpWidget(AkeUygulamasi(model: model));
     await t.pumpAndSettle();
+    await sorulariAc(t);
     await t.tap(find.text('TYT'));
     await t.pumpAndSettle();
     await t.tap(find.text('Matematik'));

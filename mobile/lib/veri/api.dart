@@ -170,10 +170,11 @@ class AkeApi {
   // ---------- soru bankası (sunucu tarafı oturum; cevap anahtarı yalnızca cevaptan sonra gelir) ----------
   Future<Ozet> ozet() async => Ozet.fromJson(await _istek('GET', '/api/soru/ozet'));
 
-  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu}) async {
+  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu, int? zorluk}) async {
     final g = <String, dynamic>{'istek': istek, 'mod': 'practice', 'adet': adet};
     if (ders != null) g['ders'] = ders;
     if (konu != null) g['konu'] = konu;
+    if (zorluk != null) g['zorluk'] = zorluk; // 1 kolay · 2 orta · 3 zor; yoksa karışık
     return OturumYaniti.fromJson(await _istek('POST', '/api/soru/oturum', govde: g));
   }
 

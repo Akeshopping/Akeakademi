@@ -86,6 +86,37 @@ void main() {
     expect(s.istekler.any((r) => r.headers.containsKey('cookie')), isFalse);
   });
 
+  testWidgets('zorluk seçimi sunucu isteğine gider; seçilmezse zorluk alanı hiç gönderilmez (karışık)', (t) async {
+    await buyukEkran(t);
+    final s = SahteSunucu(), model = kurModel(s, BellekDeposu(SahteSunucu.anahtar));
+    await model.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: model));
+    await t.pumpAndSettle();
+    await sorulariAc(t);
+    await t.tap(find.text('TYT'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Matematik'));
+    await t.pumpAndSettle();
+    expect(find.text('Karışık 10 soru'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('zorluk-3')));
+    await t.pumpAndSettle();
+    expect(find.text('10 zor soru'), findsOneWidget);
+    await t.tap(find.text('10 zor soru'));
+    await t.pumpAndSettle();
+    final govde = s.istekler.where((r) => r.url.path == '/api/soru/oturum').map((r) => r.body).single;
+    expect(govde, contains('"zorluk":3'));
+    // geri dönüp karışık seç: zorluk alanı gönderilmez
+    Navigator.of(t.element(find.byType(Scaffold).last)).pop();
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('zorluk-0')));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Karışık 10 soru'));
+    await t.pumpAndSettle();
+    final govdeler = s.istekler.where((r) => r.url.path == '/api/soru/oturum').map((r) => r.body).toList();
+    expect(govdeler.length, 2);
+    expect(govdeler.last.contains('zorluk'), isFalse);
+  });
+
   testWidgets('kayıtlı oturum süresi dolmuşsa açılışta "oturum süresi doldu" ekranı', (t) async {
     final s = SahteSunucu()..oturumGecerli = false, model = kurModel(s, BellekDeposu(SahteSunucu.anahtar));
     await model.baslat();

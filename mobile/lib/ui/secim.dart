@@ -212,6 +212,7 @@ class KonuEkrani extends StatefulWidget {
 
 class _KonuEkraniState extends State<KonuEkrani> {
   Map<String, KonuIlerlemesi> _ilerleme = const {};
+  int? _zorluk; // null = karışık
 
   @override
   void initState() {
@@ -225,7 +226,7 @@ class _KonuEkraniState extends State<KonuEkrani> {
 
   void _baslat(String? konu) {
     Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (_) => SoruEkrani(model: widget.model, ders: widget.ders, konu: konu),
+      builder: (_) => SoruEkrani(model: widget.model, ders: widget.ders, konu: konu, zorluk: _zorluk),
     ));
   }
 
@@ -242,7 +243,9 @@ class _KonuEkraniState extends State<KonuEkrani> {
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
               children: [
-                AkeDugme('Karışık 10 soru', basinca: () => _baslat(null), simge: Icons.shuffle_rounded),
+                _ZorlukSecici(secili: _zorluk, degisti: (z) => setState(() => _zorluk = z)),
+                const SizedBox(height: 12),
+                AkeDugme(_zorluk == null ? 'Karışık 10 soru' : '10 ${_zorlukAdi(_zorluk!).toLowerCase()} soru', basinca: () => _baslat(null), simge: Icons.shuffle_rounded),
                 const SizedBox(height: 16),
                 for (final k in adlar) ...[
                   Semantics(
@@ -280,5 +283,51 @@ class _KonuEkraniState extends State<KonuEkrani> {
     if (p == null || p.cozulen == 0) return '$n soru';
     final yuzde = (p.dogru * 100 / p.cozulen).round();
     return '$n soru · ${p.cozulen} çözüldü · %$yuzde doğru';
+  }
+}
+
+String _zorlukAdi(int z) => z == 1 ? 'Kolay' : (z == 2 ? 'Orta' : 'Zor');
+
+/// Sitedeki "Zorluk" seçimi: Karışık · Kolay · Orta · Zor (sunucu `zorluk` filtresi 1/2/3; yoksa karışık).
+class _ZorlukSecici extends StatelessWidget {
+  final int? secili;
+  final ValueChanged<int?> degisti;
+  const _ZorlukSecici({required this.secili, required this.degisti});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final secenekler = <(int?, String)>[(null, 'Karışık'), (1, 'Kolay'), (2, 'Orta'), (3, 'Zor')];
+    return Semantics(
+      container: true,
+      label: 'Zorluk seçimi',
+      child: Row(children: [
+        for (var i = 0; i < secenekler.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(
+            child: Semantics(
+              button: true,
+              selected: secili == secenekler[i].$1,
+              child: ExcludeSemantics(
+                child: AkeDokun(
+                  basinca: () => degisti(secenekler[i].$1),
+                  child: Container(
+                    key: ValueKey('zorluk-${secenekler[i].$1 ?? 0}'),
+                    height: 48,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: secili == secenekler[i].$1 ? t.girinti : t.kart,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: secili == secenekler[i].$1 ? t.murekkep : t.cizgi, width: secili == secenekler[i].$1 ? 1.6 : 1),
+                    ),
+                    child: Text(secenekler[i].$2, maxLines: 1, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: secili == secenekler[i].$1 ? t.murekkep : t.murekkep2)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ]),
+    );
   }
 }

@@ -117,7 +117,7 @@ class _UstCubuk extends StatelessWidget {
         child: Row(children: [
           const AmblemKutu(boyut: 32),
           const SizedBox(width: 10),
-          Expanded(child: Align(alignment: Alignment.centerLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AkeYaziMarka(renk: t.ustMetin, akademiGoster: MediaQuery.sizeOf(context).width > 350)))),
+          Expanded(child: Align(alignment: Alignment.centerLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AkeYaziMarka(renk: t.ustMetin, akademiGoster: false)))),
           Semantics(
             button: true,
             label: 'Hesabım ve ayarlar',

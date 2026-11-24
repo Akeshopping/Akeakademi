@@ -19,7 +19,8 @@ class SoruEkrani extends StatefulWidget {
   final String ders;
   final String? konu;
   final int adet;
-  const SoruEkrani({super.key, required this.model, required this.ders, this.konu, this.adet = 10});
+  final int? zorluk;
+  const SoruEkrani({super.key, required this.model, required this.ders, this.konu, this.adet = 10, this.zorluk});
   @override
   State<SoruEkrani> createState() => _SoruEkraniState();
 }
@@ -63,7 +64,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
       _hata = null;
     });
     try {
-      final o = await _api.oturumOlustur(istek: _istekKimligi, adet: widget.adet, ders: widget.ders, konu: widget.konu);
+      final o = await _api.oturumOlustur(istek: _istekKimligi, adet: widget.adet, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk);
       if (!mounted) return;
       setState(() {
         _oturum = o;
@@ -125,7 +126,7 @@ class _SoruEkraniState extends State<SoruEkrani> {
     try {
       final s = await _api.bitir(o.oturum);
       if (!mounted) return;
-      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SonucEkrani(model: widget.model, sonuc: s, ders: widget.ders, konu: widget.konu)));
+      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SonucEkrani(model: widget.model, sonuc: s, ders: widget.ders, konu: widget.konu, zorluk: widget.zorluk)));
     } catch (e) {
       if (mounted) setState(() => _cevapHatasi = e);
     } finally {
@@ -431,7 +432,8 @@ class SonucEkrani extends StatelessWidget {
   final OturumSonucu sonuc;
   final String ders;
   final String? konu;
-  const SonucEkrani({super.key, required this.model, required this.sonuc, required this.ders, this.konu});
+  final int? zorluk;
+  const SonucEkrani({super.key, required this.model, required this.sonuc, required this.ders, this.konu, this.zorluk});
 
   @override
   Widget build(BuildContext context) {
@@ -489,7 +491,7 @@ class SonucEkrani extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
-        AkeDugme('Yeni 10 soru', basinca: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: ders, konu: konu))), simge: Icons.refresh_rounded),
+        AkeDugme('Yeni 10 soru', basinca: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: ders, konu: konu, zorluk: zorluk))), simge: Icons.refresh_rounded),
         const SizedBox(height: 12),
         AkeDugme('Gelişimimi gör', tur: DugmeTuru.cizgili, basinca: () {
           Navigator.of(context).popUntil((r) => r.isFirst);

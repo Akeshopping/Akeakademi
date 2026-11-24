@@ -205,11 +205,11 @@ void main() {
       await ek('45-deneme-baslangic-$tema');
       await dokun('Denemeyi başlat');
       await kisa();
-      await bekleBul(find.byKey(const ValueKey('deneme-sik-2')));
-      if (find.byKey(const ValueKey('deneme-sik-2')).evaluate().isEmpty) {
+      await bekleBul(find.byKey(const ValueKey('deneme-sik-1')));
+      if (find.byKey(const ValueKey('deneme-sik-1')).evaluate().isEmpty) {
         await binding.takeScreenshot('$g-HATA-deneme-baslamadi-$tema');
       }
-      await t.tap(find.byKey(const ValueKey('deneme-sik-2')));
+      await t.tap(find.byKey(const ValueKey('deneme-sik-1')));
       await kisa();
       expect(t.takeException(), isNull);
       await binding.takeScreenshot('$g-46-deneme-soru-$tema');

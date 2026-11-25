@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../durum/uygulama.dart';
 import '../veri/api.dart';
+import '../veri/deneme_plani.dart';
 import '../veri/katalog.dart';
 import '../veri/modeller.dart';
 import '../veri/hesap_verisi.dart';
@@ -22,8 +24,9 @@ String sureMetni(int sn) {
   return '${dk.toString().padLeft(2, '0')}:${kal.toString().padLeft(2, '0')}';
 }
 
-/// "Deneme" sekmesi: süreli sınav oturumu. Cevap anahtarı bitene kadar sunucuda kalır; sonuç ve çözümler bitişte gelir.
-/// Bu sürümde: sunucudaki soru bankasından karışık ya da tek dersten deneme (20/40/80 soru). Bölümlü tam TYT/AYT ve canlı deneme YOK.
+/// "Deneme" sekmesi: sitedeki Deneme merkezi. Oturum (TYT, AYT Sayısal/EA/Sözel, YDT), uzunluk (tam, yarım, mini, kendi dağılımım),
+/// bölüm tablosu ve süre; cevap anahtarı bitene kadar sunucuda kalır. "Serbest" tek ders ya da karışık deneme (20/40/80 soru) içindir.
+/// Canlı deneme bu sürümde YOK.
 class DenemeSekmesi extends StatefulWidget {
   final UygulamaModeli model;
   const DenemeSekmesi({super.key, required this.model});
@@ -31,9 +34,16 @@ class DenemeSekmesi extends StatefulWidget {
   State<DenemeSekmesi> createState() => _DenemeSekmesiState();
 }
 
+const _serbest = 'SERBEST';
+
 class _DenemeSekmesiState extends State<DenemeSekmesi> {
   late Future<(Ozet, HesapDurumu)> _f;
-  String? _ders; // null = karışık
+  String _tur = 'TYT'; // oturum; profil alanına göre ilk yüklemede ayarlanır
+  bool _turSecildi = false;
+  DenemeUzunluk _uzunluk = DenemeUzunluk.tam;
+  final Map<String, int> _ozel = {};
+  int? _sureDk; // null = otomatik
+  String? _ders; // serbest: null = karışık
   int _adet = 20;
   List<DenemeKaydi> _gecmis = const []; // Gelişim ile aynı kaynak (hesaptaki `exams`); okunamazsa liste boş kalır, ekran bozulmaz
 
@@ -41,15 +51,39 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
   void initState() {
     super.initState();
     _f = _yukle();
+    widget.model.addListener(_modelDegisti);
+  }
+
+  @override
+  void dispose() {
+    widget.model.removeListener(_modelDegisti);
+    super.dispose();
+  }
+
+  /// Sekme zaten açıkken Ana sayfadan "Mini deneme" kısayolu gelirse ¼ uzunluk hemen seçilir.
+  void _modelDegisti() {
+    if (widget.model.denemeOnAyar == 'mini' && mounted) {
+      widget.model.denemeOnAyar = null;
+      setState(() {
+        _uzunluk = DenemeUzunluk.mini;
+        _sureDk = null;
+      });
+    }
   }
 
   Future<(Ozet, HesapDurumu)> _yukle() async {
     final o = await widget.model.api.ozet();
     final h = await widget.model.api.hesapDurumu();
     try {
-      _gecmis = (await widget.model.hesapVerisi()).denemeler;
+      final v = await widget.model.hesapVerisi();
+      _gecmis = v.denemeler;
+      if (!_turSecildi) _tur = DenemeKatalogu.varsayilanTur(v.alan);
     } catch (_) {
       _gecmis = const [];
+    }
+    if (widget.model.denemeOnAyar == 'mini') {
+      _uzunluk = DenemeUzunluk.mini; // Ana sayfa "Mini deneme" kısayolu (site: sıradaki mini deneme = ¼ uzunluk)
+      widget.model.denemeOnAyar = null;
     }
     return (o, h);
   }
@@ -58,6 +92,20 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
     setState(() {
       _f = _yukle();
     });
+  }
+
+  void _turSec(String k) => setState(() {
+        _tur = k;
+        _turSecildi = true;
+        _sureDk = null;
+      });
+
+  /// Seçime göre başlatılacak plan; başlatılamıyorsa null (soru yok).
+  DenemePlani? _plan(Ozet ozet, List<DenemeSatiri> etkin, int adetSerbest, int sure) {
+    if (_tur == _serbest) return DenemePlani(ders: _ders, adet: adetSerbest, sureDk: denemeSuresiDk(adetSerbest));
+    final top = etkin.fold(0, (a, b) => a + b.n);
+    if (top == 0) return null;
+    return DenemePlani(tur: _tur, uzunluk: _uzunluk, satirlar: etkin, adet: top, sureDk: sure);
   }
 
   @override
@@ -69,101 +117,234 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
         if (s.connectionState != ConnectionState.done) return const Yukleniyor(metin: 'Deneme hazırlanıyor…');
         if (s.hasError) return DurumKutusu(simge: Icons.cloud_off, baslik: 'Yüklenemedi', aciklama: hataMetni(s.error!), dugme: 'Tekrar dene', basinca: _yenile);
         final (ozet, hesap) = s.data!;
+        final serbest = _tur == _serbest;
+        // Serbest mod
         final dersler = Katalog.dersler.keys.where((d) => ozet.dersToplami(d) > 0).toList();
         final secilenToplam = _ders == null ? ozet.toplam : ozet.dersToplami(_ders!);
         final adetler = [20, 40, 80].where((a) => a <= secilenToplam || a == 20).toList();
-        final adet = adetler.contains(_adet) ? _adet : adetler.first;
+        final adetS = adetler.contains(_adet) ? _adet : adetler.first;
+        // Bölümlü mod: havuzda olmayan sorular istenmez (sunucuya giden sayı = en çok havuz kadar)
+        final tur = DenemeKatalogu.tur(_tur == _serbest ? 'TYT' : _tur);
+        final satirlar = DenemeKatalogu.satirlar(tur, _uzunluk, _ozel);
+        final etkin = [for (final r in satirlar) if (math.min(r.n, ozet.dersToplami(r.ders)) > 0) DenemeSatiri(r.bolum, r.ders, r.tam, math.min(r.n, ozet.dersToplami(r.ders)))];
+        final istenen = satirlar.fold(0, (a, b) => a + b.n);
+        final toplam = etkin.fold(0, (a, b) => a + b.n);
+        final otomatik = DenemeKatalogu.otomatikSure(tur, toplam);
+        final sure = _sureDk ?? otomatik;
+        final plan = _plan(ozet, etkin, adetS, sure);
         final hakYok = !hesap.paketli && hesap.kalanDeneme != null && hesap.kalanDeneme! < 1;
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
-          children: [
-            const Text('Deneme', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, height: 1.15)),
-            const SizedBox(height: 4),
-            Text('Süreli sınav: cevaplar bitene kadar açıklanmaz.', style: TextStyle(color: t.murekkep2, height: 1.4)),
-            const SizedBox(height: 14),
-            KartKutu(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Ders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  _Secenek(ad: 'Karışık', secili: _ders == null, basinca: () => setState(() => _ders = null), anahtar: 'deneme-ders-karisik'),
-                  for (final d in dersler) _Secenek(ad: Katalog.dersAdi(d), secili: _ders == d, basinca: () => setState(() => _ders = d), anahtar: 'deneme-ders-$d'),
-                ]),
-                const SizedBox(height: 16),
-                const Text('Soru sayısı', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  for (final a in adetler) _Secenek(ad: '$a soru · ${denemeSuresiDk(a)} dk', secili: adet == a, basinca: () => setState(() => _adet = a), anahtar: 'deneme-adet-$a'),
-                ]),
-              ]),
-            ),
-            const SizedBox(height: 12),
-            KartKutu(
-              renk: hakYok ? t.uyariZemin : null,
-              kenar: hakYok ? t.uyari : null,
-              child: Row(children: [
-                Icon(hesap.paketli ? Icons.verified_rounded : Icons.timer_outlined, color: hakYok ? t.uyari : t.murekkep2),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    hesap.paketli
-                        ? 'Paketin aktif: deneme sayısı sınırsız.'
-                        : (hesap.kalanDeneme == null ? 'Ücretsiz hesap: bu ay deneme hakkı sunucudan okunamadı.' : (hakYok ? 'Bu ayki ücretsiz deneme hakkın bitti.' : 'Ücretsiz hesap: bu ay ${hesap.kalanDeneme} deneme hakkın var.')),
-                    style: TextStyle(color: hakYok ? t.uyari : t.murekkep, height: 1.35),
-                  ),
+        final eksik = [for (final r in satirlar) if (r.n > ozet.dersToplami(r.ders)) '${Katalog.dersAdi(r.ders)} (${ozet.dersToplami(r.ders)})'];
+        final ozetMetni = serbest ? '$adetS soru · ${denemeSuresiDk(adetS)} dk' : '$toplam soru · ${sure == 0 ? 'süresiz' : '$sure dk'}';
+        return Column(children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              children: [
+                const Text('Deneme merkezi', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, height: 1.15)),
+                const SizedBox(height: 4),
+                Text('Süreyi yönet, dersleri karıştır; sonucunu ders ders incele. Cevaplar bitene kadar açıklanmaz.', style: TextStyle(color: t.murekkep2, height: 1.4)),
+                const SizedBox(height: 14),
+                KartKutu(
+                  renk: hakYok ? t.uyariZemin : null,
+                  kenar: hakYok ? t.uyari : null,
+                  child: Row(children: [
+                    Icon(hesap.paketli ? Icons.verified_rounded : Icons.timer_outlined, color: hakYok ? t.uyari : t.murekkep2),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        hesap.paketli
+                            ? 'Paketin aktif: deneme sayısı sınırsız.'
+                            : (hesap.kalanDeneme == null ? 'Ücretsiz hesap: bu ay deneme hakkı sunucudan okunamadı.' : (hakYok ? 'Bu ayki ücretsiz deneme hakkın bitti.' : 'Ücretsiz hesap: bu ay ${hesap.kalanDeneme} deneme hakkın var.')),
+                        style: TextStyle(color: hakYok ? t.uyari : t.murekkep, height: 1.35),
+                      ),
+                    ),
+                  ]),
                 ),
-              ]),
+                const SizedBox(height: 12),
+                KartKutu(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('Oturum', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 10),
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final x in DenemeKatalogu.turler) _Secenek(ad: x.ad, secili: _tur == x.kod, basinca: () => _turSec(x.kod), anahtar: 'deneme-tur-${x.kod}'),
+                      _Secenek(ad: 'Serbest', secili: serbest, basinca: () => _turSec(_serbest), anahtar: 'deneme-tur-serbest'),
+                    ]),
+                    const SizedBox(height: 10),
+                    Text(
+                      serbest ? 'Tek ders ya da karışık, 20/40/80 soru.' : '${tur.uzun} · resmî oturum ${tur.tamSoru} soru, ${tur.dakika} dakika',
+                      key: const ValueKey('deneme-tur-aciklama'),
+                      style: TextStyle(color: t.murekkep2, fontSize: 13, height: 1.35),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: 12),
+                if (serbest)
+                  KartKutu(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Text('Ders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        _Secenek(ad: 'Karışık', secili: _ders == null, basinca: () => setState(() => _ders = null), anahtar: 'deneme-ders-karisik'),
+                        for (final d in dersler) _Secenek(ad: Katalog.dersAdi(d), secili: _ders == d, basinca: () => setState(() => _ders = d), anahtar: 'deneme-ders-$d'),
+                      ]),
+                      const SizedBox(height: 16),
+                      const Text('Soru sayısı', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        for (final a in adetler) _Secenek(ad: '$a soru · ${denemeSuresiDk(a)} dk', secili: adetS == a, basinca: () => setState(() => _adet = a), anahtar: 'deneme-adet-$a'),
+                      ]),
+                    ]),
+                  )
+                else ...[
+                  KartKutu(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Text('Uzunluk', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        for (final u in DenemeUzunluk.values) _Secenek(ad: u.ad, secili: _uzunluk == u, basinca: () => setState(() { _uzunluk = u; _sureDk = null; }), anahtar: 'deneme-uzunluk-${u.kod}'),
+                      ]),
+                    ]),
+                  ),
+                  const SizedBox(height: 12),
+                  _BolumTablosu(satirlar: satirlar, ozet: ozet, ozel: _uzunluk == DenemeUzunluk.ozel, toplam: istenen, degistir: (r, d) => setState(() { _ozel[r.anahtar] = (r.n + d).clamp(0, r.tam).toInt(); _sureDk = null; })),
+                  if (eksik.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text('Havuzda yeterli soru olmayan dersler (en çok o kadar gelir): ${eksik.join(', ')}.', key: const ValueKey('deneme-havuz-uyari'), style: TextStyle(color: t.uyari, fontSize: 12.5, height: 1.4)),
+                  ],
+                  const SizedBox(height: 12),
+                  KartKutu(
+                    child: Row(children: [
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          const Text('Süre', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(_sureDk == null ? 'Otomatik: $otomatik dk' : (sure == 0 ? 'Süresiz çalışma' : 'Kendi süren'), key: const ValueKey('deneme-sure-aciklama'), style: TextStyle(color: t.murekkep2, fontSize: 13)),
+                        ]),
+                      ),
+                      _Adimlayici(
+                        anahtar: 'deneme-sure',
+                        metin: sure == 0 ? '∞' : '$sure',
+                        azalt: sure <= 0 ? null : () => setState(() => _sureDk = math.max(0, sure - 5)),
+                        arttir: sure >= 300 ? null : () => setState(() => _sureDk = math.min(300, sure + 5)),
+                      ),
+                    ]),
+                  ),
+                ],
+                if (_gecmis.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  DenemeGecmisiKarti(denemeler: _gecmis),
+                ],
+                const SizedBox(height: 10),
+                Text('Canlı deneme bu sürümde yok. Deneme sonucu bitince Gelişim geçmişine kaydedilir.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
+              ],
             ),
-            const SizedBox(height: 16),
-            AkeDugme(
-              'Denemeyi başlat',
-              simge: Icons.play_arrow_rounded,
-              basinca: hakYok || secilenToplam == 0
-                  ? null
-                  : () async {
-                      await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DenemeEkrani(model: widget.model, ders: _ders, adet: adet)));
-                      if (mounted) _yenile();
-                    },
-            ),
-            const SizedBox(height: 14),
-            KartKutu(
-              key: const ValueKey('deneme-ozet'),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Bu denemede', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                _OzetSatiri('Ders', _ders == null ? 'Karışık' : Katalog.dersAdi(_ders!)),
-                _OzetSatiri('Soru', '$adet'),
-                _OzetSatiri('Süre', '${denemeSuresiDk(adet)} dk'),
-                _OzetSatiri('Net', 'doğru − yanlış ÷ 4 · boş bırakabilirsin'),
-              ]),
-            ),
-            if (_gecmis.isNotEmpty) ...[
-              const SizedBox(height: 14),
-              DenemeGecmisiKarti(denemeler: _gecmis),
-            ],
-            const SizedBox(height: 10),
-            Text('Bölümlü tam TYT/AYT denemesi ve canlı deneme bu sürümde yok. Deneme sonucu bitince Gelişim geçmişine kaydedilir.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
-          ],
-        );
+          ),
+          Container(
+            decoration: BoxDecoration(color: t.kart, border: Border(top: BorderSide(color: t.cizgi))),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            child: Row(children: [
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Text(serbest ? 'Serbest deneme' : (_uzunluk == DenemeUzunluk.tam ? tur.ad : '${tur.ad} · ${_uzunluk.ad}'), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(ozetMetni, key: const ValueKey('deneme-ozet'), style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
+                ]),
+              ),
+              const SizedBox(width: 10),
+              AkeDugme(
+                'Denemeyi başlat',
+                simge: Icons.play_arrow_rounded,
+                genis: false,
+                basinca: hakYok || plan == null
+                    ? null
+                    : () async {
+                        await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DenemeEkrani(model: widget.model, plan: plan)));
+                        if (mounted) _yenile();
+                      },
+              ),
+            ]),
+          ),
+        ]);
       },
     );
   }
 }
 
-class _OzetSatiri extends StatelessWidget {
-  final String ad;
-  final String deger;
-  const _OzetSatiri(this.ad, this.deger);
+/// Bölüm tablosu (site: Bölüm · Ders · Havuz · Soru). "Kendi dağılımım"da her satır − / + ile ayarlanır.
+class _BolumTablosu extends StatelessWidget {
+  final List<DenemeSatiri> satirlar;
+  final Ozet ozet;
+  final bool ozel;
+  final int toplam;
+  final void Function(DenemeSatiri, int) degistir;
+  const _BolumTablosu({required this.satirlar, required this.ozet, required this.ozel, required this.toplam, required this.degistir});
+
   @override
   Widget build(BuildContext context) {
     final t = context.ake;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 56, child: Text(ad, style: TextStyle(color: t.murekkep3, fontSize: 12.5, fontWeight: FontWeight.w700))),
-        Expanded(child: Text(deger, style: TextStyle(color: t.murekkep, fontSize: 14))),
+    String? son;
+    return KartKutu(
+      key: const ValueKey('deneme-bolumler'),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Expanded(child: Text('Bölümler', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
+          Text('Havuz · Soru', style: TextStyle(color: t.murekkep3, fontSize: 12)),
+        ]),
+        const SizedBox(height: 4),
+        for (final r in satirlar) ...[
+          if (r.bolum != (son)) Padding(padding: const EdgeInsets.only(top: 10), child: Text((son = r.bolum), style: TextStyle(color: t.murekkep, fontWeight: FontWeight.w800, fontSize: 13.5))),
+          Container(
+            constraints: const BoxConstraints(minHeight: 40),
+            child: Row(children: [
+              Expanded(child: Text(Katalog.dersAdi(r.ders), style: TextStyle(color: t.murekkep2, fontSize: 14))),
+              Text('${ozet.dersToplami(r.ders)}', key: ValueKey('deneme-havuz-${r.ders}'), style: TextStyle(color: t.murekkep3, fontSize: 12.5)),
+              const SizedBox(width: 12),
+              if (ozel)
+                _Adimlayici(anahtar: 'deneme-satir-${r.ders}', metin: '${r.n}', azalt: r.n <= 0 ? null : () => degistir(r, -1), arttir: r.n >= r.tam ? null : () => degistir(r, 1))
+              else
+                SizedBox(width: 36, child: Text('${r.n}', key: ValueKey('deneme-satir-${r.ders}'), textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w700))),
+            ]),
+          ),
+        ],
+        Container(
+          margin: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: t.cizgi))),
+          child: Row(children: [
+            const Expanded(child: Text('Toplam', style: TextStyle(fontWeight: FontWeight.w800))),
+            Text('$toplam', key: const ValueKey('deneme-toplam'), style: const TextStyle(fontWeight: FontWeight.w800)),
+          ]),
+        ),
       ]),
     );
+  }
+}
+
+/// − değer + (44 dp dokunma hedefi).
+class _Adimlayici extends StatelessWidget {
+  final String anahtar;
+  final String metin;
+  final VoidCallback? azalt;
+  final VoidCallback? arttir;
+  const _Adimlayici({required this.anahtar, required this.metin, required this.azalt, required this.arttir});
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    Widget dugme(String etiket, IconData ic, VoidCallback? f, String k) => Semantics(
+          button: true,
+          label: etiket,
+          child: ExcludeSemantics(
+            child: AkeDokun(
+              basinca: f,
+              child: Container(key: ValueKey(k), width: 44, height: 44, alignment: Alignment.center, child: Icon(ic, size: 22, color: f == null ? t.cizgi : t.murekkep)),
+            ),
+          ),
+        );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      dugme('Azalt', Icons.remove_rounded, azalt, '$anahtar-eksi'),
+      SizedBox(width: 38, child: Text(metin, key: ValueKey('$anahtar-deger'), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15))),
+      dugme('Artır', Icons.add_rounded, arttir, '$anahtar-arti'),
+    ]);
   }
 }
 
@@ -204,9 +385,8 @@ class _Secenek extends StatelessWidget {
 /// Sınav oturumu: soru gezinme paleti, geri sayım, cevap sunucuya yazılır (anahtar dönmez), bitirince sonuç.
 class DenemeEkrani extends StatefulWidget {
   final UygulamaModeli model;
-  final String? ders;
-  final int adet;
-  const DenemeEkrani({super.key, required this.model, this.ders, required this.adet});
+  final DenemePlani plan;
+  const DenemeEkrani({super.key, required this.model, required this.plan});
   @override
   State<DenemeEkrani> createState() => _DenemeEkraniState();
 }
@@ -221,7 +401,7 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
   bool _bitiyor = false;
   Object? _cevapHatasi;
   Timer? _zamanlayici;
-  late int _kalanSn = denemeSuresiDk(widget.adet) * 60;
+  late int _kalanSn = widget.plan.sureDk * 60; // süresizde (0) geçen süre sayılır
   final String _istek = UygulamaModeli.yeniIstekKimligi();
   final DateTime _baslangic = DateTime.now();
 
@@ -245,7 +425,10 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
       _hata = null;
     });
     try {
-      final o = await _api.oturumOlustur(istek: _istek, adet: widget.adet, ders: widget.ders, sinav: true);
+      final p = widget.plan;
+      final o = p.bolumlu
+          ? await _api.oturumOlustur(istek: _istek, adet: p.adet, sinav: true, bolumler: p.bolumlerJson(), tur: p.tur, uzunluk: p.uzunluk.kod)
+          : await _api.oturumOlustur(istek: _istek, adet: p.adet, ders: p.ders, sinav: true);
       if (!mounted) return;
       setState(() {
         _oturum = o;
@@ -265,7 +448,11 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
   void _tik() {
     if (!mounted || _oturum == null || _bitiyor) return;
     final gecen = DateTime.now().difference(_baslangic).inSeconds;
-    final kalan = denemeSuresiDk(widget.adet) * 60 - gecen;
+    if (widget.plan.sureDk == 0) {
+      setState(() => _kalanSn = gecen); // süresiz: geçen süre görünür, otomatik bitirme yok
+      return;
+    }
+    final kalan = widget.plan.sureDk * 60 - gecen;
     setState(() => _kalanSn = kalan);
     if (kalan <= 0) {
       _zamanlayici?.cancel();
@@ -326,7 +513,7 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
       }
       if (!mounted) return;
       _zamanlayici?.cancel();
-      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => DenemeSonucEkrani(model: widget.model, sonuc: s, sorular: o.sorular, sureDoldu: sureDoldu, harcananSn: DateTime.now().difference(_baslangic).inSeconds, ders: widget.ders, adet: widget.adet)));
+      await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => DenemeSonucEkrani(model: widget.model, sonuc: s, sorular: o.sorular, sureDoldu: sureDoldu, harcananSn: DateTime.now().difference(_baslangic).inSeconds, plan: widget.plan)));
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -377,7 +564,7 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
                   key: const ValueKey('deneme-sure'),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), color: Colors.white.withValues(alpha: 0.08)),
-                  child: Text(sureMetni(_kalanSn), style: rakamStili(_kalanSn < 300 ? AkeTok.acik.mercanAcik : AkeTok.porselen, 15, agirlik: FontWeight.w700)),
+                  child: Text(sureMetni(_kalanSn), style: rakamStili(widget.plan.sureDk > 0 && _kalanSn < 300 ? AkeTok.acik.mercanAcik : AkeTok.porselen, 15, agirlik: FontWeight.w700)),
                 ),
               ),
         govde: _yukleniyor
@@ -499,9 +686,8 @@ class DenemeSonucEkrani extends StatelessWidget {
   final List<Soru> sorular;
   final bool sureDoldu;
   final int harcananSn;
-  final String? ders;
-  final int adet;
-  const DenemeSonucEkrani({super.key, required this.model, required this.sonuc, required this.sorular, required this.sureDoldu, required this.harcananSn, required this.ders, required this.adet});
+  final DenemePlani plan;
+  const DenemeSonucEkrani({super.key, required this.model, required this.sonuc, required this.sorular, required this.sureDoldu, required this.harcananSn, required this.plan});
 
   @override
   Widget build(BuildContext context) {
@@ -525,18 +711,77 @@ class DenemeSonucEkrani extends StatelessWidget {
               Text('Süre: ${sureMetni(harcananSn)}', style: TextStyle(color: t.murekkep3, fontSize: 13)),
             ]),
           ),
+          if (plan.bolumlu && plan.bolumAdlari.length > 1) ...[
+            const SizedBox(height: 14),
+            _DersDers(plan: plan, sorular: sorular, satirlar: satirlar),
+          ],
           const SizedBox(height: 16),
           const Text('Soru soru çözümler', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
           for (var i = 0; i < sorular.length; i++) _SatirKarti(no: i + 1, soru: sorular[i], satir: satirlar[sorular[i].id]),
           const SizedBox(height: 12),
           AkeDugme('Yeni deneme', basinca: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => DenemeEkrani(model: model, ders: ders, adet: adet)));
+            Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => DenemeEkrani(model: model, plan: plan)));
           }),
           const SizedBox(height: 10),
           AkeDugme('Deneme sayfasına dön', tur: DugmeTuru.cizgili, basinca: () => Navigator.of(context).popUntil((r) => r.isFirst)),
         ],
       ),
+    );
+  }
+}
+
+/// Sitedeki "Ders ders" tablosu: bölüm başına D / Y / B / net (soru sonuçlarından hesaplanır).
+class _DersDers extends StatelessWidget {
+  final DenemePlani plan;
+  final List<Soru> sorular;
+  final Map<String, SonucSatir> satirlar;
+  const _DersDers({required this.plan, required this.sorular, required this.satirlar});
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final harita = plan.dersBolum;
+    final d = <String, int>{}, y = <String, int>{}, b = <String, int>{};
+    for (final q in sorular) {
+      final bolum = harita[q.ders];
+      if (bolum == null) continue;
+      final r = satirlar[q.id];
+      if (r?.secim == null) {
+        b[bolum] = (b[bolum] ?? 0) + 1;
+      } else if (r?.dogru == true) {
+        d[bolum] = (d[bolum] ?? 0) + 1;
+      } else {
+        y[bolum] = (y[bolum] ?? 0) + 1;
+      }
+    }
+    final adlar = plan.bolumAdlari.where((a) => (d[a] ?? 0) + (y[a] ?? 0) + (b[a] ?? 0) > 0).toList();
+    if (adlar.length < 2) return const SizedBox.shrink(); // site gibi: tek bölüm varsa ders ders tablosu gösterilmez
+    Widget hucre(String m, {bool kalin = false, double genislik = 34}) => SizedBox(width: genislik, child: Text(m, textAlign: TextAlign.right, style: TextStyle(fontWeight: kalin ? FontWeight.w800 : FontWeight.w500, fontSize: 13.5)));
+    String net(double v) => v.toStringAsFixed(2).replaceAll('.', ',');
+    return KartKutu(
+      key: const ValueKey('deneme-ders-ders'),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Ders ders', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: Text('Bölüm', style: TextStyle(color: t.murekkep3, fontSize: 12, fontWeight: FontWeight.w700))),
+          for (final h in ['D', 'Y', 'B']) hucre(h),
+          hucre('Net', genislik: 52),
+        ]),
+        for (final a in adlar)
+          Container(
+            constraints: const BoxConstraints(minHeight: 40),
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: t.cizgi))),
+            child: Row(children: [
+              Expanded(child: Text(a, style: const TextStyle(fontWeight: FontWeight.w600))),
+              hucre('${d[a] ?? 0}'),
+              hucre('${y[a] ?? 0}'),
+              hucre('${b[a] ?? 0}'),
+              SizedBox(width: 52, child: Text(net((d[a] ?? 0) - (y[a] ?? 0) / 4), key: ValueKey('deneme-bolum-net-$a'), textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w800))),
+            ]),
+          ),
+      ]),
     );
   }
 }

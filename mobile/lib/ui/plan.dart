@@ -6,6 +6,7 @@ import '../durum/uygulama.dart';
 import '../veri/api.dart';
 import '../veri/hesap_verisi.dart';
 import '../veri/katalog.dart';
+import 'odak.dart';
 import 'ortak.dart';
 import 'tema.dart';
 
@@ -47,11 +48,18 @@ class PlanDeposu {
   PlanDeposu(this.api);
 
   Future<(Map<String, dynamic>, int)> oku() async {
+    final (belge, surum, _) = await okuTam(DateTime.now());
+    return (belge, surum);
+  }
+
+  /// Plan belgesi + sürümü + hesaptaki bugünkü odak dakikası (aynı istekte okunur).
+  Future<(Map<String, dynamic>, int, int)> okuTam(DateTime simdi) async {
     final (alanlar, u) = await api.veriOkuSurumlu();
     // Sitenin belge biçimi: {_u, plan: {tasks: [...]}} (AREA.plan = ["plan"]).
     final doc = alanlar['plan'] is Map ? alanlar['plan'] as Map : const {};
     final belge = doc['plan'] is Map ? Map<String, dynamic>.from(doc['plan'] as Map) : <String, dynamic>{};
-    return (belge, u['plan'] ?? 0);
+    final fm = HesapVerisi.alanlardan(alanlar).bugun(simdi).odakDk;
+    return (belge, u['plan'] ?? 0, fm);
   }
 
   static List<GorevKaydi> gorevler(Map<String, dynamic> belge) {
@@ -97,6 +105,7 @@ class _PlanSekmesiState extends State<PlanSekmesi> {
   List<GorevKaydi>? _liste;
   Object? _hata;
   bool _yukleniyor = true;
+  int _bugunFm = 0; // hesaptaki bugünkü odak dakikası
   bool _kaydediliyor = false;
   String? _islemHatasi;
 
@@ -113,9 +122,10 @@ class _PlanSekmesiState extends State<PlanSekmesi> {
     });
     try {
       await widget.model.senkron.bosalt();
-      final (belge, _) = await _depo.oku();
+      final (belge, _, fm) = await _depo.okuTam(widget.model.saat());
       if (!mounted) return;
       setState(() {
+        _bugunFm = fm;
         _liste = PlanDeposu.gorevler(belge);
         _yukleniyor = false;
       });
@@ -209,6 +219,8 @@ class _PlanSekmesiState extends State<PlanSekmesi> {
             KartKutu(renk: t.uyariZemin, kenar: t.uyari, child: Text(_islemHatasi!, style: TextStyle(color: t.uyari))),
           ],
           const SizedBox(height: 14),
+          OdakKarti(model: widget.model, hesapBugunDk: _bugunFm),
+          const SizedBox(height: 14),
           if (liste.isEmpty)
             const KartKutu(child: Text('Henüz görevin yok. “Görev ekle” ile ilk görevini yaz.', style: TextStyle(height: 1.4)))
           else
@@ -233,7 +245,7 @@ class _PlanSekmesiState extends State<PlanSekmesi> {
             ]),
           ],
           const SizedBox(height: 8),
-          Text('AI ile plan hazırlama ve odak odası mobilde henüz yok.', style: TextStyle(color: t.murekkep3, fontSize: 12.5)),
+          Text('AI ile plan hazırlama mobilde henüz yok.', style: TextStyle(color: t.murekkep3, fontSize: 12.5)),
         ],
       ),
     );

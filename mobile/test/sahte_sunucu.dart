@@ -41,6 +41,11 @@ class SahteSunucu {
   bool silindi = false;
   int _sur(String a) => surumler[a] ?? ((veriAlanlari?.containsKey(a) ?? false) ? 1 : 0);
   String? sonOturumGovdesi;
+  // ---- odak odası ----
+  final List<Map<String, dynamic>> odakIstekleri = []; // gelen her /odak isteği (hatalı denemeler dahil)
+  final Set<String> odakTurlari = {};
+  int odakFm = 0;
+  bool odakHata = false;
   String? sonModu;
   final Map<String, List<(String soru, int secim)>> sinavCevaplari = {};
   int ilerlemeHata500 = 0; // ilk N /ilerleme isteği 500 dönsün
@@ -137,6 +142,12 @@ class SahteSunucu {
         });
       }
       final b = jsonDecode(r.body) as Map<String, dynamic>;
+      if (yol == '/api/soru/odak') {
+        odakIstekleri.add(b);
+        if (odakHata) return _y(503, {'error': 'gecici'});
+        if (odakTurlari.add('${b['tur']}')) odakFm += 25; // aynı tur ikinci kez sayılmaz (sunucu gibi)
+        return _y(200, {'fm': odakFm});
+      }
       if (yol == '/api/soru/oturum') {
         sonOturumGovdesi = r.body;
         sonModu = '${b['mod']}';

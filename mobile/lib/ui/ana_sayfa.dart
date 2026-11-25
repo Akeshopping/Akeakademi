@@ -6,6 +6,7 @@ import '../durum/uygulama.dart';
 import '../veri/hesap_verisi.dart';
 import '../veri/katalog.dart';
 import 'ortak.dart';
+import 'plan.dart';
 import 'soru.dart';
 import 'tema.dart';
 
@@ -31,6 +32,25 @@ class _AnaSayfaState extends State<AnaSayfa> {
     final v = await widget.model.hesapVerisi();
     widget.veriGeldi(v);
     return v;
+  }
+
+  bool _gorevMesgul = false;
+  String? _gorevHata;
+
+  /// Bugünün plan görevini işaretler: planı sürümle okur, koşullu yazar (409'da yeniden dener), sonra hesabı yeniler.
+  Future<void> _gorevIsaretle(String id, bool bitti) async {
+    if (_gorevMesgul || id.isEmpty) return;
+    setState(() => _gorevMesgul = true);
+    try {
+      await PlanDeposu(widget.model.api).uygula((l) => [for (final g in l) g.id == id ? g.kopya(bitti: bitti) : g]);
+      final y = _yukle();
+      if (mounted) setState(() => _f = y);
+      await y;
+    } catch (_) {
+      // Hata sessiz geçilmez: yenilenen veri eski kalır, kullanıcı Plan sekmesinde ayrıntıyı görür.
+    } finally {
+      if (mounted) setState(() => _gorevMesgul = false);
+    }
   }
 
   Future<void> _yenile() async {
@@ -76,26 +96,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
     final yuzde = bugun.soru == 0 ? 0 : (bugun.dogru * 100 / bugun.soru).round();
     final zayif = v.konular.where((k) => k.cozulen >= 5).toList()..sort((a, b) => a.yuzde.compareTo(b.yuzde));
     return [
-      KartKutu(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Expanded(child: Text('Bugünün hedefi', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700))),
-            const SizedBox(width: 8),
-            Hap('${bugun.soru}/${v.gunlukHedef} soru'),
-          ]),
-          const SizedBox(height: 14),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(value: oran, minHeight: 8, color: t.mercan, backgroundColor: t.girinti),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            bugun.soru == 0 ? 'Bugün henüz soru çözmedin. İlk soru seni bekliyor.' : 'Bugün ${bugun.soru} soru çözdün · %$yuzde doğru',
-            style: TextStyle(color: t.murekkep2, height: 1.4),
-          ),
-        ]),
-      ),
+      _Program(model: widget.model, veri: v, gorevIsaretle: _gorevIsaretle, mesgul: _gorevMesgul),
       const SizedBox(height: 14),
       KartKutu(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
@@ -114,6 +115,182 @@ class _AnaSayfaState extends State<AnaSayfa> {
         ]),
       ),
     ];
+  }
+}
+
+/// Sitedeki "Bugünün programı": günlük hedef, zayıf konular (10 soru), plandaki bugünkü görevler ve haftalık mini deneme.
+/// Hepsi hesaptaki gerçek veriden hesaplanır; "Sıradaki" ilk bitmemiş maddedir. Yanlış tekrarı ve kart tekrarı mobilde yok.
+class ProgramMaddesi {
+  final String baslik;
+  final String alt;
+  final bool bitti;
+  final String eylem; // Çöz / Başla
+  final VoidCallback? calistir;
+  final String? ders;
+  final String? gorevKimligi;
+  const ProgramMaddesi({required this.baslik, required this.alt, required this.bitti, required this.eylem, this.calistir, this.ders, this.gorevKimligi});
+}
+
+List<ProgramMaddesi> programMaddeleri(HesapVerisi v, DateTime simdi, {required UygulamaModeli model, required BuildContext context}) {
+  final bugun = v.bugun(simdi);
+  final cikti = <ProgramMaddesi>[];
+  cikti.add(ProgramMaddesi(
+    baslik: '${v.gunlukHedef} soru çöz',
+    alt: 'Bugün ${bugun.soru}/${v.gunlukHedef}',
+    bitti: bugun.soru >= v.gunlukHedef,
+    eylem: 'Çöz',
+    calistir: () => model.sekmeGit(1),
+  ));
+  final zayif = v.konular.where((k) => k.cozulen >= 3 && k.konu.isNotEmpty).toList()..sort((a, b) => a.yuzde != b.yuzde ? a.yuzde.compareTo(b.yuzde) : b.cozulen.compareTo(a.cozulen));
+  for (final k in zayif.take(2)) {
+    final n = bugun.konuSayisi['${k.ders}|${k.konu}'] ?? 0;
+    cikti.add(ProgramMaddesi(
+      baslik: '${Katalog.dersAdi(k.ders)}: ${k.konu}',
+      alt: '10 soru, bugün ${n > 10 ? 10 : n}/10',
+      bitti: n >= 10,
+      eylem: 'Çöz',
+      ders: k.ders,
+      calistir: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: k.ders, konu: k.konu))),
+    ));
+  }
+  final sonDeneme = v.denemeler.isEmpty ? 0 : v.denemeler.map((e) => e.tarihMs).reduce(math.max);
+  if (simdi.millisecondsSinceEpoch - sonDeneme > 6 * 86400000) {
+    final bugunYapildi = v.denemeler.any((e) => HesapVerisi.gunAnahtari(DateTime.fromMillisecondsSinceEpoch(e.tarihMs)) == HesapVerisi.gunAnahtari(simdi));
+    cikti.add(ProgramMaddesi(baslik: 'Mini deneme', alt: 'Haftalık durum kontrolü, süreli', bitti: bugunYapildi, eylem: 'Başla', calistir: () { model.denemeOnAyar = 'mini'; model.sekmeGit(2); }));
+  }
+  return cikti;
+}
+
+class _Program extends StatelessWidget {
+  final UygulamaModeli model;
+  final HesapVerisi veri;
+  final Future<void> Function(String id, bool bitti) gorevIsaretle;
+  final bool mesgul;
+  const _Program({required this.model, required this.veri, required this.gorevIsaretle, required this.mesgul});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final simdi = DateTime.now();
+    final bugun = veri.bugun(simdi);
+    final maddeler = programMaddeleri(veri, simdi, model: model, context: context);
+    final gunNo = simdi.weekday - 1;
+    final gorevler = veri.plan.where((g) => g.gun == gunNo).toList();
+    final tamam = maddeler.where((m) => m.bitti).length;
+    final sira = maddeler.indexWhere((m) => !m.bitti);
+    final oran = (bugun.soru / veri.gunlukHedef).clamp(0.0, 1.0).toDouble();
+    final yuzde = bugun.soru == 0 ? 0 : (bugun.dogru * 100 / bugun.soru).round();
+    return KartKutu(
+      key: const ValueKey('bugunun-programi'),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Expanded(child: Text('Bugünün programı', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700))),
+          const SizedBox(width: 8),
+          Text('$tamam/${maddeler.length} tamam', style: TextStyle(color: t.murekkep2, fontSize: 13)),
+        ]),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(value: oran, minHeight: 8, color: t.mercan, backgroundColor: t.girinti),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          bugun.soru == 0 ? 'Bugün henüz soru çözmedin. İlk soru seni bekliyor.' : 'Bugün ${bugun.soru} soru çözdün · %$yuzde doğru',
+          style: TextStyle(color: t.murekkep2, fontSize: 13, height: 1.4),
+        ),
+        const SizedBox(height: 6),
+        for (var i = 0; i < maddeler.length; i++) _ProgramSatiri(madde: maddeler[i], siradaki: i == sira),
+        if (gorevler.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text('Planındaki görevler', key: const ValueKey('plan-gorevleri'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          for (final g in gorevler) _PlanSatiri(g: g, isaretle: gorevIsaretle, mesgul: mesgul, model: model),
+        ],
+      ]),
+    );
+  }
+}
+
+class _ProgramSatiri extends StatelessWidget {
+  final ProgramMaddesi madde;
+  final bool siradaki;
+  const _ProgramSatiri({required this.madde, required this.siradaki});
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final r = madde.ders == null ? null : dersRengi(context, madde.ders!);
+    return Container(
+      constraints: const BoxConstraints(minHeight: 60),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: t.cizgi))),
+      child: Row(children: [
+        if (r != null) Container(width: 4, height: 38, margin: const EdgeInsets.only(right: 10), decoration: BoxDecoration(color: r.metin, borderRadius: BorderRadius.circular(2))),
+        Icon(madde.bitti ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, size: 22, color: madde.bitti ? t.dogru : t.cizgiGuclu),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (siradaki) Text('SIRADAKİ', style: TextStyle(color: t.mercan, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6)),
+            Text(madde.baslik, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, height: 1.25, decoration: madde.bitti ? TextDecoration.lineThrough : null, color: madde.bitti ? t.murekkep3 : t.murekkep)),
+            Text(madde.alt, style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
+          ]),
+        ),
+        const SizedBox(width: 8),
+        if (madde.bitti)
+          Text('Tamam', style: TextStyle(color: t.murekkep3, fontSize: 13))
+        else
+          AkeDugme(madde.eylem, genis: false, tur: siradaki ? DugmeTuru.dolu : DugmeTuru.cizgili, basinca: madde.calistir),
+      ]),
+    );
+  }
+}
+
+class _PlanSatiri extends StatelessWidget {
+  final PlanGorevi g;
+  final Future<void> Function(String id, bool bitti) isaretle;
+  final bool mesgul;
+  final UygulamaModeli model;
+  const _PlanSatiri({required this.g, required this.isaretle, required this.mesgul, required this.model});
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final dersli = g.ders.isNotEmpty && !g.bitti;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 56),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: t.cizgi))),
+      child: Row(children: [
+        Expanded(
+          child: Semantics(
+            button: true,
+            checked: g.bitti,
+            label: '${g.metin}, ${g.bitti ? 'tamamlandı' : 'tamamlanmadı'}. Değiştirmek için dokun.',
+            child: ExcludeSemantics(
+              child: AkeDokun(
+                basinca: mesgul ? null : () => isaretle(g.id, !g.bitti),
+                child: Container(
+                  key: ValueKey('ana-gorev-${g.id}'),
+                  constraints: const BoxConstraints(minHeight: 56),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(children: [
+                    Icon(g.bitti ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, size: 22, color: g.bitti ? t.dogru : t.cizgiGuclu),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(g.metin, style: TextStyle(fontWeight: FontWeight.w600, height: 1.3, decoration: g.bitti ? TextDecoration.lineThrough : null, color: g.bitti ? t.murekkep3 : t.murekkep)),
+                        if (g.ders.isNotEmpty || g.dakika > 0)
+                          Text([if (g.ders.isNotEmpty) Katalog.dersAdi(g.ders), if (g.dakika > 0) '${g.dakika} dk'].join(' · '), style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (dersli)
+          AkeDugme('Çöz', key: ValueKey('ana-gorev-coz-${g.id}'), genis: false, tur: DugmeTuru.cizgili, basinca: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: g.ders)))),
+      ]),
+    );
   }
 }
 

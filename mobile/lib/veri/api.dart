@@ -170,12 +170,18 @@ class AkeApi {
   // ---------- soru bankası (sunucu tarafı oturum; cevap anahtarı yalnızca cevaptan sonra gelir) ----------
   Future<Ozet> ozet() async => Ozet.fromJson(await _istek('GET', '/api/soru/ozet'));
 
-  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu, int? zorluk, String? ara, bool sinav = false}) async {
+  Future<OturumYaniti> oturumOlustur({required String istek, required int adet, String? ders, String? konu, int? zorluk, String? ara, bool sinav = false, List<Map<String, dynamic>>? bolumler, String? tur, String? uzunluk}) async {
     final g = <String, dynamic>{'istek': istek, 'mod': sinav ? 'exam' : 'practice', 'adet': adet};
     if (ara != null) g['ara'] = ara;
     if (ders != null) g['ders'] = ders;
     if (konu != null) g['konu'] = konu;
     if (zorluk != null) g['zorluk'] = zorluk; // 1 kolay · 2 orta · 3 zor; yoksa karışık
+    if (bolumler != null) {
+      // Bölümlü deneme (yalnız sınav modu): ders başına adet; toplam `adet` ile aynı olmalı. `tur`/`uzunluk` başlık ve exams.type içindir.
+      g['bolumler'] = bolumler;
+      if (tur != null) g['tur'] = tur;
+      if (uzunluk != null) g['uzunluk'] = uzunluk;
+    }
     return OturumYaniti.fromJson(await _istek('POST', '/api/soru/oturum', govde: g));
   }
 
@@ -250,6 +256,15 @@ class AkeApi {
     if (oturum != null) g['oturum'] = oturum;
     final y = await _istek('POST', '/api/soru/ilerleme', govde: g, beklenenHesap: beklenenHesap);
     return (y['bekleyen'] as num?)?.toInt() ?? 0;
+  }
+}
+
+/// Biten bir odak turunu (25 dk) günün odak dakikasına ekletir. [tur] tek seferliktir (tekrar çağrı çift saymaz).
+/// Dönen sayı: sunucudaki günün toplam odak dakikası.
+extension OdakUcu on AkeApi {
+  Future<int> odakTuru({required String tur, required int tzDk, String? beklenenHesap}) async {
+    final y = await _istek('POST', '/api/soru/odak', govde: {'tur': tur, 'tz': tzDk}, beklenenHesap: beklenenHesap);
+    return (y['fm'] as num?)?.toInt() ?? 0;
   }
 }
 

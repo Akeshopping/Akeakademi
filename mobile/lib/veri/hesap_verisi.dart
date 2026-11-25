@@ -1,19 +1,22 @@
 /// Hesaptan (sunucudan) okunan çalışma verisi: web ile aynı belgeler (`profile`, `stats`, `plan`). Salt okunur.
 /// Hiçbir alan uydurulmaz: veri yoksa null/boş döner ve ekran bunu açıkça söyler.
 class PlanGorevi {
+  final String id;
   final String metin;
   final int gun; // 0 = Pazartesi
   final String ders;
   final int dakika;
   final bool bitti;
-  const PlanGorevi({required this.metin, required this.gun, required this.ders, required this.dakika, required this.bitti});
+  const PlanGorevi({this.id = '', required this.metin, required this.gun, required this.ders, required this.dakika, required this.bitti});
 }
 
 class GunSayisi {
   final String gun; // yyyy-MM-dd
   final int soru;
   final int dogru;
-  const GunSayisi(this.gun, this.soru, this.dogru);
+  final Map<String, int> konuSayisi; // site `daily[gün].tp`: "ders|konu" -> o gün çözülen soru
+  final int odakDk; // site `daily[gün].fm`: o gün odak odasında geçen dakika
+  const GunSayisi(this.gun, this.soru, this.dogru, [this.konuSayisi = const {}, this.odakDk = 0]);
 }
 
 /// Web `exams` belgesindeki deneme özeti (web ve mobil denemeleri birlikte; `qs` yok sayılır).
@@ -71,7 +74,7 @@ class HesapVerisi {
     final gunluk = <String, GunSayisi>{};
     _m(stats['daily']).forEach((g, v) {
       final d = _m(v);
-      gunluk[g] = GunSayisi(g, _i(d['q']), _i(d['c']));
+      gunluk[g] = GunSayisi(g, _i(d['q']), _i(d['c']), {for (final e in _m(d['tp']).entries) e.key: _i(e.value)}, _i(d['fm']));
     });
     final konular = <KonuBasarisi>[];
     _m(stats['topic']).forEach((anahtar, v) {
@@ -86,7 +89,7 @@ class HesapVerisi {
         final t = _m(g);
         final metin = '${t['text'] ?? ''}'.trim();
         if (metin.isEmpty) continue;
-        gorevler.add(PlanGorevi(metin: metin, gun: _i(t['day']).clamp(0, 6).toInt(), ders: '${t['s'] ?? ''}', dakika: _i(t['min']), bitti: t['done'] == true));
+        gorevler.add(PlanGorevi(id: '${t['id'] ?? ''}', metin: metin, gun: _i(t['day']).clamp(0, 6).toInt(), ders: '${t['s'] ?? ''}', dakika: _i(t['min']), bitti: t['done'] == true));
       }
     }
     final denemeler = <DenemeKaydi>[];

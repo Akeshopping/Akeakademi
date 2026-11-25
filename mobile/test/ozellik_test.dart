@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ake_akademi/durum/uygulama.dart';
 import 'package:ake_akademi/ui/ai.dart';
 import 'package:ake_akademi/ui/deneme.dart';
@@ -11,9 +13,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'sahte_sunucu.dart';
 
-UygulamaModeli model(SahteSunucu s) {
+UygulamaModeli model(SahteSunucu s, {DateTime Function()? saat}) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(SahteSunucu.anahtar));
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}));
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}), saat: saat);
 }
 
 void ekran(WidgetTester t, double genislik, {double yukseklik = 900}) {
@@ -23,9 +25,9 @@ void ekran(WidgetTester t, double genislik, {double yukseklik = 900}) {
   addTearDown(t.view.resetDevicePixelRatio);
 }
 
-Future<UygulamaModeli> ac(WidgetTester t, SahteSunucu s, {double genislik = 390, double yukseklik = 900}) async {
+Future<UygulamaModeli> ac(WidgetTester t, SahteSunucu s, {double genislik = 390, double yukseklik = 900, DateTime Function()? saat}) async {
   ekran(t, genislik, yukseklik: yukseklik);
-  final m = model(s);
+  final m = model(s, saat: saat);
   await m.baslat();
   await t.pumpWidget(AkeUygulamasi(model: m));
   await t.pumpAndSettle();
@@ -288,6 +290,318 @@ void main() {
       expect(((yaz['plan'] as Map)['tasks'] as List).map((e) => (e as Map)['done']).toList(), [false, false]);
       expect(((yaz['plan'] as Map)['tasks'] as List).map((e) => (e as Map)['id']).toList(), ['a1', 'a2']);
       expect(yaz['_b'], 1);
+    });
+  });
+
+  group('Plan · Odak odası (site Odak odası: başlat, duraklat, mola, süre)', () {
+    DateTime simdi = DateTime(2026, 11, 25, 10, 0, 0);
+    DateTime saat() => simdi;
+    void ilerle(Duration d) => simdi = simdi.add(d);
+    setUp(() => simdi = DateTime(2026, 11, 25, 10, 0, 0));
+
+    Future<SahteSunucu> planAc(WidgetTester t, {bool hata = false}) async {
+      final s = SahteSunucu()..odakHata = hata;
+      final m = await ac(t, s, yukseklik: 2200, saat: saat);
+      m.menuyeGit(MenuSayfasi.plan);
+      await t.pumpAndSettle();
+      return s;
+    }
+
+    String saatMetni(WidgetTester t) => tester_text(t, 'odak-saat');
+
+    testWidgets('başlat → duraklat → devam et → bitince mola; mod çalışırken değişmez; bitişte tur hesaba yazılır', (t) async {
+      final s = await planAc(t);
+      expect(saatMetni(t), '25:00');
+      expect(find.text('Başlat'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      expect(find.byKey(const ValueKey('odak-duraklat')), findsOneWidget);
+      ilerle(const Duration(minutes: 10));
+      await t.pump(const Duration(seconds: 1));
+      expect(saatMetni(t), '15:00');
+      await t.tap(find.byKey(const ValueKey('odak-mod-mola')));
+      await t.pump();
+      expect(saatMetni(t), '15:00', reason: 'çalışırken mod değişmez');
+      await t.tap(find.byKey(const ValueKey('odak-duraklat')));
+      await t.pump();
+      ilerle(const Duration(minutes: 5)); // duraklatılmışken süre akmaz
+      await t.pump(const Duration(seconds: 1));
+      expect(saatMetni(t), '15:00');
+      expect(find.text('Devam et'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      ilerle(const Duration(minutes: 15));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump();
+      expect(saatMetni(t), '05:00', reason: 'odak bitti → 5 dk mola hazır');
+      expect(find.byKey(const ValueKey('odak-basla')), findsOneWidget, reason: 'mola kendiliğinden başlamaz');
+      expect(s.odakIstekleri.length, 1);
+      expect((s.odakIstekleri.single['tur'] as String).length, greaterThanOrEqualTo(16));
+      expect(s.odakIstekleri.single['tz'], simdi.timeZoneOffset.inMinutes);
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'odak-bugun'), startsWith('Bugün odaklı çalışma: 25 dk.'));
+      expect(find.byKey(const ValueKey('odak-bekleyen')), findsNothing);
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('mola 5 dk: bitince odağa döner ve hesaba odak yazılmaz; Sıfırla süreyi tam yapar', (t) async {
+      final s = await planAc(t);
+      await t.tap(find.byKey(const ValueKey('odak-mod-mola')));
+      await t.pump();
+      expect(saatMetni(t), '05:00');
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      ilerle(const Duration(minutes: 2));
+      await t.pump(const Duration(seconds: 1));
+      expect(saatMetni(t), '03:00');
+      await t.tap(find.byKey(const ValueKey('odak-sifirla')));
+      await t.pump();
+      expect(saatMetni(t), '05:00');
+      expect(find.text('Başlat'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      ilerle(const Duration(minutes: 5));
+      await t.pump(const Duration(seconds: 1));
+      await t.pump();
+      expect(saatMetni(t), '25:00', reason: 'mola bitti → odak');
+      expect(s.odakIstekleri, isEmpty, reason: 'mola odak dakikası değildir');
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('arka plana gidip dönünce süre gerçek saate göre doğru; süre arka planda dolduysa tur tamamlanmış olur', (t) async {
+      final s = await planAc(t);
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      t.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      ilerle(const Duration(minutes: 12)); // arka planda zamanlayıcı çalışmaz; saat ilerler
+      t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await t.pump();
+      expect(saatMetni(t), '13:00', reason: '25 − 12 dk');
+      expect(s.odakIstekleri, isEmpty);
+      t.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      ilerle(const Duration(minutes: 40)); // süre arka planda doldu
+      t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await t.pump();
+      await t.pump();
+      expect(saatMetni(t), '05:00');
+      expect(s.odakIstekleri.length, 1, reason: 'yalnız bir tur (site gibi)');
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('bağlantı yokken biten tur cihazda bekler, görünür; bağlantı gelince AYNI tur kimliğiyle yazılır ve çift sayılmaz', (t) async {
+      final s = await planAc(t, hata: true);
+      await t.tap(find.byKey(const ValueKey('odak-basla')));
+      await t.pump();
+      ilerle(const Duration(minutes: 25));
+      await t.pump(const Duration(seconds: 1));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('odak-bekleyen')), findsOneWidget);
+      expect(tester_text(t, 'odak-bugun'), startsWith('Bugün odaklı çalışma: 25 dk.'), reason: 'bekleyen tur da gösterilir');
+      expect(s.odakIstekleri.length, 1);
+      s.odakHata = false;
+      t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('odak-bekleyen')), findsNothing);
+      expect(s.odakIstekleri.length, 2);
+      expect(s.odakIstekleri[0]['tur'], s.odakIstekleri[1]['tur'], reason: 'tekrar denemede aynı tur kimliği');
+      expect(s.odakFm, 25, reason: 'sunucuda bir kez sayıldı');
+      expect(tester_text(t, 'odak-bugun'), startsWith('Bugün odaklı çalışma: 25 dk.'));
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('Plan boş olsa da Odak odası görünür', (t) async {
+      await planAc(t);
+      expect(find.byKey(const ValueKey('odak-odasi')), findsOneWidget);
+      expect(find.text('Odak odası'), findsOneWidget);
+      await t.pumpWidget(const SizedBox());
+    });
+  });
+
+  group('Ana sayfa · Bugünün programı (gerçek hesap verisi)', () {
+    testWidgets('hedef, zayıf konu, bugünkü plan görevi ve mini deneme gelir; görev işaretlenir, Çöz konu oturumunu açar', (t) async {
+      final simdi = DateTime.now();
+      final gun = '${simdi.year}-${simdi.month.toString().padLeft(2, '0')}-${simdi.day.toString().padLeft(2, '0')}';
+      final s = SahteSunucu()
+        ..veriAlanlari = {
+          'profile': {'_u': 1, 'profile': {'name': 'Test', 'alan': 'SAY', 'gunluk': 40}},
+          'stats': {
+            '_u': 1,
+            'daily': {gun: {'q': 14, 'c': 9, 'tp': {'mat|Problemler': 4}}},
+            'topic': {'mat|Problemler': [3, 7, 0], 'turkce|Paragraf': [8, 4, 0], 'fizik|Hareket': [9, 1, 0]},
+          },
+          'plan': {
+            '_u': 1,
+            'plan': {
+              'tasks': [
+                {'id': 'b1', 'day': simdi.weekday - 1, 'text': 'Hareket konu tekrarı', 's': 'fizik', 'min': 40, 'done': false},
+                {'id': 'b2', 'day': (simdi.weekday) % 7, 'text': 'Başka günün görevi', 's': 'mat', 'min': 20, 'done': false},
+              ],
+            },
+          },
+        };
+      await ac(t, s, yukseklik: 2200);
+      expect(find.text('Bugünün programı'), findsOneWidget);
+      expect(find.text('40 soru çöz'), findsOneWidget);
+      expect(find.text('Bugün 14/40'), findsOneWidget);
+      expect(find.text('Matematik: Problemler'), findsOneWidget);
+      expect(find.text('10 soru, bugün 4/10'), findsOneWidget);
+      expect(find.text('Türkçe: Paragraf'), findsOneWidget);
+      expect(find.text('Mini deneme'), findsOneWidget, reason: 'hiç deneme yok → haftalık mini deneme önerilir');
+      expect(find.text('SIRADAKİ'), findsOneWidget);
+      expect(find.text('Hareket konu tekrarı'), findsOneWidget);
+      expect(find.text('Başka günün görevi'), findsNothing, reason: 'yalnız bugünün görevleri');
+      expect(find.text('Tekrar çözmeye değer'), findsOneWidget, reason: 'mevcut tekrar kartı korunur');
+      await gorunurDokun(t, find.byKey(const ValueKey('ana-gorev-b1')));
+      final yaz = s.veriYazmalari.last;
+      expect(yaz['_alan'], 'plan');
+      expect(((yaz['plan'] as Map)['tasks'] as List).first['done'], isTrue);
+      expect(s.veriYazmalari.every((y) => y['_alan'] == 'plan'), isTrue);
+    });
+
+    testWidgets('Mini deneme "Başla": Deneme sekmesi ¼ uzunlukla açılır (site: sıradaki mini deneme)', (t) async {
+      final s = SahteSunucu();
+      final m = await ac(t, s, yukseklik: 2600);
+      await gorunurDokun(t, find.text('Başla'));
+      expect(m.sekme, 2);
+      expect(tester_text(t, 'deneme-satir-mat'), '8', reason: 'Temel Matematik ¼ → Matematik 8');
+      expect(tester_text(t, 'deneme-ozet'), '18 soru · 25 dk', reason: 'havuz: Türkçe 10 + Matematik 8');
+      await t.pumpWidget(const SizedBox());
+    });
+  });
+
+  group('Deneme · bölümlü oturum (site Deneme merkezi)', () {
+    Map<String, dynamic> havuz(Map<String, int> d) => {
+          'toplam': d.values.fold(0, (a, b) => a + b),
+          'dersler': {for (final e in d.entries) e.key: {'toplam': e.value, 'konular': {'K': {'toplam': e.value, 'zorluk': {'2': e.value}}}}},
+        };
+    const tytHavuz = {'turkce': 40, 'tarih': 5, 'cografya': 5, 'felsefe': 5, 'din': 5, 'mat': 30, 'geo': 10, 'fizik': 7, 'kimya': 7, 'biyoloji': 6};
+    String govdeAlan(SahteSunucu s, String k) => '${(jsonDecode(s.sonOturumGovdesi!) as Map<String, dynamic>)[k]}';
+
+    testWidgets('TYT varsayılan: bölüm tablosu tam 120 soru/165 dk; Mini (¼) site ile aynı yuvarlamayla 31 soru/43 dk; oturum bolumler ile açılır', (t) async {
+      final s = SahteSunucu()..ozetOzel = havuz(tytHavuz);
+      await ac(t, s, yukseklik: 2600);
+      await sekme(t, 2);
+      expect(find.byKey(const ValueKey('deneme-tur-TYT')), findsOneWidget);
+      expect(find.byKey(const ValueKey('deneme-tur-SAY')), findsOneWidget);
+      expect(find.byKey(const ValueKey('deneme-tur-EA')), findsOneWidget);
+      expect(find.byKey(const ValueKey('deneme-tur-SOZ')), findsOneWidget);
+      expect(find.byKey(const ValueKey('deneme-tur-YDT')), findsOneWidget);
+      expect(tester_text(t, 'deneme-tur-aciklama'), 'Temel Yeterlilik Testi · resmî oturum 120 soru, 165 dakika');
+      expect(tester_text(t, 'deneme-satir-turkce'), '40');
+      expect(tester_text(t, 'deneme-satir-mat'), '30');
+      expect(tester_text(t, 'deneme-toplam'), '120');
+      expect(tester_text(t, 'deneme-ozet'), '120 soru · 165 dk');
+      await t.tap(find.byKey(const ValueKey('deneme-uzunluk-quarter')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-satir-turkce'), '10');
+      expect(tester_text(t, 'deneme-satir-tarih'), '1');
+      expect(tester_text(t, 'deneme-satir-mat'), '8');
+      expect(tester_text(t, 'deneme-satir-geo'), '3');
+      expect(tester_text(t, 'deneme-satir-biyoloji'), '2');
+      expect(tester_text(t, 'deneme-toplam'), '31');
+      expect(tester_text(t, 'deneme-ozet'), '31 soru · 43 dk');
+      await t.tap(find.text('Denemeyi başlat'));
+      await bekle(t);
+      expect(s.sonModu, 'exam');
+      final g = jsonDecode(s.sonOturumGovdesi!) as Map<String, dynamic>;
+      expect(g['adet'], 31);
+      expect(g['tur'], 'TYT');
+      expect(g['uzunluk'], 'quarter');
+      expect(g.containsKey('ders'), isFalse, reason: 'bölümlü istekte tek ders alanı yok');
+      final b = (g['bolumler'] as List).cast<Map<String, dynamic>>();
+      expect(b.map((e) => e['ders']).toList(), ['turkce', 'tarih', 'cografya', 'felsefe', 'din', 'mat', 'geo', 'fizik', 'kimya', 'biyoloji']);
+      expect(b.map((e) => e['bolum']).toSet().toList(), ['Türkçe', 'Sosyal Bilimler', 'Temel Matematik', 'Fen Bilimleri']);
+      expect(b.fold<int>(0, (a, e) => a + (e['adet'] as int)), 31);
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('AYT Sayısal bölümleri ve Kendi dağılımım: satır −/+ ve süre ayarı toplamı, otomatik süreyi ve isteği değiştirir', (t) async {
+      final s = SahteSunucu()..ozetOzel = havuz({...tytHavuz, 'amat': 30, 'afizik': 14, 'akimya': 13, 'abiyoloji': 13});
+      await ac(t, s, yukseklik: 2600);
+      await sekme(t, 2);
+      await t.tap(find.byKey(const ValueKey('deneme-tur-SAY')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-tur-aciklama'), 'Matematik ve Fen Bilimleri · resmî oturum 80 soru, 180 dakika');
+      expect(tester_text(t, 'deneme-toplam'), '80');
+      expect(tester_text(t, 'deneme-ozet'), '80 soru · 180 dk');
+      await t.tap(find.byKey(const ValueKey('deneme-uzunluk-custom')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-satir-amat-deger'), '8', reason: 'kendi dağılımım varsayılanı ¼ (30 → 8)');
+      await t.tap(find.byKey(const ValueKey('deneme-satir-amat-arti')));
+      await t.tap(find.byKey(const ValueKey('deneme-satir-afizik-eksi')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-satir-amat-deger'), '9');
+      final onceki = int.parse(tester_text(t, 'deneme-toplam'));
+      expect(onceki, 21, reason: 'amat 9 (8+1), geo 3, fizik 3 (4−1), kimya 3, biyoloji 3');
+      await t.tap(find.byKey(const ValueKey('deneme-sure-eksi')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-sure-aciklama'), 'Kendi süren');
+      await t.tap(find.text('Denemeyi başlat'));
+      await bekle(t);
+      final g = jsonDecode(s.sonOturumGovdesi!) as Map<String, dynamic>;
+      expect(g['tur'], 'SAY');
+      expect(g['uzunluk'], 'custom');
+      expect(g['adet'], g['bolumler'].fold<int>(0, (a, e) => a + (e['adet'] as int)));
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('havuzda yetmeyen ders için uyarı çıkar ve sunucuya havuzdan fazla istenmez', (t) async {
+      final s = SahteSunucu()..ozetOzel = havuz({'turkce': 10, 'mat': 30});
+      await ac(t, s, yukseklik: 2600);
+      await sekme(t, 2);
+      expect(find.byKey(const ValueKey('deneme-havuz-uyari')), findsOneWidget);
+      expect(tester_text(t, 'deneme-ozet'), startsWith('40 soru'));
+      await t.tap(find.text('Denemeyi başlat'));
+      await bekle(t);
+      final b = ((jsonDecode(s.sonOturumGovdesi!) as Map<String, dynamic>)['bolumler'] as List).cast<Map<String, dynamic>>();
+      expect(b.map((e) => [e['ders'], e['adet']]).toList(), [['turkce', 10], ['mat', 30]], reason: 'havuzu olmayan dersler gönderilmez, fazlası kırpılır');
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('sonuç: bölümlü denemede "Ders ders" tablosu bölüm netlerini gösterir', (t) async {
+      final s = SahteSunucu()..ozetOzel = havuz({'turkce': 40, 'mat': 30});
+      s.sorular
+        ..clear()
+        ..addAll([
+          {'id': 'q1', 's': 'turkce', 't': 'Paragraf', 'd': 1, 'q': 'Soru 1?', 'o': ['a', 'b', 'c', 'd', 'e']},
+          {'id': 'q2', 's': 'mat', 't': 'Sayılar', 'd': 3, 'q': 'Soru 2?', 'o': ['a', 'b', 'c', 'd', 'e']},
+        ]);
+      s.dogruSecenek..clear()..addAll({'q1': 2, 'q2': 0});
+      await ac(t, s, yukseklik: 2600);
+      await sekme(t, 2);
+      await t.tap(find.text('Denemeyi başlat'));
+      await bekle(t);
+      await t.tap(find.byKey(const ValueKey('deneme-sik-2'))); // q1 doğru
+      await bekle(t, 3);
+      await t.tap(find.text('Sonraki'));
+      await bekle(t, 3);
+      await t.tap(find.byKey(const ValueKey('deneme-sik-1'))); // q2 yanlış
+      await bekle(t, 3);
+      await t.tap(find.text('Bitir'));
+      await bekle(t, 3);
+      await t.tap(find.byKey(const ValueKey('deneme-bitir-onay')));
+      await bekle(t, 8);
+      expect(find.byKey(const ValueKey('deneme-ders-ders')), findsOneWidget);
+      expect(tester_text(t, 'deneme-bolum-net-Türkçe'), '1,00');
+      expect(tester_text(t, 'deneme-bolum-net-Temel Matematik'), '-0,25');
+      expect(tester_text(t, 'deneme-net'), '0,75');
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('Serbest: eski tek ders / karışık akış korunur (ders alanıyla, bolumler olmadan)', (t) async {
+      final s = SahteSunucu();
+      await ac(t, s, yukseklik: 2600);
+      await sekme(t, 2);
+      await t.tap(find.byKey(const ValueKey('deneme-tur-serbest')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('deneme-ders-mat')));
+      await t.pumpAndSettle();
+      expect(tester_text(t, 'deneme-ozet'), '20 soru · 28 dk');
+      await t.tap(find.text('Denemeyi başlat'));
+      await bekle(t);
+      expect(govdeAlan(s, 'ders'), 'mat');
+      expect(govdeAlan(s, 'bolumler'), 'null');
+      await t.pumpWidget(const SizedBox());
     });
   });
 

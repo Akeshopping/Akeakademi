@@ -7,6 +7,7 @@ import '../veri/hesap_verisi.dart';
 import '../veri/ilerleme.dart';
 import '../veri/modeller.dart';
 import '../veri/oturum_deposu.dart';
+import 'odak.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
 enum Faz { yukleniyor, ag, giris, oturumBitti, ana }
@@ -19,6 +20,9 @@ class UygulamaModeli extends ChangeNotifier {
   final AkeApi api;
   final IlerlemeSenkron senkron;
   final AyarDeposu ayar;
+  final DateTime Function() saat; // test için değiştirilebilir saat
+  /// Odak odası sayacı (aktif hesaba bağlı; sekmeler arasında yaşar).
+  OdakSayaci? odak;
   Faz faz = Faz.yukleniyor;
   Kullanici? kullanici;
   ThemeMode tema = ThemeMode.system;
@@ -28,6 +32,9 @@ class UygulamaModeli extends ChangeNotifier {
 
   /// Alt gezinmedeki etkin sekme (0 Ana sayfa, 1 Soru çöz, 2 Deneme, 3 AI, 4 Menü). Ekranlar buradan sekme değiştirebilir.
   int sekme = 0;
+
+  /// Ana sayfadaki "Mini deneme" gibi kısayollar Deneme sekmesini hazır ayarla açar (ör. 'mini' = ¼ uzunluk); sekme bir kez okuyup temizler.
+  String? denemeOnAyar;
   void sekmeGit(int i) {
     if (sekme == i) return;
     sekme = i;
@@ -60,15 +67,19 @@ class UygulamaModeli extends ChangeNotifier {
     await api.hesapSil();
     senkron.temizle();
     kullanici = null;
+    odak = null;
     sekme = 0;
     menuSayfasi = null;
     faz = Faz.giris;
     notifyListeners();
   }
 
-  UygulamaModeli(this.api, this.senkron, {AyarDeposu? ayar}) : ayar = ayar ?? BellekAyar() {
+  UygulamaModeli(this.api, this.senkron, {AyarDeposu? ayar, DateTime Function()? saat})
+      : ayar = ayar ?? BellekAyar(),
+        saat = saat ?? DateTime.now {
     api.oturumBittiDinleyici = () {
       kullanici = null;
+      odak = null;
       senkron.oturumBitti();
       faz = Faz.oturumBitti;
       notifyListeners();
@@ -144,6 +155,13 @@ class UygulamaModeli extends ChangeNotifier {
 
   /// Aktif hesap bu kimliktir: başka hesabın bekleyen kayıtları silinir; bu hesabın işlenmemiş cevapları sunucudan toparlanır.
   void _hesabaGec(String id) {
+    odak = OdakSayaci(
+      ayar: ayar,
+      hesapId: id,
+      simdi: saat,
+      gonder: (tur) => api.odakTuru(tur: tur, tzDk: saat().timeZoneOffset.inMinutes, beklenenHesap: id),
+      yeniKimlik: () => yeniIstekKimligi(),
+    )..yukle();
     senkron.hesapAyarla(id);
     senkron.supur();
     senkron.bosalt();
@@ -153,6 +171,7 @@ class UygulamaModeli extends ChangeNotifier {
     await api.cikis();
     senkron.temizle();
     kullanici = null;
+    odak = null;
     sekme = 0;
     menuSayfasi = null;
     faz = Faz.giris;

@@ -90,7 +90,7 @@ void main() {
         await m.baslat();
         await t.pumpWidget(AkeUygulamasi(model: m));
         await t.pumpAndSettle();
-        expect(find.text('Bugünün hedefi'), findsOneWidget);
+        expect(find.text('Bugünün programı'), findsOneWidget);
         for (var i = 0; i < 5; i++) {
           await sekme(t, i);
           expect(t.takeException(), isNull, reason: 'sekme $i');

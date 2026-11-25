@@ -99,18 +99,6 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
             ),
             const SizedBox(height: 12),
             KartKutu(
-              key: const ValueKey('deneme-ozet'),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Bu denemede', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                _OzetSatiri('Ders', _ders == null ? 'Karışık' : Katalog.dersAdi(_ders!)),
-                _OzetSatiri('Soru', '$adet'),
-                _OzetSatiri('Süre', '${denemeSuresiDk(adet)} dk'),
-                _OzetSatiri('Net', 'doğru − yanlış ÷ 4 · boş bırakabilirsin'),
-              ]),
-            ),
-            const SizedBox(height: 12),
-            KartKutu(
               renk: hakYok ? t.uyariZemin : null,
               kenar: hakYok ? t.uyari : null,
               child: Row(children: [
@@ -136,6 +124,18 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
                       await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DenemeEkrani(model: widget.model, ders: _ders, adet: adet)));
                       if (mounted) _yenile();
                     },
+            ),
+            const SizedBox(height: 14),
+            KartKutu(
+              key: const ValueKey('deneme-ozet'),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Bu denemede', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                _OzetSatiri('Ders', _ders == null ? 'Karışık' : Katalog.dersAdi(_ders!)),
+                _OzetSatiri('Soru', '$adet'),
+                _OzetSatiri('Süre', '${denemeSuresiDk(adet)} dk'),
+                _OzetSatiri('Net', 'doğru − yanlış ÷ 4 · boş bırakabilirsin'),
+              ]),
             ),
             if (_gecmis.isNotEmpty) ...[
               const SizedBox(height: 14),

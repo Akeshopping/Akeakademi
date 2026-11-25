@@ -275,6 +275,8 @@ void main() {
     }
 
     await yuru('acik');
+    await t.tap(find.byKey(const ValueKey('menu-ayarlar')));
+    await t.pumpAndSettle();
     await dokun('Koyu');
     expect(m.tema, ThemeMode.dark);
     // sorular yeni oturumda yeniden gelsin

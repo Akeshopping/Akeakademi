@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 
 import '../durum/odak.dart';
 import '../durum/uygulama.dart';
-import 'ortak.dart';
 import 'tema.dart';
 
 String _dkSn(int sn) {

@@ -35,7 +35,6 @@ class _AnaSayfaState extends State<AnaSayfa> {
   }
 
   bool _gorevMesgul = false;
-  String? _gorevHata;
 
   /// Bugünün plan görevini işaretler: planı sürümle okur, koşullu yazar (409'da yeniden dener), sonra hesabı yeniler.
   Future<void> _gorevIsaretle(String id, bool bitti) async {
@@ -92,8 +91,6 @@ class _AnaSayfaState extends State<AnaSayfa> {
   List<Widget> _icerik(HesapVerisi v) {
     final t = context.ake;
     final bugun = v.bugun(DateTime.now());
-    final oran = (bugun.soru / v.gunlukHedef).clamp(0.0, 1.0).toDouble();
-    final yuzde = bugun.soru == 0 ? 0 : (bugun.dogru * 100 / bugun.soru).round();
     final zayif = v.konular.where((k) => k.cozulen >= 5).toList()..sort((a, b) => a.yuzde.compareTo(b.yuzde));
     return [
       _Program(model: widget.model, veri: v, gorevIsaretle: _gorevIsaretle, mesgul: _gorevMesgul),

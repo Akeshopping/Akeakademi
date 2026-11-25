@@ -133,15 +133,14 @@ class _OdakKartiState extends State<OdakKarti> with WidgetsBindingObserver {
           child: Text(_dkSn(s.kalanSn), key: const ValueKey('odak-saat'), style: rakamStili(s.mod == 'mola' ? t.dogru : t.murekkep, 56, agirlik: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
-        Row(children: [
-          Expanded(
-            child: calisiyor
-                ? AkeDugme('Duraklat', key: const ValueKey('odak-duraklat'), tur: DugmeTuru.cizgili, basinca: s.duraklat)
-                : AkeDugme(s.kismenKullanildi ? 'Devam et' : 'Başlat', key: const ValueKey('odak-basla'), basinca: s.basla),
-          ),
-          const SizedBox(width: 10),
-          Expanded(child: AkeDugme('Sıfırla', key: const ValueKey('odak-sifirla'), tur: DugmeTuru.cizgili, basinca: s.sifirla)),
-        ]),
+        LayoutBuilder(builder: (context, c) {
+          final ana = calisiyor
+              ? AkeDugme('Duraklat', key: const ValueKey('odak-duraklat'), tur: DugmeTuru.cizgili, basinca: s.duraklat)
+              : AkeDugme(s.kismenKullanildi ? 'Devam et' : 'Başlat', key: const ValueKey('odak-basla'), basinca: s.basla);
+          final sifir = AkeDugme('Sıfırla', key: const ValueKey('odak-sifirla'), tur: DugmeTuru.cizgili, basinca: s.sifirla);
+          if (c.maxWidth < 300) return Column(children: [ana, const SizedBox(height: 8), sifir]);
+          return Row(children: [Expanded(child: ana), const SizedBox(width: 10), Expanded(child: sifir)]);
+        }),
         const SizedBox(height: 12),
         Text('Bugün odaklı çalışma: $bugun dk. Telefonu bırak, 25 dakika tek bir işe odaklan; sayaç bitince mola zamanı.', key: const ValueKey('odak-bugun'), textAlign: TextAlign.center, style: TextStyle(color: t.murekkep2, fontSize: 13, height: 1.4)),
         if (s.bekleyen.isNotEmpty) ...[

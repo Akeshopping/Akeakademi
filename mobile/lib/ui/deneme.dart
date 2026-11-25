@@ -242,18 +242,13 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
           Container(
             decoration: BoxDecoration(color: t.kart, border: Border(top: BorderSide(color: t.cizgi))),
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-            child: Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                  Text(serbest ? 'Serbest deneme' : (_uzunluk == DenemeUzunluk.tam ? tur.ad : '${tur.ad} · ${_uzunluk.ad}'), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-                  Text(ozetMetni, key: const ValueKey('deneme-ozet'), style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
-                ]),
-              ),
-              const SizedBox(width: 10),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(serbest ? 'Serbest deneme' : (_uzunluk == DenemeUzunluk.tam ? tur.ad : '${tur.ad} · ${_uzunluk.ad}'), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+              Text(ozetMetni, key: const ValueKey('deneme-ozet'), style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
+              const SizedBox(height: 8),
               AkeDugme(
                 'Denemeyi başlat',
                 simge: Icons.play_arrow_rounded,
-                genis: false,
                 basinca: hakYok || plan == null
                     ? null
                     : () async {

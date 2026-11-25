@@ -229,7 +229,7 @@ void main() {
   group('Plan', () {
     testWidgets('görev ekle, işaretle, sil: web ile aynı alanlar, koşullu yazma (_b/_h), stats\'a dokunulmaz; 409\'da yeniden okuyup dener', (t) async {
       final s = SahteSunucu();
-      final m = await ac(t, s);
+      final m = await ac(t, s, yukseklik: 2200);
       m.menuyeGit(MenuSayfasi.plan);
       await t.pumpAndSettle();
       expect(find.textContaining('Henüz görevin yok'), findsOneWidget);
@@ -279,7 +279,7 @@ void main() {
             },
           },
         };
-      final m = await ac(t, s);
+      final m = await ac(t, s, yukseklik: 2200);
       m.menuyeGit(MenuSayfasi.plan);
       await t.pumpAndSettle();
       await gorunurDokun(t, find.text('Haftayı sıfırla'));
@@ -541,7 +541,7 @@ void main() {
       final g = jsonDecode(s.sonOturumGovdesi!) as Map<String, dynamic>;
       expect(g['tur'], 'SAY');
       expect(g['uzunluk'], 'custom');
-      expect(g['adet'], g['bolumler'].fold<int>(0, (a, e) => a + (e['adet'] as int)));
+      expect(g['adet'], (g['bolumler'] as List).fold<int>(0, (a, e) => a + ((e as Map)['adet'] as int)));
       await t.pumpWidget(const SizedBox());
     });
 

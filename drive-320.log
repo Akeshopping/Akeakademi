@@ -1,0 +1,227 @@
+Running Gradle task 'assembleDebug'...                            131.8s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          678ms
+D/FlutterRenderer( 5914): Width is zero. 0,0
+D/FlutterRenderer( 5914): Width is zero. 0,0
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:43231/qGDQ6d6KlHY=/
+VMServiceFlutterDriver: Isolate found with number: 5223030775131107
+VMServiceFlutterDriver: Isolate 5223030775131107 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 5914): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 5914): Compat change id reported: 236825255; UID 10192; state: ENABLED
+I/flutter ( 5914): CIHAZ_MANTIKSAL_GENISLIK=320.0 yukseklik=656.0 dpr=2.0
+I/Choreographer( 5914): Skipped 33 frames!  The application may be doing too much work on its main thread.
+I/OpenGLRenderer( 5914): Davey! duration=851ms; Flags=1, FrameTimelineVsyncId=12515, IntendedVsync=198195424528, Vsync=198745424506, InputEventId=0, HandleInputStart=198757984414, AnimationStart=198757987951, PerformTraversalsStart=198757989504, DrawStart=198760625327, FrameDeadline=198212091194, FrameInterval=198757462842, FrameStartTime=16666666, SyncQueued=198761475411, SyncStart=198761740326, IssueDrawCommandsStart=198764831277, SwapBuffers=198854619951, FrameCompleted=199047178958, DequeueBufferDuration=515110, QueueBufferDuration=21499298, GpuCompleted=199046608596, SwapBuffersCompleted=199047178958, DisplayPresentTime=0, CommandSubmissionCompleted=198854619951, 
+I/Choreographer( 5914): Skipped 128 frames!  The application may be doing too much work on its main thread.
+D/ProfileInstaller( 5914): Installing profile for com.akeakademi.ake_akademi
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=247.25ms min=27.51ms max=484.26ms count=5
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+D/EGL_emulation( 5914): app_time_stats: avg=243.69ms min=14.49ms max=611.94ms count=6
+D/EGL_emulation( 5914): app_time_stats: avg=1744.51ms min=755.26ms max=2520.18ms count=3
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:2b5704b2: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:2b5704b2: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F....ID 0,0-640,1312 #1} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:8ea7f7bd: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:8ea7f7bd: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F....ID 0,0-640,1312 #1} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 5914): app_time_stats: avg=328.51ms min=118.83ms max=488.61ms count=4
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:8ed54ab: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:8ed54ab: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=1287.05ms min=440.16ms max=2133.94ms count=2
+D/EGL_emulation( 5914): app_time_stats: avg=362.49ms min=13.82ms max=1913.24ms count=6
+D/EGL_emulation( 5914): app_time_stats: avg=154.19ms min=31.21ms max=600.38ms count=7
+D/EGL_emulation( 5914): app_time_stats: avg=1987.13ms min=1987.13ms max=1987.13ms count=1
+W/WindowOnBackDispatcher( 5914): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5914): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 5914): app_time_stats: avg=191.85ms min=54.50ms max=615.73ms count=7
+D/EGL_emulation( 5914): app_time_stats: avg=1348.99ms min=1348.99ms max=1348.99ms count=1
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:c2ed22c1: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:c2ed22c1: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d0b07999: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d0b07999: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 492 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 5914): app_time_stats: avg=111.17ms min=7.07ms max=245.11ms count=9
+D/EGL_emulation( 5914): app_time_stats: avg=1617.26ms min=1617.26ms max=1617.26ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=334.67ms min=118.16ms max=615.28ms count=3
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:db7684ba: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:db7684ba: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/EGL_emulation( 5914): app_time_stats: avg=121.03ms min=12.05ms max=619.24ms count=11
+D/EGL_emulation( 5914): app_time_stats: avg=1716.51ms min=1716.51ms max=1716.51ms count=1
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=323.39ms min=103.51ms max=978.39ms count=5
+D/EGL_emulation( 5914): app_time_stats: avg=1199.41ms min=571.26ms max=1827.56ms count=2
+D/EGL_emulation( 5914): app_time_stats: avg=189.38ms min=4.71ms max=609.75ms count=6
+D/EGL_emulation( 5914): app_time_stats: avg=176.33ms min=13.09ms max=616.62ms count=6
+D/EGL_emulation( 5914): app_time_stats: avg=708.13ms min=339.79ms max=1076.47ms count=2
+D/EGL_emulation( 5914): app_time_stats: avg=145.03ms min=8.51ms max=615.42ms count=10
+D/EGL_emulation( 5914): app_time_stats: avg=1450.04ms min=1450.04ms max=1450.04ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=146.59ms min=13.67ms max=617.04ms count=10
+D/EGL_emulation( 5914): app_time_stats: avg=1466.56ms min=1466.56ms max=1466.56ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=149.98ms min=6.30ms max=616.82ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=1200.15ms min=1200.15ms max=1200.15ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=75.27ms min=6.52ms max=233.15ms count=14
+D/EGL_emulation( 5914): app_time_stats: avg=1899.70ms min=1899.70ms max=1899.70ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=239.19ms min=108.41ms max=616.60ms count=5
+D/EGL_emulation( 5914): app_time_stats: avg=162.81ms min=23.68ms max=616.61ms count=7
+D/EGL_emulation( 5914): app_time_stats: avg=741.70ms min=481.52ms max=1001.87ms count=2
+W/WindowOnBackDispatcher( 5914): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5914): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+W/WindowOnBackDispatcher( 5914): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5914): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=92.03ms min=26.51ms max=236.25ms count=12
+D/EGL_emulation( 5914): app_time_stats: avg=858.96ms min=656.02ms max=1061.91ms count=2
+D/EGL_emulation( 5914): app_time_stats: avg=150.70ms min=22.55ms max=621.24ms count=7
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=118.32ms min=35.24ms max=232.65ms count=10
+D/EGL_emulation( 5914): app_time_stats: avg=216.41ms min=202.16ms max=232.21ms count=5
+D/EGL_emulation( 5914): app_time_stats: avg=136.62ms min=13.39ms max=225.58ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=2167.01ms min=533.02ms max=3801.00ms count=2
+D/EGL_emulation( 5914): app_time_stats: avg=204.26ms min=35.62ms max=344.23ms count=5
+D/EGL_emulation( 5914): app_time_stats: avg=105.09ms min=8.48ms max=219.62ms count=10
+D/EGL_emulation( 5914): app_time_stats: avg=136.12ms min=15.79ms max=227.80ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=141.34ms min=47.07ms max=219.85ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=4303.24ms min=4303.24ms max=4303.24ms count=1
+D/FlutterJNI( 5914): Sending viewport metrics to the engine.
+D/EGL_emulation( 5914): app_time_stats: avg=145.40ms min=32.73ms max=244.25ms count=7
+D/EGL_emulation( 5914): app_time_stats: avg=156.01ms min=21.77ms max=616.80ms count=7
+D/EGL_emulation( 5914): app_time_stats: avg=723.54ms min=192.27ms max=1254.80ms count=2
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d1aee031: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d1aee031: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:30d2995e: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:30d2995e: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 396 bytes, containing 1 windows, 3 views
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:be953815: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:be953815: onFailed at PHASE_CLIENT_VIEW_SERVED
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:6d09a19a: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:6d09a19a: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d2ece5b1: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d2ece5b1: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 464 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 5914): app_time_stats: avg=99.38ms min=7.32ms max=620.84ms count=15
+D/EGL_emulation( 5914): app_time_stats: avg=1611.97ms min=1611.97ms max=1611.97ms count=1
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:2913efae: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:2913efae: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/EGL_emulation( 5914): app_time_stats: avg=153.63ms min=21.34ms max=615.81ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=1234.09ms min=1234.09ms max=1234.09ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=159.35ms min=28.30ms max=590.34ms count=7
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:29341dd5: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:29341dd5: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:4c950c0d: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:4c950c0d: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 488 bytes, containing 1 windows, 3 views
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:59fcfb35: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:59fcfb35: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+D/EGL_emulation( 5914): app_time_stats: avg=106.14ms min=21.07ms max=623.05ms count=15
+D/EGL_emulation( 5914): app_time_stats: avg=1345.52ms min=989.53ms max=1701.51ms count=2
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:6e186825: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:6e186825: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/EGL_emulation( 5914): app_time_stats: avg=152.47ms min=23.12ms max=628.76ms count=8
+D/EGL_emulation( 5914): app_time_stats: avg=1227.61ms min=1227.61ms max=1227.61ms count=1
+D/EGL_emulation( 5914): app_time_stats: avg=125.24ms min=21.38ms max=575.17ms count=9
+D/EGL_emulation( 5914): app_time_stats: avg=1118.73ms min=1118.73ms max=1118.73ms count=1
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:bc551988: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:bc551988: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:57a3cdc8: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:57a3cdc8: onFailed at PHASE_CLIENT_VIEW_SERVED
+W/InputMethodManager( 5914): Ignoring showSoftInput() as view=io.flutter.embedding.android.FlutterView{b464d4d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} is not served.
+I/AssistStructure( 5914): Flattened final assist data: 396 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 5914): app_time_stats: avg=80.29ms min=20.38ms max=613.34ms count=18
+D/EGL_emulation( 5914): app_time_stats: avg=1452.72ms min=1452.72ms max=1452.72ms count=1
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d6a4a51b: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+I/ImeTracker( 5914): com.akeakademi.ake_akademi:d6a4a51b: onFailed at PHASE_CLIENT_VIEW_SERVED
+D/EGL_emulation( 5914): app_time_stats: avg=67.58ms min=22.04ms max=241.24ms count=15
+D/EGL_emulation( 5914): app_time_stats: avg=41.40ms min=37.05ms max=53.13ms count=25
+D/EGL_emulation( 5914): app_time_stats: avg=45.83ms min=37.21ms max=77.66ms count=22
+D/EGL_emulation( 5914): app_time_stats: avg=41.06ms min=35.86ms max=50.40ms count=25
+D/EGL_emulation( 5914): app_time_stats: avg=43.38ms min=37.10ms max=76.04ms count=24
+I/flutter ( 5914): ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+I/flutter ( 5914): The following StateError was thrown running a test:
+I/flutter ( 5914): Bad state: No element
+I/flutter ( 5914): 
+I/flutter ( 5914): When the exception was thrown, this was the stack:
+I/flutter ( 5914): #0      Iterable.single (dart:core/iterable.dart:694:25)
+I/flutter ( 5914): #1      WidgetController.element (package:flutter_test/src/controller.dart:887:30)
+I/flutter ( 5914): #2      WidgetController.dragUntilVisible.<anonymous closure> (package:flutter_test/src/controller.dart:2488:38)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #3      TestAsyncUtils.guard.<anonymous closure> (package:flutter_test/src/test_async_utils.dart:130:27)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #4      WidgetController.scrollUntilVisible.<anonymous closure> (package:flutter_test/src/controller.dart:2438:7)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #5      TestAsyncUtils.guard.<anonymous closure> (package:flutter_test/src/test_async_utils.dart:130:27)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #6      main.<anonymous closure>.dokun (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:127:9)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #7      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:278:5)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #8      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #9      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): #10     TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+I/flutter ( 5914): <asynchronous suspension>
+I/flutter ( 5914): 
+I/flutter ( 5914): The test description was:
+I/flutter ( 5914):   ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 5914): ════════════════════════════════════════════════════════════════════════════════════════════════════
+I/flutter ( 5914): 00:53 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu) [E]
+I/flutter ( 5914):   Test failed. See exception logs above.
+I/flutter ( 5914):   The test description was: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+I/flutter ( 5914):   
+I/flutter ( 5914): 00:53 +0 -1: (tearDownAll)
+I/flutter ( 5914): 00:53 +1 -1: Some tests failed.
+D/EGL_emulation( 5914): app_time_stats: avg=5769.27ms min=5769.27ms max=5769.27ms count=1
+Failure Details:
+Failure in method: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      Iterable.single (dart:core/iterable.dart:694:25)
+#1      WidgetController.element (package:flutter_test/src/controller.dart:887:30)
+#2      WidgetController.dragUntilVisible.<anonymous closure> (package:flutter_test/src/controller.dart:2488:38)
+<asynchronous suspension>
+#3      TestAsyncUtils.guard.<anonymous closure> (package:flutter_test/src/test_async_utils.dart:130:27)
+<asynchronous suspension>
+#4      WidgetController.scrollUntilVisible.<anonymous closure> (package:flutter_test/src/controller.dart:2438:7)
+<asynchronous suspension>
+#5      TestAsyncUtils.guard.<anonymous closure> (package:flutter_test/src/test_async_utils.dart:130:27)
+<asynchronous suspension>
+#6      main.<anonymous closure>.dokun (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:127:9)
+<asynchronous suspension>
+#7      main.<anonymous closure> (file:///home/runner/work/Akeakademi/Akeakademi/mobile/integration_test/ekranlar_test.dart:278:5)
+<asynchronous suspension>
+#8      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#9      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1968:5)
+<asynchronous suspension>
+#10     TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1723:12)
+<asynchronous suspension>
+
+The test description was:
+  ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan
+  → Ayarlar (açık ve koyu)
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+

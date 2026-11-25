@@ -235,7 +235,7 @@ class _ProgramSatiri extends StatelessWidget {
         if (madde.bitti)
           Text('Tamam', style: TextStyle(color: t.murekkep3, fontSize: 13))
         else
-          AkeDugme(madde.eylem, genis: false, tur: siradaki ? DugmeTuru.dolu : DugmeTuru.cizgili, basinca: madde.calistir),
+          AkeDugme(madde.eylem, kompakt: true, genis: false, tur: siradaki ? DugmeTuru.dolu : DugmeTuru.cizgili, basinca: madde.calistir),
       ]),
     );
   }
@@ -284,7 +284,7 @@ class _PlanSatiri extends StatelessWidget {
           ),
         ),
         if (dersli)
-          AkeDugme('Çöz', key: ValueKey('ana-gorev-coz-${g.id}'), genis: false, tur: DugmeTuru.cizgili, basinca: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: g.ders)))),
+          AkeDugme('Çöz', key: ValueKey('ana-gorev-coz-${g.id}'), kompakt: true, genis: false, tur: DugmeTuru.cizgili, basinca: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SoruEkrani(model: model, ders: g.ders)))),
       ]),
     );
   }
@@ -328,7 +328,7 @@ class _Karsilama extends StatelessWidget {
                 style: const TextStyle(color: AkeTok.uzerindeKoyu2, height: 1.4),
               ),
               const SizedBox(height: 18),
-              AkeDugme('Soru çöz', basinca: () => model.sekmeGit(1), genis: false, simge: Icons.arrow_forward_rounded),
+              AkeDugme('Soru çöz', basinca: () => model.sekmeGit(1), genis: false),
             ]),
           ),
         ]),

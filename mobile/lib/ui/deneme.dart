@@ -362,14 +362,16 @@ class _Secenek extends StatelessWidget {
           child: Container(
             key: ValueKey(anahtar),
             constraints: const BoxConstraints(minHeight: 44, minWidth: 64),
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            // Sitedeki gibi hap biçimli seçenek: genişliği metni kadar (Container.alignment tam genişliğe yayardı).
             decoration: BoxDecoration(
-              color: secili ? t.girinti : t.kart,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: secili ? t.murekkep : t.cizgi, width: secili ? 1.6 : 1),
+              color: secili ? t.murekkep : t.kart,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: secili ? t.murekkep : t.cizgi),
             ),
-            child: Text(ad, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: secili ? t.murekkep : t.murekkep2)),
+            child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+              Flexible(child: Text(ad, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: secili ? t.kart : t.murekkep2))),
+            ]),
           ),
         ),
       ),

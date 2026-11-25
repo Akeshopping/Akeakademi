@@ -258,7 +258,8 @@ class AkeDugme extends StatelessWidget {
   final DugmeTuru tur;
   final IconData? simge;
   final bool genis;
-  const AkeDugme(this.etiket, {super.key, required this.basinca, this.tur = DugmeTuru.dolu, this.simge, this.genis = true});
+  final bool kompakt; // liste içi eylemler (site: ~44 px; dokunma hedefi için en az 48 dp, 14 px yazı)
+  const AkeDugme(this.etiket, {super.key, required this.basinca, this.tur = DugmeTuru.dolu, this.simge, this.genis = true, this.kompakt = false});
 
   @override
   Widget build(BuildContext context) {
@@ -280,12 +281,12 @@ class AkeDugme extends StatelessWidget {
         kenar = Colors.transparent;
     }
     final govde = Container(
-      constraints: BoxConstraints(minHeight: 52, minWidth: genis ? double.infinity : 0),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      constraints: BoxConstraints(minHeight: kompakt ? 48 : 52, minWidth: genis ? double.infinity : 0),
+      padding: EdgeInsets.symmetric(horizontal: kompakt ? 16 : 20, vertical: kompakt ? 8 : 12),
       decoration: BoxDecoration(color: zemin, borderRadius: BorderRadius.circular(12), border: Border.all(color: kenar)),
       child: Row(mainAxisSize: genis ? MainAxisSize.max : MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
         if (simge != null) ...[Icon(simge, size: 20, color: yazi), const SizedBox(width: 8)],
-        Flexible(child: Text(etiket, textAlign: TextAlign.center, style: TextStyle(color: yazi, fontSize: 16, fontWeight: FontWeight.w700))),
+        Flexible(child: Text(etiket, textAlign: TextAlign.center, style: TextStyle(color: yazi, fontSize: kompakt ? 14 : 16, fontWeight: FontWeight.w700))),
       ]),
     );
     return AkeDokun(basinca: basinca, child: govde);

@@ -19,10 +19,10 @@ class _Sekme {
 }
 
 const _sekmeler = [
-  _Sekme('Ana sayfa', Icons.home_outlined, Icons.home_rounded),
-  _Sekme('Soru çöz', Icons.layers_outlined, Icons.layers_rounded),
-  _Sekme('Deneme', Icons.timer_outlined, Icons.timer_rounded),
-  _Sekme('AI', Icons.auto_awesome_outlined, Icons.auto_awesome_rounded),
+  _Sekme('Ana sayfa', Icons.home_outlined, Icons.home_outlined),
+  _Sekme('Soru çöz', Icons.dns_outlined, Icons.dns_outlined),
+  _Sekme('Deneme', Icons.timer_outlined, Icons.timer_outlined),
+  _Sekme('AI', Icons.auto_awesome_outlined, Icons.auto_awesome_outlined),
   _Sekme('Menü', Icons.menu_rounded, Icons.menu_rounded),
 ];
 
@@ -198,17 +198,12 @@ class _AltGezinme extends StatelessWidget {
                   basinca: () => secince(i),
                   child: SizedBox(
                     height: 52,
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut,
-                        width: 44,
-                        height: 26,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(13), color: i == secili ? Colors.white.withValues(alpha: 0.09) : Colors.transparent),
-                        child: Icon(i == secili ? _sekmeler[i].dolu : _sekmeler[i].simge, size: 22, color: i == secili ? AkeTok.acik.mercanAcik : AkeTok.uzerindeKoyu3),
-                      ),
-                      const SizedBox(height: 2),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                      // Sitedeki gibi: etkin sekmede üstte mercan çizgi, simge mercan; pasifte ince çizgili gri simge.
+                      AnimatedContainer(duration: const Duration(milliseconds: 200), curve: Curves.easeOut, width: i == secili ? 32 : 0, height: 2.5, decoration: BoxDecoration(color: AkeTok.acik.mercanAcik, borderRadius: BorderRadius.circular(2))),
+                      const SizedBox(height: 7),
+                      Icon(_sekmeler[i].simge, size: 22, color: i == secili ? AkeTok.acik.mercanAcik : AkeTok.uzerindeKoyu3),
+                      const SizedBox(height: 3),
                       Text(_sekmeler[i].ad, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: i == secili ? FontWeight.w700 : FontWeight.w600, color: i == secili ? AkeTok.porselen : AkeTok.uzerindeKoyu3)),
                     ]),
                   ),

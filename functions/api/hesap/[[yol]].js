@@ -10,19 +10,19 @@
 //
 // Uçlar:
 //   POST kod-gonder {eposta}         e-postaya 8 haneli giriş kodu gönderir (60 sn bekleme + saatte 5 kod: tek atomik komut)
-//   POST kod-dogrula {eposta, kod}    kodu doğrular, oturum açar (çerez). Deneme hakkı ÖNCE atomik ayrılır, kod tek komutta tüketilir.
+//   POST kod-dogrula {eposta, kod, istemci?}  kodu doğrular, oturum açar (çerez; istemci:"mobil" ise yanıtta oturumAnahtari da döner, sonraki istekler Authorization: Bearer ile). Deneme hakkı ÖNCE atomik ayrılır, kod tek komutta tüketilir.
 //   GET  ben                          oturumdaki kullanıcı, paket, bu ayki kullanım
 //   GET  kota                         ücretsiz kalan hak (günlük soru, aylık deneme)
 //   POST kota {tur, adet}             ücretsiz hak ayırır (tur: soru | deneme); biterse 402
 //   POST cikis                        oturumu kapatır
 //   GET  google / google-donus        Google ile giriş
-//   GET  veri                         hesaptaki çalışma verisi (alanlar)
-//   PUT  veri/<alan>                  bir alanı kaydeder
+//   GET  veri                         hesaptaki çalışma verisi (alanlar) + her alanın sürümü (u)
+//   PUT  veri/<alan>                  bir alanı kaydeder; gövdede "_b" (okunan sürüm) varsa KOŞULLU yazar (araya yazma girdiyse 409)
 //   POST kod-bagla {kod}              erişim kodunu hesaba bağlar
 //   POST sil                          hesabı ve verilerini siler
 
 import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
-import { json, fail, sha256, sema, oturum, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
+import { json, fail, sha256, sema, oturum, bearerToken, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
 import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
 
@@ -106,8 +106,10 @@ export async function onRequest({ request, env, params }) {
     if (!degisti(tuk)) return kodHatasi();
     const kid = await kullaniciBulVeyaAc(env, { eposta }), c = await oturumAc(env, kid);
     await bekleyenKodlariBagla(env, kid, eposta).catch(() => { });
-    const u = { id: kid, eposta, ad: "" };
-    return json(200, { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid), ucretsiz: await kotaDurum(env, kid).catch(() => null) }, { "set-cookie": c });
+    const u = { id: kid, eposta, ad: "" }, y = { kullanici: kullaniciJson(env, u), paket: await aktifPaket(env, kid), ucretsiz: await kotaDurum(env, kid).catch(() => null) };
+    /* Mobil uygulama çerez saklamaz: yalnız istemci AÇIKÇA "mobil" derse oturum anahtarı gövdede döner (web yanıtı değişmez; anahtar yalnızca geçerli kodla alınır). */
+    if (b.istemci === "mobil") { const m = /^ake_s=([^;]*)/.exec(c); if (m) y.oturumAnahtari = decodeURIComponent(m[1]); }
+    return json(200, y, { "set-cookie": c });
   }
 
   /* ---------- Google ile giriş ---------- */
@@ -152,23 +154,44 @@ export async function onRequest({ request, env, params }) {
     return json(200, r);
   }
   if (ad === "cikis" && m === "POST") {
-    const t = cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
+    const t = bearerToken(request) !== null ? bearerToken(request) : cerez(request, "ake_s"); if (t) await env.DB.prepare("DELETE FROM oturum WHERE hash = ?").bind(await sha256(t)).run();
     return json(200, { ok: true }, { "set-cookie": cerezYaz("ake_s", "", 0) });
   }
   if (ad === "veri" && m === "GET") {
-    const { results } = await env.DB.prepare("SELECT alan, json FROM veri WHERE kid = ?").bind(u.id).all();
-    const alanlar = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); } catch (e) { } });
-    return json(200, { alanlar });
+    const { results } = await env.DB.prepare("SELECT alan, json, u FROM veri WHERE kid = ?").bind(u.id).all();
+    const alanlar = {}, uu = {}; (results || []).forEach(r => { try { alanlar[r.alan] = JSON.parse(r.json); uu[r.alan] = r.u; } catch (e) { } });
+    return json(200, { alanlar, u: uu, hesap: u.id });
   }
   if (ad === "veri" && m === "PUT") {
     const alan = yol[1]; if (!ALANLAR.includes(alan)) return fail(400, "alan");
     const ham = await request.text(); if (ham.length > 262144) return fail(413, "buyuk");
     let o; try { o = JSON.parse(ham); } catch (e) { return fail(400, "json"); }
+    /* HESAP DOĞRULAMA: gövdede "_h" (istemcinin yazmak istediği hesap) varsa oturumun hesabıyla aynı olmalı. İstemci işlemi başlatırken bir hesaptaydı;
+       araya hesap değişimi (başka sekmede giriş/çıkış) girdiyse yazma REDDEDİLİR, başka hesabın belgesine yanlış veri girmez. "_h" saklanmaz. */
+    let ham1 = ham;
+    if (o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, "_h")) {
+      if (o._h !== u.id) return json(409, { error: "hesap" });
+      delete o._h; ham1 = JSON.stringify(o);
+    }
+    /* KOŞULLU YAZMA (compare-and-swap): gövdede "_b" (istemcinin okuduğu sürüm = veri.u) varsa, kayıt YALNIZCA hâlâ o sürümdeyse yazılır.
+       Aradan başka bir yazma (başka cihaz, mobil sunucu-tarafı ilerleme) girdiyse 409 döner ve istemci yeniden okuyup birleştirir; böylece
+       "yeni" zaman damgasıyla eskimiş bir belgenin üzerine yazıp başkasının ilerlemesini silmek mümkün olmaz. Karşılaştırma ve yazma TEK atomik komuttur.
+       Yeni sürüm sunucuda atanır (>= b+1) ve belgenin _u alanına yazılır. "_b" yoksa eski (son-yazan-kazanır, _u karşılaştırmalı) davranış sürer. */
+    if (o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, "_b")) {
+      const b = o._b; if (!Number.isSafeInteger(b) || b < 0) return fail(400, "_b");
+      const yeni = Math.max(Date.now(), b + 1); delete o._b; o._u = yeni;
+      const ham2 = JSON.stringify(o); if (ham2.length > 262144) return fail(413, "buyuk");
+      const yaz = b === 0
+        ? await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO NOTHING").bind(u.id, alan, ham2, yeni).run()
+        : await env.DB.prepare("UPDATE veri SET json = ?, u = ? WHERE kid = ? AND alan = ? AND u = ?").bind(ham2, yeni, u.id, alan, b).run();
+      if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
+      return json(200, { ok: true, u: yeni });
+    }
     const yeniU = Number(o && o._u) || Date.now();
-    /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda) */
-    const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first();
-    if (var_ && var_.u > yeniU) return json(409, { error: "eski", u: var_.u });
-    await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u").bind(u.id, alan, ham, yeniU).run();
+    /* Daha yeni kayıt varsa üzerine yazma (iki cihaz aynı anda). Karşılaştırma ve yazma TEK atomik komuttur (önce oku, sonra yaz yarışı yok):
+       eşzamanlı iki yazmadan eskisi, sıralama ne olursa olsun yenisinin üstüne yazamaz. Etkilenen satır 0 ise daha yeni kayıt vardır → 409. */
+    const yaz = await env.DB.prepare("INSERT INTO veri (kid, alan, json, u) VALUES (?, ?, ?, ?) ON CONFLICT (kid, alan) DO UPDATE SET json = excluded.json, u = excluded.u WHERE veri.u <= excluded.u").bind(u.id, alan, ham1, yeniU).run();
+    if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
     return json(200, { ok: true });
   }
   if (ad === "kod-bagla" && m === "POST") {
@@ -185,6 +208,12 @@ export async function onRequest({ request, env, params }) {
        yazılır (düz e-posta, ad, Google kimliği, kid tutulmaz). Böylece aynı e-postayla yeniden açınca hak sıfırlanmaz. Kişisel hesap verisi
        aşağıda mevcut şekilde silinir. Hata olursa silme yine de tamamlanır. */
     await kotaKorumaYaz(env, u.id).catch(() => { });
+    /* Mobil soru oturumları ve ilerleme olayları da hesaba aittir: silinir. Tablolar ilk kullanımda oluşur; hiç oluşmamışsa atlanır. */
+    for (const q of [
+      "DELETE FROM soru_oturum_soru WHERE oturum IN (SELECT id FROM soru_oturum WHERE kid = ?)",
+      "DELETE FROM soru_oturum WHERE kid = ?",
+      "DELETE FROM ilerleme_olay WHERE kid = ?"
+    ]) { try { await env.DB.prepare(q).bind(u.id).run(); } catch (e) { if (!/no such table/i.test(String(e && e.message))) console.error("soru verisi sil", e); } }
     await env.DB.batch([
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),

@@ -55,3 +55,12 @@ Doğrulama: yerel SQLite kabuğunda (iç içe geçen istekler, her noktada hata 
 `functions/api/yonetim/[[yol]].js` → `soru-uret` bugün yeni `onayli` soruları **legacy biçimde** yazar (`id, s, t, d, json, durum, tarih, karar`); `govde, a, x, h, rk, kaynak` kanonik kolonlarını **doldurmaz**. V2 uygun-soru koşulu (`durum IN ('banka','onayli') AND kopya_of IS NULL AND govde IS NOT NULL AND a IS NOT NULL AND x IS NOT NULL`) olduğundan, production göçünden SONRA üretilen yeni legacy `ok-*` soruları kanonik backfill/write-path yapılmazsa V2 havuzuna GİRMEZ. Bu PR'da yönetim kodu değiştirilmedi.
 
 **V2 frontend cutover'ı ve `/api/sorular`'ın kapatılması öncesinde, yönetim soru üretim write-path'i kanonik kolonları (`govde, a, x, h, rk, kaynak`) atomik olarak dolduracak şekilde güncellenmek ZORUNDADIR.** Bu iş sonraki uygun PR'a blocker olarak taşınmıştır.
+
+## `ara` filtresi (mobil Soru ara)
+`POST /api/soru/oturum` gövdesine isteğe bağlı `ara` (2–60 karakter metin) eklendi: soru metni/paragraf/seçeneklerde geçen kelime. Parametreli `LIKE` (`%`, `_`, `\` etkisizleştirilir); sonuç yoksa `503 banka_yok`. Aynı `istek` kimliği + farklı filtre `409`. SQLite küçük/büyük harf eşlemesi yalnız ASCII'dir: Türkçe büyük harf (Ç, İ…) için yazıldığı gibi eşleşme yedektir.
+
+## Deneme sonucunun Gelişim geçmişine kaydı (`POST /api/soru/ilerleme {oturum, tz}`, sınav oturumu)
+- Yalnız **bitmiş** (`bitir` çağrılmış) sınav oturumu işlenir; açıksa `409 oturum_acik`. Başkasının oturumu `404`.
+- Web `finishRun()` ile aynı iki sonuç: (1) her soru `stats`'a (doğru/yanlış; **boş** yalnız `topic[2]`, günlük sayaca girmez); (2) `exams` belgesine tek özet kaydı `{id:"m:<oturum>", kind:"exam", mode:"exam", src:"mobil", d, y, b, net, sections, ...}` (`qs` yok; en çok 60 kayıt).
+- **Çift sayım koruması:** özet kaydı kimliği oturuma bağlıdır; stats ile `ilerleme_olay` (boşlar dahil tüm sorular) tek batch'te "stats gerçekten değişti" şartıyla yazılır; özet yazılamazsa stats'a dokunulmaz. Kısmi hata sonrası yeniden denemede özet çiftlenmez, stats bir kez işlenir. Oturumsuz çağrı (süpürme) bitmiş ama işlenmemiş denemeleri toparlar.
+- Testler: `tests/mobil-deneme-gelisim.test.mjs` (gerçek sunucu kodu, node:sqlite).

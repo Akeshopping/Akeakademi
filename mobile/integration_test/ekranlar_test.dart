@@ -234,8 +234,10 @@ void main() {
         await t.enterText(find.byKey(const ValueKey('ai-kod')), 'AKE-TEST-1234');
         await dokun('Kodu bağla');
       }
+      await bekleBul(find.byKey(const ValueKey('ai-girdi')));
       await t.enterText(find.byKey(const ValueKey('ai-girdi')), 'Asal sayı nedir?');
       await t.tap(find.byKey(const ValueKey('ai-gonder')));
+      await bekleBul(find.textContaining('SAHTE YANIT'));
       await t.pumpAndSettle();
       await ek('51-ai-sohbet-$tema');
       // Menü → Gelişim, Plan (düzenleme), Ayarlar

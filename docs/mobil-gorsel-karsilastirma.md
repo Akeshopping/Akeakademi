@@ -61,3 +61,11 @@ Sınırlar: simülatördür (gerçek iPhone değil); veri sahte sunucudur; imzas
 | Sonra (2,15 sn tasarım) | **2834 ms**, 14 kare, ort. 561 ms/kare | **3180 ms**, 6 kare, ort. 864 ms/kare |
 
 - **Cihaz sınırı:** kare başına ortalama **hazırlama (UI) 1,3–3,6 ms**, **çizim (raster) 282–518 ms**. Yani uygulama kodu kare başına birkaç ms harcıyor; süreyi emülatörün yazılım GPU'su (SwiftShader) uzatıyor: animasyon zamana bağlı olduğundan, çok yavaş bir kare bitişi o karenin süresi kadar geciktirir (0,5–1,4 sn). **2,5 sn hedefi bu emülatörde tutmadı** (2,8–3,2 sn); tasarım süresi tutuyor (2,15 sn). Gerçek telefondaki akıcılık bu ölçümle kanıtlanmış DEĞİLDİR. Koşular arası değişim büyük (paylaşılan CI makinesi): "önce/sonra" farkı kesin kanıt değil, yönü gösterir.
+
+## Son tur: simge seti ve yoğunluk (aynı veriyle yeni yan yana görüntüler)
+
+Yeni `yan-yana/` görüntüleri Android emülatöründe (390 dp) alınan güncel uygulama ekranlarını, aynı test verisiyle üretilen site ekranlarının yanına koyar (`mobile/tool/yan_yana.py`).
+
+Kapatılan farklar: alt gezinme simgeleri ve etkin sekme göstergesi (ince çizgili simge, etkin sekmede üstte mercan çizgi); Soru çöz simgesi (sitedeki yığın simgesi); Oturum ve Uzunluk seçenekleri tam genişlikte yığılı yerine hap biçiminde yan yana; liste içi eylem düğmeleri (Çöz, Başla, Başlat) kompakt (48 dp); ana sayfa üst kartındaki ok simgesi kaldırıldı; Odak odası siteyle aynı düzende (Odak/Mola hapları, Başlat + metin Sıfırla).
+
+Kalan farklar (bilerek): site Plan'ı "Bugün" kartı + hafta, uygulama hafta listesi gösterir; sitedeki canlı "Odak odası: herkesle birlikte" satırı yok; başlıklarda hafif yazı boyutu ve üst çubuk yüksekliği farkı var; iOS görüntüleri (`ios/`) bu turdan ÖNCEKİ arayüzdür, yeni iOS yürüyüşü CI'da tamamlanamadı (aşağıya bakın).

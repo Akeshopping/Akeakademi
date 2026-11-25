@@ -208,6 +208,12 @@ export async function onRequest({ request, env, params }) {
        yazılır (düz e-posta, ad, Google kimliği, kid tutulmaz). Böylece aynı e-postayla yeniden açınca hak sıfırlanmaz. Kişisel hesap verisi
        aşağıda mevcut şekilde silinir. Hata olursa silme yine de tamamlanır. */
     await kotaKorumaYaz(env, u.id).catch(() => { });
+    /* Mobil soru oturumları ve ilerleme olayları da hesaba aittir: silinir. Tablolar ilk kullanımda oluşur; hiç oluşmamışsa atlanır. */
+    for (const q of [
+      "DELETE FROM soru_oturum_soru WHERE oturum IN (SELECT id FROM soru_oturum WHERE kid = ?)",
+      "DELETE FROM soru_oturum WHERE kid = ?",
+      "DELETE FROM ilerleme_olay WHERE kid = ?"
+    ]) { try { await env.DB.prepare(q).bind(u.id).run(); } catch (e) { if (!/no such table/i.test(String(e && e.message))) console.error("soru verisi sil", e); } }
     await env.DB.batch([
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),
       env.DB.prepare("DELETE FROM oturum WHERE kid = ?").bind(u.id),

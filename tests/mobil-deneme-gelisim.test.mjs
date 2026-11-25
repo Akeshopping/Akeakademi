@@ -103,3 +103,20 @@ test("6) mevcut web exams belgesi korunur; 60 kayıt sınırı; özet eski kayı
   assert.equal(A.exams.exams.length, 60); assert.equal(A.exams.exams[59].id, "m:" + oturum); assert.equal(A.exams.exams[0].id, "w1");
   assert.equal(A.exams.ozel, "korunur");
 });
+
+test("7) hesap silinince soru oturumları, oturum soruları ve ilerleme olayları da silinir; başka kullanıcınınki kalır", async () => {
+  const a = await kullanici("sil-a@ornek.com"), b = await kullanici("sil-b@ornek.com");
+  const oa = await deneme(a, 3, [0, 1, null]), ob = await deneme(b, 3, [0, 1, null]);
+  for (const [c, o] of [[a, oa], [b, ob]]) { assert.equal((await bitir(c, o)).s, 200); assert.equal((await ilerle(c, o)).s, 200); }
+  const say = (kid, oturum) => ({
+    so: DB.db.prepare("SELECT COUNT(*) n FROM soru_oturum WHERE kid = ?").get(kid).n,
+    sos: DB.db.prepare("SELECT COUNT(*) n FROM soru_oturum_soru WHERE oturum = ?").get(oturum).n,
+    io: DB.db.prepare("SELECT COUNT(*) n FROM ilerleme_olay WHERE kid = ?").get(kid).n
+  });
+  assert.ok(say(a.kid, oa).so > 0 && say(a.kid, oa).sos > 0 && say(a.kid, oa).io > 0, "silmeden önce veri var");
+  assert.equal((await cagir(a.tok, "POST", "sil", {})).status, 200);
+  assert.deepEqual(say(a.kid, oa), { so: 0, sos: 0, io: 0 }, "silinen hesabın soru verisi kalmadı");
+  const kalan = say(b.kid, ob);
+  assert.ok(kalan.so > 0 && kalan.sos > 0 && kalan.io > 0, "başka kullanıcının verisine dokunulmadı");
+  assert.equal((await cagir(a.tok, "GET", "ben")).status, 401, "silinen hesabın anahtarı çalışmaz");
+});

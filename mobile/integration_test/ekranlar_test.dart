@@ -242,6 +242,10 @@ void main() {
       await ek('51-ai-sohbet-$tema');
       // Menü → Gelişim, Plan (düzenleme), Ayarlar
       await sekme(4);
+      if (find.byKey(const ValueKey('menu-geri')).evaluate().isNotEmpty) {
+        await t.tap(find.byKey(const ValueKey('menu-geri'))); // önceki turdan açık alt sayfa varsa listeye dön
+        await t.pumpAndSettle();
+      }
       await ek('60-menu-$tema');
       await t.tap(find.byKey(const ValueKey('menu-gelisim')));
       await ek('61-gelisim-$tema');

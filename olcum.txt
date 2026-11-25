@@ -1,0 +1,9 @@
+--- acilis-390-ilk-acilis (390 dp, animator=1)
+11-25 05:00:59.908  6554  6554 I flutter : AKE_OLCUM acilis_basladi
+11-25 05:01:03.855  6554  6554 I flutter : AKE_OLCUM acilis_bitti neden=tamam sure_ms=3046 kare=16 ort_kare_ms=392.0 en_kotu_kare_ms=1060.2 kare_16ms_ustu=16 kare_33ms_ustu=16
+--- acilis-320-ilk-acilis (320 dp, animator=1)
+11-25 05:01:22.043  6769  6769 I flutter : AKE_OLCUM acilis_basladi
+11-25 05:01:26.138  6769  6769 I flutter : AKE_OLCUM acilis_bitti neden=tamam sure_ms=3195 kare=20 ort_kare_ms=327.5 en_kotu_kare_ms=993.7 kare_16ms_ustu=20 kare_33ms_ustu=20
+--- acilis-390-ikinci-acilis (390 dp, animator=1)
+--- acilis-320-hareket-azalt (320 dp, animator=0)
+11-25 05:02:22.916  7356  7356 I flutter : AKE_OLCUM acilis_bitti neden=hareket_azalt sure_ms=0 kare=0 ort_kare_ms=0.0 en_kotu_kare_ms=0.0 kare_16ms_ustu=0 kare_33ms_ustu=0

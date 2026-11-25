@@ -19,11 +19,15 @@
 //   GET  veri                         hesaptaki çalışma verisi (alanlar) + her alanın sürümü (u)
 //   PUT  veri/<alan>                  bir alanı kaydeder; gövdede "_b" (okunan sürüm) varsa KOŞULLU yazar (araya yazma girdiyse 409)
 //   POST kod-bagla {kod}              erişim kodunu hesaba bağlar
+//   GET  magaza                       mağaza durumu: {mod, urunler, hesapKimligi, islemler}
+//   POST magaza/dogrula {platform, kimlik}  mağaza işlemini SUNUCU doğrular; erişim yalnız ondan sonra açılır
+//   POST magaza/geri-yukle {islemler:[{platform, kimlik}]}  geri yükleme: her biri ayrı doğrulanır
 //   POST sil                          hesabı ve verilerini siler
 
 import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
 import { json, fail, sha256, sema, oturum, bearerToken, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
+import { magazaModu, URUNLER, hesapKimligi, dogrula, uygula, googleOnayla, hesapIslemleri, islemJson, yenile as magazaYenile } from "../../../lib/magaza.js";
 import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
@@ -143,6 +147,7 @@ export async function onRequest({ request, env, params }) {
   if (ad === "ben" && m === "GET") {
     const ayar = { google: !!env.GOOGLE_CLIENT_ID, eposta: !!env.RESEND_API_KEY };
     if (!u) return json(401, { error: "giris", ayar });
+    await magazaYenile(env, u.id).catch(e => console.error("magaza yenile", e)); /* eskiyen mağaza işlemlerini tazeler (yenileme/iade/iptal); hata erişimi etkilemez */
     const paket = await aktifPaket(env, u.id), k = await kullanimAl(env, u.id);
     return json(200, { kullanici: kullaniciJson(env, u), paket, kullanim: k, limit: paket ? limitler(env, paket.plan) : null, ucretsiz: await kotaDurum(env, u.id).catch(() => null), ayar });
   }
@@ -194,6 +199,38 @@ export async function onRequest({ request, env, params }) {
     if (!degisti(yaz)) { const var_ = await env.DB.prepare("SELECT u FROM veri WHERE kid = ? AND alan = ?").bind(u.id, alan).first(); return json(409, { error: "eski", u: var_ ? var_.u : 0 }); }
     return json(200, { ok: true });
   }
+  if (ad === "magaza") {
+    const alt = yol[1] || "";
+    /* Mağaza satın almaları (lib/magaza.js). Kapalıyken (AKE_MAGAZA tanımsız) hiçbir şey yapmaz. Uygulamanın gönderdiği "kimlik" yalnızca bir
+       anahtardır: ürün, süre, durum ve hesap bağlantısı mağazanın kendi yanıtından okunur. */
+    const mod = magazaModu(env);
+    if (mod === "kapali") return fail(503, "kapali", "Mağaza satın alma şu an kapalı.");
+    if (!alt && m === "GET") {
+      await magazaYenile(env, u.id).catch(() => { });
+      const kim = await hesapKimligi(env, u.id);
+      return json(200, { mod, urunler: Object.keys(URUNLER).map(id => ({ id, plan: URUNLER[id].plan, donem: URUNLER[id].donem })), hesapKimligi: kim, islemler: (await hesapIslemleri(env, u.id)).map(islemJson), paket: await aktifPaket(env, u.id) });
+    }
+    if ((alt === "dogrula" || alt === "geri-yukle") && m === "POST") {
+      { const red = await ipSinir(env, request, "magaza", 60, 3600000); if (red) return red; }
+      const b = await govde(request);
+      const liste = alt === "dogrula" ? [{ platform: b.platform, kimlik: b.kimlik }] : (Array.isArray(b.islemler) ? b.islemler.slice(0, 10) : []);
+      if (!liste.length) return fail(400, "bos");
+      const sonuc = [];
+      for (const it of liste) {
+        const d = await dogrula(env, String(it && it.platform || ""), String(it && it.kimlik || ""));
+        if (!d.norm) { sonuc.push({ platform: it && it.platform, ok: false, hata: d.hata }); continue; }
+        const x = await uygula(env, u.id, d.norm);
+        if (!x.satir) { sonuc.push({ platform: d.norm.platform, ok: false, hata: x.hata }); continue; }
+        let onay = true;
+        if (d.norm.platform === "google" && d.norm.onayBekliyor && ["aktif", "ek_sure", "iptal"].includes(x.satir.durum)) onay = await googleOnayla(env, d.norm); /* erişim açıldıktan SONRA */
+        sonuc.push({ platform: d.norm.platform, ok: true, islem: islemJson({ ...x.satir, oto_yenile: x.satir.otoYenile }), onay });
+      }
+      const ilk = sonuc.find(x => !x.ok);
+      const durum = alt === "dogrula" && ilk ? ({ belirtec: 400, platform: 400, islem_bulunamadi: 404, kapali: 503, yapilandirma: 503, magaza_ulasilamadi: 502, canli_islem_kapali: 403 }[ilk.hata] || 409) : 200;
+      return json(durum, { sonuc, paket: await aktifPaket(env, u.id) });
+    }
+    return fail(404, "yok");
+  }
   if (ad === "kod-bagla" && m === "POST") {
     /* Erişim kodu deneme bütçesi /api/ai ile ORTAKTIR (lib/hiz.js kodDenemeSinir); D1 arızasında kod tahminine izin verilmez. */
     { const red = await kodDenemeSinir(env, request, u.id); if (red) return red; }
@@ -212,7 +249,8 @@ export async function onRequest({ request, env, params }) {
     for (const q of [
       "DELETE FROM soru_oturum_soru WHERE oturum IN (SELECT id FROM soru_oturum WHERE kid = ?)",
       "DELETE FROM soru_oturum WHERE kid = ?",
-      "DELETE FROM ilerleme_olay WHERE kid = ?"
+      "DELETE FROM ilerleme_olay WHERE kid = ?",
+      "UPDATE magaza_islem SET kid = 'silindi' WHERE kid = ?" /* mağaza işlemi başka hesaba geçmesin; abonelik mağazadan iptal edilmelidir */
     ]) { try { await env.DB.prepare(q).bind(u.id).run(); } catch (e) { if (!/no such table/i.test(String(e && e.message))) console.error("soru verisi sil", e); } }
     await env.DB.batch([
       env.DB.prepare("DELETE FROM veri WHERE kid = ?").bind(u.id),

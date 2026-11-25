@@ -47,7 +47,7 @@ test("18.5-6) başka oturumun / rastgele soru kimliğiyle cevap anahtarı çekil
   const b = await api("oturum", { cookie: k.cookie, govde: { istek: yeniIstek(), mod: "practice", adet: 5, ders: "fizik" } });
   const bununDisinda = b.j.sorular[0].id;                       // b oturumunun sorusu, a oturumunda sorulamaz
   const cevap = (oturum, soru) => api("cevap", { cookie: k.cookie, govde: { oturum, soru, secim: 0 } });
-  for (const [o, s] of [[a.j.oturum, bununDisinda], [a.j.oturum, "g-299"], [a.j.oturum, "h-99"], [a.j.oturum, "olmayan-id"], [a.j.oturum, "' OR 1=1 --"], [a.j.oturum, "x".repeat(500)]]) {
+  for (const [o, s] of [[a.j.oturum, bununDisinda], [a.j.oturum, ["g-299", "g-298", "g-297"].find(x => !a.j.sorular.some(q => q.id === x))], [a.j.oturum, ["h-99", "h-98", "h-97"].find(x => !a.j.sorular.some(q => q.id === x))], [a.j.oturum, "olmayan-id"], [a.j.oturum, "' OR 1=1 --"], [a.j.oturum, "x".repeat(500)]]) {
     const r = await cevap(o, s); assert.ok([404].includes(r.s), `${s}: ${r.s}`); assert.ok(!sahip(r)); assert.deepEqual(sizintiBul(r.j), []);
   }
   assert.equal(DB.db.prepare("SELECT COUNT(*) n FROM soru_oturum_soru WHERE oturum = ? AND secim IS NOT NULL").get(a.j.oturum).n, 0);   // hiçbir şey yazılmadı

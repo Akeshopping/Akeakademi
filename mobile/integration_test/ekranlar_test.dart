@@ -237,6 +237,8 @@ void main() {
       if (find.byKey(const ValueKey('ai-kod')).evaluate().isNotEmpty) {
         await ek('50-ai-kapi-$tema');
         await t.enterText(find.byKey(const ValueKey('ai-kod')), 'AKE-TEST-1234');
+        FocusManager.instance.primaryFocus?.unfocus(); // klavye kapanıp yerleşim oturmadan düğmeye basılırsa tıklama yanlış yere düşer
+        await t.pumpAndSettle();
         await dokun('Kodu bağla');
       }
       await bekleBul(find.byKey(const ValueKey('ai-girdi')));

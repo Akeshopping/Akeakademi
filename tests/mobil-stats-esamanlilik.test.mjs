@@ -95,14 +95,14 @@ test("B4) web PUT'u ile mobil işleme yarışı: sunucu u'su geriye gitmez; daha
   assert.equal(toplam(await stats(c.tok)), 10, "web'in daha yeni yazması üzerine mobil artışı eklendi");
   assert.ok((await stats(c.tok))._u > sunucuU + 5);
 });
-test("B5) başkasının oturumu 404 ve başkasının belgesine yazılmaz; sınav oturumu işlenmez; geçersiz girdiler", async () => {
+test("B5) başkasının oturumu 404 ve başkasının belgesine yazılmaz; açık sınav oturumu işlenmez; geçersiz girdiler", async () => {
   const a = await kullanici("esam-b5a@ornek.com"), b = await kullanici("esam-b5b@ornek.com");
   const s = await cevapla(a, 2); await s.cevapla(0);
   assert.equal((await ilerle(b, s.oturum)).s, 404);
   assert.equal(await stats(b.tok), undefined, "B'nin belgesi oluşmadı");
   assert.equal(await stats(a.tok), undefined, "A'nın belgesi henüz işlenmedi");
   const ex = await api("oturum", { cookie: a.cookie, govde: { istek: yeniIstek(), mod: "exam", adet: 3, ders: "mat" } });
-  assert.equal((await ilerle(a, ex.j.oturum)).s, 200); assert.equal(await stats(a.tok), undefined, "sınav cevapları bu uçtan işlenmez");
+  assert.equal((await ilerle(a, ex.j.oturum)).s, 409); assert.equal(await stats(a.tok), undefined, "AÇIK sınav bu uçtan işlenmez (409); bitince işlenir: tests/mobil-deneme-gelisim.test.mjs");
   assert.equal((await ilerle(a, "x")).s, 404);
   assert.equal((await ilerle(a, s.oturum, { tz: "3" })).s, 400); assert.equal((await ilerle(a, s.oturum, { tz: 9999 })).s, 400);
   assert.equal((await ilerle(a, s.oturum, { sayac: 5 })).s, 400, "istemci sayaç gönderemez");

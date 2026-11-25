@@ -16,6 +16,19 @@ class GunSayisi {
   const GunSayisi(this.gun, this.soru, this.dogru);
 }
 
+/// Web `exams` belgesindeki deneme özeti (web ve mobil denemeleri birlikte; `qs` yok sayılır).
+class DenemeKaydi {
+  final String id;
+  final String baslik;
+  final int tarihMs;
+  final int dogru;
+  final int yanlis;
+  final int bos;
+  final double net;
+  final bool mobil;
+  const DenemeKaydi({required this.id, required this.baslik, required this.tarihMs, required this.dogru, required this.yanlis, required this.bos, required this.net, required this.mobil});
+}
+
 class KonuBasarisi {
   final String ders;
   final String konu;
@@ -34,6 +47,7 @@ class HesapVerisi {
   final Map<String, GunSayisi> gunluk;
   final List<KonuBasarisi> konular;
   final List<PlanGorevi> plan;
+  final List<DenemeKaydi> denemeler; // eskiden yeniye
   const HesapVerisi({
     required this.ad,
     required this.alan,
@@ -42,6 +56,7 @@ class HesapVerisi {
     required this.gunluk,
     required this.konular,
     required this.plan,
+    this.denemeler = const [],
   });
 
   static const varsayilanSinav = '2027-06-19';
@@ -74,6 +89,24 @@ class HesapVerisi {
         gorevler.add(PlanGorevi(metin: metin, gun: _i(t['day']).clamp(0, 6).toInt(), ders: '${t['s'] ?? ''}', dakika: _i(t['min']), bitti: t['done'] == true));
       }
     }
+    final denemeler = <DenemeKaydi>[];
+    final exListe = _m(alanlar['exams'])['exams'];
+    if (exListe is List) {
+      for (final e in exListe) {
+        final m = _m(e);
+        if (m['kind'] != 'exam' || m['net'] is! num) continue;
+        denemeler.add(DenemeKaydi(
+          id: '${m['id'] ?? ''}',
+          baslik: '${m['title'] ?? 'Deneme'}',
+          tarihMs: _i(m['date']),
+          dogru: _i(m['d']),
+          yanlis: _i(m['y']),
+          bos: _i(m['b']),
+          net: (m['net'] as num).toDouble(),
+          mobil: m['src'] == 'mobil',
+        ));
+      }
+    }
     final hedef = _i(profil['gunluk']);
     final sinav = '${profil['examDate'] ?? ''}';
     return HesapVerisi(
@@ -84,6 +117,7 @@ class HesapVerisi {
       gunluk: gunluk,
       konular: konular,
       plan: gorevler,
+      denemeler: denemeler,
     );
   }
 

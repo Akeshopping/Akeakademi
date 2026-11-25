@@ -34,7 +34,7 @@ class _GelisimSekmesiState extends State<GelisimSekmesi> {
   void _sekmeDegisti() {
     // Gelişim sekmesine her dönüşte taze veri (yeni çözülen sorular görünsün).
     final s = widget.model.sekme;
-    if (s == 2 && _sonSekme != 2 && mounted) setState(() { _f = widget.model.hesapVerisi(); });
+    if (s == 4 && _sonSekme != 4 && mounted) setState(() { _f = widget.model.hesapVerisi(); });
     _sonSekme = s;
   }
 
@@ -61,7 +61,7 @@ class _GelisimSekmesiState extends State<GelisimSekmesi> {
             return DurumKutusu(simge: Icons.cloud_off, baslik: 'İlerleme getirilemedi', aciklama: hataMetni(s.error!), dugme: 'Tekrar dene', basinca: _yenile);
           }
           final v = s.data!;
-          if (v.konular.every((k) => k.cozulen == 0)) {
+          if (v.konular.every((k) => k.cozulen == 0) && v.denemeler.isEmpty) {
             return const DurumKutusu(simge: Icons.insights_outlined, baslik: 'Henüz ilerleme yok', aciklama: 'Bir konudan soru çözdüğünde ilerlemen burada görünür.');
           }
           final simdi = DateTime.now();
@@ -84,6 +84,10 @@ class _GelisimSekmesiState extends State<GelisimSekmesi> {
               const SizedBox(height: 14),
               _SonGunler(gunler: v.sonGunler(simdi, 7)),
               const SizedBox(height: 14),
+              if (v.denemeler.isNotEmpty) ...[
+                _DenemeGecmisi(denemeler: v.denemeler),
+                const SizedBox(height: 14),
+              ],
               KartKutu(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -200,6 +204,46 @@ class _KonuSatiri extends StatelessWidget {
           ]),
         ),
       ),
+    );
+  }
+}
+
+/// Geçmiş denemeler (web ve mobil birlikte, en yeni üstte; en çok 5).
+class _DenemeGecmisi extends StatelessWidget {
+  final List<DenemeKaydi> denemeler;
+  const _DenemeGecmisi({required this.denemeler});
+
+  static String _net(double n) => n.toStringAsFixed(2).replaceAll('.', ',').replaceFirst(RegExp(r',?0+$'), '');
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    final son = denemeler.reversed.take(5).toList();
+    return KartKutu(
+      key: const ValueKey('deneme-gecmisi'),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Expanded(child: Text('Geçmiş denemeler', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))),
+          Text('${denemeler.length} deneme', style: TextStyle(color: t.murekkep2, fontSize: 13)),
+        ]),
+        const SizedBox(height: 8),
+        for (final d in son)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(children: [
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(d.baslik, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  Text('${d.dogru} doğru · ${d.yanlis} yanlış · ${d.bos} boş', style: TextStyle(color: t.murekkep2, fontSize: 12.5)),
+                ]),
+              ),
+              const SizedBox(width: 10),
+              Text(_net(d.net), key: ValueKey('deneme-net-${d.id}'), style: rakamStili(t.murekkep, 22)),
+              Text(' net', style: TextStyle(color: t.murekkep3, fontSize: 12)),
+            ]),
+          ),
+      ]),
     );
   }
 }

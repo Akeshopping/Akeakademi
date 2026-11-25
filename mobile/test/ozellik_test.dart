@@ -51,6 +51,8 @@ Future<void> gorunurDokun(WidgetTester t, Finder f) async {
   await t.pumpAndSettle();
 }
 
+String tester_text(WidgetTester t, String anahtar) => t.widget<Text>(find.byKey(ValueKey(anahtar))).data ?? '';
+
 void main() {
   group('gezinme (site bilgi mimarisi)', () {
     testWidgets('alt menü: Ana sayfa, Soru çöz, Deneme, AI, Menü; Gelişim/Plan/Ayarlar Menü içinden açılır', (t) async {
@@ -146,6 +148,8 @@ void main() {
       expect(find.text('0,75'), findsOneWidget, reason: '1 doğru, 1 yanlış → 1 − 1/4');
       expect(find.textContaining('1 doğru · 1 yanlış · 0 boş'), findsOneWidget);
       expect(find.textContaining('Doğru cevap'), findsWidgets, reason: 'bitişte anahtar gelir');
+      expect(s.ilerlemeCagrilari.where((c) => c.$1 == 'u1').length, 1, reason: 'bitince deneme sonucu hesabın ilerlemesine işlenmek üzere sunucuya bildirildi (sayaç göndermeden)');
+      expect(s.istekler.where((r) => r.url.path == '/api/soru/ilerleme').every((r) => !r.body.contains('"dogru"') && !r.body.contains('"net"')), isTrue, reason: 'istemci sayaç/net göndermez');
       expect(t.takeException(), isNull);
       await t.pumpWidget(const SizedBox());
     });
@@ -281,6 +285,31 @@ void main() {
       expect((yaz['tasks'] as List).map((e) => (e as Map)['done']).toList(), [false, false]);
       expect((yaz['tasks'] as List).map((e) => (e as Map)['id']).toList(), ['a1', 'a2']);
       expect(yaz['_b'], 1);
+    });
+  });
+
+  group('Gelişim · deneme geçmişi', () {
+    testWidgets('exams belgesindeki web ve mobil denemeler en yeni üstte listelenir; yalnız deneme olsa da boş durum görünmez', (t) async {
+      final s = SahteSunucu()
+        ..veriAlanlari = {
+          'exams': {
+            'exams': [
+              {'id': 'w1', 'kind': 'exam', 'title': 'TYT denemesi', 'date': 1000, 'd': 80, 'y': 20, 'b': 20, 'net': 75},
+              {'id': 'm:abc', 'kind': 'exam', 'src': 'mobil', 'title': 'Mobil deneme', 'date': 2000, 'd': 1, 'y': 1, 'b': 2, 'net': 0.75},
+              {'id': 'x', 'kind': 'practice', 'net': 1},
+            ],
+          },
+        };
+      final m = await ac(t, s);
+      m.menuyeGit(MenuSayfasi.gelisim);
+      await t.pumpAndSettle();
+      expect(find.text('Henüz ilerleme yok'), findsNothing);
+      expect(find.byKey(const ValueKey('deneme-gecmisi')), findsOneWidget);
+      expect(find.text('2 deneme'), findsOneWidget, reason: 'kind=exam olmayan kayıt sayılmaz');
+      expect(find.byKey(const ValueKey('deneme-net-m:abc')), findsOneWidget);
+      expect(tester_text(t, 'deneme-net-m:abc'), '0,75');
+      expect(tester_text(t, 'deneme-net-w1'), '75');
+      expect(t.takeException(), isNull);
     });
   });
 

@@ -277,6 +277,12 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
     });
     try {
       final s = await _api.bitir(o.oturum);
+      // Deneme sonucu Gelişim geçmişine SUNUCUDA işlenir (stats + deneme özeti, çift sayım korumalı); uygulama sayaç göndermez.
+      final hesap = widget.model.kullanici?.id ?? '';
+      if (hesap.isNotEmpty) {
+        widget.model.senkron.ekle(hesapId: hesap, oturum: o.oturum);
+        widget.model.senkron.bosalt();
+      }
       if (!mounted) return;
       _zamanlayici?.cancel();
       await Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => DenemeSonucEkrani(model: widget.model, sonuc: s, sorular: o.sorular, sureDoldu: sureDoldu, harcananSn: DateTime.now().difference(_baslangic).inSeconds, ders: widget.ders, adet: widget.adet)));

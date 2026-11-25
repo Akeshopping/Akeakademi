@@ -11,6 +11,7 @@ import 'package:ake_akademi/veri/oturum_deposu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'sahte_magaza.dart';
 import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {DateTime Function()? saat}) {
@@ -711,6 +712,7 @@ void main() {
           expect(t.takeException(), isNull, reason: 'sekme $i');
         }
         s.paketli = true;
+        m.magaza = SahteMagaza();
         await sekme(t, 0);
         await sekme(t, 3);
         expect(t.takeException(), isNull);

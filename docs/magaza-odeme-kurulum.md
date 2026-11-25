@@ -36,7 +36,7 @@ Workers & Pages → akeakademi → Settings → Variables and Secrets → **Prev
 | `APPLE_BUNDLE_ID` | Değişken | iOS paket kimliği | `com.akeakademi.akeAkademi` (varsayılan bu) |
 | `APPLE_IAP_ISSUER_ID` | **Secret** | B-4 Issuer ID | UUID |
 | `APPLE_IAP_KEY_ID` | **Secret** | B-4 Key ID | 10 karakter |
-| `APPLE_IAP_PRIVATE_KEY` | **Secret** | `.p8` dosyasının içeriği | `-----BEGIN PRIVATE KEY-----` ile başlar |
+| `APPLE_IAP_PRIVATE_KEY` | **Secret** | `.p8` dosyasının içeriği | çok satırlı metin; ilk satırı "BEGIN" ile başlar |
 | `MAGAZA_BILDIRIM_SIRRI` | **Secret** | Google bildirim adresindeki gizli anahtar | uzun rastgele metin |
 
 `AKE_GIZLI` zaten tanımlı olmalı (mevcut erişim kodu anahtarı); hesap takma adları ondan türetilir.

@@ -9,6 +9,7 @@ import 'package:ake_akademi/veri/oturum_deposu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'sahte_magaza.dart';
 import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {String? anahtar, Map<String, String>? ayar}) {
@@ -87,6 +88,7 @@ void main() {
         addTearDown(t.platformDispatcher.clearPlatformBrightnessTestValue);
         final s = SahteSunucu()..ilerlemeler['u1'] = {'mat|Sayılar': [7, 3, 0]};
         final m = model(s, anahtar: SahteSunucu.anahtar);
+        m.magaza = SahteMagaza(); // Paketler sayfası gerçek mağaza eklentisine değil sahte köprüye bağlanır
         await m.baslat();
         await t.pumpWidget(AkeUygulamasi(model: m));
         await t.pumpAndSettle();

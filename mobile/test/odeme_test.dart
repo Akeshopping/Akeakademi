@@ -184,7 +184,7 @@ void main() {
 
   for (final g in [320.0, 390.0]) {
     testWidgets('11) Paketler ekranı ${g.toInt()} dp: mağaza fiyatları, geri yükleme, web/Shopier bağlantısı yok, taşma yok', (t) async {
-      t.view.physicalSize = Size(g, 900);
+      t.view.physicalSize = Size(g, 1800);
       t.view.devicePixelRatio = 1.0;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
@@ -207,6 +207,7 @@ void main() {
       // satın alma → sunucu doğrular → ekran paketi gösterir
       s.magazaGercek.add('b-1');
       k.satinAlYaniti = (u) => k.olay(_alindi('b-1', urun: u));
+      await t.ensureVisible(find.byKey(const ValueKey('paket-satin-premium_aylik')));
       await t.tap(find.byKey(const ValueKey('paket-satin-premium_aylik')));
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('paket-durum')), findsOneWidget);

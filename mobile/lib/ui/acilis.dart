@@ -42,11 +42,11 @@ void _olcumBitir(String neden) {
   });
 }
 
-/// İlk açılışta bir kez oynayan kısa giriş: konu haritasının noktaları ve yolları bir öğrenme yolunda birleşir,
+/// Her yeni uygulama çalıştırıldığında bir kez oynayan kısa giriş: konu haritasının noktaları ve yolları bir öğrenme yolunda birleşir,
 /// nokta ve çizgiler K amblemin gerçek köşe noktalarına oturur; son karede gerçek K amblemi (aynı path, aynı gradyan) belirir.
 ///
 /// Süre: [sure] (1,9 sn) + 0,25 sn sönme = 2,15 sn (önceki sürüm 2,2 + 0,25; emülatör ölçümü README/karşılaştırma belgesinde). "Geç" ilk kareden itibaren görünür; ekranın herhangi bir yerine dokunmak da geçer.
-/// "Hareketi azalt" açıksa hiç oynamaz. Tekrar açılışta kullanıcı hiç bekletilmez (çağıran taraf bayrağı saklar).
+/// "Hareketi azalt" açıksa hiç oynamaz. Aynı süreçte ekrana geri dönüldüğünde tekrar oynamaz.
 class AcilisKatmani extends StatefulWidget {
   final VoidCallback bitti;
   final Duration sure;

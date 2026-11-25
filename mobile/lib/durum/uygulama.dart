@@ -31,8 +31,9 @@ class UygulamaModeli extends ChangeNotifier {
   Kullanici? kullanici;
   ThemeMode tema = ThemeMode.system;
 
-  /// İlk açılışta bir kez oynayan giriş animasyonu. Görüldüğü cihazda saklanır; tekrar açılışta hiç gösterilmez.
+  /// Her yeni uygulama çalıştırıldığında bir kez oynayan giriş animasyonu.
   bool acilisOynat = false;
+  bool _acilisKararlastirildi = false;
 
   /// Alt gezinmedeki etkin sekme (0 Ana sayfa, 1 Soru çöz, 2 Deneme, 3 AI, 4 Menü). Ekranlar buradan sekme değiştirebilir.
   int sekme = 0;
@@ -91,12 +92,16 @@ class UygulamaModeli extends ChangeNotifier {
   }
 
   Future<void> ayarlariYukle() async {
+    if (_acilisKararlastirildi) return; // Aynı süreçte ağ nedeniyle yeniden başlatma animasyonu tekrarlamaz.
+    _acilisKararlastirildi = true;
+    acilisOynat = true;
     try {
       final t = await ayar.oku('tema');
       tema = t == 'acik' ? ThemeMode.light : (t == 'koyu' ? ThemeMode.dark : ThemeMode.system);
-      acilisOynat = (await ayar.oku('acilis')) != '1';
+      // Eski sürümlerin '1' (görüldü) kaydı artık açılışı engellemez.
+      acilisOynat = (await ayar.oku('acilis')) != 'kapali';
     } catch (_) {
-      acilisOynat = false; // depo okunamazsa kullanıcıyı bekletme
+      // Ayar deposu okunamazsa bile o süreçte açılışın gösterilmesine izin ver.
     }
   }
 
@@ -114,14 +119,11 @@ class UygulamaModeli extends ChangeNotifier {
     } catch (_) {}
   }
 
-  /// Açılış animasyonu bitti ya da geçildi: bir daha oynatılmaz.
-  Future<void> acilisBitti() async {
+  /// Açılış animasyonu bitti ya da geçildi: bu süreçte tekrar oynatılmaz.
+  void acilisBitti() {
     if (!acilisOynat) return;
     acilisOynat = false;
     notifyListeners();
-    try {
-      await ayar.yaz('acilis', '1');
-    } catch (_) {}
   }
 
   Future<void> baslat() async {

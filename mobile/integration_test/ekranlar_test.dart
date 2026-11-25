@@ -94,7 +94,7 @@ void _sunucuHazirla(SahteSunucu s, {required bool uzunAciklama}) {
 
 UygulamaModeli _model(SahteSunucu s) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu());
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'})); // açılış animasyonunun kendi gerçek zamanlı kaydı var
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'})); // açılış animasyonunun kendi gerçek zamanlı kaydı var
 }
 
 void main() {

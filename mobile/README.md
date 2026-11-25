@@ -10,7 +10,7 @@ Hata, boş, yükleniyor, bağlantı yok, soru servisi kapalı, ücretsiz hak bit
 - **Marka:** K amblemi `docs/tasarim/gen_icons.py` içindeki gerçek SVG path ve gradyanla `lib/ui/marka.dart`'ta çizilir (yaklaşık logo PNG yok). Başlatıcı ikonu, açılış, giriş ve üst çubuk aynı şekli kullanır; ikon dosyaları `kur_ikon.py` ile `kur.sh` içinde uygulanır.
 - **Token'lar:** renk, yüzey ve ders renkleri `docs/tasarim/tokens.css` ile aynıdır (`lib/ui/tema.dart`, açık + koyu). Yazı: AKE Sans (Atkinson), AKE Serif (Newsreader), rakamlar AKE Rakam (Inter); site yığınındaki gibi önce Rakam, harfler Sans'a düşer (`assets/fontlar`, SIL OFL).
 - **Ekranlar:** koyu mürekkep üst çubuk + alt gezinme, sıcak açık zemin, mercan vurgu, ders renkli kartlar, zorluk seçici, soru ekranı (paragraf, beş şık, seçili/doğru/yanlış, açıklamaya kayma, sabit alt eylem alanı).
-- **Açılış animasyonu:** yalnız ilk açılışta, ≈1,9 sn + 0,25 sn sönme (2,15 sn); "Geç" ilk kareden itibaren; giriş ekranını engellemez; sonraki açılışlarda beklenmez; "hareketi azalt"ta oynamaz.
+- **Açılış animasyonu:** uygulama her yeni çalıştırıldığında bir kez, ≈1,9 sn + 0,25 sn sönme (2,15 sn); "Geç" ilk kareden itibaren; aynı süreçte sekme değiştirme ve arka plandan dönüşte tekrarlanmaz; "hareketi azalt"ta oynamaz.
 - Site → uygulama özellik eşlemesi ve eksikler: `docs/mobil-ozellik-haritasi.md`.
 
 ## Nasıl konuşur

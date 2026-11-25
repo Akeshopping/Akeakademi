@@ -10,7 +10,7 @@ import 'sahte_sunucu.dart';
 
 UygulamaModeli kurModel(SahteSunucu s, [BellekDeposu? depo]) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: depo ?? BellekDeposu());
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'})); // açılış animasyonu bu testlerde kapalı (kendi testi var)
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'})); // açılış animasyonu bu testlerde kapalı (kendi testi var)
 }
 
 /// Alt gezinmeden "Soru çöz" sekmesine geç.

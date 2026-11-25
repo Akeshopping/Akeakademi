@@ -190,7 +190,7 @@ void main() {
       addTearDown(t.view.resetDevicePixelRatio);
       final s = SahteSunucu();
       final api = _api(s);
-      final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}));
+      final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}));
       final k = SahteMagaza();
       m.magaza = k;
       await m.baslat();
@@ -224,7 +224,7 @@ void main() {
     addTearDown(t.view.resetDevicePixelRatio);
     final s = SahteSunucu()..magazaModu = 'kapali';
     final api = _api(s);
-    final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}));
+    final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}));
     m.magaza = SahteMagaza();
     await m.baslat();
     await t.pumpWidget(AkeUygulamasi(model: m));

@@ -16,7 +16,7 @@ import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {DateTime Function()? saat}) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(SahteSunucu.anahtar));
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}), saat: saat);
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}), saat: saat);
 }
 
 void ekran(WidgetTester t, double genislik, {double yukseklik = 900}) {

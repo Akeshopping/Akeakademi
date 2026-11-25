@@ -7,13 +7,14 @@ import '../veri/hesap_verisi.dart';
 import '../veri/ilerleme.dart';
 import '../veri/modeller.dart';
 import '../veri/oturum_deposu.dart';
+import '../odeme/magaza_koprusu.dart';
 import 'odak.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
 enum Faz { yukleniyor, ag, giris, oturumBitti, ana }
 
 /// Menü sekmesinin alt sayfaları (sitedeki Menü bölümü): null = menü listesi.
-enum MenuSayfasi { gelisim, plan, ayarlar }
+enum MenuSayfasi { gelisim, plan, paket, ayarlar }
 
 /// Uygulamanın kök durumu: oturum var mı, süresi doldu mu, ağ var mı.
 class UygulamaModeli extends ChangeNotifier {
@@ -23,6 +24,9 @@ class UygulamaModeli extends ChangeNotifier {
   final DateTime Function() saat; // test için değiştirilebilir saat
   /// Odak odası sayacı (aktif hesaba bağlı; sekmeler arasında yaşar).
   OdakSayaci? odak;
+
+  /// Mağaza köprüsü: boşsa Paketler ekranı gerçek Google Play / StoreKit köprüsünü kurar; testler sahte köprü verir.
+  MagazaKoprusu? magaza;
   Faz faz = Faz.yukleniyor;
   Kullanici? kullanici;
   ThemeMode tema = ThemeMode.system;

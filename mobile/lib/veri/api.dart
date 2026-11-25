@@ -207,6 +207,15 @@ class AkeApi {
     return hesapDurumu();
   }
 
+  // ---------- mağaza (Google Play / App Store) ----------
+  /// Mağaza durumu: ürün kimlikleri, bu hesap için takma adlar ve hesabın mağaza işlemleri. Kapalıysa ApiHata(kod: 'kapali').
+  Future<MagazaDurumu> magazaDurumu() async => MagazaDurumu.fromJson(await _istek('GET', '/api/hesap/magaza'));
+
+  /// Mağaza işlemini SUNUCUYA doğrulatır (kimlik yalnızca anahtardır). Başarılıysa paket açılmıştır; aksi hâlde ApiHata (govde.sonuc[0].hata).
+  Future<void> magazaDogrula(String platform, String kimlik) async {
+    await _istek('POST', '/api/hesap/magaza/dogrula', govde: {'platform': platform, 'kimlik': kimlik});
+  }
+
   /// AI öğretmen: sunucu hesabı, paketi ve kotayı denetler. JSON modu (akış yok). Anahtar ve model sunucudadır.
   Future<AiYaniti> aiSor({required List<Map<String, String>> mesajlar, String katman = 'quick'}) async {
     final y = await _istek('POST', '/api/ai', govde: {'messages': mesajlar, 'tier': katman, 'json': true});

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../durum/uygulama.dart';
 import 'ayarlar.dart';
 import 'gelisim.dart';
+import 'paket.dart';
 import 'plan.dart';
 import 'tema.dart';
 
@@ -21,6 +22,7 @@ class MenuSekmesi extends StatelessWidget {
         final (baslik, icerik) = switch (s) {
           MenuSayfasi.gelisim => ('Gelişim', GelisimSekmesi(model: model)),
           MenuSayfasi.plan => ('Plan', PlanSekmesi(model: model)),
+          MenuSayfasi.paket => ('Paketler', PaketSekmesi(model: model)),
           MenuSayfasi.ayarlar => ('Ayarlar ve hesap', AyarlarSekmesi(model: model)),
         };
         final t = context.ake;
@@ -114,9 +116,10 @@ class _Liste extends StatelessWidget {
         const SizedBox(height: 14),
         satir('gelisim', Icons.show_chart_rounded, 'Gelişim', 'Çözülen soru, doğruluk, konu başarısı', MenuSayfasi.gelisim),
         satir('plan', Icons.event_note_rounded, 'Plan', 'Haftalık görevlerini ekle, işaretle, düzenle', MenuSayfasi.plan),
+        satir('paket', Icons.workspace_premium_rounded, 'Paketler', 'Atılım ve Premium · aylık ya da yıllık', MenuSayfasi.paket),
         satir('ayarlar', Icons.tune_rounded, 'Ayarlar ve hesap', 'Profil, hedef, görünüm, paket, hesabı sil', MenuSayfasi.ayarlar),
         const SizedBox(height: 8),
-        Text('Mobilde henüz olmayanlar: bildirimler, arkadaş ligi ve Sınıfım, canlı deneme, yanlış defteri, kartlar. Ödeme/paket satın alma ayrı bir iş olarak ele alınacak.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
+        Text('Mobilde henüz olmayanlar: bildirimler, arkadaş ligi ve Sınıfım, canlı deneme, yanlış defteri, kartlar. Paket satın alma yalnızca Google Play ve App Store üzerinden yapılır.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
       ],
     );
   }

@@ -31,10 +31,10 @@ Ham site görüntüleri: `mobil-gorsel/site/`. Ham uygulama görüntüleri (aç�
 | Alan | Fark |
 |---|---|
 | Düzen | Uygulama mobil sekme düzenidir; piksel kopyası değil. Plan haftalık gün listesidir (sitede "Bugün" + Odak odası). |
-| Deneme | Sitedeki **Oturum (TYT/AYT…) seçimi ve bölüm tablosu yok**: sunucu API'si yalnız ders ve soru sayısı destekler. Bölümlü tam TYT/AYT ve canlı deneme yok. |
+| Deneme | Oturum (TYT/AYT…), uzunluk ve bölüm tablosu var; bölümlü oturumu sunucu kurar. Canlı deneme yok. |
 | Soru Merkezi | Sitedeki "ÖSYM tarzı" ve "AI ile üret" sekmeleri yok (sunucuda karşılığı yok; düğme konmadı). |
 | AI | Fotoğraf ekleme ve sesli mod yok. Soru metinleri: sitede kendi statik soru bankası; uygulamada sahte sunucunun 2 örnek sorusu (kullanıcı verisi aynı, soru içeriği aynı değil). |
-| Plan | **Odak odası yok.** |
+| Plan | Odak odası var (Odak/Mola, Başlat·Duraklat·Sıfırla). Görev düzenleme ve Bugün listesi sitedeki gibi değil, haftalık gün listesi. |
 | Simgeler | Material simgeleri; sitenin özel simge seti taşınmadı. K amblemi, renkler ve yazı tipi siteyle aynı kaynaktan. |
 | Durum çubuğu | Emülatör görüntülerinde sistem durum çubuğu yakalanmıyor (üst şerit boş). |
 

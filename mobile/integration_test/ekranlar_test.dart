@@ -205,12 +205,15 @@ void main() {
       await dokun('Ana sayfaya dön');
       // Deneme (süreli; zamanlayıcı çalıştığı için sabit bekleme yok)
       await sekme(2);
+      await dokunKisa(find.byKey(const ValueKey('deneme-tur-TYT'))); // test havuzunda yalnız TYT dersleri var (profil alanı Sayısal olsa da)
       await ek('45-deneme-baslangic-$tema');
       await dokun('Denemeyi başlat');
       await kisa();
       await bekleBul(find.byKey(const ValueKey('deneme-sik-1')));
       if (find.byKey(const ValueKey('deneme-sik-1')).evaluate().isEmpty) {
         await binding.takeScreenshot('$g-HATA-deneme-baslamadi-$tema');
+        // ignore: avoid_print
+        print('TANI deneme-baslamadi metinler: ${find.byType(Text).evaluate().map((e) => (e.widget as Text).data ?? (e.widget as Text).textSpan?.toPlainText()).whereType<String>().take(60).toList()}');
       }
       await t.tap(find.byKey(const ValueKey('deneme-sik-1')));
       await kisa();

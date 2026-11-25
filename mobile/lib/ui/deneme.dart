@@ -134,7 +134,7 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
         final plan = _plan(ozet, etkin, adetS, sure);
         final hakYok = !hesap.paketli && hesap.kalanDeneme != null && hesap.kalanDeneme! < 1;
         final eksik = [for (final r in satirlar) if (r.n > ozet.dersToplami(r.ders)) '${Katalog.dersAdi(r.ders)} (${ozet.dersToplami(r.ders)})'];
-        final ozetMetni = serbest ? '$adetS soru · ${denemeSuresiDk(adetS)} dk' : '$toplam soru · ${sure == 0 ? 'süresiz' : '$sure dk'}';
+        final ozetMetni = serbest ? '$adetS soru · ${denemeSuresiDk(adetS)} dk' : (toplam == 0 ? 'Bu oturum için havuzda soru yok; başka bir tür seç.' : '$toplam soru · ${sure == 0 ? 'süresiz' : '$sure dk'}');
         return Column(children: [
           Expanded(
             child: ListView(

@@ -15,7 +15,9 @@ class ProfilDeposu {
 
   Future<(Map<String, dynamic>, int)> oku() async {
     final (alanlar, u) = await api.veriOkuSurumlu();
-    return (alanlar['profile'] is Map ? Map<String, dynamic>.from(alanlar['profile'] as Map) : <String, dynamic>{}, u['profile'] ?? 0);
+    // Sitenin belge biçimi: {_u, profile: {name, alan, gunluk, examDate, …}} (AREA.profile = ["profile"]).
+    final belge = alanlar['profile'] is Map ? alanlar['profile'] as Map : const {};
+    return (belge['profile'] is Map ? Map<String, dynamic>.from(belge['profile'] as Map) : <String, dynamic>{}, u['profile'] ?? 0);
   }
 
   /// Yalnızca verilen alanlar değişir (name, alan, gunluk, examDate).
@@ -24,7 +26,7 @@ class ProfilDeposu {
       final (belge, surum) = await oku();
       final yeni = Map<String, dynamic>.from(belge)..addAll(degisen);
       try {
-        await api.veriYaz('profile', yeni, surum);
+        await api.veriYaz('profile', {'profile': yeni}, surum);
         return;
       } on ApiHata catch (e) {
         if (e.tur == HataTuru.cakisma && e.kod == 'eski' && deneme < 2) continue;

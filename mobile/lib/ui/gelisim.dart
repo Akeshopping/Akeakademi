@@ -85,7 +85,7 @@ class _GelisimSekmesiState extends State<GelisimSekmesi> {
               _SonGunler(gunler: v.sonGunler(simdi, 7)),
               const SizedBox(height: 14),
               if (v.denemeler.isNotEmpty) ...[
-                _DenemeGecmisi(denemeler: v.denemeler),
+                DenemeGecmisiKarti(denemeler: v.denemeler),
                 const SizedBox(height: 14),
               ],
               KartKutu(
@@ -208,10 +208,10 @@ class _KonuSatiri extends StatelessWidget {
   }
 }
 
-/// Geçmiş denemeler (web ve mobil birlikte, en yeni üstte; en çok 5).
-class _DenemeGecmisi extends StatelessWidget {
+/// Geçmiş denemeler (web ve mobil birlikte, en yeni üstte; en çok 5). Gelişim ve Deneme ekranlarında ortak.
+class DenemeGecmisiKarti extends StatelessWidget {
   final List<DenemeKaydi> denemeler;
-  const _DenemeGecmisi({required this.denemeler});
+  const DenemeGecmisiKarti({required this.denemeler});
 
   static String _net(double n) => n.toStringAsFixed(2).replaceAll('.', ',').replaceFirst(RegExp(r',?0+$'), '');
 

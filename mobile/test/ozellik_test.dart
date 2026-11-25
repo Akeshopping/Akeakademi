@@ -244,7 +244,7 @@ void main() {
       expect(yaz['_alan'], 'plan');
       expect(yaz['_b'], 0);
       expect(yaz['_h'], 'u1');
-      final g = (yaz['tasks'] as List).single as Map;
+      final g = ((yaz['plan'] as Map)['tasks'] as List).single as Map;
       expect([g['text'], g['day'], g['s'], g['min'], g['done']], ['Paragraf: 25 soru', 1, 'turkce', 30, false]);
       expect((g['id'] as String).isNotEmpty, isTrue);
       // işaretle (araya başka yazma girmiş gibi ilk deneme 409)
@@ -252,12 +252,12 @@ void main() {
       await t.tap(find.text('Paragraf: 25 soru'));
       await t.pumpAndSettle();
       yaz = s.veriYazmalari.last;
-      expect(((yaz['tasks'] as List).single as Map)['done'], isTrue);
+      expect((((yaz['plan'] as Map)['tasks'] as List).single as Map)['done'], isTrue);
       expect(s.veriYazmalari.length, 3, reason: 'ekle + 409 + başarılı yeniden deneme');
       // sil
       await t.tap(find.byIcon(Icons.delete_outline_rounded));
       await t.pumpAndSettle();
-      expect((s.veriYazmalari.last['tasks'] as List), isEmpty);
+      expect(((s.veriYazmalari.last['plan'] as Map)['tasks'] as List), isEmpty);
       expect(find.textContaining('Henüz görevin yok'), findsOneWidget);
       expect(s.veriYazmalari.every((y) => y['_alan'] == 'plan'), isTrue, reason: 'stats ve diğer alanlara yazılmadı');
       expect(t.takeException(), isNull);
@@ -267,11 +267,14 @@ void main() {
       final s = SahteSunucu()
         ..veriAlanlari = {
           'plan': {
-            'tasks': [
-              {'id': 'a1', 'day': 0, 'text': 'Problemler', 's': 'mat', 'min': 45, 'done': true},
-              {'id': 'a2', 'day': 2, 'text': 'Fizik tekrar', 's': 'fizik', 'min': 40, 'done': true},
-            ],
-            'baska': 'korunmali',
+            '_u': 1,
+            'plan': {
+              'tasks': [
+                {'id': 'a1', 'day': 0, 'text': 'Problemler', 's': 'mat', 'min': 45, 'done': true},
+                {'id': 'a2', 'day': 2, 'text': 'Fizik tekrar', 's': 'fizik', 'min': 40, 'done': true},
+              ],
+              'baska': 'korunmali',
+            },
           },
         };
       final m = await ac(t, s);
@@ -281,9 +284,9 @@ void main() {
       await t.tap(find.byKey(const ValueKey('plan-onay')));
       await t.pumpAndSettle();
       final yaz = s.veriYazmalari.last;
-      expect(yaz['baska'], 'korunmali');
-      expect((yaz['tasks'] as List).map((e) => (e as Map)['done']).toList(), [false, false]);
-      expect((yaz['tasks'] as List).map((e) => (e as Map)['id']).toList(), ['a1', 'a2']);
+      expect((yaz['plan'] as Map)['baska'], 'korunmali');
+      expect(((yaz['plan'] as Map)['tasks'] as List).map((e) => (e as Map)['done']).toList(), [false, false]);
+      expect(((yaz['plan'] as Map)['tasks'] as List).map((e) => (e as Map)['id']).toList(), ['a1', 'a2']);
       expect(yaz['_b'], 1);
     });
   });
@@ -317,7 +320,7 @@ void main() {
     testWidgets('profil ve hedef sunucuya yazılır; bilinmeyen profil alanları korunur', (t) async {
       final s = SahteSunucu()
         ..veriAlanlari = {
-          'profile': {'name': 'Ali', 'alan': 'EA', 'gunluk': 40, 'examDate': '2027-06-19', 'ozel': 'x'},
+          'profile': {'_u': 1, 'profile': {'name': 'Ali', 'alan': 'EA', 'gunluk': 40, 'examDate': '2027-06-19', 'ozel': 'x'}},
         };
       final m = await ac(t, s, yukseklik: 2600);
       m.menuyeGit(MenuSayfasi.ayarlar);
@@ -330,7 +333,8 @@ void main() {
       await t.pumpAndSettle();
       final yaz = s.veriYazmalari.last;
       expect(yaz['_alan'], 'profile');
-      expect([yaz['name'], yaz['alan'], yaz['gunluk'], yaz['examDate'], yaz['ozel']], ['Ayşe', 'SAY', 60, '2027-06-19', 'x']);
+      final pr = yaz['profile'] as Map;
+      expect([pr['name'], pr['alan'], pr['gunluk'], pr['examDate'], pr['ozel']], ['Ayşe', 'SAY', 60, '2027-06-19', 'x']);
       expect(yaz['_b'], 1);
       expect(find.textContaining('Kaydedildi'), findsOneWidget);
     });
@@ -378,11 +382,14 @@ void main() {
         final s = SahteSunucu()
           ..veriAlanlari = {
             'plan': {
-              'tasks': [
-                {'id': 'a1', 'day': 0, 'text': 'Çok uzun bir görev adı: Paragraf ve problemler karışık 30 soru çöz ve yanlışlarını yaz', 's': 'mat', 'min': 45, 'done': false},
-              ],
+              '_u': 1,
+              'plan': {
+                'tasks': [
+                  {'id': 'a1', 'day': 0, 'text': 'Çok uzun bir görev adı: Paragraf ve problemler karışık 30 soru çöz ve yanlışlarını yaz', 's': 'mat', 'min': 45, 'done': false},
+                ],
+              },
             },
-            'profile': {'name': 'Ali Kaan', 'alan': 'SAY', 'gunluk': 40, 'examDate': '2027-06-19'},
+            'profile': {'_u': 1, 'profile': {'name': 'Ali Kaan', 'alan': 'SAY', 'gunluk': 40, 'examDate': '2027-06-19'}},
           };
         final m = await ac(t, s, genislik: genislik, yukseklik: 700);
         for (final i in [2, 3, 4]) {

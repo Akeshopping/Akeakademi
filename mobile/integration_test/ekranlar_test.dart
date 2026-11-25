@@ -26,7 +26,7 @@ Map<String, dynamic> _veri() {
     if (soru[i] > 0) gunluk[_gun(g)] = {'q': soru[i], 'c': dogru[i]};
   }
   return {
-    'profile': {'name': 'Test Öğrencisi', 'alan': 'say', 'gunluk': 40, 'examDate': '2027-06-19'},
+    'profile': {'_u': 1, 'profile': {'name': 'Test Öğrencisi', 'alan': 'SAY', 'gunluk': 40, 'examDate': '2027-06-19', 'ok': true}},
     'stats': {
       'daily': gunluk,
       'topic': {
@@ -37,13 +37,16 @@ Map<String, dynamic> _veri() {
       },
     },
     'plan': {
-      'tasks': [
-        {'text': 'Problemler: 30 soru', 'day': 0, 's': 'mat', 'min': 45, 'done': true},
-        {'text': 'Paragraf: 25 soru', 'day': 1, 's': 'turkce', 'min': 30, 'done': true},
-        {'text': 'Hareket konu tekrarı', 'day': 2, 's': 'fizik', 'min': 40, 'done': false},
-        {'text': 'Sayılar: yanlışları çöz', 'day': 3, 's': 'mat', 'min': 35, 'done': false},
-        {'text': 'Deneme sonrası analiz', 'day': 5, 's': 'mat', 'min': 60, 'done': false},
-      ],
+      '_u': 1,
+      'plan': {
+        'tasks': [
+          {'text': 'Problemler: 30 soru', 'day': 0, 's': 'mat', 'min': 45, 'done': true},
+          {'text': 'Paragraf: 25 soru', 'day': 1, 's': 'turkce', 'min': 30, 'done': true},
+          {'text': 'Hareket konu tekrarı', 'day': 2, 's': 'fizik', 'min': 40, 'done': false},
+          {'text': 'Sayılar: yanlışları çöz', 'day': 3, 's': 'mat', 'min': 35, 'done': false},
+          {'text': 'Deneme sonrası analiz', 'day': 5, 's': 'mat', 'min': 60, 'done': false},
+        ],
+      },
     },
   };
 }
@@ -242,6 +245,7 @@ void main() {
         await dokun('Kodu bağla');
       }
       await bekleBul(find.byKey(const ValueKey('ai-girdi')));
+      await ek('50b-ai-bos-$tema'); // site ile aynı durum: henüz mesaj yok
       await t.enterText(find.byKey(const ValueKey('ai-girdi')), 'Asal sayı nedir?');
       await t.tap(find.byKey(const ValueKey('ai-gonder')));
       await bekleBul(find.textContaining('SAHTE YANIT'));

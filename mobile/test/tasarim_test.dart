@@ -172,7 +172,7 @@ void main() {
   });
 
   group('açılış animasyonu', () {
-    test('toplam süre ≤ 2,5 sn (2,2 sn animasyon + 0,25 sn sönme)', () {
+    test('toplam süre ≤ 2,5 sn (1,9 sn animasyon + 0,25 sn sönme = 2,15 sn)', () {
       const katman = AcilisKatmani(bitti: _bos);
       expect(katman.sure.inMilliseconds + 250, lessThanOrEqualTo(2500));
     });

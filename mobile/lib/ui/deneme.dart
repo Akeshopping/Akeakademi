@@ -6,6 +6,8 @@ import '../durum/uygulama.dart';
 import '../veri/api.dart';
 import '../veri/katalog.dart';
 import '../veri/modeller.dart';
+import '../veri/hesap_verisi.dart';
+import 'gelisim.dart' show DenemeGecmisiKarti;
 import 'ortak.dart';
 import 'tema.dart';
 
@@ -33,6 +35,7 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
   late Future<(Ozet, HesapDurumu)> _f;
   String? _ders; // null = karışık
   int _adet = 20;
+  List<DenemeKaydi> _gecmis = const []; // Gelişim ile aynı kaynak (hesaptaki `exams`); okunamazsa liste boş kalır, ekran bozulmaz
 
   @override
   void initState() {
@@ -43,6 +46,11 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
   Future<(Ozet, HesapDurumu)> _yukle() async {
     final o = await widget.model.api.ozet();
     final h = await widget.model.api.hesapDurumu();
+    try {
+      _gecmis = (await widget.model.hesapVerisi()).denemeler;
+    } catch (_) {
+      _gecmis = const [];
+    }
     return (o, h);
   }
 
@@ -91,6 +99,18 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
             ),
             const SizedBox(height: 12),
             KartKutu(
+              key: const ValueKey('deneme-ozet'),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Bu denemede', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                _OzetSatiri('Ders', _ders == null ? 'Karışık' : Katalog.dersAdi(_ders!)),
+                _OzetSatiri('Soru', '$adet'),
+                _OzetSatiri('Süre', '${denemeSuresiDk(adet)} dk'),
+                _OzetSatiri('Net', 'doğru − yanlış ÷ 4 · boş bırakabilirsin'),
+              ]),
+            ),
+            const SizedBox(height: 12),
+            KartKutu(
               renk: hakYok ? t.uyariZemin : null,
               kenar: hakYok ? t.uyari : null,
               child: Row(children: [
@@ -117,11 +137,32 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
                       if (mounted) _yenile();
                     },
             ),
+            if (_gecmis.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              DenemeGecmisiKarti(denemeler: _gecmis),
+            ],
             const SizedBox(height: 10),
-            Text('Bölümlü tam TYT/AYT denemesi ve canlı deneme bu sürümde yok. Deneme sonucu şimdilik yalnız bu ekranda görünür; Gelişim geçmişine yazılmaz.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
+            Text('Bölümlü tam TYT/AYT denemesi ve canlı deneme bu sürümde yok. Deneme sonucu bitince Gelişim geçmişine kaydedilir.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
           ],
         );
       },
+    );
+  }
+}
+
+class _OzetSatiri extends StatelessWidget {
+  final String ad;
+  final String deger;
+  const _OzetSatiri(this.ad, this.deger);
+  @override
+  Widget build(BuildContext context) {
+    final t = context.ake;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(width: 56, child: Text(ad, style: TextStyle(color: t.murekkep3, fontSize: 12.5, fontWeight: FontWeight.w700))),
+        Expanded(child: Text(deger, style: TextStyle(color: t.murekkep, fontSize: 14))),
+      ]),
     );
   }
 }

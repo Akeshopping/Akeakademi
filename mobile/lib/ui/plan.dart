@@ -48,7 +48,9 @@ class PlanDeposu {
 
   Future<(Map<String, dynamic>, int)> oku() async {
     final (alanlar, u) = await api.veriOkuSurumlu();
-    final belge = alanlar['plan'] is Map ? Map<String, dynamic>.from(alanlar['plan'] as Map) : <String, dynamic>{};
+    // Sitenin belge biçimi: {_u, plan: {tasks: [...]}} (AREA.plan = ["plan"]).
+    final doc = alanlar['plan'] is Map ? alanlar['plan'] as Map : const {};
+    final belge = doc['plan'] is Map ? Map<String, dynamic>.from(doc['plan'] as Map) : <String, dynamic>{};
     return (belge, u['plan'] ?? 0);
   }
 
@@ -71,7 +73,7 @@ class PlanDeposu {
       final yeni = degistir(gorevler(belge));
       final gonder = Map<String, dynamic>.from(belge)..['tasks'] = yeni.map((g) => g.json()).toList();
       try {
-        await api.veriYaz('plan', gonder, surum);
+        await api.veriYaz('plan', {'plan': gonder}, surum);
         return yeni;
       } on ApiHata catch (e) {
         if (e.tur == HataTuru.cakisma && e.kod == 'eski' && deneme < 2) continue; // araya başka yazma girdi: yeniden oku, uygula

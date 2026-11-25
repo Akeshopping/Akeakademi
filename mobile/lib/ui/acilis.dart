@@ -41,12 +41,12 @@ void _olcumBitir(String neden) {
 /// İlk açılışta bir kez oynayan kısa giriş: konu haritasının noktaları ve yolları bir öğrenme yolunda birleşir,
 /// nokta ve çizgiler K amblemin gerçek köşe noktalarına oturur; son karede gerçek K amblemi (aynı path, aynı gradyan) belirir.
 ///
-/// Süre: [sure] (2,2 sn) + 0,25 sn sönme. "Geç" ilk kareden itibaren görünür; ekranın herhangi bir yerine dokunmak da geçer.
+/// Süre: [sure] (1,9 sn) + 0,25 sn sönme = 2,15 sn (önceki sürüm 2,2 + 0,25; emülatör ölçümü README/karşılaştırma belgesinde). "Geç" ilk kareden itibaren görünür; ekranın herhangi bir yerine dokunmak da geçer.
 /// "Hareketi azalt" açıksa hiç oynamaz. Tekrar açılışta kullanıcı hiç bekletilmez (çağıran taraf bayrağı saklar).
 class AcilisKatmani extends StatefulWidget {
   final VoidCallback bitti;
   final Duration sure;
-  const AcilisKatmani({super.key, required this.bitti, this.sure = const Duration(milliseconds: 2200)});
+  const AcilisKatmani({super.key, required this.bitti, this.sure = const Duration(milliseconds: 1900)});
   @override
   State<AcilisKatmani> createState() => _AcilisKatmaniState();
 }
@@ -161,6 +161,58 @@ const List<Offset> _kKoseleri = [
   Offset(54, 60), Offset(36, 41.5), Offset(54, 22.4), Offset(45.7, 22.4), Offset(31, 38),
 ];
 
+/// Kare başına yeniden üretilmesi gereksiz (ve yazılım GPU'lu emülatörde pahalı) nesneler: başlangıç noktaları, amblem yolu,
+/// yazı düzeni ve gradyan gölgelendiricileri. Boyut ya da kuantize alfa değişince yeniden kurulur; görünüm aynıdır (alfa 1/16 adımlı).
+class _Onbellek {
+  static Size? _boyut;
+  static List<Offset> baslangic = const [];
+  static Path? _yol;
+  static final Map<int, TextPainter> _yazilar = {};
+  static final Map<int, Shader> _amblem = {};
+  static final Map<int, Shader> _isik = {};
+
+  static void hazirla(Size boyut, Offset merkez) {
+    if (_boyut == boyut) return;
+    _boyut = boyut;
+    final rnd = math.Random(11);
+    final n = _kKoseleri.length;
+    baslangic = List.generate(n, (i) {
+      final a = (i / n) * 2 * math.pi + rnd.nextDouble() * 0.8;
+      final r = (0.32 + rnd.nextDouble() * 0.3) * math.min(boyut.width, boyut.height) * 1.15;
+      return Offset(merkez.dx + math.cos(a) * r, merkez.dy + math.sin(a) * r * 1.1);
+    });
+    _isik.clear();
+  }
+
+  static Path get yol => _yol ??= AkeAmblemYolu.olustur();
+  static int adim(double a) => (a.clamp(0.0, 1.0) * 16).round();
+
+  static TextPainter yazi(double alfa) => _yazilar.putIfAbsent(adim(alfa), () {
+        final a = adim(alfa) / 16;
+        return TextPainter(
+          text: TextSpan(children: [
+            TextSpan(text: 'AKE', style: TextStyle(color: AkeTok.porselen.withValues(alpha: a))),
+            TextSpan(text: ' Akademi', style: TextStyle(color: AkeTok.porselen.withValues(alpha: 0.86 * a))),
+          ], style: const TextStyle(fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
+          textDirection: TextDirection.ltr,
+        )..layout();
+      });
+
+  static Shader amblem(double alfa, Rect kutu) => _amblem.putIfAbsent(adim(alfa), () {
+        final a = adim(alfa) / 16;
+        return LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AkeAmblemRenk.koyuZemin.baslangic.withValues(alpha: a), AkeAmblemRenk.koyuZemin.bitis.withValues(alpha: a)],
+        ).createShader(kutu);
+      });
+
+  static Shader isik(double alfa, Rect kutu) => _isik.putIfAbsent(adim(alfa * 3), () {
+        final a = adim(alfa * 3) / 48;
+        return RadialGradient(colors: [const Color(0xFFF27D6D).withValues(alpha: a), const Color(0x00F27D6D)]).createShader(kutu);
+      });
+}
+
 class _AcilisBoyaci extends CustomPainter {
   final double u;
   _AcilisBoyaci(this.u);
@@ -176,14 +228,10 @@ class _AcilisBoyaci extends CustomPainter {
     final sol = merkez.dx - emblemW / 2, ust = merkez.dy - emblemH / 2;
     Offset hedef(Offset p) => Offset(sol + (p.dx - AkeAmblemYolu.sol) * emblemW / AkeAmblemYolu.genislik, ust + (p.dy - AkeAmblemYolu.ust) * emblemW / AkeAmblemYolu.genislik);
 
-    // Dağınık başlangıç noktaları (sabit tohum: her açılışta aynı, deterministik).
-    final rnd = math.Random(11);
+    // Dağınık başlangıç noktaları (sabit tohum: her açılışta aynı, deterministik); boyut değişmedikçe önbellekten.
+    _Onbellek.hazirla(size, merkez);
+    final baslangic = _Onbellek.baslangic;
     final n = _kKoseleri.length;
-    final baslangic = List.generate(n, (i) {
-      final a = (i / n) * 2 * math.pi + rnd.nextDouble() * 0.8;
-      final r = (0.32 + rnd.nextDouble() * 0.3) * math.min(w, h) * 1.15;
-      return Offset(merkez.dx + math.cos(a) * r, merkez.dy + math.sin(a) * r * 1.1);
-    });
 
     final giris = _aralik(u, 0.0, 0.28);
     final hareket = Curves.easeInOutCubic.transform(_aralik(u, 0.22, 0.72));
@@ -191,7 +239,7 @@ class _AcilisBoyaci extends CustomPainter {
     final cizgiSon = 1 - Curves.easeIn.transform(_aralik(u, 0.72, 0.92));
 
     // Arka plan ışığı (mercan, K belirdikçe güçlenir).
-    final isik = Paint()..shader = RadialGradient(colors: [const Color(0xFFF27D6D).withValues(alpha: 0.10 + 0.20 * doldur), const Color(0x00F27D6D)]).createShader(Rect.fromCircle(center: merkez, radius: math.min(w, h) * 0.55));
+    final isik = Paint()..shader = _Onbellek.isik(0.10 + 0.20 * doldur, Rect.fromCircle(center: merkez, radius: math.min(w, h) * 0.55));
     // Yalnız ışığın gerçekten göründüğü daire çizilir (tüm ekranı boyamak yazılım GPU'sunda gereksiz dolgu maliyeti).
     canvas.drawCircle(merkez, math.min(w, h) * 0.55, isik);
 
@@ -250,25 +298,15 @@ class _AcilisBoyaci extends CustomPainter {
       const kutu = Rect.fromLTRB(AkeAmblemYolu.sol, AkeAmblemYolu.ust, AkeAmblemYolu.sag, AkeAmblemYolu.alt);
       final boya = Paint()
         ..isAntiAlias = true
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AkeAmblemRenk.koyuZemin.baslangic.withValues(alpha: doldur), AkeAmblemRenk.koyuZemin.bitis.withValues(alpha: doldur)],
-        ).createShader(kutu);
-      canvas.drawPath(AkeAmblemYolu.olustur(), boya);
+        ..shader = _Onbellek.amblem(doldur, kutu);
+      canvas.drawPath(_Onbellek.yol, boya);
       canvas.restore();
     }
 
     // Site adı.
     final yazi = _aralik(u, 0.78, 1.0);
     if (yazi > 0) {
-      final tp = TextPainter(
-        text: TextSpan(children: [
-          TextSpan(text: 'AKE', style: TextStyle(color: AkeTok.porselen.withValues(alpha: yazi))),
-          TextSpan(text: ' Akademi', style: TextStyle(color: AkeTok.porselen.withValues(alpha: 0.86 * yazi))),
-        ], style: const TextStyle(fontFamily: AkeYazi.govde, fontFamilyFallback: AkeYazi.yedek, fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
-        textDirection: TextDirection.ltr,
-      )..layout();
+      final tp = _Onbellek.yazi(yazi);
       tp.paint(canvas, Offset(merkez.dx - tp.width / 2, ust + emblemH + 28 + (1 - yazi) * 8));
     }
   }

@@ -65,9 +65,9 @@ class HesapVerisi {
   static Map<String, dynamic> _m(Object? v) => v is Map ? Map<String, dynamic>.from(v) : <String, dynamic>{};
 
   factory HesapVerisi.alanlardan(Map<String, dynamic> alanlar) {
-    final profil = _m(alanlar['profile']);
+    final profil = _m(_m(alanlar['profile'])['profile']); // site belge biçimi: {_u, profile: {…}}
     final stats = _m(alanlar['stats']);
-    final plan = _m(alanlar['plan']);
+    final plan = _m(_m(alanlar['plan'])['plan']); // {_u, plan: {tasks}}
     final gunluk = <String, GunSayisi>{};
     _m(stats['daily']).forEach((g, v) {
       final d = _m(v);
@@ -135,8 +135,9 @@ class HesapVerisi {
     return r;
   }
 
-  int get toplamSoru => konular.fold(0, (a, k) => a + k.cozulen);
-  int get toplamDogru => konular.fold(0, (a, k) => a + k.dogru);
+  /// Site (`totals()`) ile aynı kaynak: günlük sayaçların toplamı. Günlük kayıt hiç yoksa konu toplamına düşer.
+  int get toplamSoru => gunluk.isNotEmpty ? gunluk.values.fold(0, (a, g) => a + g.soru) : konular.fold(0, (a, k) => a + k.cozulen);
+  int get toplamDogru => gunluk.isNotEmpty ? gunluk.values.fold(0, (a, g) => a + g.dogru) : konular.fold(0, (a, k) => a + k.dogru);
 
   /// Sınava kalan tam gün (en az 0). Site: ceil((sınav 10:15 +03:00 − şimdi) / gün).
   int kalanGun(DateTime simdi) {

@@ -187,7 +187,7 @@ class _AiSekmesiState extends State<AiSekmesi> {
   Widget _sohbet(BuildContext context, HesapDurumu d) {
     final t = context.ake;
     final kalan = d.aiMesajLimit - d.aiMesaj;
-    const oneriler = ['Bu soruyu adım adım çöz', 'Asal sayıları anlat', 'Bugün ne çalışmalıyım?'];
+    const oneriler = ['Türevde zincir kuralını bir örnekle anlat', 'Paragraf sorularında nasıl hızlanırım?', 'Bugün ne çalışmalıyım?', 'Mol kavramını sıfırdan anlat', 'Divan edebiyatı nazım şekillerini özetle', 'Present perfect ile past simple farkı ne?'];
     return Column(children: [
       Expanded(
         child: ListView(
@@ -200,8 +200,10 @@ class _AiSekmesiState extends State<AiSekmesi> {
             ]),
             const SizedBox(height: 12),
             if (_mesajlar.isEmpty) ...[
-              Text('Bir soru yaz ya da konu iste. Cevaplar yapay zekâ ile üretilir; önemli yerleri kendin de kontrol et.', style: TextStyle(color: t.murekkep2, height: 1.45)),
+              Text('Takıldığın soruyu yaz; konu anlatımı, çözüm adımları ve çalışma önerisi iste. Öğretmen alanını ve zayıf konularını bilir. Cevaplar yapay zekâ ile üretilir; önemli yerleri kendin de kontrol et.', style: TextStyle(color: t.murekkep2, height: 1.45)),
               const SizedBox(height: 12),
+              Text('Şunlardan biriyle başlayabilirsin:', key: const ValueKey('ai-oneri-baslik'), style: TextStyle(color: t.murekkep2, fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final o in oneriler)
                   Semantics(
@@ -239,7 +241,8 @@ class _AiSekmesiState extends State<AiSekmesi> {
       Container(
         decoration: BoxDecoration(color: t.kart, border: Border(top: BorderSide(color: t.cizgi))),
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(
             child: TextField(
               key: const ValueKey('ai-girdi'),
@@ -260,6 +263,12 @@ class _AiSekmesiState extends State<AiSekmesi> {
               child: Container(key: const ValueKey('ai-gonder'), width: 52, height: 52, decoration: BoxDecoration(color: _bekliyor ? t.girinti : t.mercan, borderRadius: BorderRadius.circular(14)), child: Icon(Icons.arrow_upward_rounded, color: _bekliyor ? t.murekkep3 : t.mercanUstu)),
             ),
           ),
+          ]),
+          if (d.aiMesajLimit > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Align(alignment: Alignment.centerLeft, child: Text('Bu ay ${kalan < 0 ? 0 : kalan} mesaj hakkın kaldı. Soru sorduğunda kullanılır.', key: const ValueKey('ai-kota-notu'), style: TextStyle(color: t.murekkep3, fontSize: 12.5))),
+            ),
         ]),
       ),
     ]);

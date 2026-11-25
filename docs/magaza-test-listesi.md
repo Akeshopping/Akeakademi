@@ -35,7 +35,7 @@ Her satırda: ✅ geçti / ❌ kaldı + ekran görüntüsü. Kalan satırın ne 
 | I5 | Satın alma penceresinde **İptal** | "Satın alma iptal edildi"; paket değişmez |
 | I6 | Uçak modu senaryosu (A9 ile aynı) | "doğrulanamadı" + Yeniden dene; sonra açılır |
 | I7 | Uygulamayı sil, yükle, giriş → **Satın almalarımı geri yükle** | Paket geri gelir |
-| I8 | **Başka AKE hesabıyla** Geri yükle | Paket açılmaz (A11 ile aynı beklenti). **ÖNEMLİ:** burada paket başka hesapta açılırsa bana yaz; Apple `appAccountToken` eklentiden gitmiyor demektir |
+| I8 | **Başka AKE hesabıyla** Geri yükle | Paket açılmaz (A11 ile aynı beklenti). Beklenen sonuç budur. Ayrıca I3'te satın alma "başka bir AKE hesabına ait" diye REDDEDİLİRSE Apple `appAccountToken` eklentiden gitmiyor demektir: bana yaz (belirteçsiz işlem bilerek kabul edilmiyor) |
 | I9 | Sandbox aboneliği (dakikalarla yenilenir): yenilemeleri bekle | Bitiş uzar; sandbox yenileme limitine ulaşınca erişim kapanır |
 | I10 | Ayarlar → Apple Kimliği → Abonelikler'den iptal et | Süre bitene kadar erişim sürer |
 | I11 | Sandbox'ta iade/geri alma (App Store Connect sandbox "Satın alma geçmişini yönet" ile) | Paket kapanır |

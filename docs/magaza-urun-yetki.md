@@ -49,7 +49,7 @@ Fiyatı **mağaza** belirler ve uygulama ekranda mağazanın verdiği fiyatı g�
 
 - Her mağaza işlemi (Google satın alma belirteci, Apple özgün işlem kimliği) **tek bir AKE hesabına** bağlanır. Başka hesap aynı işlemi alamaz (`409`).
 - Google: satın alma sırasında konan hesap takma adı sunucuda doğrulanır; uyuşmazsa işlem reddedilir.
-- Apple: işlemde `appAccountToken` varsa uyuşmak zorundadır; Flutter eklentisi belirteci koyamazsa işlem ilk doğrulayan hesaba bağlanır. Bu, gerçek telefonda test edilecek bir noktadır (`magaza-test-listesi.md`).
+- Apple: işlemde `appAccountToken` **zorunlu** ve bu hesabın takma adıyla eşleşmeli. Belirteçsiz işlem hiçbir hesaba bağlanmaz (reddedilir); böylece işlem kimliğini bilen biri başkasının satın almasını sahiplenemez. Flutter eklentisi belirteci koymazsa iPhone satın almaları bu yüzden doğrulanmaz; bu durum gerçek iPhone testinde (I3, I8) görülür.
 - Aynı işlem tekrar gelirse sonuç aynıdır, ikinci satır oluşmaz.
 - Hesap silinirse işlem satırı `silindi` olarak kalır: başka hesaba geçmez. **Mağaza aboneliği kendiliğinden iptal olmaz**; kullanıcı Google Play / App Store'dan iptal etmelidir.
 - Hesap değiştirince (başka e-posta ile giriş) mağaza geri yüklemesi başka hesabın işlemini açmaz.

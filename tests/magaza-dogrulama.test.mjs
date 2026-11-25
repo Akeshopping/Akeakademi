@@ -172,15 +172,19 @@ test("8) Apple: sandbox modu Production'a hiç gitmez; işlem doğrulanır; Prod
   assert.notEqual((await o.cagir(c3, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000777" })).s, 200); assert.equal(await o.ben(c3), null);
 });
 
-test("8b) Apple işleminde appAccountToken yoksa ilk doğrulayan hesaba bağlanır, ikinci hesap alamaz; yanlış belirteç reddedilir", async () => {
+test("8b) Apple işleminde appAccountToken YOKSA reddedilir (ilk gelen sahiplenemez); yanlış belirteç de reddedilir; doğru belirteç kabul", async () => {
   const o = await ortam(); const A = await o.kullanici("m8d@ornek.com"), B = await o.kullanici("m8e@ornek.com"), C = await o.kullanici("m8f@ornek.com");
   M.apple["1000000123456789"] = aGovde("atilim_aylik", { hesap: undefined });
-  assert.equal((await o.cagir(A, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000111" })).s, 200);
-  assert.equal((await o.cagir(B, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000111" })).s, 409);
-  assert.equal(await o.ben(B), null); assert.equal((await o.ben(A)).plan, "orta");
+  for (const h of [A, B]) {
+    const r = await o.cagir(h, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000111" });
+    assert.equal(r.s, 409); assert.equal(r.j.sonuc[0].hata, "hesap_eslesmedi"); assert.equal(await o.ben(h), null);
+  }
+  assert.equal(satir(o.DB, "apple", "1000000123456789"), undefined, "belirteçsiz işlem hiçbir hesaba bağlanmadı");
   M.apple["1000000555"] = aGovde("premium_aylik", { hesap: (await o.kimlik(A)).apple, orig: "1000000555", islem: "2000000555" });
   assert.equal((await o.cagir(C, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000555" })).s, 409, "belirteç başka hesabın");
   assert.equal(await o.ben(C), null);
+  assert.equal((await o.cagir(A, "POST", "magaza/dogrula", { platform: "apple", kimlik: "2000000555" })).s, 200);
+  assert.equal((await o.ben(A)).plan, "premium");
 });
 
 test("9) Apple iade (revocationDate) erişimi kapatır; Google'da gerçek (test olmayan) işlem sandbox modunda reddedilir", async () => {

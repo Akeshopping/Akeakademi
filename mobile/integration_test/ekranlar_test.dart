@@ -229,6 +229,11 @@ void main() {
       await t.pumpAndSettle();
       // AI öğretmen
       await sekme(3);
+      // AI durumu asenkron yüklenir: kapı (kod alanı) ya da sohbet girdisi çıkana dek bekle; sonra karar ver.
+      for (var i = 0; i < 80 && find.byKey(const ValueKey('ai-kod')).evaluate().isEmpty && find.byKey(const ValueKey('ai-girdi')).evaluate().isEmpty; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await t.pump(const Duration(milliseconds: 100));
+      }
       if (find.byKey(const ValueKey('ai-kod')).evaluate().isNotEmpty) {
         await ek('50-ai-kapi-$tema');
         await t.enterText(find.byKey(const ValueKey('ai-kod')), 'AKE-TEST-1234');

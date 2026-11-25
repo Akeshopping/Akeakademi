@@ -126,7 +126,6 @@ class _Karsilama extends StatelessWidget {
   Widget build(BuildContext context) {
     final simdi = DateTime.now();
     final ad = (veri?.ad.isNotEmpty == true ? veri!.ad : (model.kullanici?.ad.trim() ?? ''));
-    final ilk = ad.split(' ').first;
     final kalan = veri?.kalanGun(simdi);
     return Container(
       width: double.infinity,
@@ -142,7 +141,7 @@ class _Karsilama extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(ilk.isEmpty ? 'Merhaba' : 'Merhaba $ilk', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: AkeTok.porselen, height: 1.1)),
+              Text(ad.trim().isEmpty ? 'Merhaba' : 'Merhaba ${ad.trim()}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: AkeTok.porselen, height: 1.1)),
               const SizedBox(height: 8),
               Text.rich(
                 TextSpan(children: [

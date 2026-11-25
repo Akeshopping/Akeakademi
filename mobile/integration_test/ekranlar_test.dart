@@ -264,6 +264,7 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('menu-plan')));
       await t.pumpAndSettle();
+      await ek('63-plan-gorevli-$tema'); // site ile aynı durum: yalnız test verisindeki 5 görev, henüz eklenen yok
       await t.tap(find.byKey(const ValueKey('plan-ekle')));
       await t.pumpAndSettle();
       await t.enterText(find.byKey(const ValueKey('gorev-metin')), 'Paragraf: 25 soru');
@@ -274,7 +275,7 @@ void main() {
       await t.ensureVisible(find.byKey(const ValueKey('gorev-kaydet')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('gorev-kaydet')));
-      await ek('63-plan-gorevli-$tema');
+      await ek('64-plan-gorev-eklendi-$tema');
       await t.tap(find.byKey(const ValueKey('menu-geri')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('menu-ayarlar')));

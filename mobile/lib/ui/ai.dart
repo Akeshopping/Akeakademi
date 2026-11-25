@@ -212,7 +212,7 @@ class _AiSekmesiState extends State<AiSekmesi> {
                     child: ExcludeSemantics(
                       child: AkeDokun(
                         basinca: () => _girdi.text = o,
-                        child: Container(constraints: const BoxConstraints(minHeight: 44), padding: const EdgeInsets.symmetric(horizontal: 14), alignment: Alignment.center, decoration: BoxDecoration(color: t.kart, borderRadius: BorderRadius.circular(12), border: Border.all(color: t.cizgi)), child: Text(o, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5))),
+                        child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14), decoration: BoxDecoration(color: t.kart, borderRadius: BorderRadius.circular(12), border: Border.all(color: t.cizgi)), child: Text(o, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5))),
                       ),
                     ),
                   ),

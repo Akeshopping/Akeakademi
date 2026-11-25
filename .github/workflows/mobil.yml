@@ -69,6 +69,8 @@ jobs:
     name: iOS · macOS derleme + test (imzasız; mağaza/TestFlight değil)
     runs-on: macos-latest
     timeout-minutes: 50
+    permissions:
+      contents: write   # yalnız iOS kanıt dalını yayınlamak için (kanit/pr43-ios-<sha>); main/Production'a yazılmaz
     defaults:
       run:
         working-directory: mobile
@@ -103,6 +105,19 @@ jobs:
             mobile/ekran-kanit/*.png
             mobile/kanit/*
           retention-days: 14
+      - name: iOS kanıtını kanıt dalına yayınla (ekran görüntüleri + günlük)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          test -d ekran-kanit || exit 0
+          rm -rf /tmp/ioskanit && mkdir -p /tmp/ioskanit/ekranlar && cp ekran-kanit/*.png /tmp/ioskanit/ekranlar/ && cp kanit/ios-* /tmp/ioskanit/ 2>/dev/null || true
+          cd /tmp/ioskanit
+          git init -q -b "kanit/pr43-ios-${GITHUB_SHA::7}"
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "iOS simülatör ekran kanıtı ${GITHUB_SHA::7} [skip ci]"
+          git push -q "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/kanit/pr43-ios-${GITHUB_SHA::7}"
 
   emulator:
     name: Emülatör ekran kanıtı (320/390 dp ekran yürüyüşü + gerçek zamanlı açılış kaydı)

@@ -126,6 +126,19 @@ class _UstCubuk extends StatelessWidget {
           Expanded(child: Align(alignment: Alignment.centerLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: AkeYaziMarka(renk: t.ustMetin, akademiGoster: false)))),
           Semantics(
             button: true,
+            label: 'Temayı değiştir',
+            child: AkeDokun(
+              basinca: () => model.temaDegistir(Theme.of(context).brightness == Brightness.dark ? ThemeMode.light : ThemeMode.dark),
+              child: SizedBox(
+                key: const ValueKey('tema-dugmesi'),
+                width: 48,
+                height: 48,
+                child: Icon(Theme.of(context).brightness == Brightness.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined, color: t.ustMetin, size: 22),
+              ),
+            ),
+          ),
+          Semantics(
+            button: true,
             label: 'Hesabım ve ayarlar',
             child: AkeDokun(
               basinca: () => model.menuyeGit(MenuSayfasi.ayarlar),

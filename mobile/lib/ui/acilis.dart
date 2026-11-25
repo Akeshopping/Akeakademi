@@ -32,9 +32,13 @@ void _olcumBitir(String neden) {
     final k = _olcumKareleri.map((f) => f.totalSpan.inMicroseconds / 1000).toList();
     final ort = k.isEmpty ? 0.0 : k.reduce((a, b) => a + b) / k.length;
     final enKotu = k.isEmpty ? 0.0 : k.reduce(math.max);
+    // Hazırlama (UI iş parçacığı: build+layout+paint) ve çizim (raster/GPU) süreleri ayrı: yavaşlık hangisinde?
+    double ortalama(Iterable<double> d) => d.isEmpty ? 0.0 : d.reduce((a, b) => a + b) / d.length;
+    final ortHazirla = ortalama(_olcumKareleri.map((f) => f.buildDuration.inMicroseconds / 1000));
+    final ortCizim = ortalama(_olcumKareleri.map((f) => f.rasterDuration.inMicroseconds / 1000));
     // ignore: avoid_print
     print('AKE_OLCUM acilis_bitti neden=$neden sure_ms=$sureMs kare=${k.length} ort_kare_ms=${ort.toStringAsFixed(1)} en_kotu_kare_ms=${enKotu.toStringAsFixed(1)} '
-        'kare_16ms_ustu=${k.where((x) => x > 16.7).length} kare_33ms_ustu=${k.where((x) => x > 33.4).length}');
+        'kare_16ms_ustu=${k.where((x) => x > 16.7).length} kare_33ms_ustu=${k.where((x) => x > 33.4).length} ort_hazirlama_ms=${ortHazirla.toStringAsFixed(1)} ort_cizim_raster_ms=${ortCizim.toStringAsFixed(1)}');
   });
 }
 

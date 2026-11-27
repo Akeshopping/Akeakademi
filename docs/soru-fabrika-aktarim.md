@@ -13,13 +13,16 @@ Bu belge soru METNİ içermez.
 | ZIP | Site |
 |---|---|
 | `s: tyt_matematik` | `s: mat` (`lib/soru-api.js DERSLER`) |
-| `t` (ör. "Yaş Problemleri") | olduğu gibi. **Sitenin mevcut konu listesinde (`fabrika/mevcut_konular.json`) yok** → rapor "yeni konu adı" der; karar yöneticide |
+| `t` (ör. "Yaş Problemleri") | **olduğu gibi (ayrı konu, eşleme yok)**; karar: `soru-fabrika-konu-esleme.md`. Sitenin mevcut listesinde olmadığı için rapor "yeni konu adı" notu düşer |
 | `d` | bağımsız ölçülen zorluk (tahmin; gerçek çözüm verisiyle ayarlanmalı) |
 | `dUret` | atılır (yalnız ledger notu) |
 | `id` | `py-<ders>-<8 hex>`; mevcut `ok-*`/statik kimliklerle çakışmaz |
 
 ## Kontroller (soru başına sonuç: `uygun | tekrar | gecersiz | inceleme`, aktarımdan sonra `aktarildi | zaten_var | catisma`)
 Dosya bütünlüğü (JSON satırı, `rapor.json` ile satır sayısı) · `dogrulaSoru` (zorunlu alanlar, 5 farklı şık, `a` 0-4) · kimlik biçimi/benzersizlik · çözümün işaretli şıkkı söylemesi · `kanonikHash` tekrarı (yükleme içi ve depodaki statik bankayla; farklı cevaplı aynı soru = `inceleme`) · mevcut gömülü/statik soru köküyle çakışma = `inceleme` · `dogrula.mjs` ile aynı 3-gram Jaccard ≥ 0.8 benzerlik kuralı (aynı şablon grubu içinde, ilk soru tutulur, sonrakiler `tekrar`) · bağımsız çözüm `dogru` değilse = `inceleme`.
+
+## Pilot modu (`--pilot`)
+`--pilot` ile yalnız sabit kuralla seçilen en çok 200 soru (şablon başına ≤ 5) `uygun` kalır; gerisi `pilot_disi` olur ve yazılmaz. Kural/kimlikler: `soru-fabrika-pilot.md`, kod: `fabrika/soru-fabrika-pilot.mjs`. Her ledger satırında `insanInceleme` alanı vardır (`bekliyor` ya da `yok`); **hiçbir soru onaylı sayılmaz**, araç `onayli` yazmaz ve yayımlı sayı değişirse durur. `--pilot-inceleme <repo-dışı.md>` soru metinli inceleme paketini repo DIŞINA yazar.
 
 ## Yinelenebilirlik
 `INSERT … WHERE NOT EXISTS (id)`, 40'lık işlemlerle. Yarıda kalırsa aynı komut yeniden çalıştırılır: var olan aynı içerik `zaten_var`, farklı içerik `catisma` (üzerine yazılmaz).

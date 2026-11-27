@@ -7,6 +7,7 @@
 // ÜRETİM D1'E BU ARAÇ BAĞLANMAZ (yalnız --local-db <sqlite>). Üretim için gereken adımlar: docs/soru-fabrika-aktarim.md
 //
 // Kullanım:
+//   ... --pilot [--pilot-inceleme <repo-dışı.md>]   → yalnız sabit kuralla seçilen pilot sorular (bkz. soru-fabrika-pilot.mjs); gerisi pilot_disi
 //   node fabrika/soru-fabrika-aktar.mjs --girdi <zip-icerigi-klasoru> --bagimsiz <bagimsiz.json> --cikti <rapor-klasoru>             # ön kontrol
 //   ... --local-db /tmp/staging.sqlite --apply                                                                                       # yerel staging'e aktar
 // --bagimsiz: python3 fabrika/uretim_py/bagimsiz_cozum.py <girdi> <bagimsiz.json> çıktısı (soru metninden bağımsız çözüm).
@@ -18,6 +19,7 @@ import { DatabaseSync } from "node:sqlite";
 import { dogrulaSoru, kanonikHash, cevapHash, normalize, soruKanonikSema } from "../lib/soru-kanonik.js";
 import { DERSLER } from "../lib/soru-api.js";
 import { statikKaynaklar, d1Yerel } from "./soru-migrate.mjs";
+import { pilotSec } from "./soru-fabrika-pilot.mjs";
 
 const KOK = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const DERS_HARITA = { tyt_matematik: "mat" };      // üreticideki ders anahtarı → sitedeki ders kodu (lib/soru-api.js DERSLER)
@@ -153,12 +155,31 @@ async function main() {
   for (const m of JSON.parse(fs.readFileSync(path.join(KOK, "fabrika/mevcut_ozet.json"), "utf8"))) mevcutKok.add(m.s + "\n" + normalize(m.q));   // gömülü banka (yalnız metin)
   const mevcutGolge = JSON.parse(fs.readFileSync(path.join(KOK, "fabrika/mevcut_ozet.json"), "utf8")).map(m => ({ s: m.s, q: m.q, g: golge((m.p || "") + " " + m.q) }));
   const { ledger, rapor } = await degerlendir({ konular, bagimsiz, mevcutKonu, mevcutHash, mevcutId, mevcutKok, mevcutGolge });
+  if (arg("pilot")) {                                          // pilot: yalnız seçilen sorular 'uygun' kalır, diğerleri 'pilot_disi'
+    const p = pilotSec(ledger.filter(l => l.sonuc === "uygun"));
+    const secili = new Set(p.secilen);
+    for (const l of ledger) if (l.sonuc === "uygun" && !secili.has(l.id)) { l.sonuc = "pilot_disi"; l.neden.push("pilot seçimi dışı"); l.aday = undefined; }
+    for (const l of ledger) if (secili.has(l.id)) l.pilot = true;
+    rapor.pilot = p.rapor; rapor.pilotIds = p.secilen;
+  }
+  for (const l of ledger) l.insanInceleme = l.sonuc === "uygun" || l.sonuc === "aktarildi" || l.sonuc === "zaten_var" ? "bekliyor" : "yok";   // hiçbir soru onaylı sayılmaz
   rapor.dosyaHata = dosyaHata; rapor.depoReferans = { statikId: mevcutId.size, statikHash: mevcutHash.size, kokAnahtari: mevcutKok.size };
   rapor.mod = apply ? "yerel-staging-yazma" : "on-kontrol (yazma yok)";
   if (apply) rapor.yazma = await yerelAktar(path.resolve(localDb), ledger);
   fs.mkdirSync(cikti, { recursive: true });
-  fs.writeFileSync(path.join(cikti, "ledger.jsonl"), ledger.map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden, yeniKonu: l.yeniKonu || undefined, not: l.not })).join("\n") + "\n");
+  fs.writeFileSync(path.join(cikti, "ledger.jsonl"), ledger.map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden, pilot: l.pilot || undefined, insanInceleme: l.insanInceleme, yeniKonu: l.yeniKonu || undefined, not: l.not })).join("\n") + "\n");
   fs.writeFileSync(path.join(cikti, "inceleme.jsonl"), ledger.filter(l => l.sonuc === "inceleme" || l.sonuc === "gecersiz").map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden })).join("\n") + "\n");
+  if (rapor.pilot) {
+    fs.writeFileSync(path.join(cikti, "pilot-secim.json"), JSON.stringify({ kural: rapor.pilot.kural, ids: rapor.pilotIds, sablonlar: rapor.pilot.sablonlar }, null, 1));
+    const inc = arg("pilot-inceleme");
+    if (typeof inc === "string") {
+      if (path.resolve(inc).startsWith(KOK + path.sep)) { console.error("DURDUR: --pilot-inceleme repo içinde olamaz (soru metni içerir)."); process.exit(2); }
+      const tum = new Map(konular.flatMap(k => k.sorular.map(q => [q.id, q])));
+      const md = ["# Pilot inceleme paketi (insan incelemesi bekliyor)", "", "Hiçbir soru onaylı değildir. Karar sütununu inceleyen doldurur: DOĞRU / DÜZELT / REDDET.", ""];
+      rapor.pilot.sablonlar.forEach((s, i) => { md.push(`## ${i + 1}. ${s.konu} · ${s.sablon}`, ""); for (const id of s.secilen) { const q = tum.get(id); md.push(`**${id}** · zorluk ${q.d}`, "", q.q, "", ...q.o.map((o, k) => `- ${"ABCDE"[k]}) ${o}${k === q.a ? "  ← işaretli" : ""}`), "", `Çözüm: ${q.x}`, "", "Karar: ____  Not: ____", ""); } });
+      fs.writeFileSync(inc, md.join("\n"));
+    }
+  }
   fs.writeFileSync(path.join(cikti, "rapor.json"), JSON.stringify(rapor, null, 1));
   console.log(JSON.stringify({ genel: rapor.genel, konu: Object.fromEntries(Object.entries(rapor.konu).map(([k, r]) => [k, { okunan: r.okunan, uygun: r.uygun, tekrar: r.tekrar, gecersiz: r.gecersiz, inceleme: r.inceleme, sablon: r.sablonSayisi, uyusmazlik: r.sayiUyusmazligi, yeniKonu: r.yeniKonuAdlari }])), yazma: rapor.yazma, dosyaHata }, null, 1));
 }

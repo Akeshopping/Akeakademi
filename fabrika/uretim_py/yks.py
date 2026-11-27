@@ -79,7 +79,7 @@ def uret_konu(konu, kalip_listesi, adet, tohum):
     sayac = {}
     for d in (1, 2, 3):
         i, denemeler, bos = 0, 0, {}
-        while sum(1 for q in onayli if q["d"] == d) < hedef[d]:
+        while sum(1 for q in onayli if q["dUret"] == d) < hedef[d]:   # üretim zorluğu sayılır (ölçülen d değil)
             k = kalip_listesi[i % len(kalip_listesi)]
             i += 1
             denemeler += 1

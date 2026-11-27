@@ -39,6 +39,15 @@ class Testler(unittest.TestCase):
         b = C.kur(k, 1, random.Random(5))
         self.assertEqual(a, b)
 
+    def test_uretim_hedefi_uretim_zorluguna_gore(self):
+        # Regresyon: hedef ölçülen zorluğa göre sayılınca orta (d=2) soru hiç üretilmiyordu.
+        grup = [k for k in C.KALIPLAR.values() if k.konu == "Yaş Problemleri"]
+        onayli, _, rapor = yks.uret_konu("Yaş Problemleri", grup, 600, 1)
+        sayim = {d: sum(1 for q in onayli if q["dUret"] == d) for d in (1, 2, 3)}
+        self.assertGreater(sayim[1], 50)
+        self.assertGreater(sayim[2], 100)
+        self.assertGreater(sayim[3], 50)
+
 
 if __name__ == "__main__":
     unittest.main()

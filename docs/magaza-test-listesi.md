@@ -11,6 +11,7 @@ Her satırda: ✅ geçti / ❌ kaldı + ekran görüntüsü. Kalan satırın ne 
 | A1 | Kapalı test sürümünü Play'den yükle, test Gmail'iyle Play'e giriş yap, AKE hesabına giriş yap | Giriş çalışır |
 | A2 | Menü → Paketler | 4 abonelik, **fiyatlar Play'den** (₺…); "mağazada hazır değil" yazan satır yok |
 | A3 | Atılım aylık → satın al → Play penceresi → onayla | "Paketin açıldı"; Paketler "Atılım paketindesin · … tarihine kadar"; "TEST satın alması" notu |
+| A3b | Play onay penceresi açıkken Paketler'den Menü'ye dön; mağaza olayı geldikten sonra Paketler'i yeniden aç | Satın alma yine doğrulanır, paket görünür; ikinci kez sayılmaz |
 | A4 | Ayarlar → hesap durumu | Paketli hesap görünür; AI öğretmen açılır |
 | A5 | Uygulamayı kapat-aç | Paket yerinde |
 | A6 | Premium yıllık satın al (yükseltme) | Premium görünür |
@@ -31,11 +32,12 @@ Her satırda: ✅ geçti / ❌ kaldı + ekran görüntüsü. Kalan satırın ne 
 | I1 | TestFlight'tan yükle; Ayarlar → App Store → Sandbox Hesabı ile gir; AKE hesabına giriş yap | Giriş çalışır |
 | I2 | Menü → Paketler | 4 abonelik, **fiyatlar App Store'dan** |
 | I3 | Atılım aylık → satın al → Sandbox onay penceresi ("[Environment: Sandbox]") | "Paketin açıldı"; paket görünür |
+| I3b | Onay sırasında Paketler'den Menü'ye dön; işlem tamamlanınca Paketler'i yeniden aç | Paket doğrulanır; başka hesapta erişim açılmaz |
 | I4 | Uygulamayı kapat-aç | Paket yerinde |
 | I5 | Satın alma penceresinde **İptal** | "Satın alma iptal edildi"; paket değişmez |
 | I6 | Uçak modu senaryosu (A9 ile aynı) | "doğrulanamadı" + Yeniden dene; sonra açılır |
 | I7 | Uygulamayı sil, yükle, giriş → **Satın almalarımı geri yükle** | Paket geri gelir |
-| I8 | **Başka AKE hesabıyla** Geri yükle | Paket açılmaz (A11 ile aynı beklenti). Beklenen sonuç budur. Ayrıca I3'te satın alma "başka bir AKE hesabına ait" diye REDDEDİLİRSE Apple `appAccountToken` eklentiden gitmiyor demektir: bana yaz (belirteçsiz işlem bilerek kabul edilmiyor) |
+| I8 | **Başka AKE hesabıyla** Geri yükle | Paket açılmaz (A11 ile aynı beklenti). I3'te kendi hesabının satın alımı reddedilirse Apple `appAccountToken` eşleşmesini ve yapılandırmayı incelemek gerekir; belirteçsiz işlem bilerek kabul edilmez |
 | I9 | Sandbox aboneliği (dakikalarla yenilenir): yenilemeleri bekle | Bitiş uzar; sandbox yenileme limitine ulaşınca erişim kapanır |
 | I10 | Ayarlar → Apple Kimliği → Abonelikler'den iptal et | Süre bitene kadar erişim sürer |
 | I11 | Sandbox'ta iade/geri alma (App Store Connect sandbox "Satın alma geçmişini yönet" ile) | Paket kapanır |

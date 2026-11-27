@@ -165,6 +165,18 @@ void main() {
     expect(k.satinAlmalar.length, 1);
   });
 
+  test('9b) mağaza kimlik vermediğinde satın alma kilidi çözülür, erişim açılmaz', () async {
+    final (o, s, k) = await _kur();
+    k.satinAlYaniti = (u) => k.olay(MagazaOlayi(MagazaOlayTuru.satinAlindi, urunId: u, platform: 'google'));
+    await o.satinAl('premium_aylik');
+    await _bosalt();
+    expect(o.islemdeUrun, isNull);
+    expect(o.mesajHata, isTrue);
+    expect(o.mesaj, contains('kimliği'));
+    expect(s.magazaDogrulamalari, isEmpty);
+    expect(k.tamamlananlar, isEmpty);
+  });
+
   test('10) Apple köprüsü: işlem kimliği ve apple takma adı kullanılır', () async {
     final s = SahteSunucu();
     final api = _api(s);
@@ -180,6 +192,14 @@ void main() {
     await _bosalt();
     expect(s.magazaDogrulamalari.single, {'platform': 'apple', 'kimlik': '2000000111'});
     expect(o.hesap?.paketli, true);
+  });
+
+  test('10b) başka hesaba ait bekleyen mağaza isteği ağa çıkmadan reddedilir', () async {
+    final s = SahteSunucu(), api = _api(s);
+    await api.anahtariYukle();
+    await api.ben();
+    await expectLater(api.magazaDogrula('google', 'eski-islem', beklenenHesap: 'baska-hesap'), throwsA(isA<ApiHata>().having((e) => e.kod, 'kod', 'hesap_degisti')));
+    expect(s.magazaDogrulamalari, isEmpty);
   });
 
   for (final g in [320.0, 390.0]) {
@@ -233,5 +253,43 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('Paket satın alma henüz açık değil'), findsOneWidget);
     expect(find.byKey(const ValueKey('paket-satin-premium_aylik')), findsNothing);
+  });
+
+  testWidgets('13) Paketler ekranı kapansa da satın alma işlenir; çıkıştan sonra eski dinleyici işlem yapmaz', (t) async {
+    t.view.physicalSize = const Size(390, 900);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final s = SahteSunucu(), api = _api(s), k = SahteMagaza();
+    final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}))..magaza = k;
+    await m.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: m));
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    m.menuyeGit(null); // Satın alma onayı kullanıcı Menü'ye dönmüşken gelebilir.
+    await t.pumpAndSettle();
+    s.magazaGercek.add('gec-gelen-islem');
+    k.olay(_alindi('gec-gelen-islem'));
+    await t.pumpAndSettle();
+    expect(s.magazaDogrulamalari.single['kimlik'], 'gec-gelen-islem');
+    expect(k.tamamlananlar.length, 1);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('Premium paketindesin'), findsOneWidget);
+    await m.cikis();
+    await t.pumpAndSettle();
+    k.olay(_alindi('eski-hesap-islemi'));
+    await t.pumpAndSettle();
+    expect(s.magazaDogrulamalari.length, 1, reason: 'çıkıştan sonra eski hesapla yeni ödeme doğrulanmaz');
+    expect(k.tamamlananlar.length, 1);
+    s.hesapId = 'u2';
+    await m.kodDogrula('yeni@ornek.com', '12345678');
+    await t.pumpAndSettle();
+    s.magazaGercek.add('yeni-hesap-islemi');
+    k.olay(_alindi('yeni-hesap-islemi'));
+    await t.pumpAndSettle();
+    expect(s.magazaDogrulamalari.length, 2, reason: 'yeni hesap kendi ödeme dinleyicisini açar');
+    expect(s.magazaDogrulamalari.last['kimlik'], 'yeni-hesap-islemi');
   });
 }

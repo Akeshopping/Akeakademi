@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../durum/uygulama.dart';
-import '../odeme/magaza_koprusu.dart';
 import '../odeme/odeme.dart';
 import 'ortak.dart';
 import 'tema.dart';
@@ -16,16 +15,15 @@ class PaketSekmesi extends StatefulWidget {
 }
 
 class _PaketSekmesiState extends State<PaketSekmesi> {
-  late final OdemeModeli _o = OdemeModeli(widget.model.api, widget.model.magaza ?? GercekMagazaKoprusu())..baslat();
-
-  @override
-  void dispose() {
-    _o.dispose();
-    super.dispose();
-  }
+  // Dinleyici hesaba bağlıdır; bu ekran kapanınca satın alma olayı kaybolmaz.
+  OdemeModeli get _o => widget.model.odeme!;
 
   @override
   Widget build(BuildContext context) {
+    if (widget.model.odeme == null) {
+      // Oturum yoksa ya da mağaza köprüsü verilmemişse dinleyici açılmaz; çökmek yerine açıklama göster.
+      return const DurumKutusu(simge: Icons.storefront_rounded, baslik: 'Mağazaya ulaşılamıyor', aciklama: 'Paketleri görmek için hesabına giriş yapmış olmalısın ve bu cihazda Google Play ya da App Store kullanılabilmeli.');
+    }
     return ListenableBuilder(
       listenable: _o,
       builder: (context, _) {

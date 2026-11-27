@@ -3,6 +3,8 @@
 Mobilde ücretli paket **yalnızca Google Play (Android) ve App Store (iPhone)** aboneliğiyle alınır. Web/Shopier ödeme bağlantısı uygulamada yoktur.
 Erişimi **sunucu** verir: uygulama mağazadan aldığı işlem kimliğini sunucuya yollar, sunucu mağazaya kendisi sorar (`lib/magaza.js`). Uygulamanın "satın aldım" demesi tek başına hiçbir şey açmaz.
 
+Mobil uygulama mağaza olaylarını giriş yapılmış hesap boyunca dinler; Paketler ekranından ayrılmak dinlemeyi durdurmaz. Çıkışta veya hesap değişiminde eski dinleyici kapanır. Doğrulanamayan mağaza işlemi tamamlanmaz; kullanıcı Paketler'deki Geri yükle ile yeniden deneyebilir.
+
 ## 1) Paketler ve yetkiler
 
 | | Ücretsiz | Atılım | Premium |

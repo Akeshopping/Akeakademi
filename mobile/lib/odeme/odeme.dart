@@ -24,7 +24,8 @@ class OdemeModeli extends ChangeNotifier {
   final AkeApi api;
   final MagazaKoprusu koprusu;
   final Duration geriYuklemeBekleme;
-  OdemeModeli(this.api, this.koprusu, {this.geriYuklemeBekleme = const Duration(seconds: 6)});
+  final String? hesapId;
+  OdemeModeli(this.api, this.koprusu, {this.hesapId, this.geriYuklemeBekleme = const Duration(seconds: 6)});
 
   OdemeFazi faz = OdemeFazi.yukleniyor;
   String hataMesaji = '';
@@ -53,27 +54,33 @@ class OdemeModeli extends ChangeNotifier {
   bool _kapandi = false;
 
   Future<void> baslat() async {
+    if (_kapandi) return;
     _abone ??= koprusu.olaylar.listen(_olay, onError: (Object e) => _sonuc('Mağaza bildirimi okunamadı.', hata: true));
     await yenile();
   }
 
   Future<void> yenile() async {
+    if (_kapandi) return;
     faz = OdemeFazi.yukleniyor;
     notifyListeners();
     try {
-      final d = await api.magazaDurumu();
+      final d = await api.magazaDurumu(beklenenHesap: hesapId);
+      if (_kapandi) return;
       hesapKimligi = koprusu.platform == 'apple' ? d.kimlikApple : d.kimlikGoogle;
       islemler = d.islemler;
       hesap = d.hesap;
       if (!await koprusu.kullanilabilir()) {
+        if (_kapandi) return;
         faz = OdemeFazi.magazaYok;
         paketler = const [];
       } else {
         final okunan = {for (final u in await koprusu.urunleriOku(d.urunler.map((e) => e.$1).toSet())) u.id: u};
+        if (_kapandi) return;
         paketler = [for (final e in d.urunler) PaketSatiri(e.$1, e.$2, e.$3, okunan[e.$1])];
         faz = OdemeFazi.hazir;
       }
     } on ApiHata catch (e) {
+      if (_kapandi) return;
       if (e.kod == 'kapali') {
         faz = OdemeFazi.sunucuKapali;
       } else {
@@ -81,6 +88,7 @@ class OdemeModeli extends ChangeNotifier {
         hataMesaji = e.tur == HataTuru.ag ? 'Sunucuya ulaşılamadı. Bağlantını kontrol edip tekrar dene.' : 'Paket bilgisi okunamadı. Biraz sonra tekrar dene.';
       }
     } catch (_) {
+      if (_kapandi) return;
       faz = OdemeFazi.hata;
       hataMesaji = 'Mağaza bilgisi okunamadı. Biraz sonra tekrar dene.';
     }
@@ -90,7 +98,7 @@ class OdemeModeli extends ChangeNotifier {
   bool get mesgul => islemdeUrun != null || _surenler.isNotEmpty || _geriYukleniyor;
 
   Future<void> satinAl(String urunId) async {
-    if (mesgul || hesapKimligi == null) return;
+    if (_kapandi || faz != OdemeFazi.hazir || mesgul || hesapKimligi == null) return;
     islemdeUrun = urunId;
     bekliyor = false;
     mesaj = '';
@@ -99,13 +107,14 @@ class OdemeModeli extends ChangeNotifier {
     try {
       await koprusu.satinAl(urunId, hesapKimligi!);
     } catch (_) {
+      if (_kapandi) return;
       islemdeUrun = null;
       _sonuc('Satın alma başlatılamadı. Biraz sonra tekrar dene.', hata: true);
     }
   }
 
   Future<void> geriYukle() async {
-    if (mesgul) return;
+    if (_kapandi || mesgul) return;
     _geriYukleniyor = true;
     _geriYuklenen = 0;
     mesaj = '';
@@ -114,6 +123,7 @@ class OdemeModeli extends ChangeNotifier {
     try {
       await koprusu.geriYukle();
     } catch (_) {
+      if (_kapandi) return;
       _geriYukleniyor = false;
       _sonuc('Satın almalar geri yüklenemedi. Biraz sonra tekrar dene.', hata: true);
       return;
@@ -132,12 +142,13 @@ class OdemeModeli extends ChangeNotifier {
   /// Sunucu doğrulaması ağ/sunucu yüzünden yapılamadıysa aynı işlemi yeniden dener.
   Future<void> yenidenDene() async {
     final o = dogrulanamayan;
-    if (o == null || mesgul) return;
+    if (_kapandi || o == null || mesgul) return;
     dogrulanamayan = null;
     await _dogrula(o);
   }
 
   void _olay(MagazaOlayi o) {
+    if (_kapandi) return;
     switch (o.tur) {
       case MagazaOlayTuru.bekliyor:
         bekliyor = true;
@@ -160,17 +171,27 @@ class OdemeModeli extends ChangeNotifier {
 
   /// Mağazanın verdiği işlemi SUNUCUYA doğrulatır. Kabul gelmeden işlem tamamlanmaz ve paket açılmış gösterilmez.
   Future<void> _dogrula(MagazaOlayi o) async {
-    if (o.kimlik.isEmpty || !_surenler.add(o.kimlik)) return;
+    if (_kapandi) return;
+    if (o.kimlik.isEmpty) {
+      islemdeUrun = null;
+      _geriYukleniyor = false;
+      _sonuc('Mağaza işlem kimliği vermedi. Ücret alındıysa Geri yükle ile tekrar dene; sorun sürerse bizimle iletişime geç.', hata: true);
+      return;
+    }
+    if (!_surenler.add(o.kimlik)) return;
     bekliyor = false;
     notifyListeners();
     try {
-      await api.magazaDogrula(o.platform, o.kimlik);
+      await api.magazaDogrula(o.platform, o.kimlik, beklenenHesap: hesapId);
+      if (_kapandi) return; // Hesap değiştiyse eski ekrandan mağaza işlemini tamamlama.
       await koprusu.tamamla(o);
+      if (_kapandi) return;
       islemdeUrun = null;
       _geriYukleniyor = false;
       await yenile();
       _sonuc('Paketin açıldı. Teşekkürler!', hata: false);
     } on ApiHata catch (e) {
+      if (_kapandi) return;
       islemdeUrun = null;
       _geriYukleniyor = false;
       final kod = _sunucuHatasi(e);
@@ -181,6 +202,7 @@ class OdemeModeli extends ChangeNotifier {
         _sonuc(_hataMetni(kod), hata: true);
       }
     } catch (_) {
+      if (_kapandi) return;
       islemdeUrun = null;
       _geriYukleniyor = false;
       dogrulanamayan = o;
@@ -207,6 +229,7 @@ class OdemeModeli extends ChangeNotifier {
       };
 
   void _sonuc(String m, {required bool hata}) {
+    if (_kapandi) return;
     mesaj = m;
     mesajHata = hata;
     if (!_kapandi) notifyListeners();

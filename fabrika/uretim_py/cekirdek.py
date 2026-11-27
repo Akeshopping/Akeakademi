@@ -44,6 +44,51 @@ def eksi_duzelt(metin):
     return _EKSI.sub(lambda m: m.group(1) + "−", metin)
 
 
+
+# ---------------------------------------------------------------- Türkçe sayı sonrası ek uyumu
+_SON = {1: ("i", False, "r"), 2: ("i", True, ""), 3: ("ü", False, "ç"), 4: ("ö", False, "t"), 5: ("e", False, "ş"), 6: ("ı", True, ""),
+        7: ("i", True, ""), 8: ("i", False, "z"), 9: ("u", False, "z")}
+_ONLAR = {1: ("o", "n"), 2: ("i", ""), 3: ("u", "z"), 4: ("ı", "k"), 5: ("i", ""), 6: ("ı", "ş"), 7: ("i", "ş"), 8: ("e", "n"), 9: ("a", "n")}
+
+
+def _son_ses(n):
+    """Sayının okunuşunun son ünlüsü ve son harfi (ek uyumu için)."""
+    n = abs(int(n))
+    if n % 10:
+        u, _, c = _SON[n % 10]
+        return u, c
+    if n % 100:
+        u, c = _ONLAR[(n // 10) % 10]
+        return u, c
+    return ("ü", "z") if n % 1000 else ("i", "n")   # yüz / bin
+
+
+def sayi_eki(n, sinif):
+    """sinif: 'dir' (-dir/-dır/-dur/-dür/-tir…), 'e' (yönelme), 'den' (ayrılma), 'de' (bulunma)."""
+    u, c = _son_ses(n)
+    unlu_biter = c == ""
+    sert = c in ("ç", "f", "h", "k", "p", "s", "ş", "t")
+    arka = u in "aıou"
+    if sinif == "dir":
+        v = {"a": "ı", "ı": "ı", "e": "i", "i": "i", "o": "u", "u": "u", "ö": "ü", "ü": "ü"}[u]
+        return ("t" if sert else "d") + v + "r"
+    if sinif == "e":
+        return ("y" if unlu_biter else "") + ("a" if arka else "e")
+    if sinif == "den":
+        return ("t" if sert else "d") + ("a" if arka else "e") + "n"
+    return ("t" if sert else "d") + ("a" if arka else "e")
+
+
+_EK_SINIF = {**{k: "dir" for k in ("dir", "dır", "dur", "dür", "tir", "tır", "tur", "tür")}, **{k: "e" for k in ("a", "e", "ya", "ye")},
+             **{k: "den" for k in ("den", "dan", "ten", "tan")}, **{k: "de" for k in ("de", "da", "te", "ta")}}
+_EK_RX = re.compile(r"(?<![\d,/.])(\d+)'(" + "|".join(sorted(_EK_SINIF, key=len, reverse=True)) + r")(?![a-zçğıöşü])")
+
+
+def ek_duzelt(metin):
+    """Rakamla yazılmış sayıdan sonraki 'ek'leri okunuşa göre düzeltir (3'ya → 3'e, 6'dir → 6'dır, 5'ten, 10'dan …)."""
+    return _EK_RX.sub(lambda m: f"{m.group(1)}'{sayi_eki(int(m.group(1)), _EK_SINIF[m.group(2)])}", metin)
+
+
 # ---------------------------------------------------------------- şık kurma
 
 
@@ -96,6 +141,8 @@ def secenek_kur(r, dogru, yanlis, bic=tr, pozitif=False, adim=None):
     alt = sorted([v for v in havuz if v < dogru], reverse=True)
     ust = sorted([v for v in havuz if v > dogru])
 
+    dolgu = [0]
+
     def doldur(liste, yon, n):
         cikti = list(liste[:n])
         gor = {bic(v) for v in cikti} | {dogru_metin}
@@ -113,11 +160,13 @@ def secenek_kur(r, dogru, yanlis, bic=tr, pozitif=False, adim=None):
                 continue
             gor.add(m)
             cikti.append(v)
+            dolgu[0] += 1
         return cikti if len(cikti) == n else None
 
     sira = [0, 1, 2, 3, 4]
     r.shuffle(sira)
     for k in sira:
+        dolgu[0] = 0
         a, u = doldur(alt, -1, k), doldur(ust, +1, 4 - k)
         if a is None or u is None:
             continue
@@ -125,7 +174,7 @@ def secenek_kur(r, dogru, yanlis, bic=tr, pozitif=False, adim=None):
         metin = [bic(v) for v in degerler]
         if len(set(metin)) != 5:
             continue
-        return metin, degerler.index(dogru), degerler
+        return metin, degerler.index(dogru), degerler, dolgu[0]
     return None
 
 
@@ -167,12 +216,14 @@ def kur(k, d, r):
     sec = secenek_kur(r, g["dogru"], g["yanlis"], bic=g.get("bic", tr), pozitif=g.get("pozitif", k.pozitif), adim=g.get("adim"))
     if not sec:
         return None
-    metin, a, degerler = sec
-    x = eksi_duzelt(g["x"].strip()) + f" Doğru cevap {'ABCDE'[a]} şıkkıdır."
-    q = eksi_duzelt(g["q"].strip())
+    metin, a, degerler, dolgu = sec
+    if dolgu >= 2:   # çeldiricilerin çoğu 'gerçek öğrenci hatası' değil sayısal dolgu: kalitesiz, reddedilir
+        return None
+    x = ek_duzelt(eksi_duzelt(g["x"].strip())) + f" Doğru cevap {'ABCDE'[a]} şıkkıdır."
+    q = ek_duzelt(eksi_duzelt(g["q"].strip()))
     anahtar = k.id + "|" + json.dumps(g["prm"], sort_keys=True, ensure_ascii=False)
     kimlik = f"py-{k.ders}-{hashlib.sha1(anahtar.encode()).hexdigest()[:8]}"
     if re.search(r"\d[.,]\d{5,}|None|nan|inf", q + " ".join(metin) + x):
         return None
     soru = {"id": kimlik, "s": k.ders, "t": k.konu, "d": d, "q": q, "o": metin, "a": a, "x": x}
-    return {"soru": soru, "meta": {"kalip": k.id, "uz": g.get("uz"), "prm": g["prm"], "dUret": d, "degerler": [float(v) for v in degerler], "anahtar": anahtar}}
+    return {"soru": soru, "meta": {"kalip": k.id, "uz": g.get("uz"), "dolgu": dolgu, "prm": g["prm"], "dUret": d, "degerler": [float(v) for v in degerler], "anahtar": anahtar}}

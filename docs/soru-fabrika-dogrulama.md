@@ -40,3 +40,17 @@ Bilinmeyen bir cümle kalıbı **sessizce geçmez**; `cozulemedi` olarak raporla
 **Kök neden: doğrulayıcıda değil, üretici CLI'sında hata.** `yks.py` zorluk hedefini *ölçülen* zorluğa göre sayıyordu. Zorluk ölçümü çoğu soruyu "orta" saydığı için, kolay (d=1) turunda üretilen sorular orta hedefini zaten dolduruyor ve orta (d=2) turu hiç soru üretmiyordu. Bu yüzden 7 orta alt tip ZIP'e girmedi ve zorluk dağılımı kaydı (kolay 107 / orta 4.682 / zor 2.500). Düzeltme: hedef üretim zorluğuna (`dUret`) göre sayılır; regresyon testi eklendi (`test_uretim_hedefi_uretim_zorluguna_gore`). Düzeltmeden sonra yaş konusu 10.000'e ulaşıyor (7.289 değil).
 
 **Sonuç:** Çözücüde kapsam boşluğu yok; 7 kuralın gerçek veriyle sınanmamış olması ise bir **sınama boşluğu**: bu 7 kural yalnız birim testlerle (üreticinin örnekleriyle) sınandı, ZIP'teki gerçek sorularla değil. ZIP yeniden üretilirse (konu kararı sonrası) bu kurallar da gerçek veriyle çalışır. **Pilot 40 şablonla sınırlıdır; bu 7 alt tip pilotta yoktur.**
+
+
+## Bağımsız kalite denetimi (v2, `fabrika/uretim_py/denetim.py`)
+
+Matematik doğru olsa bile soru kötü olabilir. Bu denetim, üretici meta bilgisini kullanmadan yalnız dosyadaki soru/şık/çözüm metnine bakar:
+
+- **gerçeklik:** yaş senaryosu metinden yeniden kurulur (çözücü kayıtları); ebeveyn–çocuk farkı 20–45, ebeveyn ≤ 70, geçmişte sorulan zamanda çocuk ≥ 1, kardeş farkı ≤ 15, tek kişi yaşı 5–90. Aykırıysa **REDDET**.
+- **çözüm:** çözüm metnindeki `a = b = c` biçimli işlemler yeniden hesaplanır; `ax − b` için "çıkarılır", `ax + b` için "eklenir" denmesi, gereksiz/çift işaretli parantez yakalanır. **DÜZELT**.
+- **metin:** rakamdan sonraki ekler sayının okunuşuna göre denetlenir (3'ya → 3'e, 6'dir → 6'dır); ASCII eksi, boşluk hataları. **DÜZELT**.
+- **şık:** beş şık eşit aralıklıysa (sayısal dolgu) veya bir çeldirici cevaptan bariz uzak/ters işaretliyse. **DÜZELT**.
+
+Bulgusu olan soru, cevabı doğru olsa da `inceleme` kuyruğuna gider (`--denetim` zorunlu). Sınır: işlem denetimi yalnız `a = b = c` biçimli sayısal ifadeleri doğrular; anlatımın her cümlesini anlamaz. Üretici tarafında da aynı kurallar uygulanır (yaş gerçekçiliği, ek düzeltici, sayısal dolgu şıkkı en çok 1; fazlasında soru reddedilir).
+
+Eski aday ZIP'e uygulandığında (14.444/18.719 soruda en az bir bulgu) üç bildirilen soru da yakalandı.

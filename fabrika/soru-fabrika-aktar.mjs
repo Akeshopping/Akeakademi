@@ -10,6 +10,7 @@
 //   ... --pilot [--pilot-inceleme <repo-dışı.md>]   → yalnız sabit kuralla seçilen pilot sorular (bkz. soru-fabrika-pilot.mjs); gerisi pilot_disi
 //   node fabrika/soru-fabrika-aktar.mjs --girdi <zip-icerigi-klasoru> --bagimsiz <bagimsiz.json> --cikti <rapor-klasoru>             # ön kontrol
 //   ... --local-db /tmp/staging.sqlite --apply                                                                                       # yerel staging'e aktar
+// --denetim: python3 fabrika/uretim_py/denetim.py <girdi> <denetim.json> çıktısı (gerçeklik/çözüm anlatımı/metin/şık bulguları → inceleme).
 // --bagimsiz: python3 fabrika/uretim_py/bagimsiz_cozum.py <girdi> <bagimsiz.json> çıktısı (soru metninden bağımsız çözüm).
 // Çıktılar (repo DIŞINA yazın; soru metni içerir): ledger.jsonl (soru başına sonuç), inceleme.jsonl, rapor.json
 import fs from "node:fs";
@@ -53,7 +54,7 @@ export function dosyalariOku(girdi) {
 }
 
 /* ---- 2) soru başına karar (saf hesap, yazmaz) ---- */
-export async function degerlendir({ konular, bagimsiz, mevcutKonu, mevcutHash, mevcutId, mevcutKok, mevcutGolge = [] }) {
+export async function degerlendir({ konular, bagimsiz, denetim = {}, mevcutKonu, mevcutHash, mevcutId, mevcutKok, mevcutGolge = [] }) {
   const ledger = [], gorulenId = new Map(), gorulenH = new Map(), tutulan = new Map();
   const rapor = { konu: {}, genel: {} };
   for (const k of konular) {
@@ -87,6 +88,12 @@ export async function degerlendir({ konular, bagimsiz, mevcutKonu, mevcutHash, m
         if (kayit.sonuc === "uygun") {
           if (!b) { kayit.sonuc = "inceleme"; kayit.neden.push("bağımsız çözüm kaydı yok"); }
           else if (b.s !== "dogru") { kayit.sonuc = "inceleme"; kayit.neden.push("bağımsız çözüm: " + b.s + (b.n ? " · " + b.n : "")); }
+        }
+        const dn = denetim[q.id];          // bağımsız kalite denetimi (gerçeklik · çözüm anlatımı · metin · şık): bulgu varsa cevap doğru olsa bile İNCELEME
+        if (kayit.sonuc === "uygun" && dn && dn.length) {
+          kayit.sonuc = "inceleme"; kayit.denetim = dn.map(x => `${x.tur}: ${x.ne}`);
+          kayit.oneri = dn.some(x => x.oneri === "REDDET") ? "REDDET" : "DÜZELT";
+          for (const x of kayit.denetim) kayit.neden.push("denetim · " + x);
         }
         if (kayit.sonuc === "uygun") {
           const g = golge((q.p || "") + " " + q.q), grup = q.s + "|" + sablon(q.q);
@@ -143,18 +150,19 @@ export async function yerelAktar(dbYol, ledger) {
 }
 
 async function main() {
-  const girdi = arg("girdi"), bagYol = arg("bagimsiz"), cikti = arg("cikti"), localDb = arg("local-db"), apply = !!arg("apply");
-  if (!girdi || !bagYol || !cikti) { console.error("Kullanım: --girdi <klasor> --bagimsiz <json> --cikti <rapor-klasoru> [--local-db <sqlite> --apply]"); process.exit(2); }
+  const girdi = arg("girdi"), bagYol = arg("bagimsiz"), denYol = arg("denetim"), cikti = arg("cikti"), localDb = arg("local-db"), apply = !!arg("apply");
+  if (!girdi || !bagYol || !denYol || !cikti) { console.error("Kullanım: --girdi <klasor> --bagimsiz <json> --denetim <json> --cikti <rapor-klasoru> [--local-db <sqlite> --apply]"); process.exit(2); }
   if (path.resolve(cikti).startsWith(KOK + path.sep)) { console.error("DURDUR: --cikti repo içinde olamaz (soru metni içerir)."); process.exit(2); }
   if (apply && !localDb) { console.error("DURDUR: --apply yalnız --local-db <sqlite> ile çalışır. Üretim D1'e bu araç bağlanmaz."); process.exit(3); }
   const { konular, dosyaHata } = dosyalariOku(girdi);
   const bagimsiz = JSON.parse(fs.readFileSync(bagYol, "utf8"));
+  const denetim = JSON.parse(fs.readFileSync(denYol, "utf8"));   // python3 fabrika/uretim_py/denetim.py <girdi> <denetim.json>
   const mevcutKonu = JSON.parse(fs.readFileSync(path.join(KOK, "fabrika/mevcut_konular.json"), "utf8"));
   const mevcutHash = new Map(), mevcutId = new Set(), mevcutKok = new Set();
   for (const k of statikKaynaklar(KOK)) for (const q of k.sorular) { mevcutId.add(q.id); mevcutHash.set(await kanonikHash(q), { id: q.id, ha: await cevapHash(q) }); mevcutKok.add(q.s + "\n" + normalize(q.q)); }
   for (const m of JSON.parse(fs.readFileSync(path.join(KOK, "fabrika/mevcut_ozet.json"), "utf8"))) mevcutKok.add(m.s + "\n" + normalize(m.q));   // gömülü banka (yalnız metin)
   const mevcutGolge = JSON.parse(fs.readFileSync(path.join(KOK, "fabrika/mevcut_ozet.json"), "utf8")).map(m => ({ s: m.s, q: m.q, g: golge((m.p || "") + " " + m.q) }));
-  const { ledger, rapor } = await degerlendir({ konular, bagimsiz, mevcutKonu, mevcutHash, mevcutId, mevcutKok, mevcutGolge });
+  const { ledger, rapor } = await degerlendir({ konular, bagimsiz, denetim, mevcutKonu, mevcutHash, mevcutId, mevcutKok, mevcutGolge });
   if (arg("pilot")) {                                          // pilot: yalnız seçilen sorular 'uygun' kalır, diğerleri 'pilot_disi'
     const p = pilotSec(ledger.filter(l => l.sonuc === "uygun"));
     const secili = new Set(p.secilen);
@@ -167,7 +175,7 @@ async function main() {
   rapor.mod = apply ? "yerel-staging-yazma" : "on-kontrol (yazma yok)";
   if (apply) rapor.yazma = await yerelAktar(path.resolve(localDb), ledger);
   fs.mkdirSync(cikti, { recursive: true });
-  fs.writeFileSync(path.join(cikti, "ledger.jsonl"), ledger.map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden, pilot: l.pilot || undefined, insanInceleme: l.insanInceleme, yeniKonu: l.yeniKonu || undefined, not: l.not })).join("\n") + "\n");
+  fs.writeFileSync(path.join(cikti, "ledger.jsonl"), ledger.map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden, oneri: l.oneri || undefined, pilot: l.pilot || undefined, insanInceleme: l.insanInceleme, yeniKonu: l.yeniKonu || undefined, not: l.not })).join("\n") + "\n");
   fs.writeFileSync(path.join(cikti, "inceleme.jsonl"), ledger.filter(l => l.sonuc === "inceleme" || l.sonuc === "gecersiz").map(l => JSON.stringify({ id: l.id, konu: l.konu, sonuc: l.sonuc, neden: l.neden })).join("\n") + "\n");
   if (rapor.pilot) {
     fs.writeFileSync(path.join(cikti, "pilot-secim.json"), JSON.stringify({ kural: rapor.pilot.kural, ids: rapor.pilotIds, sablonlar: rapor.pilot.sablonlar }, null, 1));

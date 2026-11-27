@@ -41,6 +41,21 @@ def tek(liste):
     return liste[0] if len(liste) == 1 else None
 
 
+SEN = []   # son çözümün senaryo kayıtları (gerçeklik denetimi için)
+
+
+def ec(e, c, gecmis=0):
+    SEN.append(("ebeveyn", e, c, gecmis))
+
+
+def kard(o, y, gecmis=0):
+    SEN.append(("kardes", o, y, gecmis))
+
+
+def kisi(yas):
+    SEN.append(("kisi", yas))
+
+
 R = []  # (regex, çözücü)
 
 
@@ -130,40 +145,60 @@ def _(k):
 # ---------------- Yaş (eski kalıp)
 @kural(r"Ali ile babasının yaşları toplamı (\d+), yaşları arasındaki fark (\d+) olduğuna göre Ali kaç yaşındadır\?")
 def _(T, Fk):
-    return tek(a for a in range(0, 150) if a + a + Fk == T)
+    a = tek(a for a in range(0, 150) if a + a + Fk == T)
+    if a is not None:
+        ec(a + Fk, a)
+    return a
 
 
 @kural(r"Babanın şimdiki yaşı (\d+), oğlunun şimdiki yaşı (\d+) olduğuna göre kaç yıl sonra babanın yaşı oğlunun yaşının (\d+) katı olur\?")
 def _(B, O, k):
+    ec(B, O)
     return tek(x for x in range(0, 200) if B + x == k * (O + x))
 
 
 @kural(r"Ayşe, Burak'tan (\d+) yaş büyüktür\. Burak da Can'dan (\d+) yaş büyüktür\. Üçünün yaşları toplamı (\d+) olduğuna göre Can kaç yaşındadır\?")
 def _(a, b, T):
-    return tek(c for c in range(0, 150) if c + (c + b) + (c + b + a) == T)
+    c = tek(c for c in range(0, 150) if c + (c + b) + (c + b + a) == T)
+    if c is not None:
+        kard(c + b + a, c)
+    return c
 
 
 # ---------------- Yaş (yeni kalıplar)
 @kural(r"Bir annenin yaşı kızının yaşının (\d+) katıdır\. İkisinin yaşları toplamı (\d+) olduğuna göre kızı kaç yaşındadır\?")
 def _(k, T):
-    return tek(s for s in range(0, 150) if s + k * s == T)
+    s = tek(s for s in range(0, 150) if s + k * s == T)
+    if s is not None:
+        ec(k * s, s)
+    return s
 
 
 @kural(r"Bir babanın yaşı oğlunun yaşının (\d+) katıdır\. İkisinin yaşları toplamı (\d+) olduğuna göre baba kaç yaşındadır\?")
 def _(k, T):
-    return tek(k * s for s in range(0, 150) if s + k * s == T)
+    s = tek(s for s in range(0, 150) if s + k * s == T)
+    if s is not None:
+        ec(k * s, s)
+    return None if s is None else k * s
 
 
 @kural(r"Bir annenin yaşı kızının yaşının (\d+) katıdır\. (\d+) yıl önce ikisinin yaşları toplamı (\d+) olduğuna göre annenin bugünkü yaşı kaçtır\?")
 def _(k, m, P):
-    return tek(k * s for s in range(0, 150) if (s - m) + (k * s - m) == P and s > m)
+    s = tek(s for s in range(0, 150) if (s - m) + (k * s - m) == P and s > m)
+    if s is not None:
+        ec(k * s, s, m)
+    return None if s is None else k * s
 
 
 AILE = r"Bir ailede anne, baba ve bir çocuk vardır\. Annenin yaşı çocuğun yaşının (\d+) katıdır\. Baba, anneden (\d+) yaş büyüktür\. Üç kişinin yaşları toplamı (\d+) olduğuna göre "
 
 
 def _aile(c, b, T):
-    return tek(s for s in range(0, 150) if s + c * s + (c * s + b) == T)
+    s = tek(s for s in range(0, 150) if s + c * s + (c * s + b) == T)
+    if s is not None:
+        ec(c * s, s)
+        ec(c * s + b, s)
+    return s
 
 
 @kural(AILE + r"çocuk kaç yaşındadır\?")
@@ -187,7 +222,10 @@ ORAN = r"Bir anne ile kızının yaşları oranı (\d+)/(\d+), yaşları toplam�
 
 
 def _oran(p, q, T):
-    return tek(s for s in range(1, 150) if (T - s) * q == p * s)
+    s = tek(s for s in range(1, 150) if (T - s) * q == p * s)
+    if s is not None:
+        ec(T - s, s)
+    return s
 
 
 @kural(ORAN + r"kızı kaç yaşındadır\?")
@@ -211,7 +249,10 @@ GG = r"Bir baba ile oğlu hakkında şu bilgiler veriliyor: (\d+) yıl önce bab
 
 
 def _gg(a, k, b, l):
-    return tek((x, y) for x in range(1, 100) for y in range(1, 200) if x > a and y - a == k * (x - a) and y + b == l * (x + b))
+    c = tek((x, y) for x in range(1, 100) for y in range(1, 200) if x > a and y - a == k * (x - a) and y + b == l * (x + b))
+    if c is not None:
+        ec(c[1], c[0], a)
+    return c
 
 
 @kural(GG + r"oğlun bugünkü yaşı kaçtır\?")
@@ -232,26 +273,39 @@ def _(a, k, b, l):
     return None if s is None else s[0] + s[1]
 
 
-@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'dir\. Bu gruptan bir kişi ayrılınca ortalama (\d+) oluyor\. Ayrılan kişi kaç yaşındadır\?")
+@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'[a-zçğıöşü]+\. Bu gruptan bir kişi ayrılınca ortalama (\d+) oluyor\. Ayrılan kişi kaç yaşındadır\?")
 def _(n, M, M2):
-    return tek(y for y in range(0, 200) if n * M - y == (n - 1) * M2)
+    y = tek(y for y in range(0, 200) if n * M - y == (n - 1) * M2)
+    if y is not None:
+        kisi(y)
+    return y
 
 
-@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'dir\. Gruba yeni bir kişi katılınca ortalama (\d+) oluyor\. Gruba katılan kişi kaç yaşındadır\?")
+@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'[a-zçğıöşü]+\. Gruba yeni bir kişi katılınca ortalama (\d+) oluyor\. Gruba katılan kişi kaç yaşındadır\?")
 def _(n, M, M2):
-    return tek(y for y in range(0, 200) if n * M + y == (n + 1) * M2)
+    y = tek(y for y in range(0, 200) if n * M + y == (n + 1) * M2)
+    if y is not None:
+        kisi(y)
+    return y
 
 
-@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'dir\. Gruptan (\d+) yaşındaki bir kişi ile yaşı bilinmeyen başka bir kişi ayrılınca ortalama (\d+) oluyor\. Diğer ayrılan kişi kaç yaşındadır\?")
+@kural(r"(\d+) kişilik bir grubun yaş ortalaması (\d+)'[a-zçğıöşü]+\. Gruptan (\d+) yaşındaki bir kişi ile yaşı bilinmeyen başka bir kişi ayrılınca ortalama (\d+) oluyor\. Diğer ayrılan kişi kaç yaşındadır\?")
 def _(n, M, z, M2):
-    return tek(a for a in range(0, 200) if n * M - z - a == (n - 2) * M2)
+    a = tek(a for a in range(0, 200) if n * M - z - a == (n - 2) * M2)
+    kisi(z)
+    if a is not None:
+        kisi(a)
+    return a
 
 
-FARK = r"İki kardeşin yaşları arasındaki fark (\d+)'tür\. (\d+) yıl önce yaşları toplamı (\d+) olduğuna göre "
+FARK = r"İki kardeşin yaşları arasındaki fark (\d+)'[a-zçğıöşü]+\. (\d+) yıl önce yaşları toplamı (\d+) olduğuna göre "
 
 
 def _fark(dif, n, P):
-    return tek((o, o - dif) for o in range(1, 200) if o - dif > n and (o - n) + (o - dif - n) == P)
+    c = tek((o, o - dif) for o in range(1, 200) if o - dif > n and (o - n) + (o - dif - n) == P)
+    if c is not None:
+        kard(c[0], c[1], n)
+    return c
 
 
 @kural(FARK + r"büyük kardeş şimdi kaç yaşındadır\?")
@@ -322,6 +376,7 @@ def esitsizlik_ozel(q):
 
 def coz(q):
     """Metinden çözer. Dönüş: (durum, değer|neden). durum: 'ok' | 'cozulemedi'"""
+    SEN.clear()
     e = esitsizlik_ozel(q)
     if e != "yok":
         return ("ok", F(e)) if e is not None else ("cozulemedi", "eşitsizlik ayrıştırılamadı")

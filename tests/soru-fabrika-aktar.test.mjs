@@ -97,3 +97,20 @@ test("aynı id farklı içerikle varsa üzerine yazılmaz (çatışma)", async (
   assert.equal(JSON.parse(new DatabaseSync(dbYol).prepare("SELECT json FROM soru").get().json).farkli, 1);
   fs.rmSync(dir, { recursive: true });
 });
+
+test("denetim bulgusu: cevap doğru olsa bile inceleme; öneri REDDET/DÜZELT; bulgusuz soru uygun kalır", async () => {
+  const s = [soru(11), soru(2000), soru(3333333)];
+  const { dir, girdi, bagimsiz } = kur(s);
+  const denetim = {
+    [s[0].id]: [{ tur: "gerceklik", ne: "ebeveyn 12, çocuk 6: yaş farkı 6", oneri: "REDDET" }],
+    [s[1].id]: [{ tur: "cozum", ne: "negatif sayı 'çıkarılıyor' diye anlatılmış", oneri: "DÜZELT" }],
+  };
+  const { konular } = dosyalariOku(girdi);
+  const { ledger } = await degerlendir({ konular, bagimsiz, denetim, ...ortak });
+  const l = Object.fromEntries(ledger.map(x => [x.id, x]));
+  assert.equal(l[s[0].id].sonuc, "inceleme"); assert.equal(l[s[0].id].oneri, "REDDET");
+  assert.equal(l[s[1].id].sonuc, "inceleme"); assert.equal(l[s[1].id].oneri, "DÜZELT");
+  assert.equal(l[s[2].id].sonuc, "uygun");
+  assert.ok(l[s[0].id].neden.some(n => n.startsWith("denetim")));
+  fs.rmSync(dir, { recursive: true });
+});

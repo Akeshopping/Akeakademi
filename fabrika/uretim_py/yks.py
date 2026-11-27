@@ -134,9 +134,12 @@ def komut_uret(a):
     if not secilen:
         print("Eşleşen konu yok. `python3 yks.py konular` ile bak.")
         return 1
+    if a.cikti and os.path.isdir(a.cikti) and any(os.scandir(a.cikti)):
+        print("DURDUR: --cikti dolu bir klasör; mevcut çıktının üzerine yazılmaz.")
+        return 3
     for konu in secilen:
         onayli, red, rapor = uret_konu(konu, gruplar[konu], a.adet, a.tohum)
-        kl = os.path.join(CIKTI, slug(konu))
+        kl = os.path.join(a.cikti or CIKTI, slug(konu))
         os.makedirs(kl, exist_ok=True)
         with open(os.path.join(kl, "onayli.jsonl"), "w", encoding="utf8") as f:
             for q in onayli:
@@ -158,6 +161,7 @@ def main():
     u.add_argument("--hepsi", action="store_true")
     u.add_argument("--adet", type=int, default=1000)
     u.add_argument("--tohum", type=int, default=1)
+    u.add_argument("--cikti", help="çıktı kökü (varsayılan: soru-cikti/py); mevcut bir klasörün ÜZERİNE yazmayı reddeder")
     u.set_defaults(f=komut_uret)
     a = p.parse_args()
     sys.exit(a.f(a) or 0)

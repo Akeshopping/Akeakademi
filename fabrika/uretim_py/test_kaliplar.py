@@ -51,3 +51,36 @@ class Testler(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestKaliteDenetimi(unittest.TestCase):
+    """Kullanıcının bildirdiği üç soru türü ve yeni üretim kuralları."""
+
+    def test_sayi_eki(self):
+        for g, b in [("3'ya", "3'e"), ("6'dir", "6'dır"), ("10'dir", "10'dur"), ("12'tür", "12'dir"), ("5'ya", "5'e"), ("9'e", "9'a"), ("20'de", "20'de")]:
+            self.assertEqual(C.ek_duzelt(g), b)
+
+    def test_yas_gerceklik_denetimi(self):
+        import denetim as D
+        anne6 = {"q": "Bir ailede anne, baba ve bir çocuk vardır. Annenin yaşı çocuğun yaşının 2 katıdır. Baba, anneden 7 yaş büyüktür. Üç kişinin yaşları toplamı 37 olduğuna göre çocuk kaç yaşındadır?", "x": "", "o": ["1", "2", "3", "4", "5"], "a": 0}
+        self.assertTrue(any(b["tur"] == "gerceklik" for b in D.gerceklik(anne6)))      # anne 12, çocuk 6
+
+    def test_islem_anlatimi_isarete_uygun(self):
+        import denetim as D
+        q = {"q": "3x − 5 < 13 eşitsizliğini sağlayan kaç tane pozitif tam sayı vardır?", "x": "Her iki yandan 5 çıkarılınca 3x < 8 olur.", "o": ["1", "2", "3", "4", "5"], "a": 1}
+        self.assertTrue(any("çıkarılır" in b["ne"] for b in D.cozum_islemleri(q)))     # −5 için 'çıkarılır' yanlış
+        q["x"] = "Her iki yana 5 eklenince 3x < 18 olur."
+        self.assertEqual(D.cozum_islemleri(q), [])
+
+    def test_uretilen_sorularda_bulgu_yok(self):
+        import random
+        import denetim as D
+        for kid in ("tyt-mat-basit-esitsizlik", "yas-kat-toplam", "yas-aile-uzun", "yas-oran", "yas-gecmis-gelecek", "tyt-mat-yas"):
+            r = random.Random(7)
+            for d in (1, 2, 3):
+                for _ in range(150):
+                    u = C.kur(C.KALIPLAR[kid], d, r)
+                    if u:
+                        q = {"id": "x", **u["soru"]} if "soru" in u else u
+                        bul = [b for b in D.gerceklik(q) + D.cozum_islemleri(q) + D.metin(q)]
+                        self.assertEqual(bul, [], (kid, q["q"], bul))

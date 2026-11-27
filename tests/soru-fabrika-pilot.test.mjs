@@ -35,16 +35,29 @@ test("toplam üst sınır uygulanır (farklı şablonlar)", () => {
   assert.equal(r.rapor.sablonSayisi, 10);
 });
 
-test("makul olmayan çeldirici elenir; yeterli makul aday yoksa gevşetilir ve raporlanır", () => {
+test("makul olmayan çeldirici elenir; kota uygun olmayanla DOLDURULMAZ, eksik raporlanır", () => {
   assert.equal(makulMu(mk(10).aday), true);
   const kotu = mk(10).aday; kotu.o = ["1", "2", "40", "900", "5000"]; kotu.a = 2;
   assert.equal(makulMu(kotu), false);
   const a = [...havuz(4), ...Array.from({ length: 4 }, (_, i) => { const l = mk(80 + i); l.aday.o = ["1", "2", String(l.aday.o[l.aday.a]), "9000", "9001"]; l.aday.a = 2; return l; })];
   a.forEach(l => { l.aday.q = "Aynı kalıp sayı " + l.aday.q.length; });
   const r = pilotSec(a);
-  assert.equal(r.rapor.gevsetilen, 1);
-  assert.ok(r.rapor.sablonlar[0].gevsetildi);
-  assert.equal(r.secilen.length, 5);
+  assert.equal(r.secilen.length, 4);                      // 5'e tamamlanmaz
+  assert.equal(r.rapor.eksikSablon, 1);
+  assert.equal(r.rapor.sablonlar[0].eksik, 1);
+  assert.ok(r.secilen.every(id => !a.find(l => l.id === id).aday.o.includes("9000")));
+});
+
+test("denetimde bulgusu olan (engel) aday, işaretli cevap doğru olsa da seçilmez; hiç aday yoksa şablon boş kalır", () => {
+  const a = havuz(6); a.forEach(l => { l.aday.q = "Tek kalıp " + l.aday.q.length; });
+  a[0].engel = true; a[1].engel = true;
+  const r = pilotSec(a);
+  assert.equal(r.secilen.length, 4);
+  assert.ok(!r.secilen.includes(a[0].id) && !r.secilen.includes(a[1].id));
+  const hepsi = havuz(3); hepsi.forEach(l => { l.engel = true; });
+  const r2 = pilotSec(hepsi);
+  assert.equal(r2.secilen.length, 0);
+  assert.equal(r2.rapor.eksikToplam, 5 * r2.rapor.sablonSayisi);
 });
 
 test("seçenek değeri: virgül, eksi, yüzde, kesir", () => {

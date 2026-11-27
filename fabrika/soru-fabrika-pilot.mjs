@@ -6,7 +6,9 @@
 //   2) Her şablondan en çok ONLAR_KADAR (varsayılan 5), toplam en çok TOPLAM_TAVAN (varsayılan 200) soru.
 //   3) Uygunluk: cevap önemsiz değil (|cevap| ≥ 2; kesirde 0/1 hariç) ve çeldiriciler makul: her çeldirici cevaba
 //      |çeldirici − cevap| ≤ max(0,75·|cevap|, 6) uzaklıkta, cevapla aynı işaretli, cevaptan farklı. Uygun aday < 5 ise
-//      eksik kalan yer uygun olmayanlardan doldurulur ve şablon "gevsetildi" diye raporlanır.
+//      ŞABLON KOTASI ASLA uygun olmayan soruyla doldurulmaz: uygun aday 5'ten azsa o şablondan 5'ten az soru
+//      alınır ve eksik "eksik" alanında raporlanır. Ayrıca bağımsız denetimde (gerçeklik, çözüm anlatımı, metin, şık) bulgusu olan
+//      aday (l.engel doluysa) hiç aday olamaz; toplam sayı 200'e zorlanmaz.
 //   4) Çeşitlilik: soru metnindeki sayılar + cevap değeri + zorluk, şablon içinde 0-1'e ölçeklenir. İlk soru şablonun "orta"
 //      durumuna (merkeze) en yakın olandır; sonrakiler, seçilmişlere en UZAK olandır (maximin). Cevap şıkkı konumu ve zorluk
 //      henüz seçilmemişse uzaklığa bonus eklenir. Eşitlikte küçük kimlik kazanır. Dosyadaki ilk 5 soru otomatik alınmaz.
@@ -42,9 +44,9 @@ export function pilotSec(adaylar, { sablonBasina = ONLAR_KADAR, tavan = TOPLAM_T
   const secim = [];
   for (const k of [...gruplar.keys()].sort()) {
     const grup = gruplar.get(k);
-    const uygun = grup.filter(l => makulMu(l.aday));
-    let havuz = uygun, gevsetildi = false;
-    if (uygun.length < sablonBasina) { havuz = grup; gevsetildi = true; }
+    const uygun = grup.filter(l => !l.engel && makulMu(l.aday));
+    const havuz = uygun;
+    if (!havuz.length) { secim.push({ konu: grup[0].konu, sablon: sablonOf(grup[0].aday.q), aday: grup.length, uygun: 0, eksik: sablonBasina, secilen: [] }); continue; }
     const oz = havuz.map(l => ozellik(l.aday));
     const boyut = Math.max(...oz.map(o => o.sayilar.length), 0);
     const vek = oz.map(o => [...o.sayilar, ...Array(boyut - o.sayilar.length).fill(0), o.cevap]);
@@ -69,7 +71,7 @@ export function pilotSec(adaylar, { sablonBasina = ONLAR_KADAR, tavan = TOPLAM_T
       }
       alinan.add(en); secilen.push(en);
     }
-    secim.push({ konu: grup[0].konu, sablon: sablonOf(grup[0].aday.q), aday: grup.length, uygun: uygun.length, gevsetildi, secilen: secilen.map(i => havuz[i].id) });
+    secim.push({ konu: grup[0].konu, sablon: sablonOf(grup[0].aday.q), aday: grup.length, uygun: uygun.length, eksik: Math.max(0, sablonBasina - n), secilen: secilen.map(i => havuz[i].id) });
   }
   /* toplam tavan: fazlalık, en çok soru seçilmiş şablonlardan (eşitlikte sondaki şablondan) sondan kırpılır */
   let toplam = secim.reduce((t, s) => t + s.secilen.length, 0);
@@ -84,7 +86,7 @@ export function pilotSec(adaylar, { sablonBasina = ONLAR_KADAR, tavan = TOPLAM_T
     secilen: ids,
     rapor: {
       kural: { sablonBasina, tavan, uygunlukEsigi: "|cevap|>=2; çeldirici <= max(0,75*|cevap|,6) uzakta, aynı işaretli, cevaptan farklı", sira: "maximin çeşitlilik, merkezden başla, eşitlikte küçük kimlik" },
-      toplam: ids.length, sablonSayisi: secim.length, gevsetilen: secim.filter(s => s.gevsetildi).length,
+      toplam: ids.length, sablonSayisi: secim.length, eksikSablon: secim.filter(s => s.eksik > 0).length, eksikToplam: secim.reduce((t, s) => t + s.eksik, 0),
       konuBazinda: say(l => l.konu), cevapKonumu: say(l => "ABCDE"[l.aday.a]), zorluk: say(l => l.aday.d),
       sablonlar: secim
     }

@@ -11,6 +11,17 @@ def lcm(a, b):
     return a // gcd(a, b) * b
 
 
+def yan_islem(b, kip, ip=False):
+    """ax + b ifadesinde b'yi yok etmek için doğru işlemi anlatır. b > 0 → çıkar, b < 0 → ekle, b = 0 → "" (işlem yok).
+    kip 'iki': her iki yan · 'her': her yan. ip=True: '...çıkarılıp / eklenip', değilse '...çıkarılınca / eklenince'."""
+    if b == 0:
+        return ""
+    yan = "her iki yan" if kip == "iki" else "her yan"
+    if b > 0:
+        return f"{yan.capitalize()}dan {tr(b)} " + ("çıkarılıp" if ip else "çıkarılınca")
+    return f"{yan.capitalize()}a {tr(-b)} " + ("eklenip" if ip else "eklenince")
+
+
 # ------------------------------------------------------------------ Sayı Basamakları
 def _en_buyuk_uc_basamakli(S, farkli=True, kucuk=False):
     aralik = range(100, 1000) if kucuk else range(999, 99, -1)
@@ -105,7 +116,7 @@ def basit_esitsizlik(r, d):
             return None
         return dict(prm=dict(tip=1, a=a, b=b, c=c), q=f"{dogrusal(a, b)} < {tr(c)} eşitsizliğini sağlayan kaç tane pozitif tam sayı vardır?",
                     dogru=say, yanlis=[say + 1, say - 1, say + 2, say - 2, say + 3, (c - b) // a if (c - b) % a else (c - b) // a - 1],
-                    x=f"Eşitsizlik {tr(c)} − ({tr(b)}) = {c - b} değeriyle düzenlenince {a}x < {c - b} olur. Bu eşitsizliği sağlayan pozitif tam sayılar 1'den {say}'e kadardır, yani {say} tanedir.")
+                    x=f"{yan_islem(b, 'iki') or 'Eşitsizlik'} {a}x < {c - b} olur. Bu eşitsizliği sağlayan pozitif tam sayılar 1'den {say}'e kadardır, yani {say} tanedir.")
     if d == 2:
         a = r.randint(2, 4)
         b = r.randint(-5, 5)
@@ -117,7 +128,7 @@ def basit_esitsizlik(r, d):
         top = sum(cozum)
         return dict(prm=dict(tip=2, a=a, b=b, alt=alt, ust=ust), q=f"x bir tam sayı olmak üzere {tr(alt)} < {dogrusal(a, b)} ≤ {tr(ust)} eşitsizliğini sağlayan x değerlerinin toplamı kaçtır?",
                     dogru=top, yanlis=[len(cozum), top + cozum[0], top - cozum[-1], top + cozum[-1], top - cozum[0], top + 1, top - 1, sum(cozum[1:])],
-                    x=f"Her yandan {tr(b)} çıkarılıp {a}'ya bölününce x'in aralığı bulunur. Bu aralıktaki tam sayılar {', '.join(tr(x) for x in cozum)} olur. Toplamları {tr(top)}'dir.")
+                    x=f"{(yan_islem(b, 'her', ip=True) + ' ') if b else ''}{a}'ya bölününce x'in aralığı bulunur. Bu aralıktaki tam sayılar {', '.join(tr(x) for x in cozum)} olur. Toplamları {tr(top)}'dir.")
     a, b = r.choice([2, 3]), r.randint(1, 9)
     c = r.randint(4, 15)
     cozum = [x for x in range(-100, 101) if abs(a * x - b) <= c]
@@ -163,12 +174,14 @@ def yas(r, d):
     if d == 2:
         O, x, k = r.randint(6, 16), r.randint(2, 12), r.randint(2, 4)
         B = k * (O + x) - x
-        if not (O + 20 <= B <= 62):
+        if not (20 <= B - O <= 45 and B <= 62):   # baba-oğul yaş farkı gerçekçi
             return None
         return dict(prm=dict(tip=2, B=B, O=O, k=k), q=f"Babanın şimdiki yaşı {B}, oğlunun şimdiki yaşı {O} olduğuna göre kaç yıl sonra babanın yaşı oğlunun yaşının {k} katı olur?",
                     dogru=x, yanlis=[x + 1, x - 1, B - k * O, k, B - O, x + 2, x * 2],
                     x=f"x yıl sonra {B} + x = {k}·({O} + x) olmalıdır. Düzenlenince {B - k * O} = {k - 1}x olur ve x = {x} bulunur.")
     c, a, b = r.randint(5, 20), r.randint(2, 8), r.randint(2, 8)
+    if a + b > 15:   # en büyük ile en küçük kardeş farkı makul kalsın
+        return None
     T = 3 * c + 2 * b + a
     return dict(prm=dict(tip=3, a=a, b=b, T=T), q=f"Ayşe, Burak'tan {a} yaş büyüktür. Burak da Can'dan {b} yaş büyüktür. Üçünün yaşları toplamı {T} olduğuna göre Can kaç yaşındadır?",
                 dogru=c, yanlis=[c + b, c + a + b, T // 3, c + 1, c - 1, c + 2, T - 3 * c],

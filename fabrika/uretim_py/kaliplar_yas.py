@@ -7,11 +7,21 @@ from cekirdek import kalip
 D, K = "tyt_matematik", "Yaş Problemleri"
 
 
+def gercekci_ec(ebeveyn, cocuk, gecmis=0):
+    """Ebeveyn-çocuk gerçekçiliği: yaş farkı 20-45, ebeveyn ≤ 70, geçmişte sorulan zamanda çocuk en az 1 yaşında."""
+    return 20 <= ebeveyn - cocuk <= 45 and ebeveyn <= 70 and cocuk - gecmis >= 1
+
+
 # 1 · KISA · k katı + toplam
 @kalip("yas-kat-toplam", D, K)
 def yas_kat_toplam(r, d):
-    k = r.randint(2, 4) if d == 1 else r.randint(3, 7)
-    s = r.randint(4, 17)
+    for _ in range(300):
+        k = r.randint(2, 4) if d == 1 else r.randint(2, 6)
+        s = r.randint(5, 30)
+        if gercekci_ec(k * s, s):
+            break
+    else:
+        return None
     f, T = k * s, (k + 1) * s
     if d == 1:
         return dict(uz="kisa", prm=dict(tip=1, k=k, T=T), q=f"Bir annenin yaşı kızının yaşının {k} katıdır. İkisinin yaşları toplamı {T} olduğuna göre kızı kaç yaşındadır?",
@@ -31,9 +41,12 @@ def yas_kat_toplam(r, d):
 # 2 · UZUN · üç kişilik aile
 @kalip("yas-aile-uzun", D, K)
 def yas_aile(r, d):
-    c = r.randint(2, 4)
-    s = r.randint(5, 16)
-    b = r.randint(2, 7)
+    for _ in range(300):
+        c, s, b = r.randint(2, 4), r.randint(5, 25), r.randint(2, 7)
+        if gercekci_ec(c * s, s) and gercekci_ec(c * s + b, s) and c * s <= 55:
+            break
+    else:
+        return None
     mo = c * s
     fa = mo + b
     T = s + mo + fa
@@ -55,11 +68,14 @@ def yas_aile(r, d):
 # 3 · KISA · yaş oranı
 @kalip("yas-oran", D, K)
 def yas_oran(r, d):
-    q = r.randint(1, 4)
-    p = r.randint(q + 1, 7)
-    if gcd(p, q) != 1:
+    for _ in range(400):
+        q = r.randint(1, 4)
+        p = r.randint(q + 1, 7)
+        u = r.randint(2, 15)
+        if gcd(p, q) == 1 and gercekci_ec(p * u, q * u):
+            break
+    else:
         return None
-    u = r.randint(2, 9)
     kucuk, buyuk = q * u, p * u
     T = kucuk + buyuk
     if d == 1:
@@ -87,7 +103,7 @@ def yas_gecmis_gelecek(r, d):
         b = r.randint(1, 15)
         if (f + b) % (s + b) == 0:
             l = (f + b) // (s + b)
-            if 2 <= l < k and f < 80:
+            if 2 <= l < k and gercekci_ec(f, s, a):
                 break
     else:
         return None

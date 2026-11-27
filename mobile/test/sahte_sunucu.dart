@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -46,6 +47,11 @@ class SahteSunucu {
   String? magazaHata; // doluysa her doğrulama bu hata koduyla reddedilir (örn. hesap_eslesmedi)
   int magazaAgHatasi = 0; // ilk N doğrulama isteğinde sunucu 502 magaza_ulasilamadi dönsün
   bool magazaPaketAcik = false;
+  String? magazaBitenDurum; // paket açık değilken işlem satırı bu durumla görünür (bitti | iade): erişim yok
+  int magazaGetSayisi = 0; // /hesap/magaza GET istekleri
+  bool magazaGetAgYok = false; // yalnız mağaza durumu GET'i ağ hatasıyla düşer
+  bool magazaGetTut = false; // true iken GET yanıtı İSTEK ANINDAKİ durumla hazırlanır ama [magazaTutulan] bırakılana dek gecikir
+  final List<Completer<void>> magazaTutulan = [];
   int _sur(String a) => surumler[a] ?? ((veriAlanlari?.containsKey(a) ?? false) ? 1 : 0);
   String? sonOturumGovdesi;
   // ---- odak odası ----
@@ -101,7 +107,9 @@ class SahteSunucu {
     if (yol.startsWith('/api/hesap/magaza')) {
       if (magazaModu == 'kapali') return _y(503, {'error': 'kapali', 'message': ''});
       if (yol == '/api/hesap/magaza' && r.method == 'GET') {
-        return _y(200, {
+        magazaGetSayisi++;
+        if (magazaGetAgYok) throw http.ClientException('ağ yok');
+        final y = _y(200, {
           'mod': magazaModu,
           'urunler': [
             {'id': 'atilim_aylik', 'plan': 'orta', 'donem': 'ay'},
@@ -110,9 +118,17 @@ class SahteSunucu {
             {'id': 'premium_yillik', 'plan': 'premium', 'donem': 'yil'},
           ],
           'hesapKimligi': {'google': 'g-$hesapId', 'apple': '00000000-0000-4000-8000-000000000001'},
-          'islemler': magazaPaketAcik ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': 'aktif', 'bitis': '2027-06-30', 'erisim': true, 'test': true}] : [],
+          'islemler': magazaPaketAcik
+              ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': 'aktif', 'bitis': '2027-06-30', 'erisim': true, 'test': true}]
+              : (magazaBitenDurum != null ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': magazaBitenDurum, 'bitis': '2026-11-01', 'erisim': false, 'test': true}] : []),
           'paket': magazaPaketAcik || paketli ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
         });
+        if (magazaGetTut) {
+          final c = Completer<void>();
+          magazaTutulan.add(c);
+          await c.future;
+        }
+        return y;
       }
       if (yol == '/api/hesap/magaza/dogrula' && r.method == 'POST') {
         final b = jsonDecode(r.body) as Map<String, dynamic>;

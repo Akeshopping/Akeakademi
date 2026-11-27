@@ -5,6 +5,8 @@ Erişimi **sunucu** verir: uygulama mağazadan aldığı işlem kimliğini sunuc
 
 Mobil uygulama mağaza olaylarını giriş yapılmış hesap boyunca dinler; Paketler ekranından ayrılmak dinlemeyi durdurmaz. Çıkışta veya hesap değişiminde eski dinleyici kapanır. Doğrulanamayan mağaza işlemi tamamlanmaz; kullanıcı Paketler'deki Geri yükle ile yeniden deneyebilir.
 
+Paketler ekranı her açılışta ve ekran açıkken uygulama arka plandan dönünce abonelik durumunu sunucudan tazeler (`OdemeModeli.tazele`). Eşzamanlı okumalarda yalnız en son başlayan yanıt uygulanır; süren satın alma, bekleyen onay ve "Yeniden dene" korunur. Ağ hatasında eski bilgi "eski olabilir" uyarısıyla ve Tekrar dene düğmesiyle gösterilir. Hesap değişince/çıkışta eski hesabın yanıtı atılır.
+
 ## 1) Paketler ve yetkiler
 
 | | Ücretsiz | Atılım | Premium |

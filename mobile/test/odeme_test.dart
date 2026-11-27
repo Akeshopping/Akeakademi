@@ -16,7 +16,7 @@ import 'sahte_sunucu.dart';
 AkeApi _api(SahteSunucu s) => AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(SahteSunucu.anahtar));
 
 Future<void> _bosalt() async {
-  for (var i = 0; i < 12; i++) {
+  for (var i = 0; i < 40; i++) {
     await Future<void>.delayed(Duration.zero);
   }
 }
@@ -291,5 +291,236 @@ void main() {
     await t.pumpAndSettle();
     expect(s.magazaDogrulamalari.length, 2, reason: 'yeni hesap kendi ödeme dinleyicisini açar');
     expect(s.magazaDogrulamalari.last['kimlik'], 'yeni-hesap-islemi');
+  });
+
+  // ---------- durum tazeleme (Paketler yeniden açılınca / uygulama arka plandan dönünce) ----------
+  group('14) tazele: süre bitimi ve iade', () {
+    for (final durum in ['bitti', 'iade']) {
+      test('sunucu "$durum" dönünce paket kapanır; ekran "yükleniyor"a düşmez', () async {
+        final s0 = SahteSunucu()..magazaPaketAcik = true;
+        final api = _api(s0);
+        await api.anahtariYukle();
+        final k = SahteMagaza();
+        final o = OdemeModeli(api, k);
+        addTearDown(o.dispose);
+        await o.baslat();
+        await _bosalt();
+        expect(o.hesap?.paketli, true);
+        s0.magazaPaketAcik = false;
+        s0.magazaBitenDurum = durum;
+        final fazlar = <OdemeFazi>[];
+        o.addListener(() => fazlar.add(o.faz));
+        await o.tazele();
+        expect(o.hesap?.paketli, false, reason: 'erişim sunucunun yanıtına göre kapanır');
+        expect(o.islemler.single.durum, durum);
+        expect(fazlar, everyElement(OdemeFazi.hazir), reason: 'eldeki bilgi tazelenirken ekran boşalmaz');
+      });
+    }
+  });
+
+  test('15) eski yanıt yeni durumu ezmez (iki eşzamanlı tazeleme, eski olan en son döner)', () async {
+    final s = SahteSunucu()..magazaPaketAcik = true;
+    final api = _api(s);
+    await api.anahtariYukle();
+    final o = OdemeModeli(api, SahteMagaza());
+    addTearDown(o.dispose);
+    await o.baslat();
+    await _bosalt();
+    expect(o.hesap?.paketli, true);
+    s.magazaGetTut = true;
+    final eski = o.tazele(); // o anki durum: paket açık
+    await _bosalt();
+    s.magazaPaketAcik = false; // arada iade
+    s.magazaBitenDurum = 'iade';
+    final yeni = o.tazele();
+    await _bosalt();
+    s.magazaTutulan[1].complete();
+    await yeni;
+    expect(o.hesap?.paketli, false);
+    s.magazaTutulan[0].complete(); // eski yanıt en son gelir
+    await eski;
+    expect(o.hesap?.paketli, false, reason: 'daha yeni okumanın sonucu eski yanıtla geri alınmaz');
+    expect(o.islemler.single.durum, 'iade');
+  });
+
+  test('16) ağ hatasında eski bilgi güncelmiş gibi sunulmaz: uyarı + tekrar deneme; düzelince uyarı kalkar', () async {
+    final s = SahteSunucu()..magazaPaketAcik = true;
+    final api = _api(s);
+    await api.anahtariYukle();
+    final o = OdemeModeli(api, SahteMagaza());
+    addTearDown(o.dispose);
+    await o.baslat();
+    await _bosalt();
+    s.magazaGetAgYok = true;
+    await o.tazele();
+    expect(o.eskimis, true);
+    expect(o.eskimisMesaji, contains('Sunucuya ulaşılamadı'));
+    expect(o.faz, OdemeFazi.hazir, reason: 'eski liste kalır');
+    expect(o.hesap?.paketli, true, reason: 'bilgi silinmez ama "eski olabilir" diye işaretlidir');
+    s.magazaGetAgYok = false;
+    await o.tazele();
+    expect(o.eskimis, false);
+    // eldeki bilgi yokken (ilk yükleme) hata ekranına düşer
+    final s2 = SahteSunucu()..magazaGetAgYok = true;
+    final api2 = _api(s2);
+    await api2.anahtariYukle();
+    final o2 = OdemeModeli(api2, SahteMagaza());
+    addTearDown(o2.dispose);
+    await o2.baslat();
+    await _bosalt();
+    expect(o2.faz, OdemeFazi.hata);
+    expect(o2.hataMesaji, contains('Sunucuya ulaşılamadı'));
+    expect(o2.hesap, isNull);
+  });
+
+  test('17) tazeleme süren satın alma, bekleyen onay, mesaj ve "Yeniden dene" durumunu sıfırlamaz', () async {
+    final (o, s, k) = await _kur();
+    // (a) işlem mağazada sürüyor
+    await o.satinAl('premium_aylik');
+    expect(o.islemdeUrun, 'premium_aylik');
+    await o.tazele();
+    expect(o.islemdeUrun, 'premium_aylik');
+    // (b) mağaza onay bekliyor
+    k.olay(_alindi('', tur: MagazaOlayTuru.bekliyor));
+    await _bosalt();
+    expect(o.bekliyor, true);
+    await o.tazele();
+    expect(o.bekliyor, true);
+    // (c) sunucu doğrulayamadı → Yeniden dene bekliyor; tazeleme bunu silmez
+    final (o2, s2, k2) = await _kur();
+    s2.magazaGercek.add('t-1');
+    s2.magazaAgHatasi = 1;
+    k2.satinAlYaniti = (u) => k2.olay(_alindi('t-1', urun: u));
+    await o2.satinAl('premium_aylik');
+    await _bosalt();
+    expect(o2.dogrulanamayan, isNotNull);
+    final mesaj = o2.mesaj;
+    await o2.tazele();
+    expect(o2.dogrulanamayan, isNotNull);
+    expect(o2.mesaj, mesaj);
+    await o2.yenidenDene();
+    await _bosalt();
+    expect(o2.hesap?.paketli, true);
+    expect(s.magazaDogrulamalari, isEmpty);
+  });
+
+  test('18) tazeleme sürerken satın alma olayı gelirse sonuç eski (satın almadan önceki) yanıtla ezilmez', () async {
+    final (o, s, k) = await _kur();
+    expect(o.hesap?.paketli, isNot(true));
+    s.magazaGetTut = true;
+    final eski = o.tazele(); // satın almadan ÖNCEKİ durum: paket yok
+    await _bosalt();
+    s.magazaGercek.add('t-2');
+    k.olay(_alindi('t-2'));
+    await _bosalt();
+    expect(s.magazaDogrulamalari.single['kimlik'], 't-2');
+    expect(s.magazaTutulan.length, 2, reason: 'doğrulama sonrası yenileme de yolda');
+    s.magazaTutulan[1].complete(); // yeni (satın alma sonrası) yanıt
+    await _bosalt();
+    expect(o.hesap?.paketli, true);
+    s.magazaTutulan[0].complete(); // eski yanıt en son gelir
+    await eski;
+    await _bosalt();
+    expect(o.hesap?.paketli, true, reason: 'eski yanıt paketi geri kapatmaz');
+    expect(k.tamamlananlar.length, 1);
+    expect(o.mesaj, contains('Paketin açıldı'));
+  });
+
+  test('19) hesap değişirse eski hesabın yanıtı uygulanmaz', () async {
+    // (a) yanıt yolda iken dinleyici kapanır (çıkış / hesap değişimi)
+    final s = SahteSunucu()..magazaPaketAcik = true;
+    final api = _api(s);
+    await api.anahtariYukle();
+    await api.ben();
+    final o = OdemeModeli(api, SahteMagaza(), hesapId: 'u1');
+    s.magazaGetTut = true;
+    final f = o.baslat();
+    await _bosalt();
+    o.dispose();
+    s.magazaTutulan.single.complete();
+    await f;
+    expect(o.hesap, isNull, reason: 'kapanmış dinleyici eski hesabın paketini almaz');
+    // (b) istek bile atılmaz: oturum başka hesaba geçmiş
+    final s2 = SahteSunucu()..magazaPaketAcik = true;
+    final api2 = _api(s2);
+    await api2.anahtariYukle();
+    await api2.ben();
+    final o2 = OdemeModeli(api2, SahteMagaza(), hesapId: 'baska-hesap');
+    addTearDown(o2.dispose);
+    await o2.tazele();
+    expect(s2.magazaGetSayisi, 0);
+    expect(o2.hesap, isNull);
+  });
+
+  Future<(UygulamaModeli, SahteSunucu, SahteMagaza)> ekranKur(WidgetTester t, {bool paketAcik = false}) async {
+    t.view.physicalSize = const Size(390, 900);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final s = SahteSunucu()..magazaPaketAcik = paketAcik, api = _api(s), k = SahteMagaza();
+    final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}))..magaza = k;
+    await m.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: m));
+    await t.pumpAndSettle();
+    return (m, s, k);
+  }
+
+  testWidgets('20) Paketler her yeniden açılışta tazelenir (süre bitimi / başka cihazdaki değişiklik görünür)', (t) async {
+    final (m, s, _) = await ekranKur(t, paketAcik: true);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('Premium paketindesin'), findsOneWidget);
+    final once = s.magazaGetSayisi;
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    s.magazaPaketAcik = false; // arada süre bitti
+    s.magazaBitenDurum = 'bitti';
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(s.magazaGetSayisi, greaterThan(once));
+    expect(find.textContaining('Premium paketindesin'), findsNothing);
+    expect(find.textContaining('ücretsiz paketi'), findsOneWidget);
+  });
+
+  testWidgets('21) ekran açıkken uygulama arka plandan dönünce tazelenir; ekran kapalıyken sunucuya sorulmaz', (t) async {
+    final (m, s, _) = await ekranKur(t, paketAcik: true);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('Premium paketindesin'), findsOneWidget);
+    s.magazaPaketAcik = false; // arka plandayken iade edildi
+    s.magazaBitenDurum = 'iade';
+    t.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await t.pumpAndSettle();
+    expect(find.textContaining('Premium paketindesin'), findsNothing);
+    expect(find.textContaining('ücretsiz paketi'), findsOneWidget);
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    final n = s.magazaGetSayisi;
+    t.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await t.pumpAndSettle();
+    expect(s.magazaGetSayisi, n, reason: 'Paketler kapalıyken geri dönüşte gereksiz istek yok');
+  });
+
+  testWidgets('22) tazeleme ağ hatasıyla düşerse ekranda "eski olabilir" uyarısı ve Tekrar dene çıkar; düzelince kalkar', (t) async {
+    final (m, s, _) = await ekranKur(t, paketAcik: true);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-eski')), findsNothing);
+    s.magazaGetAgYok = true;
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-eski')), findsOneWidget);
+    expect(find.textContaining('eski olabilir'), findsOneWidget);
+    expect(find.textContaining('Premium paketindesin'), findsOneWidget, reason: 'eski bilgi silinmez, ama uyarıyla gösterilir');
+    s.magazaGetAgYok = false;
+    await t.ensureVisible(find.byKey(const ValueKey('paket-tazele')));
+    await t.tap(find.byKey(const ValueKey('paket-tazele')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-eski')), findsNothing);
+    expect(t.takeException(), isNull);
   });
 }

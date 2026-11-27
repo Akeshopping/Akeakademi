@@ -59,40 +59,68 @@ class OdemeModeli extends ChangeNotifier {
     await yenile();
   }
 
-  Future<void> yenile() async {
+  /// Son tazeleme başarısız oldu: ekrandaki paket bilgisi ESKİ olabilir (bilgi silinmez ama güncelmiş gibi de sunulmaz).
+  bool eskimis = false;
+  String eskimisMesaji = '';
+  int _nesil = 0; // her sunucu okumasına artan numara: yalnız EN SON başlatılan yanıt uygulanır (eski yanıt yeni durumu ezmez)
+
+  /// Sert yenileme: "yükleniyor" gösterir (ilk açılış, açık hata, elle "Tekrar dene").
+  Future<void> yenile() => _getir(sert: true);
+
+  /// Yumuşak tazeleme (ekran yeniden açılınca, uygulama arka plandan dönünce): elindeki bilgi ekranda kalır; sürmekte olan satın alma,
+  /// bekleyen onay, mesaj ve "Yeniden dene" durumuna DOKUNMAZ. Ağ hatasında eski bilgi "eski olabilir" uyarısıyla kalır.
+  Future<void> tazele() => _getir(sert: false);
+
+  Future<void> _getir({required bool sert}) async {
     if (_kapandi) return;
-    faz = OdemeFazi.yukleniyor;
-    notifyListeners();
+    final n = ++_nesil;
+    bool eski() => _kapandi || n != _nesil; // kapandıysa (hesap değişti/çıkış) ya da daha yeni bir okuma başladıysa bu yanıt atılır
+    final eldeBilgiVar = !sert && faz == OdemeFazi.hazir;
+    if (!eldeBilgiVar) {
+      faz = OdemeFazi.yukleniyor;
+      notifyListeners();
+    }
     try {
       final d = await api.magazaDurumu(beklenenHesap: hesapId);
-      if (_kapandi) return;
+      if (eski()) return;
+      final kullanilabilir = await koprusu.kullanilabilir();
+      if (eski()) return;
+      List<PaketSatiri> yeniPaketler = const [];
+      if (kullanilabilir) {
+        final okunan = {for (final u in await koprusu.urunleriOku(d.urunler.map((e) => e.$1).toSet())) u.id: u};
+        if (eski()) return;
+        yeniPaketler = [for (final e in d.urunler) PaketSatiri(e.$1, e.$2, e.$3, okunan[e.$1])];
+      }
       hesapKimligi = koprusu.platform == 'apple' ? d.kimlikApple : d.kimlikGoogle;
       islemler = d.islemler;
       hesap = d.hesap;
-      if (!await koprusu.kullanilabilir()) {
-        if (_kapandi) return;
-        faz = OdemeFazi.magazaYok;
-        paketler = const [];
-      } else {
-        final okunan = {for (final u in await koprusu.urunleriOku(d.urunler.map((e) => e.$1).toSet())) u.id: u};
-        if (_kapandi) return;
-        paketler = [for (final e in d.urunler) PaketSatiri(e.$1, e.$2, e.$3, okunan[e.$1])];
-        faz = OdemeFazi.hazir;
-      }
+      paketler = yeniPaketler;
+      faz = kullanilabilir ? OdemeFazi.hazir : OdemeFazi.magazaYok;
+      eskimis = false;
+      eskimisMesaji = '';
     } on ApiHata catch (e) {
-      if (_kapandi) return;
+      if (eski()) return;
       if (e.kod == 'kapali') {
         faz = OdemeFazi.sunucuKapali;
+        eskimis = false;
       } else {
-        faz = OdemeFazi.hata;
-        hataMesaji = e.tur == HataTuru.ag ? 'Sunucuya ulaşılamadı. Bağlantını kontrol edip tekrar dene.' : 'Paket bilgisi okunamadı. Biraz sonra tekrar dene.';
+        _tazelemeHatasi(eldeBilgiVar, e.tur == HataTuru.ag ? 'Sunucuya ulaşılamadı. Bağlantını kontrol edip tekrar dene.' : 'Paket bilgisi okunamadı. Biraz sonra tekrar dene.');
       }
     } catch (_) {
-      if (_kapandi) return;
-      faz = OdemeFazi.hata;
-      hataMesaji = 'Mağaza bilgisi okunamadı. Biraz sonra tekrar dene.';
+      if (eski()) return;
+      _tazelemeHatasi(eldeBilgiVar, 'Mağaza bilgisi okunamadı. Biraz sonra tekrar dene.');
     }
     if (!_kapandi) notifyListeners();
+  }
+
+  void _tazelemeHatasi(bool eldeBilgiVar, String m) {
+    if (eldeBilgiVar) {
+      eskimis = true; // eski liste kalır ama güncel değil
+      eskimisMesaji = m;
+    } else {
+      faz = OdemeFazi.hata;
+      hataMesaji = m;
+    }
   }
 
   bool get mesgul => islemdeUrun != null || _surenler.isNotEmpty || _geriYukleniyor;

@@ -14,7 +14,29 @@ class PaketSekmesi extends StatefulWidget {
   State<PaketSekmesi> createState() => _PaketSekmesiState();
 }
 
-class _PaketSekmesiState extends State<PaketSekmesi> {
+class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Ekran her açılışında abonelik durumu sunucudan tazelenir (süre bitimi, iade, başka cihazdaki değişiklik görünsün).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.model.odeme?.tazele();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState durum) {
+    // Ekran açıkken uygulama arka plandan dönerse tazele (ekran kapalıyken dinleyici yine mağaza olaylarını işler, tazeleme gerekmez).
+    if (durum == AppLifecycleState.resumed && mounted) widget.model.odeme?.tazele();
+  }
+
   // Dinleyici hesaba bağlıdır; bu ekran kapanınca satın alma olayı kaybolmaz.
   OdemeModeli get _o => widget.model.odeme!;
 
@@ -55,6 +77,8 @@ class _PaketSekmesiState extends State<PaketSekmesi> {
         const SizedBox(height: 6),
         Text(h != null && h.paketli ? 'Şu an ${h.plan == 'premium' ? 'Premium' : 'Atılım'} paketindesin${h.bitis.isEmpty ? '' : ' · ${h.bitis} tarihine kadar'}.' : 'Şu an ücretsiz paketi kullanıyorsun.', key: const ValueKey('paket-durum'), style: TextStyle(color: t.murekkep2, height: 1.4)),
         const SizedBox(height: 14),
+        if (_o.eskimis) _bilgi(t, Icons.cloud_off_rounded, '${_o.eskimisMesaji} Gördüğün paket bilgisi eski olabilir.', const ValueKey('paket-eski'), hata: true),
+        if (_o.eskimis) Padding(padding: const EdgeInsets.only(bottom: 14), child: AkeDugme('Tekrar dene', key: const ValueKey('paket-tazele'), tur: DugmeTuru.cizgili, basinca: _o.tazele)),
         if (_o.bekliyor) _bilgi(t, Icons.hourglass_top_rounded, 'Ödeme onay bekliyor. Mağaza onaylayana kadar paketin açılmaz; onaylanınca burada görünür.', const ValueKey('paket-bekliyor')),
         if (_o.mesaj.isNotEmpty) _bilgi(t, _o.mesajHata ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded, _o.mesaj, const ValueKey('paket-mesaj'), hata: _o.mesajHata),
         if (_o.dogrulanamayan != null) Padding(padding: const EdgeInsets.only(bottom: 14), child: AkeDugme('Yeniden dene', key: const ValueKey('paket-yeniden'), tur: DugmeTuru.cizgili, basinca: mesgul ? null : _o.yenidenDene)),

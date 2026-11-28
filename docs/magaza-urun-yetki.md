@@ -27,6 +27,8 @@ Etkin bir **mağaza** aboneliği varken ikinci ürünü satın alma da kapalıd�
 Sayılar sunucudaki mevcut ayarlardır (`limitler()`, `ucretsizLimit()`; ortam değişkeniyle değişir). Paketler ekranındaki hak rakamları SABİT değildir: `GET /api/hesap/magaza` yanıtındaki `haklar` alanından yazılır; sunucu göndermezse ekran rakam yazmaz.
 Mobil AI ekranı bu turda yalnız hızlı sohbet çağrısını kullanır; gelişmiş çözüm seçicisi henüz yok. Paketler ekranı bu hakkı satın alma vaadi olarak göstermez.
 
+**İlk satış: yalnız Atılım.** Premium varsayılan olarak SATIŞA KAPALI. Sunucu `GET /api/hesap/magaza`'da Premium ürünleri listelemez, kullanıcı başlatımlı doğrulama/geri yüklemede Premium ürünü `urun_kapali` ile reddeder (mağaza bildirimleri mevcut satırları etkilemeye devam eder); Paketler ekranı Premium kartını yalnız sunucu listelediyse gösterir. Premium'u açmak için Preview/Production ortamına `AKE_MAGAZA_PREMIUM=acik` konur; bu karar (mobilde gelişmiş çözüm anahtarı dahil) ayrıca verilecek. Mağazada Premium ürünlerini AÇMA.
+
 ## 2) Ürünler (iki mağazada AYNI kimlik)
 
 | Ürün kimliği | Paket | Süre | Mağazada tür |

@@ -43,7 +43,7 @@ function aGovde(urun, { ortam = "Sandbox", durum = 1, bitis = Date.now() + 30 * 
 const T = await kur();
 await T.hazirla();
 const hesap = await import(pathToFileURL(resolve("functions/api/hesap/[[yol]].js")).href);
-const VARSAYILAN = { AKE_MAGAZA: "sandbox", GOOGLE_PLAY_HIZMET_HESABI: GOOGLE_HS, APPLE_IAP_ISSUER_ID: "issuer-1", APPLE_IAP_KEY_ID: "KEY123", APPLE_IAP_PRIVATE_KEY: APPLE_PEM, MAGAZA_FETCH: magazaFetch, MAGAZA_BILDIRIM_SIRRI: "bildirim-sirri" };
+const VARSAYILAN = { AKE_MAGAZA: "sandbox", AKE_MAGAZA_PREMIUM: "acik", GOOGLE_PLAY_HIZMET_HESABI: GOOGLE_HS, APPLE_IAP_ISSUER_ID: "issuer-1", APPLE_IAP_KEY_ID: "KEY123", APPLE_IAP_PRIVATE_KEY: APPLE_PEM, MAGAZA_FETCH: magazaFetch, MAGAZA_BILDIRIM_SIRRI: "bildirim-sirri" };
 let ipSayac = 0, eposta = 0;
 async function ortam(ekEnv = {}) {
   sifirla();
@@ -266,4 +266,19 @@ test("15) Paketler vaatleri sunucunun GERÇEK ayarıdır: varsayılanlar ve orta
   h = (await o.cagir(c, "GET", "magaza")).j.haklar;
   assert.deepEqual([h.orta.mesaj, h.premium.mesaj, h.ucretsiz.soru], [150, 400, 10], "ekran rakamı ortam ayarını izler");
   for (const k of ["AKE_LIMIT_ORTA", "AKE_LIMIT_PREMIUM", "AKE_UCRETSIZ_SORU"]) delete T.env[k];
+});
+
+test("16) Premium varsayılan KAPALI: listelenmez, kullanıcı doğrulaması reddedilir; Atılım çalışır; ayar açılınca Premium da gelir", async () => {
+  const o = await ortam({ AKE_MAGAZA_PREMIUM: "" }); const c = await o.kullanici("m16@ornek.com"); const k = await o.kimlik(c);
+  let r = await o.cagir(c, "GET", "magaza");
+  assert.deepEqual(r.j.urunler.map(u => u.id), ["atilim_aylik", "atilim_yillik"]);
+  M.google[TOKEN] = gGovde("premium_aylik", { hesap: k.google });
+  r = await o.cagir(c, "POST", "magaza/dogrula", { platform: "google", kimlik: TOKEN });
+  assert.notEqual(r.s, 200); assert.equal(r.j.sonuc[0].hata, "urun_kapali"); assert.equal(r.j.paket, null);
+  assert.equal(await o.ben(c), null, "Premium erişimi açılmadı");
+  M.google[TOKEN] = gGovde("atilim_aylik", { hesap: k.google });
+  r = await o.cagir(c, "POST", "magaza/dogrula", { platform: "google", kimlik: TOKEN });
+  assert.equal(r.s, 200, JSON.stringify(r.j)); assert.equal((await o.ben(c)).plan, "orta");
+  const a = await ortam({ AKE_MAGAZA_PREMIUM: "acik" }); const ca = await a.kullanici("m16b@ornek.com");
+  assert.equal((await a.cagir(ca, "GET", "magaza")).j.urunler.length, 4);
 });

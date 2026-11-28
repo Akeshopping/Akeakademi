@@ -54,6 +54,9 @@ class SahteSunucu {
   bool magazaGetAgYok = false; // yalnız mağaza durumu GET'i ağ hatasıyla düşer
   bool magazaGetTut = false; // true iken GET yanıtı İSTEK ANINDAKİ durumla hazırlanır ama [magazaTutulan] bırakılana dek gecikir
   final List<Completer<void>> magazaTutulan = [];
+  bool magazaPremiumKapali = false; // true: sunucu Premium ürünleri listelemez (ilk satış yalnız Atılım)
+  bool benTut = false; // true iken /hesap/ben yanıtı İSTEK ANINDAKİ durumla hazırlanır ama [benTutulan] bırakılana dek gecikir (geç gelen eski yanıt)
+  final List<Completer<void>> benTutulan = [];
   int _sur(String a) => surumler[a] ?? ((veriAlanlari?.containsKey(a) ?? false) ? 1 : 0);
   String? sonOturumGovdesi;
   // ---- odak odası ----
@@ -92,13 +95,19 @@ class SahteSunucu {
     if (!yetkili) return _y(401, {'error': 'giris'});
     if (silindi) return _y(401, {'error': 'giris'});
     if (yol == '/api/hesap/ben') {
-      return _y(200, {
+      final y = _y(200, {
         'kullanici': {'id': hesapId, 'eposta': 'ogrenci@ornek.com', 'ad': ''},
         'paket': paketli || magazaPaketAcik ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
         'kullanim': {'mesaj': aiIstekleri.length, 'guclu': 0},
         'limit': paketli ? {'mesaj': 500, 'guclu': 60} : null,
         'ucretsiz': paketli ? {'sinirsiz': true} : {'sinirsiz': false, 'kalanSoru': 12, 'kalanDeneme': kalanDeneme},
       });
+      if (benTut) {
+        final c = Completer<void>();
+        benTutulan.add(c);
+        await c.future;
+      }
+      return y;
     }
     if (yol == '/api/hesap/kod-bagla') {
       final b = jsonDecode(r.body) as Map<String, dynamic>;
@@ -116,8 +125,8 @@ class SahteSunucu {
           'urunler': [
             {'id': 'atilim_aylik', 'plan': 'orta', 'donem': 'ay'},
             {'id': 'atilim_yillik', 'plan': 'orta', 'donem': 'yil'},
-            {'id': 'premium_aylik', 'plan': 'premium', 'donem': 'ay'},
-            {'id': 'premium_yillik', 'plan': 'premium', 'donem': 'yil'},
+            if (!magazaPremiumKapali) {'id': 'premium_aylik', 'plan': 'premium', 'donem': 'ay'},
+            if (!magazaPremiumKapali) {'id': 'premium_yillik', 'plan': 'premium', 'donem': 'yil'},
           ],
           'hesapKimligi': {'google': 'g-$hesapId', 'apple': '00000000-0000-4000-8000-000000000001'},
           'islemler': magazaPaketAcik

@@ -761,4 +761,23 @@ void main() {
     expect(find.byKey(const ValueKey('paket-yonet')), findsNothing);
     expect(t.takeException(), isNull);
   });
+  testWidgets('33) Premium sunucuda satışa kapalıyken yalnız Atılım ve fiyatı görünür (Premium kartı/düğmesi yok)', (t) async {
+    t.view.physicalSize = const Size(390, 2400);
+    t.view.devicePixelRatio = 1.0;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final s = SahteSunucu()..magazaPremiumKapali = true, api = _api(s), k = SahteMagaza();
+    final m = UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}))..magaza = k;
+    await m.baslat();
+    await t.pumpWidget(AkeUygulamasi(model: m));
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-satin-atilim_aylik')), findsOneWidget);
+    expect(find.byKey(const ValueKey('paket-satin-atilim_yillik')), findsOneWidget);
+    expect(find.byKey(const ValueKey('paket-satin-premium_aylik')), findsNothing);
+    expect(find.byKey(const ValueKey('paket-satin-premium_yillik')), findsNothing);
+    expect(find.text('Premium'), findsNothing);
+    expect(t.takeException(), isNull);
+  });
 }

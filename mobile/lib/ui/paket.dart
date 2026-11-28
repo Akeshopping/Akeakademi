@@ -60,7 +60,7 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
               SizedBox(height: 8),
               Text('Atılım: sınırsız soru ve deneme, her ay belirli sayıda AI öğretmen mesajı.'),
               SizedBox(height: 8),
-              Text('Premium: sınırsız soru ve deneme, Atılım\'dan daha fazla aylık AI öğretmen mesajı.'),
+
             ]);
           case OdemeFazi.magazaYok:
             return DurumKutusu(simge: Icons.storefront_rounded, baslik: 'Mağazaya ulaşılamıyor', aciklama: 'Bu cihazda Google Play ya da App Store satın alma şu an kullanılamıyor. Mağaza hesabına giriş yaptığından emin olup tekrar dene.', dugme: 'Tekrar dene', basinca: _o.yenile);
@@ -105,7 +105,7 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
             Text(_ucretsizMetni(), style: TextStyle(color: t.murekkep2, height: 1.4)),
           ]),
         ),
-        for (final plan in const ['orta', 'premium']) ...[const SizedBox(height: 14), _planKarti(t, plan, mesgul || _o.satinAlmaEngelli)],
+        for (final plan in ['orta', if (_o.paketler.any((p) => p.plan == 'premium')) 'premium']) // Premium yalnız sunucu satışa açtıysa görünür ...[const SizedBox(height: 14), _planKarti(t, plan, mesgul || _o.satinAlmaEngelli)],
         const SizedBox(height: 14),
         AkeDugme(_o.islemdeUrun == null && !mesgul ? 'Satın almalarımı geri yükle' : 'İşlem sürüyor…', key: const ValueKey('paket-geri-yukle'), tur: DugmeTuru.cizgili, simge: Icons.restore_rounded, basinca: mesgul ? null : _o.geriYukle),
         const SizedBox(height: 14),

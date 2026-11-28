@@ -27,7 +27,7 @@
 import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
 import { json, fail, sha256, sema, oturum, bearerToken, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
-import { magazaModu, URUNLER, hesapKimligi, dogrula, uygula, googleOnayla, hesapIslemleri, islemJson, yenile as magazaYenile } from "../../../lib/magaza.js";
+import { magazaModu, URUNLER, satisaAcikUrunler, hesapKimligi, dogrula, uygula, googleOnayla, hesapIslemleri, islemJson, yenile as magazaYenile } from "../../../lib/magaza.js";
 import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle, ucretsizLimit } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
@@ -210,7 +210,7 @@ export async function onRequest({ request, env, params }) {
     if (!alt && m === "GET") {
       await magazaYenile(env, u.id).catch(() => { });
       const kim = await hesapKimligi(env, u.id);
-      return json(200, { mod, urunler: Object.keys(URUNLER).map(id => ({ id, plan: URUNLER[id].plan, donem: URUNLER[id].donem })), hesapKimligi: kim, islemler: (await hesapIslemleri(env, u.id)).map(islemJson), paket: await aktifPaket(env, u.id), haklar: haklarJson(env) });
+      return json(200, { mod, urunler: satisaAcikUrunler(env).map(id => ({ id, plan: URUNLER[id].plan, donem: URUNLER[id].donem })), hesapKimligi: kim, islemler: (await hesapIslemleri(env, u.id)).map(islemJson), paket: await aktifPaket(env, u.id), haklar: haklarJson(env) });
     }
     if ((alt === "dogrula" || alt === "geri-yukle") && m === "POST") {
       { const red = await ipSinir(env, request, "magaza", 60, 3600000); if (red) return red; }

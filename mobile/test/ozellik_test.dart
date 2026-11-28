@@ -47,6 +47,19 @@ Future<void> sekme(WidgetTester t, int i) async {
   await t.pumpAndSettle();
 }
 
+/// Tutulan /hesap/ben isteklerinden [i]. olanı bırakır (yanıt o anki, yani ESKİ durumla hazırlanmıştı).
+Future<void> benBirak(WidgetTester t, SahteSunucu s, int i) async {
+  s.benTutulan[i].complete();
+  await t.pumpAndSettle();
+}
+
+Future<void> benBekle(WidgetTester t, SahteSunucu s, int adet) async {
+  for (var k = 0; k < 20 && s.benTutulan.length < adet; k++) {
+    await t.pump(const Duration(milliseconds: 50));
+  }
+  expect(s.benTutulan.length, adet, reason: 'sunucu $adet /ben isteği tutuyor olmalı');
+}
+
 Future<void> gorunurDokun(WidgetTester t, Finder f) async {
   await t.ensureVisible(f);
   await t.pumpAndSettle();
@@ -188,6 +201,30 @@ void main() {
       expect(t.widget<AkeDugme>(find.ancestor(of: find.text('Denemeyi başlat'), matching: find.byType(AkeDugme))).basinca, isNotNull);
     });
 
+    testWidgets('Deneme: geç gelen ESKİ /ben yanıtı yeni hak durumunu ezmez', (t) async {
+      final s = SahteSunucu(); // kalanDeneme 3
+      final m = await ac(t, s);
+      await sekme(t, 2);
+      expect(find.textContaining('3 deneme hakkın var'), findsOneWidget);
+      s.benTut = true;
+      m.sekmeGit(0);
+      await t.pumpAndSettle();
+      m.sekmeGit(2); // okuma #1: sunucu 3 hak görüyor
+      await benBekle(t, s, 1);
+      s.kalanDeneme = 0; // araya hak bitti
+      m.sekmeGit(0);
+      await t.pump();
+      m.sekmeGit(2); // okuma #2: sunucu 0 hak görüyor
+      await benBekle(t, s, 2);
+      await benBirak(t, s, 1); // yeni yanıt önce gelir
+      expect(find.textContaining('hakkın bitti'), findsWidgets);
+      await benBirak(t, s, 0); // ESKİ yanıt (3 hak) sonra gelir
+      expect(find.textContaining('hakkın bitti'), findsWidgets, reason: 'eski yanıt yeni durumu ezmemeli');
+      expect(find.textContaining('3 deneme hakkın var'), findsNothing);
+      expect(find.byKey(const ValueKey('deneme-paketler')), findsOneWidget);
+      await t.pumpWidget(const SizedBox());
+    });
+
     testWidgets('paketli hesapta hak sınırsız görünür', (t) async {
       final s = SahteSunucu()..paketli = true;
       await ac(t, s);
@@ -215,6 +252,28 @@ void main() {
       m.sekmeGit(3);
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget, reason: 'AI sekmesi eski ücretsiz kapısında kalmaz');
+    });
+    testWidgets('AI: geç gelen ESKİ /ben yanıtı yeni (paketli) durumu ezmez', (t) async {
+      final s = SahteSunucu();
+      final m = await ac(t, s);
+      await sekme(t, 3);
+      expect(find.byKey(const ValueKey('ai-kapi')), findsOneWidget);
+      s.benTut = true;
+      m.sekmeGit(0);
+      await t.pumpAndSettle();
+      m.sekmeGit(3); // okuma #1: hesap henüz paketsiz
+      await benBekle(t, s, 1);
+      s.paketli = true; // satın alma doğrulandı
+      m.sekmeGit(0);
+      await t.pump();
+      m.sekmeGit(3); // okuma #2: paketli
+      await benBekle(t, s, 2);
+      await benBirak(t, s, 1);
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget);
+      await benBirak(t, s, 0); // ESKİ (paketsiz) yanıt sonra gelir
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget, reason: 'eski yanıt kapıyı geri getirmemeli');
+      expect(find.byKey(const ValueKey('ai-kapi')), findsNothing);
+      await t.pumpWidget(const SizedBox());
     });
     testWidgets('paket yokken AI çağrılmaz; yanlış kod hata verir; doğru kodla sohbet açılır ve gerçek /api/ai çağrısı gider', (t) async {
       final s = SahteSunucu();

@@ -453,7 +453,7 @@ void main() {
   });
 
   Future<(UygulamaModeli, SahteSunucu, SahteMagaza)> ekranKur(WidgetTester t, {bool paketAcik = false}) async {
-    t.view.physicalSize = const Size(390, 900);
+    t.view.physicalSize = const Size(390, 2400);
     t.view.devicePixelRatio = 1.0;
     addTearDown(t.view.resetPhysicalSize);
     addTearDown(t.view.resetDevicePixelRatio);

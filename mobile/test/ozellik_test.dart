@@ -16,7 +16,7 @@ import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {DateTime Function()? saat}) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(SahteSunucu.anahtar));
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}), saat: saat);
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}), saat: saat)..magaza = SahteMagaza(); // üretimde main() gerçek köprüyü verir
 }
 
 void ekran(WidgetTester t, double genislik, {double yukseklik = 900}) {

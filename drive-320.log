@@ -1,0 +1,513 @@
+Running Gradle task 'assembleDebug'...                             95.8s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          619ms
+I/flutter ( 5644): The Dart VM service is listening on http://127.0.0.1:33487/Wqa7Cw21euM=/
+D/FlutterRenderer( 5644): Width is zero. 0,0
+D/FlutterRenderer( 5644): Width is zero. 0,0
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:44127/tyGMba8dhX4=/
+VMServiceFlutterDriver: Isolate found with number: 1390701720605667
+VMServiceFlutterDriver: Isolate 1390701720605667 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+I/flutter ( 5644): 00:00 +0: ekran yürüyüşü: giriş → ana → Soru çöz → soru → Gelişim → Plan → Ayarlar (açık ve koyu)
+VMServiceFlutterDriver: Connected to Flutter application.
+D/CompatibilityChangeReporter( 5644): Compat change id reported: 236825255; UID 10192; state: ENABLED
+I/flutter ( 5644): CIHAZ_MANTIKSAL_GENISLIK=320.0 yukseklik=656.0 dpr=2.0
+D/ProfileInstaller( 5644): Installing profile for com.akeakademi.ake_akademi
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=262.88ms min=18.13ms max=589.77ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=238.83ms min=15.28ms max=631.93ms count=6
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+D/EGL_emulation( 5644): app_time_stats: avg=1539.18ms min=929.35ms max=1962.51ms count=3
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:6f09c8: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F....ID 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:17d2246b: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F....ID 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 432 bytes, containing 1 windows, 3 views
+D/EGL_emulation( 5644): app_time_stats: avg=124.56ms min=9.21ms max=226.71ms count=9
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:5ab55a2d: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+D/InsetsController( 5644): show(ime(), fromIme=true)
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=820.68ms min=217.82ms max=1423.54ms count=2
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=1244.69ms min=1244.69ms max=1244.69ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:17d2246b: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@b557da2
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:8658e771: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:5ab55a2d: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=101.75ms min=7.41ms max=386.35ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=212.44ms min=106.22ms max=334.45ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=234.41ms min=51.16ms max=590.95ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=1716.59ms min=1716.59ms max=1716.59ms count=1
+W/WindowOnBackDispatcher( 5644): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5644): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 5644): app_time_stats: avg=185.52ms min=27.04ms max=615.54ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=1311.71ms min=1311.71ms max=1311.71ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ea3fb654: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:6ada7d64: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 492 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:6ada7d64: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=132.12ms min=14.87ms max=423.56ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=177.55ms min=26.71ms max=694.29ms count=6
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ea3fb654: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=206.55ms min=93.44ms max=324.68ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=584.68ms min=54.74ms max=1518.89ms count=3
+D/EGL_emulation( 5644): app_time_stats: avg=333.17ms min=124.93ms max=606.53ms count=3
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:e4c3870a: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@f3359ac
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:722fe055: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:e4c3870a: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=167.00ms min=41.43ms max=403.48ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=154.24ms min=27.18ms max=588.79ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=267.08ms min=33.30ms max=1683.75ms count=9
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=209.00ms min=91.38ms max=522.22ms count=5
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=210.80ms min=52.07ms max=579.53ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=1004.76ms min=412.80ms max=1596.71ms count=2
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=177.79ms min=9.19ms max=614.60ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=769.75ms min=521.78ms max=1017.72ms count=2
+D/EGL_emulation( 5644): app_time_stats: avg=168.26ms min=7.71ms max=616.09ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=1516.49ms min=1516.49ms max=1516.49ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=146.70ms min=17.57ms max=617.49ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=1466.08ms min=1466.08ms max=1466.08ms count=1
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=190.32ms min=13.76ms max=616.29ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=1336.66ms min=1336.66ms max=1336.66ms count=1
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=75.58ms min=10.11ms max=213.54ms count=14
+D/EGL_emulation( 5644): app_time_stats: avg=1912.15ms min=1912.15ms max=1912.15ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=237.84ms min=109.46ms max=616.63ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=158.00ms min=32.02ms max=617.49ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=724.31ms min=399.90ms max=1048.72ms count=2
+W/WindowOnBackDispatcher( 5644): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5644): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 5644): OnBackInvokedCallback is not enabled for the application.
+W/WindowOnBackDispatcher( 5644): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+D/EGL_emulation( 5644): app_time_stats: avg=118.06ms min=54.27ms max=255.55ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=167.28ms min=38.00ms max=469.34ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=258.38ms min=117.02ms max=615.46ms count=4
+D/EGL_emulation( 5644): app_time_stats: avg=1569.02ms min=584.46ms max=2553.59ms count=2
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=129.12ms min=18.25ms max=278.04ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=225.10ms min=162.01ms max=288.25ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=137.32ms min=17.38ms max=241.69ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=2122.49ms min=272.36ms max=3972.61ms count=2
+D/EGL_emulation( 5644): app_time_stats: avg=230.20ms min=200.19ms max=271.55ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=98.63ms min=7.11ms max=217.33ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=137.49ms min=12.97ms max=218.58ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=138.66ms min=43.23ms max=218.01ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=4256.41ms min=4256.41ms max=4256.41ms count=1
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=168.02ms min=59.34ms max=229.81ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=199.00ms min=54.73ms max=591.24ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=823.18ms min=176.19ms max=1470.17ms count=2
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ab9dd94f: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:9baca668: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:f0f9c52b: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+W/RemoteInputConnectionImpl( 5644): getSurroundingText on inactive InputConnection
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:9baca668: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@dbe3bc6
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ab9dd94f: onCancelled at PHASE_CLIENT_ANIMATION_CANCEL
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=204.51ms min=43.73ms max=457.25ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=147.39ms min=10.45ms max=426.56ms count=8
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:b61cc420: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:f0f9c52b: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=257.94ms min=53.45ms max=451.50ms count=4
+D/EGL_emulation( 5644): app_time_stats: avg=184.88ms min=26.07ms max=615.60ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=658.82ms min=86.21ms max=1662.40ms count=3
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:bb470002: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:aa938a9e: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 464 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:aa938a9e: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:bb470002: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=151.75ms min=9.54ms max=366.61ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=346.65ms min=135.07ms max=631.77ms count=3
+D/EGL_emulation( 5644): app_time_stats: avg=278.49ms min=12.62ms max=1492.81ms count=8
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:a1999eac: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@e7f5db2
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:f265e147: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:a1999eac: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=252.78ms min=57.12ms max=546.46ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=250.35ms min=112.75ms max=625.73ms count=4
+D/EGL_emulation( 5644): app_time_stats: avg=216.82ms min=30.90ms max=1205.07ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=251.61ms min=16.22ms max=603.05ms count=4
+D/EGL_emulation( 5644): app_time_stats: avg=1051.54ms min=1051.54ms max=1051.54ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=108.74ms min=12.19ms max=616.94ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=1200.63ms min=1200.63ms max=1200.63ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:dfc3681c: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:a066f02b: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 488 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:a066f02b: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:dfc3681c: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=173.26ms min=18.43ms max=400.00ms count=7
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:421790c0: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:421790c0: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=297.64ms min=196.49ms max=588.15ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=297.54ms min=16.17ms max=1780.19ms count=9
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:bb015d3e: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@649abd2
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:b2b32a10: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:bb015d3e: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=212.46ms min=81.02ms max=723.13ms count=8
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=183.37ms min=10.15ms max=944.23ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=174.18ms min=31.98ms max=601.40ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=1810.35ms min=1810.35ms max=1810.35ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=173.60ms min=47.16ms max=615.80ms count=6
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:a27c70c5: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:274d5098: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 396 bytes, containing 1 windows, 3 views
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=170.50ms min=25.01ms max=795.57ms count=6
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:274d5098: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=95.46ms min=19.31ms max=613.92ms count=15
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:f78eedfd: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@cc4b48f
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=282.51ms min=52.33ms max=626.93ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=232.64ms min=64.86ms max=413.26ms count=5
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:427165ab: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:f78eedfd: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=126.76ms min=39.68ms max=260.57ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=69.16ms min=28.02ms max=124.67ms count=16
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=606.16ms min=58.80ms max=2421.87ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=100.38ms min=44.64ms max=147.33ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=147.94ms min=13.04ms max=616.04ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=1350.15ms min=1350.15ms max=1350.15ms count=1
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=151.37ms min=5.94ms max=617.79ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=1182.36ms min=1182.36ms max=1182.36ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:df20f9b8: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:478dd4e2: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 492 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:478dd4e2: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:df20f9b8: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=124.47ms min=7.41ms max=389.93ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=113.32ms min=12.57ms max=562.47ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=262.44ms min=115.41ms max=603.25ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=1368.92ms min=1368.92ms max=1368.92ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:2f1584a8: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@99d2882
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:4f439c57: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:2f1584a8: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=170.13ms min=24.28ms max=290.74ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=157.87ms min=43.70ms max=583.10ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=269.60ms min=19.80ms max=1629.19ms count=8
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=135.42ms min=24.82ms max=616.27ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=1517.92ms min=1517.92ms max=1517.92ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=141.85ms min=21.90ms max=615.92ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=708.15ms min=263.79ms max=1152.51ms count=2
+D/EGL_emulation( 5644): app_time_stats: avg=141.64ms min=15.79ms max=615.97ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=1415.97ms min=1415.97ms max=1415.97ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=141.07ms min=10.60ms max=617.81ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=1548.40ms min=1548.40ms max=1548.40ms count=1
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=145.50ms min=15.31ms max=618.18ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=1169.03ms min=1169.03ms max=1169.03ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=74.05ms min=9.41ms max=219.11ms count=14
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=1880.73ms min=1880.73ms max=1880.73ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=236.13ms min=115.74ms max=614.40ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=137.08ms min=27.40ms max=617.07ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=716.56ms min=262.11ms max=1171.01ms count=2
+D/EGL_emulation( 5644): app_time_stats: avg=81.72ms min=5.52ms max=222.01ms count=14
+D/EGL_emulation( 5644): app_time_stats: avg=173.76ms min=14.52ms max=616.17ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=2532.27ms min=2532.27ms max=2532.27ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=109.87ms min=21.95ms max=215.78ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=216.90ms min=209.19ms max=224.13ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=137.29ms min=12.46ms max=232.37ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=4035.45ms min=4035.45ms max=4035.45ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=234.98ms min=208.39ms max=304.35ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=100.47ms min=8.27ms max=231.77ms count=11
+D/EGL_emulation( 5644): app_time_stats: avg=133.95ms min=12.15ms max=223.57ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=135.17ms min=21.26ms max=218.24ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=4215.54ms min=4215.54ms max=4215.54ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=111.15ms min=5.54ms max=220.82ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=202.84ms min=52.23ms max=616.26ms count=5
+D/EGL_emulation( 5644): app_time_stats: avg=1369.52ms min=1369.52ms max=1369.52ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:d6d44351: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ebd84222: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 464 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ebd84222: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:d6d44351: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=139.33ms min=5.59ms max=341.14ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=182.32ms min=15.37ms max=1150.01ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=359.48ms min=86.24ms max=560.15ms count=3
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:273ecc6c: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@74cb31b
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:1ea3bb1c: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:273ecc6c: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=140.85ms min=11.74ms max=690.42ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=193.20ms min=52.12ms max=332.62ms count=6
+D/EGL_emulation( 5644): app_time_stats: avg=1286.45ms min=1286.45ms max=1286.45ms count=1
+D/EGL_emulation( 5644): app_time_stats: avg=158.86ms min=34.22ms max=593.62ms count=7
+D/EGL_emulation( 5644): app_time_stats: avg=116.34ms min=5.80ms max=618.12ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=1065.87ms min=947.49ms max=1184.26ms count=2
+D/EGL_emulation( 5644): app_time_stats: avg=136.04ms min=6.42ms max=616.98ms count=8
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:c2559478: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:449794ed: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 488 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:449794ed: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:51a5a055: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+D/EGL_emulation( 5644): app_time_stats: avg=125.39ms min=17.51ms max=316.28ms count=8
+D/InsetsController( 5644): show(ime(), fromIme=true)
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:51a5a055: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+D/EGL_emulation( 5644): app_time_stats: avg=232.34ms min=14.35ms max=1435.51ms count=9
+D/EGL_emulation( 5644): app_time_stats: avg=260.79ms min=90.18ms max=687.59ms count=4
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ad872404: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@7ca8afa
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:5baaca1c: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:ad872404: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=204.32ms min=29.99ms max=687.95ms count=8
+D/EGL_emulation( 5644): app_time_stats: avg=199.29ms min=20.16ms max=964.74ms count=9
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=159.05ms min=13.94ms max=613.76ms count=10
+D/EGL_emulation( 5644): app_time_stats: avg=1568.57ms min=1568.57ms max=1568.57ms count=1
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:15f90756: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:d988c9bf: onRequestShow at ORIGIN_CLIENT_SHOW_SOFT_INPUT reason SHOW_SOFT_INPUT
+D/InputMethodManager( 5644): showSoftInput() view=io.flutter.embedding.android.FlutterView{5a9248d VFE...... .F...... 0,0-640,1312 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/AssistStructure( 5644): Flattened final assist data: 396 bytes, containing 1 windows, 3 views
+D/InsetsController( 5644): show(ime(), fromIme=true)
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=60.44ms min=10.76ms max=285.39ms count=19
+D/EGL_emulation( 5644): app_time_stats: avg=195.26ms min=24.62ms max=818.59ms count=5
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:d988c9bf: onShown
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::1@1@com.akeakademi.ake_akademi>
+D/EGL_emulation( 5644): app_time_stats: avg=227.17ms min=39.75ms max=729.63ms count=4
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:fc245587: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+W/WindowOnBackDispatcher( 5644): sendCancelIfRunning: isInProgress=falsecallback=ImeCallback=ImeOnBackInvokedCallback@128948570 Callback=android.window.IOnBackInvokedCallback$Stub$Proxy@7de36b1
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=444.32ms min=131.64ms max=874.53ms count=4
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=341.75ms min=91.25ms max=791.76ms count=3
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:95a7a683: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT_BY_INSETS_API
+I/ImeTracker( 5644): com.akeakademi.ake_akademi:fc245587: onHidden
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/FlutterJNI( 5644): Sending viewport metrics to the engine.
+D/EGL_emulation( 5644): app_time_stats: avg=112.45ms min=29.38ms max=317.69ms count=9
+I/flutter ( 5644): 01:48 +1: (tearDownAll)
+I/Choreographer( 5644): Skipped 51 frames!  The application may be doing too much work on its main thread.
+I/flutter ( 5644): 01:49 +2: All tests passed!
+D/EGL_emulation( 5644): app_time_stats: avg=439.34ms min=30.35ms max=1563.29ms count=4
+I/OpenGLRenderer( 5644): Davey! duration=881ms; Flags=0, FrameTimelineVsyncId=40413, IntendedVsync=249497442559, Vsync=250347442525, InputEventId=0, HandleInputStart=250364287328, AnimationStart=250364289513, PerformTraversalsStart=250364290572, DrawStart=250365151451, FrameDeadline=249514109225, FrameInterval=250364000616, FrameStartTime=16666666, SyncQueued=250365360938, SyncStart=250366618292, IssueDrawCommandsStart=250366735222, SwapBuffers=250367458600, FrameCompleted=250379923234, DequeueBufferDuration=8342, QueueBufferDuration=1425371, GpuCompleted=250373709307, SwapBuffersCompleted=250379923234, DisplayPresentTime=0, CommandSubmissionCompleted=250367458600, 
+E/FrameTracker( 5644): force finish cuj, time out: J<IME_INSETS_ANIMATION::0@1@com.akeakademi.ake_akademi>
+All tests passed.

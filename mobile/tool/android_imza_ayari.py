@@ -21,7 +21,7 @@ if 'AKE: yükleme anahtarı' in s:
 if kt:
     baslik = ('// AKE: yükleme anahtarı key.properties dosyasından okunur (repoda YOK; bkz. docs/android-kapali-test.md)\n'
               'val akeAnahtarDosyasi = rootProject.file("key.properties")\n'
-              'val akeAnahtar = java.util.Properties().apply { if (akeAnahtarDosyasi.exists()) load(java.io.FileInputStream(akeAnahtarDosyasi)) }\n'
+              'val akeAnahtar = Properties().apply { if (akeAnahtarDosyasi.exists()) load(FileInputStream(akeAnahtarDosyasi)) }\n'
               'val akeBundleGorevi = gradle.startParameter.taskNames.any { it.contains("bundle", ignoreCase = true) }\n\n')
     blok = ('    signingConfigs {\n'
             '        if (akeAnahtarDosyasi.exists()) {\n'
@@ -62,5 +62,7 @@ m = re.search(r'^android\s*\{\s*\n', s, flags=re.M)
 if not m:
     sys.exit('HATA: android { bloğu bulunamadı.')
 s = s[:m.start()] + baslik + s[m.start():m.end()] + blok + s[m.end():]
+if kt:
+    s = 'import java.io.FileInputStream\nimport java.util.Properties\n\n' + s   # 'java' adı Gradle'da eklenti uzantısını gölgeler; içe aktarma şart
 g.write_text(s, encoding='utf-8')
 print('Release imza ayarı uygulandı (anahtar yoksa AAB imzasız çıkar).')

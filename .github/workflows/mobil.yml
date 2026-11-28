@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Bu dalın Preview adresi (test D1'e bağlı). Production adresi hiçbir derlemeye verilmez.
+  AKE_API_PREVIEW: https://mobil-magaza-sandbox.akeakademi.pages.dev
+
 concurrency:
   group: mobil-${{ github.ref }}
   cancel-in-progress: true
@@ -55,15 +59,98 @@ jobs:
         run: flutter analyze --no-fatal-infos   # hata ve uyarılar kırmızı; 'info' (ör. material.dart kullanımdan kalkma notu) değil
       - name: flutter test
         run: flutter test --reporter expanded
-      - name: Android debug APK (Preview adresiyle; Production'a bağlanmaz)
-        run: flutter build apk --debug --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
-      - name: APK özeti
-        run: ls -l build/app/outputs/flutter-apk/app-debug.apk
+      - name: Android debug APK (bu dalın Preview adresiyle; Production'a bağlanmaz)
+        run: flutter build apk --debug --dart-define=AKE_API=${{ env.AKE_API_PREVIEW }}
+      - name: APK özeti + gömülü API adresi doğrulaması (derleme kaydı)
+        run: |
+          set -e
+          APK=build/app/outputs/flutter-apk/app-debug.apk
+          ls -l "$APK"
+          mkdir -p apk-kayit
+          unzip -p "$APK" assets/flutter_assets/kernel_blob.bin | strings -n 8 | grep -oE 'https://[A-Za-z0-9.-]+\.(pages\.dev|com)' | sort | uniq -c > apk-kayit/gomulu-adresler.txt || true
+          {
+            echo "commit: ${GITHUB_SHA}"
+            echo "calisma: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "beklenen_api: https://mobil-magaza-sandbox.akeakademi.pages.dev"
+            echo "apk_sha256: $(sha256sum "$APK" | cut -d' ' -f1)"
+            echo "apk_boyut: $(stat -c %s "$APK")"
+            echo "--- APK içinde bulunan https adresleri (adet adres) ---"
+            cat apk-kayit/gomulu-adresler.txt
+          } | tee apk-kayit/derleme-kaydi.txt
+          grep -q 'mobil-magaza-sandbox.akeakademi.pages.dev' apk-kayit/gomulu-adresler.txt || { echo "HATA: beklenen API adresi APK'de yok"; exit 1; }
+          if grep -q 'mobil-ake-ilk-surum' apk-kayit/gomulu-adresler.txt; then echo "HATA: eski dal adresi APK'de"; exit 1; fi
       - uses: actions/upload-artifact@v4
         with:
-          name: ake-akademi-android-debug
-          path: mobile/build/app/outputs/flutter-apk/app-debug.apk
-          retention-days: 7
+          name: ake-akademi-android-debug-magaza-sandbox
+          path: |
+            mobile/build/app/outputs/flutter-apk/app-debug.apk
+            mobile/apk-kayit/derleme-kaydi.txt
+          retention-days: 14
+
+  aab:
+    name: Release AAB (Play kapalı test yolu; yükleme anahtarı yoksa İMZASIZ)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Platform klasörlerini üret (kur.sh; flutter pub get dahil)
+        run: ./kur.sh
+      - name: Yükleme anahtarı (yalnız GitHub Secrets'ta varsa; değerler loga yazılmaz, repoya girmez)
+        id: anahtar
+        env:
+          KS_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          KS_SIFRE: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          KS_TAKMA: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          KS_ANAHTAR_SIFRE: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set +x
+          if [ -n "$KS_B64" ] && [ -n "$KS_SIFRE" ] && [ -n "$KS_TAKMA" ] && [ -n "$KS_ANAHTAR_SIFRE" ]; then
+            umask 077
+            printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/yukleme.jks"
+            printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$RUNNER_TEMP/yukleme.jks" "$KS_SIFRE" "$KS_TAKMA" "$KS_ANAHTAR_SIFRE" > android/key.properties
+            echo "imzali=evet" >> "$GITHUB_OUTPUT"
+            echo "Yükleme anahtarı bulundu: AAB imzalanacak."
+          else
+            echo "imzali=hayir" >> "$GITHUB_OUTPUT"
+            echo "Yükleme anahtarı Secrets'ta YOK: AAB İMZASIZ üretilecek ve Play'e yüklenemez."
+          fi
+      - name: flutter build appbundle --release (Preview adresiyle; sürüm kodu = çalıştırma numarası)
+        run: flutter build appbundle --release --dart-define=AKE_API=${{ env.AKE_API_PREVIEW }} --build-number=${{ github.run_number }}
+      - name: AAB doğrulaması (paket kimliği, sürüm kodu, Billing izni, gömülü adres, imza)
+        run: |
+          mkdir -p aab-kayit
+          cp build/app/outputs/bundle/release/app-release.aab aab-kayit/ake-akademi-release.aab
+          ./tool/aab_dogrula.sh aab-kayit/ake-akademi-release.aab com.akeakademi.ake_akademi "${{ env.AKE_API_PREVIEW }}" "${{ github.run_number }}" "${{ steps.anahtar.outputs.imzali }}" aab-kayit/aab-kaydi.txt
+      - name: Anahtar dosyalarını sil
+        if: always()
+        run: rm -f android/key.properties "$RUNNER_TEMP/yukleme.jks"
+      - uses: actions/upload-artifact@v4
+        if: steps.anahtar.outputs.imzali == 'evet'
+        with:
+          name: ake-akademi-android-release-aab-imzali
+          path: |
+            mobile/aab-kayit/ake-akademi-release.aab
+            mobile/aab-kayit/aab-kaydi.txt
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: steps.anahtar.outputs.imzali != 'evet'
+        with:
+          name: ake-akademi-android-release-aab-IMZASIZ-play-e-yuklenemez
+          path: |
+            mobile/aab-kayit/ake-akademi-release.aab
+            mobile/aab-kayit/aab-kaydi.txt
+          retention-days: 14
 
   ios:
     name: iOS · macOS derleme + test (imzasız; mağaza/TestFlight değil)
@@ -85,7 +172,7 @@ jobs:
       - name: flutter test (macOS üzerinde)
         run: flutter test --reporter expanded
       - name: iOS derlemesi (--no-codesign; Preview adresiyle)
-        run: flutter build ios --release --no-codesign --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
+        run: flutter build ios --release --no-codesign --dart-define=AKE_API=${{ env.AKE_API_PREVIEW }}
       - name: Derleme özeti
         run: ls -l build/ios/iphoneos/Runner.app | head -5
       - name: iOS simülatöründe ekran yürüyüşü (giriş → alt gezinme → soru akışı → Gelişim/Plan/Ayarlar; test verisi = sahte sunucu)
@@ -143,7 +230,7 @@ jobs:
         run: ./kur.sh
       - name: Gerçek uygulama (release/AOT, Preview adresi) emülatör başlamadan derlenir — emülatörle CPU paylaşıp kaydı bozmasın
         run: |
-          flutter build apk --release --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev --dart-define=AKE_OLCUM=true
+          flutter build apk --release --dart-define=AKE_API=${{ env.AKE_API_PREVIEW }} --dart-define=AKE_OLCUM=true
           mkdir -p kanit-apk && cp build/app/outputs/flutter-apk/app-release.apk kanit-apk/ake-release.apk
           ls -l kanit-apk
           # release derlemesi dev-bağımlılık eklentilerini (integration_test) kayıttan çıkarır; sürücü derlemesi temiz başlasın

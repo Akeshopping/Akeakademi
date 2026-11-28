@@ -11,11 +11,12 @@ import 'package:ake_akademi/veri/oturum_deposu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'sahte_magaza.dart';
 import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {DateTime Function()? saat}) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(SahteSunucu.anahtar));
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': '1'}), saat: saat);
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar({'acilis': 'kapali'}), saat: saat)..magaza = SahteMagaza(); // üretimde main() gerçek köprüyü verir
 }
 
 void ekran(WidgetTester t, double genislik, {double yukseklik = 900}) {
@@ -44,6 +45,19 @@ Future<void> bekle(WidgetTester t, [int adim = 8]) async {
 Future<void> sekme(WidgetTester t, int i) async {
   await t.tap(find.byKey(ValueKey('sekme-$i')));
   await t.pumpAndSettle();
+}
+
+/// Tutulan /hesap/ben isteklerinden [i]. olanı bırakır (yanıt o anki, yani ESKİ durumla hazırlanmıştı).
+Future<void> benBirak(WidgetTester t, SahteSunucu s, int i) async {
+  s.benTutulan[i].complete();
+  await t.pumpAndSettle();
+}
+
+Future<void> benBekle(WidgetTester t, SahteSunucu s, int adet) async {
+  for (var k = 0; k < 20 && s.benTutulan.length < adet; k++) {
+    await t.pump(const Duration(milliseconds: 50));
+  }
+  expect(s.benTutulan.length, adet, reason: 'sunucu $adet /ben isteği tutuyor olmalı');
 }
 
 Future<void> gorunurDokun(WidgetTester t, Finder f) async {
@@ -92,6 +106,20 @@ void main() {
   });
 
   group('Soru Çözüm Merkezi', () {
+    testWidgets('ücretsiz soru hakkı bitince Paketler ekranına geçilir, yarın devam seçeneği kalır', (t) async {
+      final s = SahteSunucu()..limitDoldu = true;
+      final m = await ac(t, s);
+      await sekme(t, 1);
+      await t.tap(find.byKey(const ValueKey('soru-sekme-2')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('paragraf-baslat')));
+      await t.pumpAndSettle();
+      expect(find.text('Ücretsiz hakkın bitti'), findsOneWidget);
+      expect(find.text('Geri dön'), findsOneWidget);
+      await t.tap(find.text('Paketleri gör'));
+      await t.pumpAndSettle();
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+    });
     testWidgets('Soru ara: kelime sunucuya `ara` olarak gider; Paragraf sekmesi konu filtresiyle başlar', (t) async {
       final s = SahteSunucu();
       await ac(t, s);
@@ -158,12 +186,43 @@ void main() {
 
     testWidgets('ücretsiz deneme hakkı bitince başlatma düğmesi pasif', (t) async {
       final s = SahteSunucu()..kalanDeneme = 0;
-      await ac(t, s);
+      final m = await ac(t, s);
       await sekme(t, 2);
       expect(find.textContaining('hakkın bitti'), findsWidgets);
       await t.tap(find.text('Denemeyi başlat'), warnIfMissed: false);
       await t.pumpAndSettle();
       expect(s.sonModu, isNull, reason: 'oturum hiç açılmadı');
+      await gorunurDokun(t, find.byKey(const ValueKey('deneme-paketler')));
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+      s.paketli = true; // satın alma başka ekranda doğrulandı
+      m.sekmeGit(2);
+      await t.pumpAndSettle();
+      expect(find.textContaining('deneme sayısı sınırsız'), findsOneWidget);
+      expect(t.widget<AkeDugme>(find.ancestor(of: find.text('Denemeyi başlat'), matching: find.byType(AkeDugme))).basinca, isNotNull);
+    });
+
+    testWidgets('Deneme: geç gelen ESKİ /ben yanıtı yeni hak durumunu ezmez', (t) async {
+      final s = SahteSunucu(); // kalanDeneme 3
+      final m = await ac(t, s);
+      await sekme(t, 2);
+      expect(find.textContaining('3 deneme hakkın var'), findsOneWidget);
+      s.benTut = true;
+      m.sekmeGit(0);
+      await t.pumpAndSettle();
+      m.sekmeGit(2); // okuma #1: sunucu 3 hak görüyor
+      await benBekle(t, s, 1);
+      s.kalanDeneme = 0; // araya hak bitti
+      m.sekmeGit(0);
+      await t.pump();
+      m.sekmeGit(2); // okuma #2: sunucu 0 hak görüyor
+      await benBekle(t, s, 2);
+      await benBirak(t, s, 1); // yeni yanıt önce gelir
+      expect(find.textContaining('hakkın bitti'), findsWidgets);
+      await benBirak(t, s, 0); // ESKİ yanıt (3 hak) sonra gelir
+      expect(find.textContaining('hakkın bitti'), findsWidgets, reason: 'eski yanıt yeni durumu ezmemeli');
+      expect(find.textContaining('3 deneme hakkın var'), findsNothing);
+      expect(find.byKey(const ValueKey('deneme-paketler')), findsOneWidget);
+      await t.pumpWidget(const SizedBox());
     });
 
     testWidgets('paketli hesapta hak sınırsız görünür', (t) async {
@@ -179,6 +238,43 @@ void main() {
   });
 
   group('AI öğretmen', () {
+    testWidgets('ücretsiz öğrenci AI kapısından Paketler sayfasına gider', (t) async {
+      final s = SahteSunucu()..magazaModu = 'kapali'; // ödeme kapalı önizleme: fayda özeti var, fiyat/satın alma düğmesi yok
+      final m = await ac(t, s);
+      await sekme(t, 3);
+      expect(find.byKey(const ValueKey('ai-kapi')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('ai-paketler')));
+      await t.pumpAndSettle();
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+      expect(find.text('Paket satın alma henüz açık değil'), findsOneWidget);
+      expect(s.aiIstekleri, isEmpty);
+      s.paketli = true; // mağaza doğrulaması sonrası sunucu hesabı paketli döner
+      m.sekmeGit(3);
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget, reason: 'AI sekmesi eski ücretsiz kapısında kalmaz');
+    });
+    testWidgets('AI: geç gelen ESKİ /ben yanıtı yeni (paketli) durumu ezmez', (t) async {
+      final s = SahteSunucu();
+      final m = await ac(t, s);
+      await sekme(t, 3);
+      expect(find.byKey(const ValueKey('ai-kapi')), findsOneWidget);
+      s.benTut = true;
+      m.sekmeGit(0);
+      await t.pumpAndSettle();
+      m.sekmeGit(3); // okuma #1: hesap henüz paketsiz
+      await benBekle(t, s, 1);
+      s.paketli = true; // satın alma doğrulandı
+      m.sekmeGit(0);
+      await t.pump();
+      m.sekmeGit(3); // okuma #2: paketli
+      await benBekle(t, s, 2);
+      await benBirak(t, s, 1);
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget);
+      await benBirak(t, s, 0); // ESKİ (paketsiz) yanıt sonra gelir
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget, reason: 'eski yanıt kapıyı geri getirmemeli');
+      expect(find.byKey(const ValueKey('ai-kapi')), findsNothing);
+      await t.pumpWidget(const SizedBox());
+    });
     testWidgets('paket yokken AI çağrılmaz; yanlış kod hata verir; doğru kodla sohbet açılır ve gerçek /api/ai çağrısı gider', (t) async {
       final s = SahteSunucu();
       await ac(t, s);
@@ -711,6 +807,7 @@ void main() {
           expect(t.takeException(), isNull, reason: 'sekme $i');
         }
         s.paketli = true;
+        m.magaza = SahteMagaza();
         await sekme(t, 0);
         await sekme(t, 3);
         expect(t.takeException(), isNull);

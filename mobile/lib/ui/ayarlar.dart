@@ -201,6 +201,8 @@ class _AyarlarSekmesiState extends State<AyarlarSekmesi> {
                   )
                 else if (yuklendi) _profilKarti(t),
                 const SizedBox(height: 14),
+                if (d != null) AkeDugme('Paketleri gör', key: const ValueKey('ayar-paketler'), tur: DugmeTuru.cizgili, simge: Icons.workspace_premium_rounded, basinca: () => model.menuyeGit(MenuSayfasi.paket)),
+                if (d != null) const SizedBox(height: 14),
                 if (d != null && !d.paketli) _kodKarti(t),
                 if (d != null && !d.paketli) const SizedBox(height: 14),
                 KartKutu(

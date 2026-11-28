@@ -188,9 +188,14 @@ class _SoruEkraniState extends State<SoruEkrani> {
           return DurumKutusu(
             simge: Icons.lock_clock,
             baslik: 'Ücretsiz hakkın bitti',
-            aciklama: 'Bugünkü ücretsiz soru hakkını kullandın. Hakkın yenilendiğinde kaldığın yerden devam edebilirsin.',
-            dugme: 'Geri dön',
-            basinca: () => Navigator.of(context).pop(),
+            aciklama: 'Bugünkü ücretsiz soru hakkını kullandın. Paketle sınırsız soru çözebilir veya gün değişince ücretsiz hakkınla devam edebilirsin.',
+            dugme: 'Paketleri gör',
+            basinca: () {
+              Navigator.of(context).pop();
+              widget.model.menuyeGit(MenuSayfasi.paket);
+            },
+            ikinciDugme: 'Geri dön',
+            ikinciBasinca: () => Navigator.of(context).pop(),
           );
         }
         if (h is ApiHata && h.tur == HataTuru.oturum) return const Yukleniyor(metin: 'Oturum kontrol ediliyor…');

@@ -9,11 +9,12 @@ import 'package:ake_akademi/veri/oturum_deposu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'sahte_magaza.dart';
 import 'sahte_sunucu.dart';
 
 UygulamaModeli model(SahteSunucu s, {String? anahtar, Map<String, String>? ayar}) {
   final api = AkeApi(taban: 'https://test.ake', istemci: s.istemci, depo: BellekDeposu(anahtar));
-  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar(ayar ?? {'acilis': '1'}));
+  return UygulamaModeli(api, IlerlemeSenkron(api), ayar: BellekAyar(ayar ?? {'acilis': 'kapali'}));
 }
 
 void ekran(WidgetTester t, double genislik, {double yukseklik = 700}) {
@@ -87,6 +88,7 @@ void main() {
         addTearDown(t.platformDispatcher.clearPlatformBrightnessTestValue);
         final s = SahteSunucu()..ilerlemeler['u1'] = {'mat|Sayılar': [7, 3, 0]};
         final m = model(s, anahtar: SahteSunucu.anahtar);
+        m.magaza = SahteMagaza(); // Paketler sayfası gerçek mağaza eklentisine değil sahte köprüye bağlanır
         await m.baslat();
         await t.pumpWidget(AkeUygulamasi(model: m));
         await t.pumpAndSettle();
@@ -177,9 +179,9 @@ void main() {
       expect(katman.sure.inMilliseconds + 250, lessThanOrEqualTo(2500));
     });
 
-    testWidgets('ilk açılışta oynar, "Geç" ilk karede var, süre sonunda biter ve bir daha oynamaz', (t) async {
+    testWidgets('her yeni çalıştırmada oynar, aynı süreçte tekrar oynamaz', (t) async {
       ekran(t, 390);
-      final s = SahteSunucu(), m = model(s, ayar: const <String, String>{});
+      final s = SahteSunucu(), m = model(s, ayar: const <String, String>{'acilis': '1'});
       await m.baslat();
       expect(m.acilisOynat, isTrue);
       await t.pumpWidget(AkeUygulamasi(model: m));
@@ -193,11 +195,14 @@ void main() {
       await t.pump();
       expect(find.byType(AcilisKatmani), findsNothing);
       expect(m.acilisOynat, isFalse);
-      expect(await m.ayar.oku('acilis'), '1');
-      // tekrar açılış: aynı ayarla yeni model animasyonu hiç göstermez
+      expect(await m.ayar.oku('acilis'), '1', reason: 'eski görüldü bayrağı yeni çalıştırmayı engellemez');
+      await m.baslat();
+      expect(m.acilisOynat, isFalse, reason: 'aynı süreçte tekrar dene animasyonu açmaz');
+      // Yeni süreç: aynı kalıcı ayarlarda yeni model açılışı yeniden oynatır.
       final m2 = UygulamaModeli(m.api, m.senkron, ayar: m.ayar);
       await m2.baslat();
-      expect(m2.acilisOynat, isFalse);
+      expect(m2.acilisOynat, isTrue);
+      m2.acilisBitti();
     });
 
     testWidgets('"Geç" hemen bitirir ve giriş ekranı kullanılabilir kalır', (t) async {
@@ -214,6 +219,10 @@ void main() {
       await t.tap(find.text('Ücretsiz başla'));
       await t.pumpAndSettle();
       expect(find.byType(TextField), findsOneWidget);
+      final m2 = UygulamaModeli(m.api, m.senkron, ayar: m.ayar);
+      await m2.baslat();
+      expect(m2.acilisOynat, isTrue, reason: 'Geç yalnız bu çalıştırmayı atlar');
+      m2.acilisBitti();
     });
 
     testWidgets('hareketi azalt açıkken animasyon hiç oynamaz', (t) async {

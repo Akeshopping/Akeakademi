@@ -31,7 +31,7 @@ class BellekDeposu implements OturumDeposu {
   Future<void> sil() async => _v = null;
 }
 
-/// Küçük uygulama ayarları (tema, açılış animasyonu görüldü mü). Oturum anahtarından ayrı tutulur; çıkışta silinmez.
+/// Küçük uygulama ayarları (tema ve isteğe bağlı açılış tercihi). Oturum anahtarından ayrı tutulur; çıkışta silinmez.
 abstract class AyarDeposu {
   Future<String?> oku(String ad);
   Future<void> yaz(String ad, String deger);

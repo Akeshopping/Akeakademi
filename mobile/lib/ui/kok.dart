@@ -47,7 +47,7 @@ class _AkeUygulamasiState extends State<AkeUygulamasi> {
         theme: akeTema(koyu: false),
         darkTheme: akeTema(koyu: true),
         themeMode: model.tema,
-        // İlk açılışta bir kez oynayan giriş animasyonu uygulamanın ÜSTÜNDE durur; altta uygulama aynı anda yüklenir.
+        // Her yeni çalıştırmada bir kez oynayan giriş animasyonu uygulamanın ÜSTÜNDE durur; altta uygulama aynı anda yüklenir.
         builder: (context, child) => Stack(children: [
           Positioned.fill(child: child ?? const SizedBox.shrink()),
           if (model.acilisOynat) Positioned.fill(child: AcilisKatmani(bitti: model.acilisBitti)),

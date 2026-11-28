@@ -1,4 +1,6 @@
-# Mobil mağaza satın alma · erişim modeli (TASLAK, bu turda uygulanmadı)
+# Mobil mağaza satın alma · erişim modeli (ESKİ TASLAK — yerini `magaza-urun-yetki.md` aldı)
+
+> **Güncel durum:** Bu taslağın büyük kısmı `mobil/magaza-sandbox` dalında uygulandı. Güncel tablo ve adımlar: `docs/magaza-urun-yetki.md`, `docs/magaza-odeme-kurulum.md`, `docs/magaza-test-listesi.md`. Uygulamadaki farklar: işlemler `kod` tablosuna değil `magaza_islem` tablosuna yazılır (`aktifPaket` ikisini birleştirir); Apple yanıtı doğrudan App Store Server API'den TLS ile alınır, bildirim JWS imzası zinciri doğrulanmaz (bildirim yalnızca tetikleyicidir); uç adları `/api/hesap/magaza/*` ve `/api/magaza/{google,apple}`. Aşağıdaki metin tarihçe için bırakıldı.
 
 **Durum:** Yalnızca tasarım notu. Mobil uygulamada gerçek satın alma, ödeme bağlantısı, Shopier ya da web ödeme yolu YOKTUR. Hiçbir tablo, uç veya ortam değişkeni eklenmedi.
 **Vergi/fatura:** 20/B uygunluğu ve mağaza gelirlerinin faturalandırılması mali müşavir/vergi dairesi kararına bağlıdır; bu belge o kararı varsaymaz.

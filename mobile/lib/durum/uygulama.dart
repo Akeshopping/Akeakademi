@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -7,13 +8,15 @@ import '../veri/hesap_verisi.dart';
 import '../veri/ilerleme.dart';
 import '../veri/modeller.dart';
 import '../veri/oturum_deposu.dart';
+import '../odeme/magaza_koprusu.dart';
+import '../odeme/odeme.dart';
 import 'odak.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 
 enum Faz { yukleniyor, ag, giris, oturumBitti, ana }
 
 /// Menü sekmesinin alt sayfaları (sitedeki Menü bölümü): null = menü listesi.
-enum MenuSayfasi { gelisim, plan, ayarlar }
+enum MenuSayfasi { gelisim, plan, paket, ayarlar }
 
 /// Uygulamanın kök durumu: oturum var mı, süresi doldu mu, ağ var mı.
 class UygulamaModeli extends ChangeNotifier {
@@ -23,12 +26,18 @@ class UygulamaModeli extends ChangeNotifier {
   final DateTime Function() saat; // test için değiştirilebilir saat
   /// Odak odası sayacı (aktif hesaba bağlı; sekmeler arasında yaşar).
   OdakSayaci? odak;
+
+  /// Üretimde main() gerçek köprüyü verir; testler sahte köprü verebilir veya mağazayı hiç açmaz.
+  MagazaKoprusu? magaza;
+  /// Satın alma dinleyicisi ekranlar arasında yaşar, çıkışta ve hesap değişiminde kapanır.
+  OdemeModeli? odeme;
   Faz faz = Faz.yukleniyor;
   Kullanici? kullanici;
   ThemeMode tema = ThemeMode.system;
 
-  /// İlk açılışta bir kez oynayan giriş animasyonu. Görüldüğü cihazda saklanır; tekrar açılışta hiç gösterilmez.
+  /// Her yeni uygulama çalıştırıldığında bir kez oynayan giriş animasyonu.
   bool acilisOynat = false;
+  bool _acilisKararlastirildi = false;
 
   /// Alt gezinmedeki etkin sekme (0 Ana sayfa, 1 Soru çöz, 2 Deneme, 3 AI, 4 Menü). Ekranlar buradan sekme değiştirebilir.
   int sekme = 0;
@@ -65,6 +74,7 @@ class UygulamaModeli extends ChangeNotifier {
   /// Hesap silme: sunucu siler, yerel her şey temizlenir, giriş ekranına dönülür.
   Future<void> hesapSil() async {
     await api.hesapSil();
+    _odemeyiKapat();
     senkron.temizle();
     kullanici = null;
     odak = null;
@@ -78,6 +88,7 @@ class UygulamaModeli extends ChangeNotifier {
       : ayar = ayar ?? BellekAyar(),
         saat = saat ?? DateTime.now {
     api.oturumBittiDinleyici = () {
+      _odemeyiKapat();
       kullanici = null;
       odak = null;
       senkron.oturumBitti();
@@ -87,12 +98,16 @@ class UygulamaModeli extends ChangeNotifier {
   }
 
   Future<void> ayarlariYukle() async {
+    if (_acilisKararlastirildi) return; // Aynı süreçte ağ nedeniyle yeniden başlatma animasyonu tekrarlamaz.
+    _acilisKararlastirildi = true;
+    acilisOynat = true;
     try {
       final t = await ayar.oku('tema');
       tema = t == 'acik' ? ThemeMode.light : (t == 'koyu' ? ThemeMode.dark : ThemeMode.system);
-      acilisOynat = (await ayar.oku('acilis')) != '1';
+      // Eski sürümlerin '1' (görüldü) kaydı artık açılışı engellemez.
+      acilisOynat = (await ayar.oku('acilis')) != 'kapali';
     } catch (_) {
-      acilisOynat = false; // depo okunamazsa kullanıcıyı bekletme
+      // Ayar deposu okunamazsa bile o süreçte açılışın gösterilmesine izin ver.
     }
   }
 
@@ -110,14 +125,11 @@ class UygulamaModeli extends ChangeNotifier {
     } catch (_) {}
   }
 
-  /// Açılış animasyonu bitti ya da geçildi: bir daha oynatılmaz.
-  Future<void> acilisBitti() async {
+  /// Açılış animasyonu bitti ya da geçildi: bu süreçte tekrar oynatılmaz.
+  void acilisBitti() {
     if (!acilisOynat) return;
     acilisOynat = false;
     notifyListeners();
-    try {
-      await ayar.yaz('acilis', '1');
-    } catch (_) {}
   }
 
   Future<void> baslat() async {
@@ -155,6 +167,11 @@ class UygulamaModeli extends ChangeNotifier {
 
   /// Aktif hesap bu kimliktir: başka hesabın bekleyen kayıtları silinir; bu hesabın işlenmemiş cevapları sunucudan toparlanır.
   void _hesabaGec(String id) {
+    _odemeyiKapat();
+    if (magaza != null) {
+      odeme = OdemeModeli(api, magaza!, hesapId: id);
+      unawaited(odeme!.baslat());
+    }
     odak = OdakSayaci(
       ayar: ayar,
       hesapId: id,
@@ -168,6 +185,7 @@ class UygulamaModeli extends ChangeNotifier {
   }
 
   Future<void> cikis() async {
+    _odemeyiKapat();
     await api.cikis();
     senkron.temizle();
     kullanici = null;
@@ -181,6 +199,17 @@ class UygulamaModeli extends ChangeNotifier {
   void yenidenGirisYap() {
     faz = Faz.giris;
     notifyListeners();
+  }
+
+  void _odemeyiKapat() {
+    odeme?.dispose();
+    odeme = null;
+  }
+
+  @override
+  void dispose() {
+    _odemeyiKapat();
+    super.dispose();
   }
 
   /// Aynı istek tekrarlandığında sunucu aynı oturumu döner (kota ikinci kez düşmez). Her yeni oturum için yeni kimlik üretilir.

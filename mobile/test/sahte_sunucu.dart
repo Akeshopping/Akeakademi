@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -39,6 +40,23 @@ class SahteSunucu {
   bool aiKotaDoldu = false;
   final List<List<Map<String, dynamic>>> aiIstekleri = [];
   bool silindi = false;
+  // ---- mağaza (sunucu sözleşmesi: lib/magaza.js). magazaGercek = "mağazanın gerçekten var dediği" işlem kimlikleri; sunucu yalnız bunları kabul eder.
+  String magazaModu = 'sandbox'; // 'kapali' → 503
+  final Set<String> magazaGercek = {};
+  final List<Map<String, dynamic>> magazaDogrulamalari = []; // gelen her doğrulama isteği
+  String? magazaHata; // doluysa her doğrulama bu hata koduyla reddedilir (örn. hesap_eslesmedi)
+  int magazaAgHatasi = 0; // ilk N doğrulama isteğinde sunucu 502 magaza_ulasilamadi dönsün
+  bool magazaPaketAcik = false;
+  Map<String, dynamic>? magazaHaklar = {'ucretsiz': {'soru': 20, 'deneme': 1}, 'orta': {'mesaj': 200, 'guclu': 20}, 'premium': {'mesaj': 500, 'guclu': 60}}; // null: sunucu haklar göndermiyor
+  String magazaAktifDurum = 'aktif'; // etkin işlem satırının durumu (aktif | iptal: süre bitene dek erişim, yenilenmez)
+  String? magazaBitenDurum; // paket açık değilken işlem satırı bu durumla görünür (bitti | iade): erişim yok
+  int magazaGetSayisi = 0; // /hesap/magaza GET istekleri
+  bool magazaGetAgYok = false; // yalnız mağaza durumu GET'i ağ hatasıyla düşer
+  bool magazaGetTut = false; // true iken GET yanıtı İSTEK ANINDAKİ durumla hazırlanır ama [magazaTutulan] bırakılana dek gecikir
+  final List<Completer<void>> magazaTutulan = [];
+  bool magazaPremiumKapali = false; // true: sunucu Premium ürünleri listelemez (ilk satış yalnız Atılım)
+  bool benTut = false; // true iken /hesap/ben yanıtı İSTEK ANINDAKİ durumla hazırlanır ama [benTutulan] bırakılana dek gecikir (geç gelen eski yanıt)
+  final List<Completer<void>> benTutulan = [];
   int _sur(String a) => surumler[a] ?? ((veriAlanlari?.containsKey(a) ?? false) ? 1 : 0);
   String? sonOturumGovdesi;
   // ---- odak odası ----
@@ -77,19 +95,66 @@ class SahteSunucu {
     if (!yetkili) return _y(401, {'error': 'giris'});
     if (silindi) return _y(401, {'error': 'giris'});
     if (yol == '/api/hesap/ben') {
-      return _y(200, {
+      final y = _y(200, {
         'kullanici': {'id': hesapId, 'eposta': 'ogrenci@ornek.com', 'ad': ''},
-        'paket': paketli ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
+        'paket': paketli || magazaPaketAcik ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
         'kullanim': {'mesaj': aiIstekleri.length, 'guclu': 0},
         'limit': paketli ? {'mesaj': 500, 'guclu': 60} : null,
         'ucretsiz': paketli ? {'sinirsiz': true} : {'sinirsiz': false, 'kalanSoru': 12, 'kalanDeneme': kalanDeneme},
       });
+      if (benTut) {
+        final c = Completer<void>();
+        benTutulan.add(c);
+        await c.future;
+      }
+      return y;
     }
     if (yol == '/api/hesap/kod-bagla') {
       final b = jsonDecode(r.body) as Map<String, dynamic>;
       if (b['kod'] != 'AKE-TEST-1234') return _y(400, {'error': 'kod_gecersiz'});
       paketli = true;
       return _y(200, {'paket': {'plan': 'premium', 'bitis': '2027-06-30'}});
+    }
+    if (yol.startsWith('/api/hesap/magaza')) {
+      if (magazaModu == 'kapali') return _y(503, {'error': 'kapali', 'message': ''});
+      if (yol == '/api/hesap/magaza' && r.method == 'GET') {
+        magazaGetSayisi++;
+        if (magazaGetAgYok) throw http.ClientException('ağ yok');
+        final y = _y(200, {
+          'mod': magazaModu,
+          'urunler': [
+            {'id': 'atilim_aylik', 'plan': 'orta', 'donem': 'ay'},
+            {'id': 'atilim_yillik', 'plan': 'orta', 'donem': 'yil'},
+            if (!magazaPremiumKapali) {'id': 'premium_aylik', 'plan': 'premium', 'donem': 'ay'},
+            if (!magazaPremiumKapali) {'id': 'premium_yillik', 'plan': 'premium', 'donem': 'yil'},
+          ],
+          'hesapKimligi': {'google': 'g-$hesapId', 'apple': '00000000-0000-4000-8000-000000000001'},
+          'islemler': magazaPaketAcik
+              ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': magazaAktifDurum, 'bitis': '2027-06-30', 'erisim': true, 'test': true}]
+              : (magazaBitenDurum != null ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': magazaBitenDurum, 'bitis': '2026-11-01', 'erisim': false, 'test': true}] : []),
+          'paket': magazaPaketAcik || paketli ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
+          if (magazaHaklar != null) 'haklar': magazaHaklar,
+        });
+        if (magazaGetTut) {
+          final c = Completer<void>();
+          magazaTutulan.add(c);
+          await c.future;
+        }
+        return y;
+      }
+      if (yol == '/api/hesap/magaza/dogrula' && r.method == 'POST') {
+        final b = jsonDecode(r.body) as Map<String, dynamic>;
+        magazaDogrulamalari.add(b);
+        if (magazaAgHatasi > 0) {
+          magazaAgHatasi--;
+          return _y(502, {'sonuc': [{'ok': false, 'hata': 'magaza_ulasilamadi'}]});
+        }
+        if (magazaHata != null) return _y(409, {'sonuc': [{'ok': false, 'hata': magazaHata}]});
+        if (!magazaGercek.contains(b['kimlik'])) return _y(404, {'sonuc': [{'ok': false, 'hata': 'islem_bulunamadi'}]});
+        magazaPaketAcik = true; // yalnız sunucu mağazadan doğruladıktan sonra
+        return _y(200, {'sonuc': [{'ok': true}], 'paket': {'plan': 'premium', 'bitis': '2027-06-30'}});
+      }
+      return _y(404, {'error': 'yok'});
     }
     if (yol == '/api/hesap/sil' && r.method == 'POST') {
       silindi = true;

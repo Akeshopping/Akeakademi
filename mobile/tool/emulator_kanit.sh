@@ -62,7 +62,7 @@ kayit() { # $1=dp $2=ad $3=temiz|kal $4=animator ölçeği (1 normal, 0 = hareke
     sleep 1
     adb pull /sdcard/$2.mp4 kanit/$2.mp4 >/dev/null 2>&1 || echo "KAYIT_ALINAMADI_$2" | tee -a kanit/cihaz.txt
     sure=$(ffprobe -v error -show_entries format=duration -of csv=p=0 kanit/$2.mp4 2>/dev/null | cut -d. -f1)
-    [ "$3" != "temiz" ] && break        # ikinci açılış/ sabit ekran: video kısa olabilir (ekran değişmeyince kare yazılmaz)
+    [ "$3" != "temiz" ] && break        # ikinci açılışta uygulama verileri korunur
     [ "${sure:-0}" -ge 6 ] && break
     echo "KAYIT_KISA_$2 (sure=${sure:-0}) deneme=$deneme" | tee -a kanit/cihaz.txt
     adb shell am force-stop $PAKET; [ "$3" = "temiz" ] && adb shell pm clear $PAKET >/dev/null
@@ -72,7 +72,7 @@ kayit() { # $1=dp $2=ad $3=temiz|kal $4=animator ölçeği (1 normal, 0 = hareke
 }
 kayit 390 acilis-390-ilk-acilis temiz 1
 kayit 320 acilis-320-ilk-acilis temiz 1
-kayit 390 acilis-390-ikinci-acilis kal 1      # bayrak kaydedildi: animasyon OYNAMAMALI
+kayit 390 acilis-390-ikinci-acilis kal 1      # aynı kurulum, yeni süreç: animasyon yeniden OYNAMALI
 kayit 320 acilis-320-hareket-azalt temiz 0     # sistem animasyonları kapalı: animasyon OYNAMAMALI
 adb shell settings put global animator_duration_scale 1; adb shell settings put global transition_animation_scale 1; adb shell settings put global window_animation_scale 1
 cat kanit/olcum.txt

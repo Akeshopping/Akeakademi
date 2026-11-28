@@ -14,9 +14,21 @@ if m.exists():
     if 'android.permission.INTERNET' not in s:
         s = s.replace('<application', '<uses-permission android:name="android.permission.INTERNET"/>\n    <application', 1)
     s = re.sub(r'android:label="[^"]*"', 'android:label="AKE Akademi"', s, count=1)
+    if 'com.android.vending.BILLING' not in s:   # Google Play Billing (eklenti de ekler; açıkça yazmak denetimi kolaylaştırır)
+        s = s.replace('<application', '<uses-permission android:name="com.android.vending.BILLING"/>\n    <application', 1)
     if 'android:allowBackup' not in s:
         s = s.replace('<application', '<application android:allowBackup="false"', 1)
     m.write_text(s, encoding='utf-8')
+# in_app_purchase_android eklentisinin release "lintVital" çözümlemesi bu araç zincirinde çöküyor (NoSuchMethodError, JavaDocParser). Yalnız eklenti
+# alt projelerinin lintVital görevleri kapatılır; uygulamanın (app) kendi denetimi ve derleme sonucu etkilenmez.
+for ad, kt in (('android/build.gradle.kts', True), ('android/build.gradle', False)):
+    g = pathlib.Path(ad)
+    if g.exists():
+        s = g.read_text(encoding='utf-8')
+        if 'AKE: eklenti lintVital' not in s:
+            s += ('\n// AKE: eklenti lintVital kapalı (bkz. kur.sh)\nsubprojects {\n    if (project.name != "app") {\n        tasks.configureEach {\n            if (name.startsWith("lintVital")) { enabled = false }\n        }\n    }\n}\n') if kt else ('\n// AKE: eklenti lintVital kapalı (bkz. kur.sh)\nsubprojects { sp ->\n    if (sp.name != "app") {\n        sp.tasks.configureEach { t -> if (t.name.startsWith("lintVital")) { t.enabled = false } }\n    }\n}\n')
+            g.write_text(s, encoding='utf-8')
+        break
 p = pathlib.Path('ios/Runner/Info.plist')
 if p.exists():
     s = p.read_text(encoding='utf-8')
@@ -24,6 +36,7 @@ if p.exists():
     p.write_text(s, encoding='utf-8')
 print('Platform ayarları uygulandı.')
 PY
+python3 tool/android_imza_ayari.py   # release imzası key.properties'ten; anahtar yoksa AAB imzasız (repoda anahtar YOK)
 python3 kur_ikon.py   # sitedeki K amblemi: başlatıcı ikonu + koyu açılış zemini
 rm -f test/widget_test.dart   # flutter create şablon testi (bu uygulamaya ait değil)
 flutter pub get

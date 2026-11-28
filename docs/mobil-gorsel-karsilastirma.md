@@ -51,7 +51,7 @@ Aynı ekran yürüyüşü (giriş, alt gezinme, ana, Soru çöz, soru çözme, D
 Sınırlar: simülatördür (gerçek iPhone değil); veri sahte sunucudur; imzasız derleme, TestFlight/mağaza yok; iOS'ta açılış süresi ölçülmedi.
 
 ## 4) Açılış animasyonu
-- Tasarım süresi **2,45 sn → 2,15 sn** (1,9 sn animasyon + 0,25 sn sönme; birim testi ≤2,5 sn). Son kare gerçek K amblemi; "Geç" ilk kareden itibaren var; ikinci açılışta oynamaz; "hareketi azalt" açıkken 0 ms (CI'da doğrulandı: `neden=hareket_azalt sure_ms=0`).
+- Tasarım süresi **2,45 sn → 2,15 sn** (1,9 sn animasyon + 0,25 sn sönme; birim testi ≤2,5 sn). Son kare gerçek K amblemi; "Geç" ilk kareden itibaren var; "hareketi azalt" açıkken 0 ms (CI'da doğrulandı: `neden=hareket_azalt sure_ms=0`). Bu tablodaki eski kayıtlar ikinci açılışın atlandığı sürüme aittir. Yeni davranışta her yeni uygulama çalıştırmasında açılış oynar; aynı süreçte geri dönüşte tekrarlanmaz. Yeni cihaz ölçümü ayrıca alınmalıdır.
 - Kare başına yeniden üretilen nesneler (başlangıç noktaları, amblem yolu, yazı düzeni, gradyan gölgelendiricileri) önbelleğe alındı.
 - **CI emülatöründe ölçülen gerçek süre (açılış başlangıcından bitişe):**
 

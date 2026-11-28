@@ -46,11 +46,14 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
   String? _ders; // serbest: null = karışık
   int _adet = 20;
   List<DenemeKaydi> _gecmis = const []; // Gelişim ile aynı kaynak (hesaptaki `exams`); okunamazsa liste boş kalır, ekran bozulmaz
+  late int _sonSekme;
+  int _nesil = 0; // geç gelen eski okuma geçmişi/hakkı ezmesin
 
   @override
   void initState() {
     super.initState();
     _f = _yukle();
+    _sonSekme = widget.model.sekme;
     widget.model.addListener(_modelDegisti);
   }
 
@@ -62,6 +65,11 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
 
   /// Sekme zaten açıkken Ana sayfadan "Mini deneme" kısayolu gelirse ¼ uzunluk hemen seçilir.
   void _modelDegisti() {
+    final yeni = widget.model.sekme;
+    if (yeni != _sonSekme) {
+      _sonSekme = yeni;
+      if (yeni == 2 && mounted) _yenile(); // Paketler'den dönüşte deneme hakkını tekrar oku.
+    }
     if (widget.model.denemeOnAyar == 'mini' && mounted) {
       widget.model.denemeOnAyar = null;
       setState(() {
@@ -72,14 +80,17 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
   }
 
   Future<(Ozet, HesapDurumu)> _yukle() async {
+    final n = ++_nesil;
     final o = await widget.model.api.ozet();
-    final h = await widget.model.api.hesapDurumu();
+    final h = await widget.model.api.hesapDurumu(beklenenHesap: widget.model.kullanici?.id);
     try {
       final v = await widget.model.hesapVerisi();
-      _gecmis = v.denemeler;
-      if (!_turSecildi) _tur = DenemeKatalogu.varsayilanTur(v.alan);
+      if (n == _nesil) {
+        _gecmis = v.denemeler;
+        if (!_turSecildi) _tur = DenemeKatalogu.varsayilanTur(v.alan);
+      }
     } catch (_) {
-      _gecmis = const [];
+      if (n == _nesil) _gecmis = const [];
     }
     if (widget.model.denemeOnAyar == 'mini') {
       _uzunluk = DenemeUzunluk.mini; // Ana sayfa "Mini deneme" kısayolu (site: sıradaki mini deneme = ¼ uzunluk)
@@ -154,12 +165,16 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
                       child: Text(
                         hesap.paketli
                             ? 'Paketin aktif: deneme sayısı sınırsız.'
-                            : (hesap.kalanDeneme == null ? 'Ücretsiz hesap: bu ay deneme hakkı sunucudan okunamadı.' : (hakYok ? 'Bu ayki ücretsiz deneme hakkın bitti.' : 'Ücretsiz hesap: bu ay ${hesap.kalanDeneme} deneme hakkın var.')),
+                            : (hesap.kalanDeneme == null ? 'Ücretsiz hesap: bu ay deneme hakkı sunucudan okunamadı.' : (hakYok ? 'Bu ayki ücretsiz deneme hakkın bitti. Ay değişince hakkın yenilenir; Paketle sınırsız deneme çözebilirsin.' : 'Ücretsiz hesap: bu ay ${hesap.kalanDeneme} deneme hakkın var.')),
                         style: TextStyle(color: hakYok ? t.uyari : t.murekkep, height: 1.35),
                       ),
                     ),
                   ]),
                 ),
+                if (hakYok) ...[
+                  const SizedBox(height: 10),
+                  AkeDugme('Paketleri gör', key: const ValueKey('deneme-paketler'), tur: DugmeTuru.cizgili, basinca: () => widget.model.menuyeGit(MenuSayfasi.paket)),
+                ],
                 const SizedBox(height: 12),
                 KartKutu(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -571,8 +586,10 @@ class _DenemeEkraniState extends State<DenemeEkrani> {
                     simge: Icons.cloud_off,
                     baslik: _hata is ApiHata && (_hata as ApiHata).tur == HataTuru.limit ? 'Deneme hakkın bitti' : 'Deneme başlatılamadı',
                     aciklama: hataMetni(_hata ?? 'x'),
-                    dugme: _hata is ApiHata && (_hata as ApiHata).tur == HataTuru.limit ? null : 'Tekrar dene',
-                    basinca: _baslat,
+                    dugme: _hata is ApiHata && (_hata as ApiHata).tur == HataTuru.limit ? 'Paketleri gör' : 'Tekrar dene',
+                    basinca: _hata is ApiHata && (_hata as ApiHata).tur == HataTuru.limit
+                        ? () { Navigator.of(context).pop(); widget.model.menuyeGit(MenuSayfasi.paket); }
+                        : _baslat,
                   )
                 : _icerik(t, o),
       ),

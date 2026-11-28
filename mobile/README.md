@@ -10,7 +10,7 @@ Hata, boş, yükleniyor, bağlantı yok, soru servisi kapalı, ücretsiz hak bit
 - **Marka:** K amblemi `docs/tasarim/gen_icons.py` içindeki gerçek SVG path ve gradyanla `lib/ui/marka.dart`'ta çizilir (yaklaşık logo PNG yok). Başlatıcı ikonu, açılış, giriş ve üst çubuk aynı şekli kullanır; ikon dosyaları `kur_ikon.py` ile `kur.sh` içinde uygulanır.
 - **Token'lar:** renk, yüzey ve ders renkleri `docs/tasarim/tokens.css` ile aynıdır (`lib/ui/tema.dart`, açık + koyu). Yazı: AKE Sans (Atkinson), AKE Serif (Newsreader), rakamlar AKE Rakam (Inter); site yığınındaki gibi önce Rakam, harfler Sans'a düşer (`assets/fontlar`, SIL OFL).
 - **Ekranlar:** koyu mürekkep üst çubuk + alt gezinme, sıcak açık zemin, mercan vurgu, ders renkli kartlar, zorluk seçici, soru ekranı (paragraf, beş şık, seçili/doğru/yanlış, açıklamaya kayma, sabit alt eylem alanı).
-- **Açılış animasyonu:** yalnız ilk açılışta, ≈1,9 sn + 0,25 sn sönme (2,15 sn); "Geç" ilk kareden itibaren; giriş ekranını engellemez; sonraki açılışlarda beklenmez; "hareketi azalt"ta oynamaz.
+- **Açılış animasyonu:** uygulama her yeni çalıştırıldığında bir kez, ≈1,9 sn + 0,25 sn sönme (2,15 sn); "Geç" ilk kareden itibaren; aynı süreçte sekme değiştirme ve arka plandan dönüşte tekrarlanmaz; "hareketi azalt"ta oynamaz.
 - Site → uygulama özellik eşlemesi ve eksikler: `docs/mobil-ozellik-haritasi.md`.
 
 ## Nasıl konuşur
@@ -21,7 +21,7 @@ Hata, boş, yükleniyor, bağlantı yok, soru servisi kapalı, ücretsiz hak bit
 - Soru oturumu açarken istek kimliği ekran başına bir kez üretilir; ağ hatasında "Tekrar dene" aynı kimliği kullanır, yanıt kaybolsa bile ikinci kota kullanımı olmaz.
 
 ## Sunucu adresi (varsayılan YOK)
-`AKE_API` zorunludur; verilmezse uygulama "Yapılandırma hatası" gösterir ve ağa çıkmaz. Production adresine (akeakademi.com) yalnızca **release** derlemesi bağlanır; debug/profile/test için ayrıca `--dart-define=AKE_URETIM_ONAY=evet` gerekir. Test için **mobil dalın kendi Preview adresi**: `https://mobil-ake-ilk-surum.akeakademi.pages.dev` (dal takma adı; her commit ayrıca kendi adresini alır, PR denetimindeki "Cloudflare Pages" satırında görünür). Başka dalın Preview adresi kullanılmaz.
+`AKE_API` zorunludur; verilmezse uygulama "Yapılandırma hatası" gösterir ve ağa çıkmaz. Production adresine (akeakademi.com) yalnızca **release** derlemesi bağlanır; debug/profile/test için ayrıca `--dart-define=AKE_URETIM_ONAY=evet` gerekir. Test için **PR #44 dalının (`mobil/magaza-sandbox`) kendi Preview adresi**: `https://mobil-magaza-sandbox.akeakademi.pages.dev` (dal takma adı; her commit ayrıca kendi adresini alır, PR denetimindeki "Cloudflare Pages" satırında görünür). Başka dalın Preview adresi kullanılmaz.
 
 Soru servisi sunucuda `AKE_SORU_V2=1` ve canonical soru verisi ister. **Production'da bayrak kapalıdır** (uygulama o zaman "Soru servisi henüz açık değil" gösterir). Preview'da bayrağın açık olduğu `/api/soru/ozet` → 401 (kapalı olsaydı 404) ile doğrulandı; Preview'ın test veritabanında canonical soru verisi olup olmadığı giriş yapılmadan doğrulanamaz, ilk gerçek denemede görülecek.
 
@@ -33,20 +33,23 @@ Soru servisi sunucuda `AKE_SORU_V2=1` ve canonical soru verisi ister. **Producti
    powershell -ExecutionPolicy Bypass -File .\kur.ps1     # android/ ve ios/ üretir, ayarları uygular, pub get
    flutter analyze
    flutter test
-   flutter run -d emulator-5554 --dart-define=AKE_API=https://mobil-ake-ilk-surum.akeakademi.pages.dev
+   flutter run -d emulator-5554 --dart-define=AKE_API=https://mobil-magaza-sandbox.akeakademi.pages.dev
    ```
    Emülatör kimliğini `flutter devices` gösterir.
 
 macOS/Linux: `./kur.sh` aynı işi yapar.
 
 ## Doğrulama (CI)
-`.github/workflows/mobil.yml` her PR/push'ta `flutter pub get`, `flutter analyze`, `flutter test` ve `flutter build apk --debug` çalıştırır; sonuç PR denetimlerinde görünür, debug APK artefakt olarak 7 gün saklanır. **iOS CI'da derlenmez** (Mac/Xcode/imza yok).
+`.github/workflows/mobil.yml` her PR/push'ta dört iş çalıştırır: **Node** sunucu testleri; **android** (`flutter pub get`, `flutter analyze`, `flutter test`, debug APK); **aab** (release AAB + doğrulama, aşağıda); **ios** (macOS'ta `flutter test`, imzasız `flutter build ios --release --no-codesign` ve simülatörde ekran yürüyüşü); ayrıca **emulator** işi. Artefaktlar 14 gün saklanır. iOS tarafı yalnız **imzasız derleme + simülatör testidir**: TestFlight/App Store paketi (IPA), imza ve Apple geliştirici hesabı gerektiren adımlar CI'da YOKTUR ve gerçek iPhone'da denenmemiştir. Tüm CI derlemeleri bu dalın Preview adresine bağlıdır (`AKE_API_PREVIEW`, iş akışı başında).
+
+### Android kapalı test sürümü (AAB)
+`aab` işi `flutter build appbundle --release` üretir (sürüm kodu = çalıştırma numarası) ve `tool/aab_dogrula.sh` ile paket kimliğini, sürüm kodunu, Play Billing iznini, gömülü Preview adresini ve imzayı denetler. **Yükleme anahtarı GitHub Secrets'ta yoksa AAB İMZASIZ çıkar** (artefakt adında `IMZASIZ-play-e-yuklenemez` yazar) ve Play'e yüklenemez. Anahtar oluşturma ve Secrets adımları: `docs/android-kapali-test.md`. Anahtar, parola ve keystore repoya girmez.
 
 ### Emülatör ekran kanıtı (CI, `emulator` işi)
 `tool/emulator_kanit.sh`, Android 14 emülatörde 320 dp ve 390 dp genişlikte `integration_test/ekranlar_test.dart` ile ekranları gezer ve PNG alır; ardından **gerçek** release uygulamanın ilk/ikinci açılışını ve "hareketi azalt" açılışını gerçek zamanlı `screenrecord` ile kaydeder. Çıktı: iş artefaktı `ake-emulator-kanit` ve push'ta `kanit/pr43-<sha>` dalı. **Ekran yürüyüşündeki ders/soru/istatistikler TEST VERİSİDİR** (`test/sahte_sunucu.dart`, bellek içi); gerçek hesap, Preview girişi ve Production emülatör testinde kullanılmaz. CI emülatörü yazılım GPU'sudur; kare hızı telefonu temsil etmez.
 
 ## iOS
-`ios/` kaynakları `./kur.sh` ile üretilir. Derleme ve imzalama için Mac + Xcode + Apple geliştirici hesabı gerekir; bu depoda iOS derlemesi **yapılmadı**.
+`ios/` kaynakları `./kur.sh` ile üretilir. CI (macOS) imzasız derleme ve simülatör testi yapar. Gerçek cihaz, TestFlight ve App Store için Mac + Xcode + Apple geliştirici hesabı ve imza gerekir; bu adımlar henüz **yapılmadı**.
 
 ## Bilinen sınırlar (bu sürüm)
 - **Web ile eşzamanlı yazma:** yeni web sürümü cevapları yerelde kalıcı olay olarak da tutar; senkronda uzak belgeyi okur, eksik olayları üstüne uygular ve sunucuya koşullu (`_b`) yazar. Çevrimdışı/gönderilmemiş cevaplar ve eskimiş sekmeler mobil ilerlemesini ezmez, mobil de web'inkini ezmez; yanıt kaybolsa çift sayım olmaz (testler: `tests/web-stats-senkron.test.mjs`, ayrıca Preview D1'de doğrulandı). **Kalan sınırlar:** (1) bu değişiklikten önceki, önbellekteki ESKİ web sürümü koşulsuz yazmaya devam eder; yeni web yayınlanıp sekme yenilenince kapanır. (2) Bir cihaz yeni sürümle ilk kez senkron olurken, eski sürümden kalan gönderilmemiş yerel sayaçlar uzak sayaçlarla "büyüğünü koru" kuralıyla birleşir (tek seferlik, en kötü durumda küçük taraftaki artış kaybolabilir). (3) `ans/para/rozet` dışındaki web alanları (sınavlar, yanlışlar defteri vb.) eskisi gibi son-yazan-kazanır.

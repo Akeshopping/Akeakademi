@@ -159,6 +159,43 @@ class HesapDurumu {
   }
 }
 
+class SunucuIslemi {
+  final String platform, urun, plan, durum, bitis;
+  final bool erisim, test;
+  const SunucuIslemi(this.platform, this.urun, this.plan, this.durum, this.bitis, this.erisim, this.test);
+}
+
+/// /api/hesap/magaza: sunucunun bildiği ürünler (plan/dönem), bu hesap için takma adlar ve hesabın mağaza işlemleri.
+class MagazaDurumu {
+  final List<(String, String, String)> urunler; // (id, plan, donem)
+  final String? kimlikGoogle;
+  final String? kimlikApple;
+  final List<SunucuIslemi> islemler;
+  final HesapDurumu? hesap;
+
+  /// Sunucunun GERÇEK hak ayarları (ortamla değişebilir): {ucretsiz:{soru,deneme}, orta:{mesaj,guclu}, premium:{mesaj,guclu}}. Yoksa ekran rakam yazmaz.
+  final Map<String, Map<String, int>> haklar;
+  const MagazaDurumu(this.urunler, this.kimlikGoogle, this.kimlikApple, this.islemler, this.hesap, [this.haklar = const {}]);
+  factory MagazaDurumu.fromJson(Map<String, dynamic> j) {
+    final k = j['hesapKimligi'] is Map ? Map<String, dynamic>.from(j['hesapKimligi'] as Map) : <String, dynamic>{};
+    return MagazaDurumu(
+      [for (final u in (j['urunler'] is List ? j['urunler'] as List : const [])) if (u is Map) ('${u['id']}', '${u['plan']}', '${u['donem']}')],
+      k['google'] == null ? null : '${k['google']}',
+      k['apple'] == null ? null : '${k['apple']}',
+      [
+        for (final i in (j['islemler'] is List ? j['islemler'] as List : const []))
+          if (i is Map) SunucuIslemi('${i['platform']}', '${i['urun']}', '${i['plan']}', '${i['durum']}', '${i['bitis']}', i['erisim'] == true, i['test'] == true)
+      ],
+      HesapDurumu.fromJson({'paket': j['paket']}),
+      {
+        if (j['haklar'] is Map)
+          for (final e in (j['haklar'] as Map).entries)
+            if (e.value is Map) '${e.key}': {for (final h in (e.value as Map).entries) if (h.value is num) '${h.key}': (h.value as num).toInt()}
+      },
+    );
+  }
+}
+
 /// Hesap belgesi + sürümü (koşullu yazma için). [surum] sunucunun `u` değeridir.
 class SurumluBelge {
   final Map<String, dynamic> belge;

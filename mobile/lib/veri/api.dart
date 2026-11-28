@@ -199,12 +199,21 @@ class AkeApi {
 
   // ---------- hesap durumu, veri, AI, hesap silme ----------
   /// Paket, AI kullanımı, ücretsiz haklar (sunucudan).
-  Future<HesapDurumu> hesapDurumu() async => HesapDurumu.fromJson(await _istek('GET', '/api/hesap/ben'));
+  Future<HesapDurumu> hesapDurumu({String? beklenenHesap}) async => HesapDurumu.fromJson(await _istek('GET', '/api/hesap/ben', beklenenHesap: beklenenHesap));
 
   /// Erişim kodunu hesaba bağlar (sunucu doğrular). Yanlış/kullanılmış kod ayrı mesaj vermez.
   Future<HesapDurumu> kodBagla(String kod) async {
     await _istek('POST', '/api/hesap/kod-bagla', govde: {'kod': kod.trim()});
     return hesapDurumu();
+  }
+
+  // ---------- mağaza (Google Play / App Store) ----------
+  /// Mağaza durumu: ürün kimlikleri, bu hesap için takma adlar ve hesabın mağaza işlemleri. Kapalıysa ApiHata(kod: 'kapali').
+  Future<MagazaDurumu> magazaDurumu({String? beklenenHesap}) async => MagazaDurumu.fromJson(await _istek('GET', '/api/hesap/magaza', beklenenHesap: beklenenHesap));
+
+  /// Mağaza işlemini SUNUCUYA doğrulatır (kimlik yalnızca anahtardır). Başarılıysa paket açılmıştır; aksi hâlde ApiHata (govde.sonuc[0].hata).
+  Future<void> magazaDogrula(String platform, String kimlik, {String? beklenenHesap}) async {
+    await _istek('POST', '/api/hesap/magaza/dogrula', govde: {'platform': platform, 'kimlik': kimlik}, beklenenHesap: beklenenHesap);
   }
 
   /// AI öğretmen: sunucu hesabı, paketi ve kotayı denetler. JSON modu (akış yok). Anahtar ve model sunucudadır.

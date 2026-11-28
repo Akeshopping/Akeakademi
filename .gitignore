@@ -7,3 +7,8 @@ fabrika/rapor/son-dogrulama.json
 
 # wrangler yerel durum klasörü (yayına girmesin)
 .wrangler/
+
+# Android imzalama: anahtar/parola repoya GİRMEZ
+*.jks
+*.keystore
+key.properties

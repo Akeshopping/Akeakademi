@@ -1,0 +1,14 @@
+The following plugins do not support Swift Package Manager for ios:
+  - flutter_secure_storage
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Running Xcode build...                                          
+Xcode build done.                                           180.3s
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:51580/ZbwpwKS2G7k=/
+VMServiceFlutterDriver: Isolate found with number: 4068259259542639
+VMServiceFlutterDriver: Isolate 4068259259542639 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+VMServiceFlutterDriver: get_health message is taking a long time to complete...
+VMServiceFlutterDriver: Connected to Flutter application.
+VMServiceFlutterDriver: request_data message is taking a long time to complete...
+All tests passed.

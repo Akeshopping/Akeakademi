@@ -229,7 +229,7 @@ void main() {
 
   for (final g in [320.0, 390.0]) {
     testWidgets('11) Paketler ekranı ${g.toInt()} dp: mağaza fiyatları, geri yükleme, web/Shopier bağlantısı yok, taşma yok', (t) async {
-      t.view.physicalSize = Size(g, 1800);
+      t.view.physicalSize = Size(g, 2800);
       t.view.devicePixelRatio = 1.0;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);

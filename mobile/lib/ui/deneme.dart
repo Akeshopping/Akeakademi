@@ -171,6 +171,10 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
                     ),
                   ]),
                 ),
+                if (hakYok) ...[
+                  const SizedBox(height: 10),
+                  AkeDugme('Paketleri gör', key: const ValueKey('deneme-paketler'), tur: DugmeTuru.cizgili, basinca: () => widget.model.menuyeGit(MenuSayfasi.paket)),
+                ],
                 const SizedBox(height: 12),
                 KartKutu(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -244,10 +248,6 @@ class _DenemeSekmesiState extends State<DenemeSekmesi> {
                 if (_gecmis.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   DenemeGecmisiKarti(denemeler: _gecmis),
-                ],
-                if (hakYok) ...[
-                  const SizedBox(height: 12),
-                  AkeDugme('Paketleri gör', key: const ValueKey('deneme-paketler'), tur: DugmeTuru.cizgili, basinca: () => widget.model.menuyeGit(MenuSayfasi.paket)),
                 ],
                 const SizedBox(height: 10),
                 Text('Canlı deneme bu sürümde yok. Deneme sonucu bitince Gelişim geçmişine kaydedilir.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),

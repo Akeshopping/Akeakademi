@@ -202,7 +202,7 @@ void main() {
 
   group('AI öğretmen', () {
     testWidgets('ücretsiz öğrenci AI kapısından Paketler sayfasına gider', (t) async {
-      final s = SahteSunucu();
+      final s = SahteSunucu()..magazaModu = 'kapali'; // ödeme kapalı önizleme: fayda özeti var, fiyat/satın alma düğmesi yok
       final m = await ac(t, s);
       await sekme(t, 3);
       expect(find.byKey(const ValueKey('ai-kapi')), findsOneWidget);

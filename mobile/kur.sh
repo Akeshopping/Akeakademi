@@ -14,6 +14,8 @@ if m.exists():
     if 'android.permission.INTERNET' not in s:
         s = s.replace('<application', '<uses-permission android:name="android.permission.INTERNET"/>\n    <application', 1)
     s = re.sub(r'android:label="[^"]*"', 'android:label="AKE Akademi"', s, count=1)
+    if 'com.android.vending.BILLING' not in s:   # Google Play Billing (eklenti de ekler; açıkça yazmak denetimi kolaylaştırır)
+        s = s.replace('<application', '<uses-permission android:name="com.android.vending.BILLING"/>\n    <application', 1)
     if 'android:allowBackup' not in s:
         s = s.replace('<application', '<application android:allowBackup="false"', 1)
     m.write_text(s, encoding='utf-8')
@@ -34,6 +36,7 @@ if p.exists():
     p.write_text(s, encoding='utf-8')
 print('Platform ayarları uygulandı.')
 PY
+python3 tool/android_imza_ayari.py   # release imzası key.properties'ten; anahtar yoksa AAB imzasız (repoda anahtar YOK)
 python3 kur_ikon.py   # sitedeki K amblemi: başlatıcı ikonu + koyu açılış zemini
 rm -f test/widget_test.dart   # flutter create şablon testi (bu uygulamaya ait değil)
 flutter pub get

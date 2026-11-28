@@ -523,4 +523,117 @@ void main() {
     expect(find.byKey(const ValueKey('paket-eski')), findsNothing);
     expect(t.takeException(), isNull);
   });
+
+  // ---------- eski bilgi / doğrulanamayan işlem varken yeni satın alma kapalı ----------
+  test('23) ağ kesintisi → eski bilgi → satın alma engeli → bağlantı gelince tazeleme → yeniden açılır', () async {
+    final (o, s, k) = await _kur();
+    expect(o.satinAlmaEngelli, false);
+    s.magazaGetAgYok = true;
+    await o.tazele();
+    expect(o.eskimis, true);
+    expect(o.satinAlmaEngelli, true);
+    await o.satinAl('premium_aylik');
+    expect(k.satinAlmalar, isEmpty, reason: 'eski bilgiyle yeni ödeme başlatılmaz (model katmanı)');
+    expect(o.islemdeUrun, isNull);
+    await o.tazele(); // hâlâ ağ yok
+    expect(o.satinAlmaEngelli, true);
+    s.magazaGetAgYok = false;
+    await o.tazele();
+    expect(o.eskimis, false);
+    expect(o.satinAlmaEngelli, false);
+    await o.satinAl('premium_aylik');
+    expect(k.satinAlmalar.length, 1, reason: 'başarılı tazelemeden sonra satın alma yeniden açılır');
+  });
+
+  test('24) doğrulanamayan işlem korunur: yeni satın alma onu silmez; yalnız sunucu doğrulayınca kalkar', () async {
+    final (o, s, k) = await _kur();
+    s.magazaGercek.add('u-1');
+    s.magazaAgHatasi = 1;
+    k.satinAlYaniti = (u) => k.olay(_alindi('u-1', urun: u));
+    await o.satinAl('premium_aylik');
+    await _bosalt();
+    expect(o.dogrulanamayan?.kimlik, 'u-1');
+    expect(o.satinAlmaEngelli, true);
+    expect(k.satinAlmalar.length, 1);
+    // yeni satın alma denemesi: mağazaya gitmez, kayıt silinmez
+    await o.satinAl('atilim_aylik');
+    expect(k.satinAlmalar.length, 1);
+    expect(o.dogrulanamayan?.kimlik, 'u-1');
+    // başarılı tazeleme çözülmemiş işlemi silmez, satın almayı da açmaz
+    await o.tazele();
+    expect(o.eskimis, false);
+    expect(o.dogrulanamayan?.kimlik, 'u-1');
+    expect(o.satinAlmaEngelli, true);
+    // "Geri yükle" mağazadan işlem getirmezse kayıt yine kalır
+    await o.geriYukle();
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    expect(o.dogrulanamayan?.kimlik, 'u-1');
+    expect(o.satinAlmaEngelli, true);
+    // sunucu doğrulayınca kayıt kalkar, satın alma yeniden açılır
+    await o.yenidenDene();
+    await _bosalt();
+    expect(o.dogrulanamayan, isNull);
+    expect(k.tamamlananlar.length, 1);
+    expect(o.hesap?.paketli, true);
+    expect(o.satinAlmaEngelli, false);
+    k.satinAlYaniti = null;
+    await o.satinAl('premium_yillik');
+    expect(k.satinAlmalar.length, 2);
+  });
+
+  testWidgets('25) Paketler: ağ kesintisi uyarısı + satın alma kilidi; bağlantı gelince Tekrar dene kilidi açar', (t) async {
+    final (m, s, k) = await ekranKur(t);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-engel')), findsNothing);
+    s.magazaGetAgYok = true;
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-eski')), findsOneWidget);
+    expect(find.byKey(const ValueKey('paket-engel')), findsOneWidget);
+    await t.ensureVisible(find.byKey(const ValueKey('paket-satin-premium_aylik')));
+    await t.tap(find.byKey(const ValueKey('paket-satin-premium_aylik')), warnIfMissed: false);
+    await t.pumpAndSettle();
+    expect(k.satinAlmalar, isEmpty, reason: 'düğme kilitli: mağaza penceresi açılmaz');
+    s.magazaGetAgYok = false;
+    await t.ensureVisible(find.byKey(const ValueKey('paket-tazele')));
+    await t.tap(find.byKey(const ValueKey('paket-tazele')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-eski')), findsNothing);
+    expect(find.byKey(const ValueKey('paket-engel')), findsNothing);
+    await t.ensureVisible(find.byKey(const ValueKey('paket-satin-premium_aylik')));
+    await t.tap(find.byKey(const ValueKey('paket-satin-premium_aylik')));
+    await t.pumpAndSettle();
+    expect(k.satinAlmalar.length, 1, reason: 'tazeleme başarılı: satın alma yeniden açıldı');
+    expect(t.takeException(), isNull);
+  });
+
+  testWidgets('26) Paketler: doğrulanamayan ödeme varken yeni satın alma kapalı, "Yeniden dene" yolu gösterilir', (t) async {
+    final (m, s, k) = await ekranKur(t);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    s.magazaGercek.add('w-1');
+    s.magazaAgHatasi = 1;
+    k.satinAlYaniti = (u) => k.olay(_alindi('w-1', urun: u));
+    await t.ensureVisible(find.byKey(const ValueKey('paket-satin-premium_aylik')));
+    await t.tap(find.byKey(const ValueKey('paket-satin-premium_aylik')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-yeniden')), findsOneWidget);
+    expect(find.textContaining('henüz doğrulanamadı'), findsOneWidget);
+    await t.ensureVisible(find.byKey(const ValueKey('paket-satin-atilim_aylik')));
+    await t.tap(find.byKey(const ValueKey('paket-satin-atilim_aylik')), warnIfMissed: false);
+    await t.pumpAndSettle();
+    expect(k.satinAlmalar.length, 1, reason: 'ikinci satın alma başlamadı');
+    expect(find.byKey(const ValueKey('paket-yeniden')), findsOneWidget, reason: 'çözülmemiş işlem silinmedi');
+    await t.ensureVisible(find.byKey(const ValueKey('paket-yeniden')));
+    await t.tap(find.byKey(const ValueKey('paket-yeniden')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-yeniden')), findsNothing);
+    expect(find.byKey(const ValueKey('paket-engel')), findsNothing);
+    expect(find.textContaining('Premium paketindesin'), findsOneWidget);
+    expect(m.odeme!.satinAlmaEngelli, false);
+    expect(t.takeException(), isNull);
+  });
 }

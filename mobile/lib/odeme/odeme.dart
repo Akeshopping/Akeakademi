@@ -125,12 +125,15 @@ class OdemeModeli extends ChangeNotifier {
 
   bool get mesgul => islemdeUrun != null || _surenler.isNotEmpty || _geriYukleniyor;
 
+  /// Yeni satın alma kapalı: ekrandaki bilgi eski olabilir (son tazeleme başarısız) ya da mağazanın aldığı bir ödeme henüz
+  /// sunucuya doğrulatılamadı. İkincisinde yeni satın alma o kaydı silmez; önce "Yeniden dene" ya da "Geri yükle" kullanılır.
+  bool get satinAlmaEngelli => eskimis || dogrulanamayan != null;
+
   Future<void> satinAl(String urunId) async {
-    if (_kapandi || faz != OdemeFazi.hazir || mesgul || hesapKimligi == null) return;
+    if (_kapandi || faz != OdemeFazi.hazir || mesgul || hesapKimligi == null || satinAlmaEngelli) return;
     islemdeUrun = urunId;
     bekliyor = false;
     mesaj = '';
-    dogrulanamayan = null;
     notifyListeners();
     try {
       await koprusu.satinAl(urunId, hesapKimligi!);
@@ -146,8 +149,8 @@ class OdemeModeli extends ChangeNotifier {
     _geriYukleniyor = true;
     _geriYuklenen = 0;
     mesaj = '';
-    dogrulanamayan = null;
-    notifyListeners();
+    notifyListeners(); // çözülmemiş işlem kaydı (dogrulanamayan) burada SİLİNMEZ; yalnız sunucu o işlemi doğrulayınca kalkar
+
     try {
       await koprusu.geriYukle();
     } catch (_) {
@@ -214,6 +217,7 @@ class OdemeModeli extends ChangeNotifier {
       if (_kapandi) return; // Hesap değiştiyse eski ekrandan mağaza işlemini tamamlama.
       await koprusu.tamamla(o);
       if (_kapandi) return;
+      if (dogrulanamayan?.kimlik == o.kimlik) dogrulanamayan = null; // çözüldü
       islemdeUrun = null;
       _geriYukleniyor = false;
       await yenile();

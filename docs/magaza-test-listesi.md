@@ -13,6 +13,8 @@ Her satırda: ✅ geçti / ❌ kaldı + ekran görüntüsü. Kalan satırın ne 
 | A3 | Atılım aylık → satın al → Play penceresi → onayla | "Paketin açıldı"; Paketler "Atılım paketindesin · … tarihine kadar"; "TEST satın alması" notu |
 | A3b | Play onay penceresi açıkken Paketler'den Menü'ye dön; mağaza olayı geldikten sonra Paketler'i yeniden aç | Satın alma yine doğrulanır, paket görünür; ikinci kez sayılmaz |
 | A3c | Paketler açıkken uygulamayı arka plana at, Play'den (veya sunucudan) aboneliği iptal/iade ettir, uygulamaya dön; ayrıca Paketler'den çıkıp yeniden gir | Ekran kendiliğinden tazelenir: iade/süre bitiminde paket kapanır; uçak modunda "bilgi eski olabilir" uyarısı + Tekrar dene çıkar |
+| A3d | Uçak modunda Paketler'i yeniden aç; sonra bağlantıyı aç ve "Tekrar dene"ye bas | Uyarı çıkar, satın alma düğmeleri kilitli; Tekrar dene başarılı olunca düğmeler açılır |
+| A3e | Ödeme sonrası sunucuya ulaşılamasın (uçak modu); "doğrulanamadı" çıkınca yeni paket almayı dene | Yeni satın alma kapalı; bağlantı gelince "Yeniden dene" ile paket açılır, sonra satın alma yeniden açılır |
 | A4 | Ayarlar → hesap durumu | Paketli hesap görünür; AI öğretmen açılır |
 | A5 | Uygulamayı kapat-aç | Paket yerinde |
 | A6 | Premium yıllık satın al (yükseltme) | Premium görünür |
@@ -35,6 +37,8 @@ Her satırda: ✅ geçti / ❌ kaldı + ekran görüntüsü. Kalan satırın ne 
 | I3 | Atılım aylık → satın al → Sandbox onay penceresi ("[Environment: Sandbox]") | "Paketin açıldı"; paket görünür |
 | I3b | Onay sırasında Paketler'den Menü'ye dön; işlem tamamlanınca Paketler'i yeniden aç | Paket doğrulanır; başka hesapta erişim açılmaz |
 | I3c | Paketler açıkken arka plana at, abonelik durumu değişince (iptal/iade/süre bitimi) geri dön; Paketler'i kapatıp yeniden aç | Durum tazelenir; uçak modunda "bilgi eski olabilir" uyarısı çıkar |
+| I3d | A3d ile aynı (iPhone) | Aynı beklenti |
+| I3e | A3e ile aynı (iPhone) | Aynı beklenti |
 | I4 | Uygulamayı kapat-aç | Paket yerinde |
 | I5 | Satın alma penceresinde **İptal** | "Satın alma iptal edildi"; paket değişmez |
 | I6 | Uçak modu senaryosu (A9 ile aynı) | "doğrulanamadı" + Yeniden dene; sonra açılır |

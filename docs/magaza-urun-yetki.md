@@ -7,6 +7,8 @@ Mobil uygulama mağaza olaylarını giriş yapılmış hesap boyunca dinler; Pak
 
 Paketler ekranı her açılışta ve ekran açıkken uygulama arka plandan dönünce abonelik durumunu sunucudan tazeler (`OdemeModeli.tazele`). Eşzamanlı okumalarda yalnız en son başlayan yanıt uygulanır; süren satın alma, bekleyen onay ve "Yeniden dene" korunur. Ağ hatasında eski bilgi "eski olabilir" uyarısıyla ve Tekrar dene düğmesiyle gösterilir. Hesap değişince/çıkışta eski hesabın yanıtı atılır.
 
+Yeni satın alma, ekrandaki bilgi eskiyken (son tazeleme başarısız) ya da doğrulanamamış bir mağaza işlemi varken kapalıdır (arayüzde ve `OdemeModeli.satinAl` içinde). Doğrulanamamış işlem kaydı yeni satın almayla, tazelemeyle ya da boş bir "Geri yükle" ile silinmez; yalnız sunucu o işlemi doğrulayınca kalkar. Başarılı tazelemeden ve çözülmemiş işlem kalmayınca satın alma yeniden açılır.
+
 ## 1) Paketler ve yetkiler
 
 | | Ücretsiz | Atılım | Premium |

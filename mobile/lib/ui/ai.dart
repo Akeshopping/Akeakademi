@@ -18,7 +18,7 @@ class _Mesaj {
 }
 
 /// "AI" sekmesi: gerçek /api/ai çağrısı. Hesap, paket ve aylık hak SUNUCUDA denetlenir; paket yoksa erişim kodu girilebilir.
-/// Ödeme/paket satın alma bu sürümde yok. Görsel yükleme, akış (yazıyor…) ve sohbet geçmişi saklama yok.
+/// Görsel yükleme, akış (yazıyor…) ve sohbet geçmişi saklama yok.
 class AiSekmesi extends StatefulWidget {
   final UygulamaModeli model;
   const AiSekmesi({super.key, required this.model});
@@ -36,24 +36,37 @@ class _AiSekmesiState extends State<AiSekmesi> {
   bool _kodGonderiliyor = false;
   String? _kodHatasi;
   HesapDurumu? _guncel;
+  late int _sonSekme;
+  int _nesil = 0; // yalnız en son başlatılan hesap okuması _guncel'i değiştirir (geç gelen eski yanıt yenisini ezmez)
 
   @override
   void initState() {
     super.initState();
     _durum = _yukle();
+    _sonSekme = widget.model.sekme;
+    widget.model.addListener(_sekmeDegisti);
   }
 
   @override
   void dispose() {
+    widget.model.removeListener(_sekmeDegisti);
     _girdi.dispose();
     _kod.dispose();
     _kaydirma.dispose();
     super.dispose();
   }
 
+  void _sekmeDegisti() {
+    final yeni = widget.model.sekme;
+    if (yeni == _sonSekme) return;
+    _sonSekme = yeni;
+    if (yeni == 3 && mounted) _yenile(); // Paketler'den dönünce yeni satın alınan erişimi göster.
+  }
+
   Future<HesapDurumu> _yukle() async {
-    final d = await widget.model.api.hesapDurumu();
-    _guncel = d;
+    final n = ++_nesil;
+    final d = await widget.model.api.hesapDurumu(beklenenHesap: widget.model.kullanici?.id); // hesap değiştiyse istek hiç atılmaz
+    if (n == _nesil && mounted) _guncel = d;
     return d;
   }
 
@@ -162,8 +175,12 @@ class _AiSekmesiState extends State<AiSekmesi> {
               const Expanded(child: Text('Paketli hesaplara açık', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
             ]),
             const SizedBox(height: 10),
-            Text('AI öğretmen soru çözümünü adım adım anlatır. Bu hesapta aktif paket yok. Erişim kodun varsa aşağıya yazıp hesabına bağlayabilirsin.', style: TextStyle(color: t.murekkep2, height: 1.45)),
+            Text('AI öğretmenle konu çalışabilir ve sorularını sorabilirsin. Aylık mesaj hakkı pakete göre değişir; Paketler ekranında güncel hakkı görürsün.', style: TextStyle(color: t.murekkep2, height: 1.45)),
             const SizedBox(height: 14),
+            AkeDugme('Paketleri gör', key: const ValueKey('ai-paketler'), basinca: () => widget.model.menuyeGit(MenuSayfasi.paket)),
+            const SizedBox(height: 18),
+            Text('Erişim kodun varsa hesabına bağla:', style: TextStyle(color: t.murekkep2)),
+            const SizedBox(height: 10),
             TextField(
               key: const ValueKey('ai-kod'),
               controller: _kod,
@@ -176,8 +193,6 @@ class _AiSekmesiState extends State<AiSekmesi> {
             if (_kodHatasi != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_kodHatasi!, style: TextStyle(color: t.yanlis))),
             const SizedBox(height: 12),
             AkeDugme(_kodGonderiliyor ? 'Bağlanıyor…' : 'Kodu bağla', basinca: _kodGonderiliyor ? null : _kodBagla),
-            const SizedBox(height: 10),
-            Text('Paket satın alma bu uygulamada henüz yok; ayrı, doğrulanabilir bir iş olarak yapılacak.', style: TextStyle(color: t.murekkep3, fontSize: 12.5, height: 1.4)),
           ]),
         ),
       ],

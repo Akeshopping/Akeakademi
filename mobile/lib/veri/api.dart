@@ -199,7 +199,7 @@ class AkeApi {
 
   // ---------- hesap durumu, veri, AI, hesap silme ----------
   /// Paket, AI kullanımı, ücretsiz haklar (sunucudan).
-  Future<HesapDurumu> hesapDurumu() async => HesapDurumu.fromJson(await _istek('GET', '/api/hesap/ben'));
+  Future<HesapDurumu> hesapDurumu({String? beklenenHesap}) async => HesapDurumu.fromJson(await _istek('GET', '/api/hesap/ben', beklenenHesap: beklenenHesap));
 
   /// Erişim kodunu hesaba bağlar (sunucu doğrular). Yanlış/kullanılmış kod ayrı mesaj vermez.
   Future<HesapDurumu> kodBagla(String kod) async {

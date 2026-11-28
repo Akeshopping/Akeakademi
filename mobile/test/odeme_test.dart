@@ -61,6 +61,31 @@ void main() {
     expect(o.islemdeUrun, isNull);
   });
 
+  test('2b) etkin mağaza aboneliği varken ayrı ürüne ikinci satın alma başlatılmaz', () async {
+    final (o, s, k) = await _kur();
+    s.magazaGercek.add('belirtec-ilk');
+    k.satinAlYaniti = (u) => k.olay(_alindi('belirtec-ilk', urun: u));
+    await o.satinAl('atilim_aylik');
+    await _bosalt();
+    expect(o.aktifMagazaAboneligi, true);
+    expect(o.satinAlmaEngelli, true);
+    await o.satinAl('premium_aylik');
+    expect(k.satinAlmalar.length, 1, reason: 'ikinci mağaza ürünü iki ayrı tahsilat başlatamaz');
+    s.magazaPaketAcik = false; // süre bitince, sunucu mağazadan güncel durumu döndürür
+    await o.tazele();
+    expect(o.aktifMagazaAboneligi, false);
+  });
+
+  test('2c) yalnız erişim koduyla paketliyken mağaza aboneliği satın alınabilir', () async {
+    final (o, s, k) = await _kur();
+    s.paketli = true; // mağaza işlem satırı yok, koddan gelen erişim
+    await o.tazele();
+    expect(o.hesap?.paketli, true);
+    expect(o.aktifMagazaAboneligi, false);
+    await o.satinAl('atilim_aylik');
+    expect(k.satinAlmalar.length, 1);
+  });
+
   test('3) sunucu reddederse paket AÇILMAZ ve işlem tamamlanmaz (uygulamanın "aldım" demesi yetmez)', () async {
     final (o, s, k) = await _kur();
     k.olay(_alindi('uydurma-belirtec')); // mağazada böyle bir işlem yok
@@ -232,6 +257,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('paket-durum')), findsOneWidget);
       expect(find.textContaining('Premium paketindesin'), findsOneWidget);
+      expect(find.byKey(const ValueKey('paket-engel')), findsOneWidget, reason: 'aktif aboneliğe ikinci mağaza satın alması yok');
       expect(find.byKey(const ValueKey('paket-test')), findsOneWidget);
       expect(t.takeException(), isNull);
     });
@@ -569,16 +595,17 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 80));
     expect(o.dogrulanamayan?.kimlik, 'u-1');
     expect(o.satinAlmaEngelli, true);
-    // sunucu doğrulayınca kayıt kalkar, satın alma yeniden açılır
+    // Sunucu doğrulayınca kayıt kalkar; artık etkin abonelik olduğundan ikinci ürün kapalıdır.
     await o.yenidenDene();
     await _bosalt();
     expect(o.dogrulanamayan, isNull);
     expect(k.tamamlananlar.length, 1);
     expect(o.hesap?.paketli, true);
-    expect(o.satinAlmaEngelli, false);
+    expect(o.satinAlmaEngelli, true);
+    expect(o.aktifMagazaAboneligi, true);
     k.satinAlYaniti = null;
     await o.satinAl('premium_yillik');
-    expect(k.satinAlmalar.length, 2);
+    expect(k.satinAlmalar.length, 1, reason: 'başarılı doğrulamadan sonra ikinci abonelik başlatılmaz');
   });
 
   testWidgets('25) Paketler: ağ kesintisi uyarısı + satın alma kilidi; bağlantı gelince Tekrar dene kilidi açar', (t) async {
@@ -631,9 +658,107 @@ void main() {
     await t.tap(find.byKey(const ValueKey('paket-yeniden')));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('paket-yeniden')), findsNothing);
-    expect(find.byKey(const ValueKey('paket-engel')), findsNothing);
+    expect(find.byKey(const ValueKey('paket-engel')), findsOneWidget, reason: 'etkin abonelik varken ikinci tahsilat kapalı');
     expect(find.textContaining('Premium paketindesin'), findsOneWidget);
-    expect(m.odeme!.satinAlmaEngelli, false);
+    expect(m.odeme!.aktifMagazaAboneligi, true);
+    expect(t.takeException(), isNull);
+  });
+
+  // ---------- hak vaatleri, fiyat/dönem, abonelik yönetimi, ödeme kapalı önizleme ----------
+  test('27) hak rakamları sunucunun gerçek ayarından gelir; sunucu göndermiyorsa rakam yok', () async {
+    final (o, s, _) = await _kur();
+    expect([o.hak('orta', 'mesaj'), o.hak('premium', 'mesaj'), o.hak('ucretsiz', 'soru')], [200, 500, 20]);
+    s.magazaHaklar = {'orta': {'mesaj': 150}, 'premium': {'mesaj': 400}};
+    await o.yenile();
+    expect([o.hak('orta', 'mesaj'), o.hak('premium', 'mesaj'), o.hak('ucretsiz', 'soru')], [150, 400, null]);
+    s.magazaHaklar = null;
+    await o.yenile();
+    expect(o.hak('orta', 'mesaj'), isNull);
+  });
+
+  test('28) hesap değiştiyse hak okuması hiç istek atmaz (başka hesabın hakkı gösterilmez)', () async {
+    final s = SahteSunucu(), api = _api(s);
+    await api.anahtariYukle();
+    await api.ben();
+    final once = s.istekler.length;
+    await expectLater(api.hesapDurumu(beklenenHesap: 'baska-hesap'), throwsA(isA<ApiHata>().having((e) => e.kod, 'kod', 'hesap_degisti')));
+    expect(s.istekler.length, once);
+  });
+
+  test('29) abonelik yönetim adresi: sabit https, kişisel veri yok', () {
+    final g = abonelikAdresi('google'), a = abonelikAdresi('apple');
+    expect([g.scheme, g.host, g.path, g.queryParameters['package']], ['https', 'play.google.com', '/store/account/subscriptions', 'com.akeakademi.ake_akademi']);
+    expect([a.scheme, a.host, a.path], ['https', 'apps.apple.com', '/account/subscriptions']);
+    expect(g.toString(), isNot(contains('@')));
+  });
+
+  testWidgets('30) Paketler: gerçek fiyat + tahsilat dönemi, vaatler sunucu rakamından; rakam yoksa uydurulmaz', (t) async {
+    final (m, s, _) = await ekranKur(t);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('₺199,00 / ay'), findsOneWidget);
+    expect(find.textContaining('₺2.189,00 / yıl'), findsOneWidget);
+    expect(find.textContaining('ayda 200 AI öğretmen mesajı'), findsOneWidget);
+    expect(find.textContaining('ayda 500 AI öğretmen mesajı'), findsOneWidget);
+    expect(find.textContaining('Günde 20 soru, ayda 1 deneme'), findsOneWidget);
+    expect(find.textContaining('gelişmiş çözüm', findRichText: true), findsNothing, reason: 'mobilde olmayan özellik vaat edilmez');
+    s.magazaHaklar = {'orta': {'mesaj': 150}, 'premium': {'mesaj': 400}, 'ucretsiz': {'soru': 10, 'deneme': 2}};
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('ayda 150 AI öğretmen mesajı'), findsOneWidget);
+    expect(find.textContaining('Günde 10 soru, ayda 2 deneme'), findsOneWidget);
+    s.magazaHaklar = null;
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('AI öğretmen mesaj hakkı'), findsWidgets);
+    expect(find.textContaining('ayda 150'), findsNothing);
+    expect(t.takeException(), isNull);
+  });
+
+  testWidgets('31) ödeme kapalıyken fayda özeti görünür; fiyat ve satın alma düğmesi YOK', (t) async {
+    final (m, s, _) = await ekranKur(t);
+    s.magazaModu = 'kapali';
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-kapali')), findsOneWidget);
+    expect(find.textContaining('Atılım: sınırsız soru ve deneme'), findsOneWidget);
+    expect(find.textContaining('₺'), findsNothing);
+    expect(find.byWidgetPredicate((w) => w.key is ValueKey && '${(w.key as ValueKey).value}'.startsWith('paket-satin-')), findsNothing);
+    expect(t.takeException(), isNull);
+  });
+
+  testWidgets('32) etkin abonelik: yenileme/iptal bilgisi ve ÇALIŞAN "Aboneliğimi yönet"; açılamazsa elle yol', (t) async {
+    final (m, s, k) = await ekranKur(t, paketAcik: true);
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-abonelik-bilgi')), findsOneWidget);
+    expect(find.textContaining('kendiliğinden yenilenir'), findsWidgets);
+    await t.ensureVisible(find.byKey(const ValueKey('paket-yonet')));
+    await t.tap(find.byKey(const ValueKey('paket-yonet')));
+    await t.pumpAndSettle();
+    expect(k.yonetAcilis, 1);
+    k.yonetAcilir = false;
+    await t.tap(find.byKey(const ValueKey('paket-yonet')));
+    await t.pumpAndSettle();
+    expect(k.yonetAcilis, 2);
+    expect(find.textContaining('Abonelik sayfası açılamadı'), findsOneWidget);
+    // iptal edilmiş: süre bitene dek erişim, yenilenmez
+    s.magazaAktifDurum = 'iptal';
+    m.menuyeGit(null);
+    await t.pumpAndSettle();
+    m.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.textContaining('iptal edilmiş'), findsOneWidget);
+    expect(find.textContaining('sonra yenilenmez'), findsOneWidget);
+    // ücretsiz hesapta yönetim düğmesi yok
+    final (m2, _, _) = await ekranKur(t);
+    m2.menuyeGit(MenuSayfasi.paket);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('paket-yonet')), findsNothing);
     expect(t.takeException(), isNull);
   });
 }

@@ -9,6 +9,10 @@ Paketler ekranı her açılışta ve ekran açıkken uygulama arka plandan dön�
 
 Yeni satın alma, ekrandaki bilgi eskiyken (son tazeleme başarısız) ya da doğrulanamamış bir mağaza işlemi varken kapalıdır (arayüzde ve `OdemeModeli.satinAl` içinde). Doğrulanamamış işlem kaydı yeni satın almayla, tazelemeyle ya da boş bir "Geri yükle" ile silinmez; yalnız sunucu o işlemi doğrulayınca kalkar. Başarılı tazelemeden ve çözülmemiş işlem kalmayınca satın alma yeniden açılır.
 
+Etkin bir **mağaza** aboneliği varken ikinci ürünü satın alma da kapalıdır; ayrı ürünler arasında değişim bu sürümde uygulanmadı. Böylece Atılım → Premium gibi bir seçim yanlışlıkla iki ayrı yenilenen abonelik başlatmaz. Yalnız erişim kodu ile paketli olmak bu kısıtı tetiklemez; kullanıcı isterse mağaza aboneliği başlatabilir. Paket değiştirme işlemi için mağazaların geçiş/yenileme akışı ayrıca uygulanıp gerçek sandbox'ta denenmelidir.
+
+Ücretsiz soru veya deneme hakkı bittiğinde ve AI öğretmen kapısında "Paketleri gör" bağlantısı bulunur. Paket satın alma kapalıyken bile özellik karşılaştırması gösterilir; fiyat ve satın alma düğmesi yalnız mağaza/sunucu hazırsa görünür. Mağaza fiyatının yanında aylık/yıllık faturalama dönemi belirtilir.
+
 ## 1) Paketler ve yetkiler
 
 | | Ücretsiz | Atılım | Premium |
@@ -16,11 +20,12 @@ Yeni satın alma, ekrandaki bilgi eskiyken (son tazeleme başarısız) ya da do�
 | Soru çözme | günde 20 | sınırsız | sınırsız |
 | Deneme | ayda 1 | sınırsız | sınırsız |
 | AI öğretmen mesajı (aylık) | yok | 200 | 500 |
-| Gelişmiş çözüm (aylık) | yok | 20 | 60 |
+| Gelişmiş çözüm sunucu hakkı (aylık) | yok | 20 | 60 |
 | Çalışma planı, odak odası, gelişim | var | var | var |
 | Sunucudaki plan adı | – | `orta` | `premium` |
 
-Sayılar sunucudaki mevcut ayarlardır (`limitler()`); bu belge onları değiştirmez.
+Sayılar sunucudaki mevcut ayarlardır (`limitler()`, `ucretsizLimit()`; ortam değişkeniyle değişir). Paketler ekranındaki hak rakamları SABİT değildir: `GET /api/hesap/magaza` yanıtındaki `haklar` alanından yazılır; sunucu göndermezse ekran rakam yazmaz.
+Mobil AI ekranı bu turda yalnız hızlı sohbet çağrısını kullanır; gelişmiş çözüm seçicisi henüz yok. Paketler ekranı bu hakkı satın alma vaadi olarak göstermez.
 
 ## 2) Ürünler (iki mağazada AYNI kimlik)
 
@@ -64,3 +69,5 @@ Fiyatı **mağaza** belirler ve uygulama ekranda mağazanın verdiği fiyatı g�
 
 Sunucuda `AKE_MAGAZA` tanımlı değilse bütün mağaza uçları `503 kapali` döner ve uygulamada Paketler ekranı "henüz açık değil" der.
 `AKE_MAGAZA=sandbox` → yalnızca mağaza **test** işlemleri kabul edilir (gerçek tahsilatlı işlem reddedilir). `canli` → yayın sonrası için; bu turda kullanılmaz.
+
+Paketler ekranında mağazanın döndürdüğü gerçek fiyat ve tahsilat dönemi (ay/yıl) yazar; mağazada henüz olmayan ürün için fiyat uydurulmaz. Etkin mağaza aboneliği varken otomatik yenileme/iptal bilgisi ve çalışan "Aboneliğimi yönet" düğmesi (Google Play / App Store abonelik sayfası, sabit https adresi; açılamazsa elle yol tarifi) gösterilir. Ödeme kapalıyken yalnız fayda özeti görünür.

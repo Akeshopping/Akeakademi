@@ -2,9 +2,16 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Sunucunun bildiği abonelik ürün kimlikleri (lib/magaza.js URUNLER ile AYNI; Play Console abonelik kimliği ve App Store Connect ürün kimliği olarak oluşturulur).
 const magazaUrunKimlikleri = <String>['atilim_aylik', 'atilim_yillik', 'premium_aylik', 'premium_yillik'];
+
+/// Mağazanın abonelik yönetim sayfası (iptal / yenileme / ödeme yöntemi). SABİT https adresleri; kişisel veri taşımaz.
+const androidPaketKimligi = 'com.akeakademi.ake_akademi';
+Uri abonelikAdresi(String platform) => platform == 'apple'
+    ? Uri.parse('https://apps.apple.com/account/subscriptions')
+    : Uri.parse('https://play.google.com/store/account/subscriptions?package=$androidPaketKimligi');
 
 /// Mağazadan okunan ürün: ad ve FİYAT mağazanın kendi metnidir (uygulama fiyat yazmaz, yerel para birimi ve vergi mağazadan gelir).
 class MagazaUrunu {
@@ -36,6 +43,9 @@ abstract class MagazaKoprusu {
   Future<List<MagazaUrunu>> urunleriOku(Set<String> idler);
   Future<void> satinAl(String urunId, String hesapKimligi);
   Future<void> geriYukle();
+
+  /// Mağazanın abonelik yönetim sayfasını açar. Açılamazsa false (ekran elle yol tarif eder).
+  Future<bool> abonelikleriYonet();
 
   /// Mağazaya "bu işlemi tamamladım" der (Android'de onay/acknowledge, iOS'ta işlemi bitirir). YALNIZCA sunucu doğruladıktan sonra çağrılır.
   Future<void> tamamla(MagazaOlayi olay);
@@ -94,6 +104,15 @@ class GercekMagazaKoprusu implements MagazaKoprusu {
 
   @override
   Future<void> geriYukle() => _iap.restorePurchases();
+
+  @override
+  Future<bool> abonelikleriYonet() async {
+    try {
+      return await launchUrl(abonelikAdresi(platform), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      return false;
+    }
+  }
 
   @override
   Future<void> tamamla(MagazaOlayi olay) async {

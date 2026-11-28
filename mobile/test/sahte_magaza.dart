@@ -46,6 +46,14 @@ class SahteMagaza implements MagazaKoprusu {
     if (y != null) scheduleMicrotask(y);
   }
 
+  int yonetAcilis = 0;
+  bool yonetAcilir = true;
+  @override
+  Future<bool> abonelikleriYonet() async {
+    yonetAcilis++;
+    return yonetAcilir;
+  }
+
   @override
   Future<void> tamamla(MagazaOlayi olay) async => tamamlananlar.add(olay);
   @override

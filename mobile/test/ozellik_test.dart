@@ -93,6 +93,20 @@ void main() {
   });
 
   group('Soru Çözüm Merkezi', () {
+    testWidgets('ücretsiz soru hakkı bitince Paketler ekranına geçilir, yarın devam seçeneği kalır', (t) async {
+      final s = SahteSunucu()..limitDoldu = true;
+      final m = await ac(t, s);
+      await sekme(t, 1);
+      await t.tap(find.byKey(const ValueKey('soru-sekme-2')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('paragraf-baslat')));
+      await t.pumpAndSettle();
+      expect(find.text('Ücretsiz hakkın bitti'), findsOneWidget);
+      expect(find.text('Geri dön'), findsOneWidget);
+      await t.tap(find.text('Paketleri gör'));
+      await t.pumpAndSettle();
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+    });
     testWidgets('Soru ara: kelime sunucuya `ara` olarak gider; Paragraf sekmesi konu filtresiyle başlar', (t) async {
       final s = SahteSunucu();
       await ac(t, s);
@@ -159,12 +173,19 @@ void main() {
 
     testWidgets('ücretsiz deneme hakkı bitince başlatma düğmesi pasif', (t) async {
       final s = SahteSunucu()..kalanDeneme = 0;
-      await ac(t, s);
+      final m = await ac(t, s);
       await sekme(t, 2);
       expect(find.textContaining('hakkın bitti'), findsWidgets);
       await t.tap(find.text('Denemeyi başlat'), warnIfMissed: false);
       await t.pumpAndSettle();
       expect(s.sonModu, isNull, reason: 'oturum hiç açılmadı');
+      await gorunurDokun(t, find.byKey(const ValueKey('deneme-paketler')));
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+      s.paketli = true; // satın alma başka ekranda doğrulandı
+      m.sekmeGit(2);
+      await t.pumpAndSettle();
+      expect(find.textContaining('deneme sayısı sınırsız'), findsOneWidget);
+      expect(t.widget<AkeDugme>(find.ancestor(of: find.text('Denemeyi başlat'), matching: find.byType(AkeDugme))).basinca, isNotNull);
     });
 
     testWidgets('paketli hesapta hak sınırsız görünür', (t) async {
@@ -180,6 +201,21 @@ void main() {
   });
 
   group('AI öğretmen', () {
+    testWidgets('ücretsiz öğrenci AI kapısından Paketler sayfasına gider', (t) async {
+      final s = SahteSunucu();
+      final m = await ac(t, s);
+      await sekme(t, 3);
+      expect(find.byKey(const ValueKey('ai-kapi')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('ai-paketler')));
+      await t.pumpAndSettle();
+      expect(m.menuSayfasi, MenuSayfasi.paket);
+      expect(find.text('Paket satın alma henüz açık değil'), findsOneWidget);
+      expect(s.aiIstekleri, isEmpty);
+      s.paketli = true; // mağaza doğrulaması sonrası sunucu hesabı paketli döner
+      m.sekmeGit(3);
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ai-girdi')), findsOneWidget, reason: 'AI sekmesi eski ücretsiz kapısında kalmaz');
+    });
     testWidgets('paket yokken AI çağrılmaz; yanlış kod hata verir; doğru kodla sohbet açılır ve gerçek /api/ai çağrısı gider', (t) async {
       final s = SahteSunucu();
       await ac(t, s);

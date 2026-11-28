@@ -47,6 +47,8 @@ class SahteSunucu {
   String? magazaHata; // doluysa her doğrulama bu hata koduyla reddedilir (örn. hesap_eslesmedi)
   int magazaAgHatasi = 0; // ilk N doğrulama isteğinde sunucu 502 magaza_ulasilamadi dönsün
   bool magazaPaketAcik = false;
+  Map<String, dynamic>? magazaHaklar = {'ucretsiz': {'soru': 20, 'deneme': 1}, 'orta': {'mesaj': 200, 'guclu': 20}, 'premium': {'mesaj': 500, 'guclu': 60}}; // null: sunucu haklar göndermiyor
+  String magazaAktifDurum = 'aktif'; // etkin işlem satırının durumu (aktif | iptal: süre bitene dek erişim, yenilenmez)
   String? magazaBitenDurum; // paket açık değilken işlem satırı bu durumla görünür (bitti | iade): erişim yok
   int magazaGetSayisi = 0; // /hesap/magaza GET istekleri
   bool magazaGetAgYok = false; // yalnız mağaza durumu GET'i ağ hatasıyla düşer
@@ -119,9 +121,10 @@ class SahteSunucu {
           ],
           'hesapKimligi': {'google': 'g-$hesapId', 'apple': '00000000-0000-4000-8000-000000000001'},
           'islemler': magazaPaketAcik
-              ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': 'aktif', 'bitis': '2027-06-30', 'erisim': true, 'test': true}]
+              ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': magazaAktifDurum, 'bitis': '2027-06-30', 'erisim': true, 'test': true}]
               : (magazaBitenDurum != null ? [{'platform': 'google', 'urun': 'premium_aylik', 'plan': 'premium', 'durum': magazaBitenDurum, 'bitis': '2026-11-01', 'erisim': false, 'test': true}] : []),
           'paket': magazaPaketAcik || paketli ? {'plan': 'premium', 'bitis': '2027-06-30'} : null,
+          if (magazaHaklar != null) 'haklar': magazaHaklar,
         });
         if (magazaGetTut) {
           final c = Completer<void>();

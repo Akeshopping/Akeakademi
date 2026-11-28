@@ -53,7 +53,15 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
           case OdemeFazi.yukleniyor:
             return const Yukleniyor(metin: 'Paketler okunuyor…');
           case OdemeFazi.sunucuKapali:
-            return const DurumKutusu(simge: Icons.lock_clock_rounded, baslik: 'Paket satın alma henüz açık değil', aciklama: 'Mağaza satın alma açıldığında burada Atılım ve Premium paketlerini göreceksin. Erişim kodun varsa Ayarlar ve hesap bölümünden bağlayabilirsin.');
+            return ListView(key: const ValueKey('paket-kapali'), padding: const EdgeInsets.all(24), children: const [
+              DurumKutusu(simge: Icons.lock_clock_rounded, baslik: 'Paket satın alma henüz açık değil', aciklama: 'Mağaza satın alma açıldığında fiyatları ve satın alma seçeneklerini burada göreceksin.'),
+              SizedBox(height: 16),
+              Text('Ücretsiz: günlük soru ve aylık deneme hakkı, çalışma planı ve gelişim.'),
+              SizedBox(height: 8),
+              Text('Atılım: sınırsız soru ve deneme, her ay belirli sayıda AI öğretmen mesajı.'),
+              SizedBox(height: 8),
+              Text('Premium: sınırsız soru ve deneme, Atılım\'dan daha fazla aylık AI öğretmen mesajı.'),
+            ]);
           case OdemeFazi.magazaYok:
             return DurumKutusu(simge: Icons.storefront_rounded, baslik: 'Mağazaya ulaşılamıyor', aciklama: 'Bu cihazda Google Play ya da App Store satın alma şu an kullanılamıyor. Mağaza hesabına giriş yaptığından emin olup tekrar dene.', dugme: 'Tekrar dene', basinca: _o.yenile);
           case OdemeFazi.hata:
@@ -79,7 +87,14 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
         const SizedBox(height: 14),
         if (_o.eskimis) _bilgi(t, Icons.cloud_off_rounded, '${_o.eskimisMesaji} Gördüğün paket bilgisi eski olabilir.', const ValueKey('paket-eski'), hata: true),
         if (_o.eskimis) Padding(padding: const EdgeInsets.only(bottom: 14), child: AkeDugme('Tekrar dene', key: const ValueKey('paket-tazele'), tur: DugmeTuru.cizgili, basinca: _o.tazele)),
-        if (_o.satinAlmaEngelli) _bilgi(t, Icons.lock_outline_rounded, _o.dogrulanamayan != null ? 'Önceki ödemen henüz doğrulanamadı. Yeni satın alma kapalı; önce "Yeniden dene" ya da "Satın almalarımı geri yükle"yi kullan.' : 'Bilgiler güncellenene kadar yeni satın alma kapalı.', const ValueKey('paket-engel')),
+        if (_o.satinAlmaEngelli) _bilgi(t, Icons.lock_outline_rounded,
+            _o.dogrulanamayan != null
+                ? 'Önceki ödemen henüz doğrulanamadı. Yeni satın alma kapalı; önce "Yeniden dene" ya da "Satın almalarımı geri yükle"yi kullan.'
+                : _o.eskimis
+                    ? 'Bilgiler güncellenene kadar yeni satın alma kapalı.'
+                    : 'Etkin bir mağaza aboneliğin var. Çift ücret oluşmaması için bu sürümde ikinci abonelik başlatılamaz; mevcut aboneliğini mağazadan yönetebilirsin.',
+            const ValueKey('paket-engel')),
+        if (_o.aktifMagazaAboneligi) _abonelikKutusu(t),
         if (_o.bekliyor) _bilgi(t, Icons.hourglass_top_rounded, 'Ödeme onay bekliyor. Mağaza onaylayana kadar paketin açılmaz; onaylanınca burada görünür.', const ValueKey('paket-bekliyor')),
         if (_o.mesaj.isNotEmpty) _bilgi(t, _o.mesajHata ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded, _o.mesaj, const ValueKey('paket-mesaj'), hata: _o.mesajHata),
         if (_o.dogrulanamayan != null) Padding(padding: const EdgeInsets.only(bottom: 14), child: AkeDugme('Yeniden dene', key: const ValueKey('paket-yeniden'), tur: DugmeTuru.cizgili, basinca: mesgul ? null : _o.yenidenDene)),
@@ -87,7 +102,7 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('Ücretsiz', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            Text('Günde 20 soru, ayda 1 deneme, çalışma planı.', style: TextStyle(color: t.murekkep2, height: 1.4)),
+            Text(_ucretsizMetni(), style: TextStyle(color: t.murekkep2, height: 1.4)),
           ]),
         ),
         for (final plan in const ['orta', 'premium']) ...[const SizedBox(height: 14), _planKarti(t, plan, mesgul || _o.satinAlmaEngelli)],
@@ -114,10 +129,35 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
         ),
       );
 
+  String _ucretsizMetni() {
+    final soru = _o.hak('ucretsiz', 'soru'), deneme = _o.hak('ucretsiz', 'deneme');
+    if (soru == null || deneme == null) return 'Günlük soru ve aylık deneme hakkı, çalışma planı.';
+    return 'Günde $soru soru, ayda $deneme deneme, çalışma planı.';
+  }
+
+  /// Etkin mağaza aboneliği: otomatik yenileme/iptal bilgisi ve çalışan "Aboneliğimi yönet" düğmesi.
+  Widget _abonelikKutusu(AkeTok t) {
+    final i = _o.islemler.firstWhere((x) => x.erisim);
+    final iptal = i.durum == 'iptal';
+    final tarih = i.bitis.isEmpty ? '' : ' (${i.bitis})';
+    final metin = iptal
+        ? 'Aboneliğin iptal edilmiş; süre bitimine kadar$tarih erişimin sürer, sonra yenilenmez.'
+        : 'Aboneliğin her dönem sonunda kendiliğinden yenilenir$tarih; iptal etmezsen mağaza hesabından ücret alınır. İptal ve ödeme yöntemi mağazanın abonelik sayfasındadır.';
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(metin, key: const ValueKey('paket-abonelik-bilgi'), style: TextStyle(color: t.murekkep2, height: 1.45)),
+        const SizedBox(height: 10),
+        AkeDugme('Aboneliğimi yönet', key: const ValueKey('paket-yonet'), tur: DugmeTuru.cizgili, simge: Icons.open_in_new_rounded, basinca: _o.abonelikleriYonet),
+      ]),
+    );
+  }
+
   Widget _planKarti(AkeTok t, String plan, bool mesgul) {
     final satirlar = _o.paketler.where((p) => p.plan == plan).toList();
     final ad = plan == 'premium' ? 'Premium' : 'Atılım';
-    final aciklama = plan == 'premium' ? 'Sınırsız soru ve deneme, daha çok AI öğretmen mesajı ve gelişmiş çözüm.' : 'Sınırsız soru ve deneme, AI öğretmen.';
+    final mesaj = _o.hak(plan, 'mesaj'); // rakam sunucunun gerçek ayarıdır; bilinmiyorsa yazılmaz
+    final aciklama = mesaj == null ? 'Sınırsız soru ve deneme; AI öğretmen mesaj hakkı.' : 'Sınırsız soru ve deneme; ayda $mesaj AI öğretmen mesajı.';
     return KartKutu(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(ad, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
@@ -126,7 +166,7 @@ class _PaketSekmesiState extends State<PaketSekmesi> with WidgetsBindingObserver
         for (final s in satirlar) ...[
           const SizedBox(height: 10),
           AkeDugme(
-            s.urun == null ? '${s.donemAdi} · mağazada hazır değil' : '${s.donemAdi} · ${s.urun!.fiyat}',
+            s.urun == null ? '${s.donemAdi} · mağazada hazır değil' : '${s.donemAdi} abonelik · ${s.urun!.fiyat} / ${s.donem == 'yil' ? 'yıl' : 'ay'}',
             key: ValueKey('paket-satin-${s.id}'),
             tur: s.donem == 'yil' ? DugmeTuru.dolu : DugmeTuru.cizgili,
             basinca: s.urun == null || mesgul ? null : () => _o.satinAl(s.id),

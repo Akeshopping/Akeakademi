@@ -32,6 +32,10 @@ class OdemeModeli extends ChangeNotifier {
   List<PaketSatiri> paketler = const [];
   List<SunucuIslemi> islemler = const [];
   HesapDurumu? hesap;
+  Map<String, Map<String, int>> haklar = const {}; // sunucunun gerçek hak ayarları (vaat metinleri bundan yazılır)
+
+  /// Bir hakkın sunucudaki değeri; bilinmiyorsa null (ekran o zaman rakam yazmaz).
+  int? hak(String grup, String ad) => haklar[grup]?[ad];
   String? hesapKimligi; // bu platform için sunucunun verdiği takma ad (satın almaya eklenir)
 
   /// Şu an mağazada işlemi süren ürün (düğmeler kilitlenir; çift satın alma olmaz).
@@ -94,6 +98,7 @@ class OdemeModeli extends ChangeNotifier {
       hesapKimligi = koprusu.platform == 'apple' ? d.kimlikApple : d.kimlikGoogle;
       islemler = d.islemler;
       hesap = d.hesap;
+      haklar = d.haklar;
       paketler = yeniPaketler;
       faz = kullanilabilir ? OdemeFazi.hazir : OdemeFazi.magazaYok;
       eskimis = false;
@@ -127,7 +132,10 @@ class OdemeModeli extends ChangeNotifier {
 
   /// Yeni satın alma kapalı: ekrandaki bilgi eski olabilir (son tazeleme başarısız) ya da mağazanın aldığı bir ödeme henüz
   /// sunucuya doğrulatılamadı. İkincisinde yeni satın alma o kaydı silmez; önce "Yeniden dene" ya da "Geri yükle" kullanılır.
-  bool get satinAlmaEngelli => eskimis || dogrulanamayan != null;
+  /// Ayrı mağaza ürünleri arasında yükseltme/indirme işlemi bu sürümde tanımlı değil.
+  /// Etkin bir mağaza aboneliği varken yeni ürün başlatmak iki aboneliğin aynı anda ücretlenmesine yol açabilir.
+  bool get aktifMagazaAboneligi => islemler.any((i) => i.erisim);
+  bool get satinAlmaEngelli => eskimis || dogrulanamayan != null || aktifMagazaAboneligi;
 
   Future<void> satinAl(String urunId) async {
     if (_kapandi || faz != OdemeFazi.hazir || mesgul || hesapKimligi == null || satinAlmaEngelli) return;
@@ -142,6 +150,17 @@ class OdemeModeli extends ChangeNotifier {
       islemdeUrun = null;
       _sonuc('Satın alma başlatılamadı. Biraz sonra tekrar dene.', hata: true);
     }
+  }
+
+  /// Mağazanın abonelik yönetim sayfasını açar (iptal/yenileme). Açılamazsa elle yol gösterir; çalışmayan düğme bırakmaz.
+  Future<void> abonelikleriYonet() async {
+    if (_kapandi) return;
+    var acildi = false;
+    try {
+      acildi = await koprusu.abonelikleriYonet();
+    } catch (_) {}
+    if (acildi || _kapandi) return;
+    _sonuc(koprusu.platform == 'apple' ? 'Abonelik sayfası açılamadı. Ayarlar → Apple Kimliği → Abonelikler yolundan yönetebilirsin.' : 'Abonelik sayfası açılamadı. Google Play → Profil simgesi → Ödemeler ve abonelikler → Abonelikler yolundan yönetebilirsin.', hata: true);
   }
 
   Future<void> geriYukle() async {

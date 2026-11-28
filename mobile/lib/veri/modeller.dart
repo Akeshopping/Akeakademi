@@ -172,7 +172,10 @@ class MagazaDurumu {
   final String? kimlikApple;
   final List<SunucuIslemi> islemler;
   final HesapDurumu? hesap;
-  const MagazaDurumu(this.urunler, this.kimlikGoogle, this.kimlikApple, this.islemler, this.hesap);
+
+  /// Sunucunun GERÇEK hak ayarları (ortamla değişebilir): {ucretsiz:{soru,deneme}, orta:{mesaj,guclu}, premium:{mesaj,guclu}}. Yoksa ekran rakam yazmaz.
+  final Map<String, Map<String, int>> haklar;
+  const MagazaDurumu(this.urunler, this.kimlikGoogle, this.kimlikApple, this.islemler, this.hesap, [this.haklar = const {}]);
   factory MagazaDurumu.fromJson(Map<String, dynamic> j) {
     final k = j['hesapKimligi'] is Map ? Map<String, dynamic>.from(j['hesapKimligi'] as Map) : <String, dynamic>{};
     return MagazaDurumu(
@@ -184,6 +187,11 @@ class MagazaDurumu {
           if (i is Map) SunucuIslemi('${i['platform']}', '${i['urun']}', '${i['plan']}', '${i['durum']}', '${i['bitis']}', i['erisim'] == true, i['test'] == true)
       ],
       HesapDurumu.fromJson({'paket': j['paket']}),
+      {
+        if (j['haklar'] is Map)
+          for (final e in (j['haklar'] as Map).entries)
+            if (e.value is Map) '${e.key}': {for (final h in (e.value as Map).entries) if (h.value is num) '${h.key}': (h.value as num).toInt()}
+      },
     );
   }
 }

@@ -28,7 +28,7 @@ import { ipHiz, bekleBaslik, kodDenemeSinir } from "../../../lib/hiz.js";
 import { json, fail, sha256, sema, oturum, bearerToken, oturumAc, cerez, cerezYaz, kullaniciBulVeyaAc, yoneticiMi, aktifPaket, kodBagla, kullanimAl, limitler, epostaGonder, epostaSablon, bekleyenKodlariBagla } from "../../../lib/ortak.js";
 import { sosyalSil } from "../../../lib/sosyal.js";
 import { magazaModu, URUNLER, hesapKimligi, dogrula, uygula, googleOnayla, hesapIslemleri, islemJson, yenile as magazaYenile } from "../../../lib/magaza.js";
-import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle } from "../../../lib/kota.js";
+import { kotaDurum, kotaAl, kotaKorumaYaz, kotaTemizle, ucretsizLimit } from "../../../lib/kota.js";
 
 const ALANLAR = ["profile", "stats", "exams", "mistakes", "cards", "plan", "ai", "reports"];
 const EPOSTA_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i;
@@ -200,6 +200,8 @@ export async function onRequest({ request, env, params }) {
     return json(200, { ok: true });
   }
   if (ad === "magaza") {
+    /* Paketler ekranının vaatleri sabit rakam değil, sunucunun GERÇEK ayarlarıdır (ortam değişkeniyle değişebilir). "guclu" = web'deki gelişmiş çözüm; mobilde henüz yok, ekranda vaat edilmez. */
+    const haklarJson = (e) => ({ ucretsiz: ucretsizLimit(e), orta: limitler(e, "orta"), premium: limitler(e, "premium") });
     const alt = yol[1] || "";
     /* Mağaza satın almaları (lib/magaza.js). Kapalıyken (AKE_MAGAZA tanımsız) hiçbir şey yapmaz. Uygulamanın gönderdiği "kimlik" yalnızca bir
        anahtardır: ürün, süre, durum ve hesap bağlantısı mağazanın kendi yanıtından okunur. */
@@ -208,7 +210,7 @@ export async function onRequest({ request, env, params }) {
     if (!alt && m === "GET") {
       await magazaYenile(env, u.id).catch(() => { });
       const kim = await hesapKimligi(env, u.id);
-      return json(200, { mod, urunler: Object.keys(URUNLER).map(id => ({ id, plan: URUNLER[id].plan, donem: URUNLER[id].donem })), hesapKimligi: kim, islemler: (await hesapIslemleri(env, u.id)).map(islemJson), paket: await aktifPaket(env, u.id) });
+      return json(200, { mod, urunler: Object.keys(URUNLER).map(id => ({ id, plan: URUNLER[id].plan, donem: URUNLER[id].donem })), hesapKimligi: kim, islemler: (await hesapIslemleri(env, u.id)).map(islemJson), paket: await aktifPaket(env, u.id), haklar: haklarJson(env) });
     }
     if ((alt === "dogrula" || alt === "geri-yukle") && m === "POST") {
       { const red = await ipSinir(env, request, "magaza", 60, 3600000); if (red) return red; }

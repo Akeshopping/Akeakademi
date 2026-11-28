@@ -257,3 +257,13 @@ test("12) bildirimler yalnız tetikleyici: yanlış gizli anahtar 403; kayıtsı
   assert.equal(satir(o.DB, "apple", "1000000123456789").durum, "iade");
   assert.equal(await o.ben(c), null);
 });
+
+test("15) Paketler vaatleri sunucunun GERÇEK ayarıdır: varsayılanlar ve ortam değişkeniyle değişen değerler", async () => {
+  let o = await ortam(); let c = await o.kullanici("m15@ornek.com");
+  let h = (await o.cagir(c, "GET", "magaza")).j.haklar;
+  assert.deepEqual([h.orta.mesaj, h.premium.mesaj, h.ucretsiz.soru, h.ucretsiz.deneme], [200, 500, 20, 1]);
+  o = await ortam({ AKE_LIMIT_ORTA: "150", AKE_LIMIT_PREMIUM: "400", AKE_UCRETSIZ_SORU: "10" }); c = await o.kullanici("m15b@ornek.com");
+  h = (await o.cagir(c, "GET", "magaza")).j.haklar;
+  assert.deepEqual([h.orta.mesaj, h.premium.mesaj, h.ucretsiz.soru], [150, 400, 10], "ekran rakamı ortam ayarını izler");
+  for (const k of ["AKE_LIMIT_ORTA", "AKE_LIMIT_PREMIUM", "AKE_UCRETSIZ_SORU"]) delete T.env[k];
+});
